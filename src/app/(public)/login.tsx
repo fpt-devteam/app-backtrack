@@ -1,25 +1,27 @@
-import { FirebaseError } from "@firebase/util";
+import { useLogin } from "@/src/hooks/useLogin";
+import { LoginRequest } from "@/src/types/auth.type";
 import { Link } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-import { Alert, Button, Text, TextInput, View } from "react-native";
-import { auth } from "../../lib/firebase";
+import { Button, Text, TextInput, View } from "react-native";
 
-export default function Login() {
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { login, loading } = useLogin();
 
-  const onLogin = async () => {
-    setLoading(true);
-    try {
-      const { user } = await signInWithEmailAndPassword(auth, email.trim(), password);
-      console.log(user.email);
-    } catch (e: any) {
-      const err = e as FirebaseError;
-      Alert.alert("Login failed", err.message);
-    } finally { setLoading(false); }
+  const onSubmit = async () => {
+    console.log(`User login with: ${email}, ${password}`);
+    const req: LoginRequest = { email, password };
+    await login(req);
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ padding: 16, gap: 12 }}>
@@ -29,8 +31,7 @@ export default function Login() {
       <Text>Password</Text>
       <TextInput secureTextEntry value={password} onChangeText={setPassword} style={{ borderWidth: 1, padding: 10 }} />
 
-      <Button title="Login" onPress={onLogin} />
-
+      <Button title="Login" onPress={onSubmit} />
       <Link href="/(public)/register">Go to Register</Link>
       <Link href="/(public)/forgot-password">Forgot password?</Link>
     </View>

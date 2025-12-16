@@ -1,30 +1,74 @@
-import { onAuthStateChanged, User } from "firebase/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { auth } from "../lib/firebase";
+import { AUTH_STORAGE_KEY } from "../constants/auth.constant";
+import { AuthState } from "../types/auth.type";
 
-type AuthState = {
-  user: User | null;
-  initializing: boolean;
+type AuthContextType = AuthState & {
+  isAppReady: boolean;
+  setSession: (authState: AuthState) => Promise<void>;
+  clearSession: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthState>({ user: null, initializing: true });
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [initializing, setInitializing] = useState(true);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [authState, setAuthState] = useState<AuthState>({
+    isLoggedIn: false,
+    idToken: null,
+  });
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setInitializing(false);
-    });
-    return unsub;
+    const restoreSession = async () => {
+      await new Promise((res) => setTimeout(() => res(null), 1000));
+      try {
+        const data = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
+        if (data !== null) {
+          const state: AuthState = {
+            ...authState,
+            idToken: JSON.parse(data).idToken,
+            isLoggedIn: true,
+          };
+          setAuthState(state);
+        }
+      } catch (error) {
+        console.log("Error fetching from storage", error);
+      }
+      setIsAppReady(true);
+    };
+    restoreSession();
   }, []);
 
-  const value = useMemo(() => ({ user, initializing }), [user, initializing]);
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+  async function setSession(state: AuthState) {
+    setAuthState(state);
+    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(state));
+  }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+  async function clearSession() {
+    await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+    const state: AuthState = { isLoggedIn: false, idToken: null };
+    setAuthState(state);
+  }
+
+  const contextValue = useMemo(
+    () => ({
+      ...authState,
+      isAppReady,
+      setSession,
+      clearSession,
+    }),
+    [authState, isAppReady]
+  );
+
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
+};
