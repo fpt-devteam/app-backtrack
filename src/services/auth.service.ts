@@ -1,63 +1,36 @@
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
+  signInWithEmailAndPassword
 } from "firebase/auth";
 
+import { publicClient } from "../api/common/client";
 import { auth } from "../lib/firebase";
-import { LoginCredentials } from "../types/auth.type";
+import { LoginRequest, LoginResponse, SyncRequest, SyncResponse } from "../types/auth.type";
 
-export type RegisterCredentials = LoginCredentials & {
-  displayName?: string;
-};
-
-export const login = async (credential: LoginCredentials) => {
-  const { email, password } = credential;
+export const loginFirebase = async (req: LoginRequest): Promise<LoginResponse> => {
+  const { email, password } = req;
 
   if (!email || !password) throw new Error("Email and password are required");
+  const normalizedEmail = email.trim().toLowerCase();
 
+  const res: LoginResponse = { idToken: "" };
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email.trim(),
-      password
-    );
-    return userCredential.user;
+    const response = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+    res.idToken = await response.user.getIdToken();
   } catch (error: any) {
-    throw new Error("Login failed");
+    console.error(error);
   }
+  return res;
 };
 
-export const signup = async (credential: RegisterCredentials) => {
-  const { email, password, displayName } = credential;
+export const syncUser = async (req: SyncRequest): Promise<SyncResponse> => {
+  const { idToken } = req;
+  const response = await publicClient.post('core/users', {}, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`,
+    },
+  });
 
-  if (!email || !password) throw new Error("Email and password are required");
-  if (password.length < 6) throw new Error("Password must be at least 6 characters");
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email.trim(),
-      password
-    );
-
-    // Optional: set display name
-    if (displayName?.trim()) {
-      await updateProfile(userCredential.user, { displayName: displayName.trim() });
-    }
-
-    return userCredential.user;
-  } catch (error: any) {
-    const code = error?.code;
-    switch (code) {
-      case "auth/email-already-in-use":
-        throw new Error("Email is already in use");
-      case "auth/invalid-email":
-        throw new Error("Invalid email address");
-      case "auth/weak-password":
-        throw new Error("Password is too weak");
-      default:
-        throw new Error("Sign up failed");
-    }
-  }
+  const res = response.data as SyncResponse;
+  return res;
 };

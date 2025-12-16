@@ -1,12 +1,23 @@
+import { useAuth } from "@/src/providers/AuthProvider";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 
-export default function AuthLayout() {
+export default function ProtectedLayout() {
+  const { isAppReady, isLoggedIn } = useAuth();
+
+  if (!isAppReady) {
+    return null;
+  }
+
+  if (!isLoggedIn) {
+    return <Redirect href="/login" />;
+  }
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#3B82F6", // blue-500
-        tabBarInactiveTintColor: "#9CA3AF", // gray-400
+        tabBarActiveTintColor: "#3B82F6",
+        tabBarInactiveTintColor: "#9CA3AF",
         tabBarStyle: {
           backgroundColor: "#FFFFFF",
           borderTopWidth: 1,

@@ -1,44 +1,16 @@
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import { AuthProvider, useAuth } from "../providers/AuthProvider";
-
-function AuthGate() {
-  const { user, initializing } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (initializing) return;
-
-    const inPublic = segments[0] === "(public)";
-
-    if (!user && !inPublic) {
-      router.replace("/(public)/login");
-      return;
-    }
-
-    if (user && inPublic) {
-      router.replace("/(auth)/home");
-      return;
-    }
-  }, [user, initializing, segments, router]);
-
-  return (
-    <>
-      <StatusBar hidden />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(public)" />
-        <Stack.Screen name="(auth)" />
-      </Stack>
-    </>
-  );
-}
+import React from "react";
+import { AuthProvider } from "../providers/AuthProvider";
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <AuthGate />
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }} >
+        <Stack.Screen name="(protected)" />
+        <Stack.Screen name="(public)" />
+      </Stack>
     </AuthProvider>
   );
 }
