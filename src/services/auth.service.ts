@@ -1,10 +1,12 @@
 import {
-  signInWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  UserCredential
 } from "firebase/auth";
 
 import { publicClient } from "../api/common/client";
 import { auth } from "../lib/firebase";
-import { LoginRequest, LoginResponse, SyncRequest, SyncResponse } from "../types/auth.type";
+import { LoginRequest, LoginResponse, RegisterFirebaseRequest, RegisterFirebaseResponse, SyncRequest, SyncResponse } from "../types/auth.type";
 
 export const loginFirebase = async (req: LoginRequest): Promise<LoginResponse> => {
   const { email, password } = req;
@@ -34,3 +36,12 @@ export const syncUser = async (req: SyncRequest): Promise<SyncResponse> => {
   const res = response.data as SyncResponse;
   return res;
 };
+
+export const registerFirebase = async (req: RegisterFirebaseRequest): Promise<RegisterFirebaseResponse> => {
+  const { auth, email, password } = req;
+  const cred: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const res: RegisterFirebaseResponse = {
+    idToken: await cred.user.getIdToken()
+  };
+  return res;
+}

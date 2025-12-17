@@ -1,3 +1,5 @@
+import { Auth } from "firebase/auth";
+
 export type LoginRequest = {
   email: string;
   password: string;
@@ -7,12 +9,30 @@ export type LoginResponse = {
   idToken: string;
 };
 
+export type RegisterFirebaseRequest = {
+  auth: Auth;
+  email: string;
+  password: string;
+};
+
+export type RegisterFirebaseResponse = {
+  idToken: string;
+};
+
+export type RegisterRequest = LoginRequest & {
+  confirmPassword: string;
+};
+
+export type RegisterResponse = {
+  idToken: string;
+};
+
 export type SyncRequest = {
   idToken: string;
 };
 
 export type SyncResponse = {
-  user: UserProfile;
+  data: UserProfile;
 };
 
 export type UserProfile = {
@@ -27,7 +47,7 @@ export type RegisterCredentials = LoginRequest & {
 
 export type AuthState = {
   isLoggedIn: boolean;
-  idToken?: string | null;
+  idToken: string;
 };
 
 
