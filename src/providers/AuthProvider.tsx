@@ -15,7 +15,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAppReady, setIsAppReady] = useState(false);
   const [authState, setAuthState] = useState<AuthState>({
     isLoggedIn: false,
-    idToken: null,
+    idToken: "",
   });
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function clearSession() {
     await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-    const state: AuthState = { isLoggedIn: false, idToken: null };
+    const state: AuthState = { isLoggedIn: false, idToken: "" };
     setAuthState(state);
   }
 
