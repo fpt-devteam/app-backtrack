@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const Message = () => {
+const ProfileLayout = () => {
   return (
     <View>
-      <Text>Message</Text>
+      <Text>ProfileLayout</Text>
     </View>
   )
 }
 
-export default Message
+export default ProfileLayout
