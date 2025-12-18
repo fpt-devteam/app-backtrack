@@ -6,7 +6,7 @@ function PublicLayout() {
   const { isAppReady, isLoggedIn } = useAuth();
   if (!isAppReady) return null;
 
-  if (isLoggedIn) return <Redirect href="/home" />;
+  if (isLoggedIn) return <Redirect href="/" />;
   return <Slot />;
 }
 export default PublicLayout
