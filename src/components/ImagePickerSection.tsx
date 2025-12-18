@@ -1,18 +1,48 @@
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePickerAsset } from 'expo-image-picker';
 import React from 'react';
-import { Alert, Button, Image, StyleSheet, View } from 'react-native';
+import { Alert, Button, Image, Linking, Platform, StyleSheet, View } from 'react-native';
 import { ImageAsset } from '../types/firebase.type';
 
 const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pickImages: (images: ImageAsset[]) => void }) => {
 
-  const handlePickImages = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const ensureMediaPermission = async (): Promise<boolean> => {
+    const { status, canAskAgain } =
+      await ImagePicker.getMediaLibraryPermissionsAsync();
 
-    if (!permissionResult.granted) {
-      Alert.alert('Permission required', 'Permission to access the media library is required.');
-      return;
+    if (status === 'granted') {
+      return true;
     }
+
+    if (canAskAgain) {
+      const request = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      return request.status === 'granted';
+    }
+
+    Alert.alert(
+      'Permission required',
+      'Please enable photo access in Settings to upload images.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Open Settings',
+          onPress: () => {
+            if (Platform.OS === 'ios') {
+              Linking.openURL('app-settings:');
+            } else {
+              Linking.openSettings();
+            }
+          },
+        },
+      ]
+    );
+
+    return false;
+  };
+
+  const handlePickImages = async () => {
+    const hasPermission = await ensureMediaPermission();
+    if (!hasPermission) return;
 
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
