@@ -1,11 +1,11 @@
+import { Stack } from 'expo-router'
 import React from 'react'
-import { Text, View } from 'react-native'
 
 const ProfileLayout = () => {
   return (
-    <View>
-      <Text>ProfileLayout</Text>
-    </View>
+    <Stack>
+      <Stack.Screen name="index" />
+    </Stack>
   )
 }
 
