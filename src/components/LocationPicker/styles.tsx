@@ -3,12 +3,19 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
     padding: 12,
-    margin: 10,
-    backgroundColor: '#FFFFFF',
   },
+  map: {
+    width: '100%',
+    height: '70%',
+    borderRadius: 12,
+  },
+
+  button: {
+    marginTop: 12,
+    borderColor: '#3B82F6',
+  },
+
   title: {
     fontSize: 16,
     fontWeight: '600',
@@ -28,10 +35,7 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  map: {
-    width: '100%',
-    height: '100%',
-  },
+
   loadingOverlay: {
     position: 'absolute',
     top: 0,
