@@ -1,13 +1,11 @@
 import { useGetCurrentPosition } from '@/src/hooks/useGetCurrentLocation';
+import useGetFormattedLocation from '@/src/hooks/useGetFormattedLocation';
 import React, { useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
+import { Button } from 'react-native-paper';
 import { GoogleMapFormattedLocation, LocationCoordinates } from '../../types/location.type';
 import { styles } from './styles';
-
-import useGetFormattedLocation from '@/src/hooks/useGetFormattedLocation';
-import { Button } from 'react-native-paper';
-import SearchLocationField from '../SearchLocationField/SearchLocationField';
 
 const LocationPicker = () => {
   const mapRef = useRef<MapView>(null);
@@ -40,15 +38,9 @@ const LocationPicker = () => {
     console.log('Updated location:', formattedLocation);
   };
 
-  const handleSelectedPlace = () => {
-
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Last Seen Location</Text>
-      <SearchLocationField />
-
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}
