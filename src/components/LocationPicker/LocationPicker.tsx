@@ -1,63 +1,58 @@
 import { useGetCurrentPosition } from '@/src/hooks/useGetCurrentLocation';
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Button, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
-import { LocationCoordinates } from '../../types/location.type';
+import { GoogleMapFormattedLocation, LocationCoordinates } from '../../types/location.type';
 import { styles } from './styles';
+
+import useGetFormattedLocation from '@/src/hooks/useGetFormattedLocation';
+import { Button } from 'react-native-paper';
+import SearchLocationField from '../SearchLocationField/SearchLocationField';
 
 const LocationPicker = () => {
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<LocationCoordinates | null>(null);
-  const [region, setRegion] = useState<Region | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { loading: loadingGetCurrentPosition, error, getCurrentPosition } = useGetCurrentPosition();
+  const [location, setLocation] = useState<GoogleMapFormattedLocation | null>(null);
+
+  const { loading, getCurrentPosition } = useGetCurrentPosition();
+  const { formatLocation } = useGetFormattedLocation();
 
   const handleShareLocation = async () => {
-    setLoading(true);
-    try {
-      const currentPosition = await getCurrentPosition();
-      if (!currentPosition) return;
-      
-      setLocation(currentPosition);
-      const newRegion: Region = {
-        latitude: currentPosition.latitude,
-        longitude: currentPosition.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      };
-      setRegion(newRegion);
-      mapRef.current?.animateToRegion(newRegion, 1000);
-    } finally {
-      setLoading(false);
-    }
+    const currentPosition = await getCurrentPosition();
+    if (!currentPosition) return;
+    setLocation(currentPosition);
+
+    const newRegion: Region = {
+      latitude: currentPosition.latitude,
+      longitude: currentPosition.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+    mapRef.current?.animateToRegion(newRegion, 1000);
   };
 
-  const handleMarkerDragEnd = (e: any) => {
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    setLocation({ latitude, longitude });
-    console.log('Updated location - Lat:', latitude, 'Lng:', longitude);
+  const handleMarkerDragEnd = async (e: any) => {
+    const coordinates: LocationCoordinates = {
+      latitude: e.nativeEvent.coordinate.latitude,
+      longitude: e.nativeEvent.coordinate.longitude,
+    };
+    const formattedLocation = await formatLocation(coordinates);
+    setLocation(formattedLocation);
+    console.log('Updated location:', formattedLocation);
+  };
+
+  const handleSelectedPlace = () => {
+
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Location</Text>
-      <Button
-        title={loading ? "Getting location..." : "Share My Location"}
-        onPress={handleShareLocation}
-        disabled={loading}
-      />
-
-      {location && (
-        <Text style={styles.locationText}>
-          📍 {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
-        </Text>
-      )}
+      <Text style={styles.title}>Last Seen Location</Text>
+      <SearchLocationField />
 
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}
           style={styles.map}
-          region={region || undefined}
           showsUserLocation={true}
           showsMyLocationButton={true}
         >
@@ -72,13 +67,17 @@ const LocationPicker = () => {
           )}
         </MapView>
 
-        {loading && (
-          <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#3B82F6" />
-          </View>
-        )}
+        <Button
+          style={styles.button}
+          onPress={handleShareLocation}
+          disabled={loading}
+          mode="outlined"
+          icon={loading ? "loading" : "crosshairs-gps"}
+        >
+          {loading ? "Getting location..." : "Use Current Location"}
+        </Button>
       </View>
-    </View>
+    </View >
   )
 }
 
