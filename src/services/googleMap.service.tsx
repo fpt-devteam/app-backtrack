@@ -63,6 +63,5 @@ export const getCurrentPosition = async (): Promise<GoogleMapFormattedLocation |
   };
 
   const formattedLocation = await getFormattedLocation(coordinates);
-  console.log("Formatted Location: ", formattedLocation);
   return formattedLocation;
 };

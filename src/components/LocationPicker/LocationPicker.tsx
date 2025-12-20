@@ -1,23 +1,28 @@
 import { useGetCurrentPosition } from '@/src/hooks/useGetCurrentLocation';
 import useGetFormattedLocation from '@/src/hooks/useGetFormattedLocation';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Text, View } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Button } from 'react-native-paper';
 import { GoogleMapFormattedLocation, LocationCoordinates } from '../../types/location.type';
 import { styles } from './styles';
 
-const LocationPicker = () => {
+type LocationPickerProps = {
+  location: GoogleMapFormattedLocation | null;
+  changeLocation: (location: GoogleMapFormattedLocation | null) => void;
+}
+
+const LocationPicker = ({ location, changeLocation }: LocationPickerProps) => {
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<GoogleMapFormattedLocation | null>(null);
 
   const { loading, getCurrentPosition } = useGetCurrentPosition();
   const { formatLocation } = useGetFormattedLocation();
 
   const handleShareLocation = async () => {
-    const currentPosition = await getCurrentPosition();
+    const currentPosition: GoogleMapFormattedLocation | null = await getCurrentPosition();
     if (!currentPosition) return;
-    setLocation(currentPosition);
+
+    changeLocation(currentPosition);
 
     const newRegion: Region = {
       latitude: currentPosition.latitude,
@@ -33,9 +38,9 @@ const LocationPicker = () => {
       latitude: e.nativeEvent.coordinate.latitude,
       longitude: e.nativeEvent.coordinate.longitude,
     };
-    const formattedLocation = await formatLocation(coordinates);
-    setLocation(formattedLocation);
-    console.log('Updated location:', formattedLocation);
+
+    const formattedLocation: GoogleMapFormattedLocation | null = await formatLocation(coordinates);
+    changeLocation(formattedLocation);
   };
 
   return (
