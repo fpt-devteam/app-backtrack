@@ -1,11 +1,11 @@
+import { ImageAsset } from '@/src/types/firebase.type';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePickerAsset } from 'expo-image-picker';
 import React from 'react';
-import { Alert, Button, Image, Linking, Platform, StyleSheet, View } from 'react-native';
-import { ImageAsset } from '../types/firebase.type';
+import { Alert, Button, Image, Linking, Platform, View } from 'react-native';
+import { styles } from './styles';
 
 const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pickImages: (images: ImageAsset[]) => void }) => {
-
   const ensureMediaPermission = async (): Promise<boolean> => {
     const { status, canAskAgain } =
       await ImagePicker.getMediaLibraryPermissionsAsync();
@@ -63,7 +63,6 @@ const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pick
     }
   };
 
-
   return (
     <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={handlePickImages} />
@@ -76,18 +75,5 @@ const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pick
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderWidth: 1,
-    borderColor: 'black',
-    padding: 10,
-    margin: 10,
-  },
-  image: {
-    width: 200,
-    height: 200,
-  },
-})
 
 export default ImagePickerSection
