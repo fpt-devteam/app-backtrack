@@ -10,7 +10,7 @@ import * as yup from "yup";
 
 import useCreateReport from "@/src/hooks/useCreateReport";
 import { Nullable } from "@/src/types/global.type";
-import { ReportDetails } from "@/src/types/report.type";
+import { CreateReportRequest, ReportDetails } from "@/src/types/report.type";
 import ImagePickerSection from "../ImagePickerSection/ImagePickerSection";
 import LocationPicker from "../LocationPicker/LocationPicker";
 import { styles } from "./styles";
@@ -44,12 +44,12 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
   const { control, handleSubmit, reset: resetForm, formState: { errors },
   } = useForm<ReportFormSchema>({
     defaultValues: {
-      postType: reportData?.postType || "",
-      itemName: reportData?.itemName || "",
-      description: reportData?.description || "",
-      materials: reportData?.materials?.join(", ") || "",
-      brands: reportData?.brands?.join(", ") || "",
-      colors: reportData?.colors?.join(", ") || "",
+      postType: reportData?.postType ?? "",
+      itemName: reportData?.itemName ?? "",
+      description: reportData?.description ?? "",
+      materials: reportData?.materials?.join(", ") ?? "",
+      brands: reportData?.brands?.join(", ") ?? "",
+      colors: reportData?.colors?.join(", ") ?? "",
       eventTime: reportData?.eventTime ? new Date(reportData.eventTime) : new Date(),
     },
     resolver: yupResolver(reportSchema),
@@ -58,9 +58,9 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
 
   useEffect(() => {
     resetForm({
-      postType: reportData?.postType || "",
-      itemName: reportData?.itemName || "",
-      description: reportData?.description || "",
+      postType: reportData?.postType ?? "",
+      itemName: reportData?.itemName ?? "",
+      description: reportData?.description ?? "",
       materials: reportData?.materials ? reportData?.materials.join(", ") : "",
       brands: reportData?.brands ? reportData?.brands.join(", ") : "",
       colors: reportData?.colors ? reportData?.colors.join(", ") : "",
@@ -100,7 +100,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
     return imageUrls;
   }, [images, uploadImages]);
 
-  const onSubmit: SubmitHandler<ReportFormSchema> = async (data) => {
+  const onSubmit: SubmitHandler<ReportFormSchema> = async (data: ReportFormSchema) => {
     const isFormValid = validateForm();
     if (!isFormValid) return;
 
@@ -115,7 +115,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
       const brandsArray = data.brands ? data.brands.split(",").map((s) => s.trim()).filter(Boolean) : null;
       const colorsArray = data.colors ? data.colors.split(",").map((s) => s.trim()).filter(Boolean) : null;
 
-      const reportData = {
+      const reportData: CreateReportRequest = {
         postType: data.postType,
         itemName: data.itemName,
         description: data.description,
@@ -225,7 +225,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
                 <TextInput
                   style={styles.input}
                   placeholder="e.g. Leather, Cotton (comma-separated)"
-                  value={value || ""}
+                  value={value ?? ""}
                   onBlur={onBlur}
                   onChangeText={onChange}
                 />
@@ -243,7 +243,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
                 <TextInput
                   style={styles.input}
                   placeholder="e.g. Nike, Apple (comma-separated)"
-                  value={value || ""}
+                  value={value ?? ""}
                   onBlur={onBlur}
                   onChangeText={onChange}
                 />
@@ -261,7 +261,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
                 <TextInput
                   style={styles.input}
                   placeholder="e.g. Blue, Red (comma-separated)"
-                  value={value || ""}
+                  value={value ?? ""}
                   onBlur={onBlur}
                   onChangeText={onChange}
                 />

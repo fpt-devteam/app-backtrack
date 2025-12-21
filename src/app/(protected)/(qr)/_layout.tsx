@@ -1,11 +1,9 @@
+import { Stack } from 'expo-router'
 import React from 'react'
-import { Text, View } from 'react-native'
 
 const QrLayout = () => {
   return (
-    <View>
-      <Text>QrLayout  </Text>
-    </View>
+    <Stack />
   )
 }
 

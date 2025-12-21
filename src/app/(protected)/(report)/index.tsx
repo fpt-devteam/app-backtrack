@@ -1,3 +1,4 @@
+
 import PostFiltersComponent from '@/src/components/PostFilters';
 import { usePosts } from '@/src/hooks/usePosts';
 import { PostFilters, PostListItem } from '@/src/types/post.type';
@@ -178,7 +179,7 @@ const ReportScreen = () => {
 
       {/* Filters */}
       {showFilters && (
-        <PostFiltersComponent
+        <PostFiltersComponent                                                                       
           filters={filters}
           onApplyFilters={(newFilters: PostFilters) => {
             setFilters(newFilters);

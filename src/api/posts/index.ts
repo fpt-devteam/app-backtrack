@@ -1,9 +1,6 @@
-import type {
-  ApiResponse,
-  GetPostsParams,
-  PagedResponse,
-  PostResponse,
-} from '@/src/types/post.type';
+
+import { ApiResponse, PagedResponse } from '@/src/types/global.type';
+import { GetPostsParams, PostResponse } from '@/src/types/post.type';
 import { privateClient } from '../common/client';
 
 export const getPosts = async (
