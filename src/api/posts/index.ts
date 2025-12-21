@@ -15,8 +15,8 @@ export const getPosts = async (
       pageSize: params.pageSize ?? 20,
       ...(params.postType && { postType: params.postType }),
       ...(params.searchTerm && { searchTerm: params.searchTerm }),
-      ...(params.latitude !== undefined && { latitude: params.latitude }),
-      ...(params.longitude !== undefined && { longitude: params.longitude }),
+      ...(params.location?.latitude !== undefined && { latitude: params.location.latitude }),
+      ...(params.location?.longitude !== undefined && { longitude: params.location.longitude }),
       ...(params.radiusInKm !== undefined && { radiusInKm: params.radiusInKm }),
     },
   });
