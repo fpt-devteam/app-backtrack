@@ -7,8 +7,6 @@ export async function uploadImageToStorage(req: ImageUploadRequest): Promise<Ima
   const storageRef: StorageReference = ref(firebaseStorage, path);
   await uploadBytes(storageRef, blob);
 
-  const res: ImageUploadResponse = {
-    downloadURL: await getDownloadURL(storageRef)
-  };
+  const res = { downloadURL: await getDownloadURL(storageRef) } as ImageUploadResponse;
   return res;
 }

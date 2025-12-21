@@ -1,27 +1,23 @@
 import { ImageAsset } from '@/src/types/firebase.type';
 import * as ImagePicker from 'expo-image-picker';
-import { ImagePickerAsset } from 'expo-image-picker';
+import { launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
 import React from 'react';
 import { Alert, Button, Image, Linking, Platform, View } from 'react-native';
 import { styles } from './styles';
 
 const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pickImages: (images: ImageAsset[]) => void }) => {
-  const ensureMediaPermission = async (): Promise<boolean> => {
-    const { status, canAskAgain } =
-      await ImagePicker.getMediaLibraryPermissionsAsync();
+  const ensureMediaPermission = async () => {
+    const { status, canAskAgain } = await ImagePicker.getMediaLibraryPermissionsAsync();
 
-    if (status === 'granted') {
-      return true;
-    }
+    if (status === ImagePicker.PermissionStatus.GRANTED) return true;
 
     if (canAskAgain) {
       const request = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      return request.status === 'granted';
+      const isGranted = request.status === ImagePicker.PermissionStatus.GRANTED;
+      return isGranted;
     }
 
-    Alert.alert(
-      'Permission required',
-      'Please enable photo access in Settings to upload images.',
+    Alert.alert('Permission required', 'Please enable photo access in Settings to upload images.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -44,21 +40,16 @@ const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pick
     const hasPermission = await ensureMediaPermission();
     if (!hasPermission) return;
 
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const options = {
       mediaTypes: ['images'],
       aspect: [4, 3],
       quality: 1,
       allowsMultipleSelection: true,
-    });
+    } as ImagePickerOptions;
 
+    const result = await launchImageLibraryAsync(options);
     if (!result.canceled) {
-      console.log('Pick images ok', result);
-
-      const imageAssets: ImageAsset[] = result.assets.map((asset: ImagePickerAsset) => ({
-        ...asset,
-        type: 'image',
-      }));
-
+      const imageAssets = result.assets.map((asset) => ({ ...asset, type: 'image' } as ImageAsset));
       pickImages(imageAssets);
     }
   };

@@ -15,7 +15,3 @@ export type ImageUploadRequest = {
 export type ImageUploadResponse = {
   downloadURL: string;
 };
-
-export type ReportImageUploadRequest = ImageUploadRequest & {
-  postId: string;
-};
