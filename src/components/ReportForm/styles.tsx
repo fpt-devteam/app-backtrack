@@ -67,4 +67,7 @@ export const styles = StyleSheet.create({
     marginVertical: 20,
     paddingHorizontal: 16,
   },
+  radioGroup: {
+
+  }
 })
