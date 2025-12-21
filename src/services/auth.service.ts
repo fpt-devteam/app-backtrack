@@ -11,12 +11,14 @@ import { LoginRequest, LoginResponse, RegisterFirebaseRequest, RegisterFirebaseR
 export const loginFirebase = async (req: LoginRequest): Promise<LoginResponse> => {
   const { email, password } = req;
 
-  if (!email || !password) throw new Error("Email and password are required");
-  const normalizedEmail = email.trim().toLowerCase();
+  const res: LoginResponse = {
+    status: false,
+    idToken: ""
+  };
 
-  const res: LoginResponse = { idToken: "" };
   try {
-    const response = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+    const response = await signInWithEmailAndPassword(auth, email, password);
+    res.status = true;
     res.idToken = await response.user.getIdToken();
   } catch (error: any) {
     console.error(error);

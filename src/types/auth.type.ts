@@ -6,6 +6,7 @@ export type LoginRequest = {
 };
 
 export type LoginResponse = {
+  status: boolean;
   idToken: string;
 };
 

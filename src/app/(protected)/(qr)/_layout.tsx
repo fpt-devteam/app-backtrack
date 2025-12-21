@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const Message = () => {
+const QrLayout = () => {
   return (
     <View>
-      <Text>Message</Text>
+      <Text>QrLayout  </Text>
     </View>
   )
 }
 
-export default Message
+export default QrLayout

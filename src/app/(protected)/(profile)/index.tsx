@@ -4,7 +4,7 @@ import { signOut } from "firebase/auth";
 import React from "react";
 import { Button, Text, View } from "react-native";
 
-export default function Profile() {
+export default function ProfileScreen() {
   const { clearSession } = useAuth();
 
   const handleLogout = async () => {
@@ -14,7 +14,7 @@ export default function Profile() {
 
   return (
     <View style={{ padding: 16, gap: 12 }}>
-      <Text>Profile</Text>
+      <Text>ProfileScreen</Text>
       <Button title="Logout" onPress={handleLogout} />
     </View>
   );
