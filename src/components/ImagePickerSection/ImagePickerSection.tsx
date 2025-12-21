@@ -1,19 +1,17 @@
 import { ImageAsset } from '@/src/types/firebase.type';
-import * as ImagePicker from 'expo-image-picker';
-import { launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
+import { getMediaLibraryPermissionsAsync, launchImageLibraryAsync, PermissionStatus, requestMediaLibraryPermissionsAsync, type ImagePickerOptions } from 'expo-image-picker';
 import React from 'react';
 import { Alert, Button, Image, Linking, Platform, View } from 'react-native';
 import { styles } from './styles';
 
 const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pickImages: (images: ImageAsset[]) => void }) => {
   const ensureMediaPermission = async () => {
-    const { status, canAskAgain } = await ImagePicker.getMediaLibraryPermissionsAsync();
-
-    if (status === ImagePicker.PermissionStatus.GRANTED) return true;
+    const { status, canAskAgain } = await getMediaLibraryPermissionsAsync();
+    if (status === PermissionStatus.GRANTED) return true;
 
     if (canAskAgain) {
-      const request = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      const isGranted = request.status === ImagePicker.PermissionStatus.GRANTED;
+      const request = await requestMediaLibraryPermissionsAsync();
+      const isGranted = request.status === PermissionStatus.GRANTED;
       return isGranted;
     }
 
