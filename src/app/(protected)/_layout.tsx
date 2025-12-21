@@ -1,5 +1,5 @@
 import { useAuth } from "@/src/providers/AuthProvider";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 
 export default function ProtectedLayout() {
@@ -14,27 +14,9 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: "#3B82F6",
-        tabBarInactiveTintColor: "#9CA3AF",
-        tabBarStyle: {
-          backgroundColor: "#FFFFFF",
-          borderTopWidth: 1,
-          borderTopColor: "#E5E7EB",
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 60,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
-        },
-        headerShown: false,
-      }}
-    >
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
-        name="index"
+        name="(report)"
         options={{
           title: "Lost & Found",
           tabBarIcon: ({ color, size }) => (
@@ -42,17 +24,19 @@ export default function ProtectedLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
-        name="qr"
+        name="(qr)"
         options={{
-          title: "QR & Item",
+          title: "QR",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="qrcode-scan" size={size} color={color} />
+            <Ionicons name="qr-code-outline" size={size} color={color} />
           ),
         }}
       />
+
       <Tabs.Screen
-        name="message"
+        name="(message)"
         options={{
           title: "Message",
           tabBarIcon: ({ color, size }) => (
@@ -60,20 +44,14 @@ export default function ProtectedLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
-        name="profile"
+        name="(profile)"
         options={{
           title: "Profile",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
-        }}
-      />
-      {/* Hide home.tsx from tabs */}
-      <Tabs.Screen
-        name="home"
-        options={{
-          href: null,
         }}
       />
     </Tabs>

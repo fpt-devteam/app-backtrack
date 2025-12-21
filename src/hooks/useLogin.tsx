@@ -13,19 +13,20 @@ export function useLogin() {
     setError(null);
 
     try {
-      const { idToken } = await loginFirebase(req);
+      const { status, idToken } = await loginFirebase(req);
+      if (!status) {
+        setError("Invalid email or password!");
+        return;
+      }
 
       const syncReq: SyncRequest = { idToken };
       await syncUser(syncReq);
 
-      const authState: AuthState = {
-        isLoggedIn: true,
-        idToken,
-      };
+      const authState: AuthState = { isLoggedIn: true, idToken };
       await auth.setSession(authState);
     } catch (err: any) {
-      setError(err.message ?? "Login failed");
-      throw err;
+      console.error("Login error:", err);
+      setError("Login failed! Please try again.");
     } finally {
       setLoading(false);
     }

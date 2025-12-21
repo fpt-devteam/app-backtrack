@@ -1,12 +1,12 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-const QR = () => {
+const MessageStackLayout = () => {
   return (
     <View>
-      <Text>QR</Text>
+      <Text>MessageStackLayout</Text>
     </View>
   )
 }
 
-export default QR
+export default MessageStackLayout
