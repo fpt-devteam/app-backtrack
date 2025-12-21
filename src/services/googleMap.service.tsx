@@ -1,15 +1,14 @@
-import * as Location from 'expo-location';
+import { Accuracy, getCurrentPositionAsync, getForegroundPermissionsAsync, PermissionStatus, requestForegroundPermissionsAsync } from 'expo-location';
 import { Alert, Linking, Platform } from 'react-native';
 import { GeocodingResponse, GeocodingStatusValue, GoogleMapDetailLocation, GoogleMapLocation } from '../types/location.type';
 
-export const ensureLocationPermission = async (): Promise<boolean> => {
-  const { status, canAskAgain } = await Location.getForegroundPermissionsAsync();
-
-  if (status === 'granted') return true;
+export const ensureLocationPermission = async () => {
+  const { status, canAskAgain } = await getForegroundPermissionsAsync();
+  if (status === PermissionStatus.GRANTED) return true;
 
   if (canAskAgain) {
-    const request = await Location.requestForegroundPermissionsAsync();
-    return request.status === 'granted';
+    const request = await requestForegroundPermissionsAsync();
+    return request.status === PermissionStatus.GRANTED;
   }
 
   Alert.alert(
@@ -35,8 +34,8 @@ export const ensureLocationPermission = async (): Promise<boolean> => {
 
 export const getCurrentPosition = async () => {
   try {
-    const currentLocation = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
+    const currentLocation = await getCurrentPositionAsync({
+      accuracy: Accuracy.Balanced,
     });
     const googleMapLocation: GoogleMapLocation = {
       latitude: currentLocation.coords.latitude,
@@ -82,14 +81,14 @@ export const getDetailLocation = async (googleMapLocation: GoogleMapLocation) =>
     const result = await fetchGeocodingDataAsync({ latitude: lat, longitude: lng });
     if (!result) return null;
 
-    const detailLocation: GoogleMapDetailLocation = {
+    const detailLocation = {
       location: {
         latitude: lat,
         longitude: lng,
       },
       displayAddress: result.formatted_address,
       externalPlaceId: result.place_id,
-    };
+    } as GoogleMapDetailLocation;
 
     return detailLocation;
   } catch (error) {

@@ -24,27 +24,6 @@ export interface PostResponse {
   createdAt: string; // ISO 8601 date string
 }
 
-export interface PagedResponse<T> {
-  items: T[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
-}
-
-export interface ApiError {
-  code: string;
-  message: string;
-  statusCode: number;
-  details?: any;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T | null;
-  error: ApiError | null;
-  correlationId: string;
-}
-
 export interface LaTLng {
   latitude: number;
   longitude: number;
