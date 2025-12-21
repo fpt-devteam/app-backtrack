@@ -28,6 +28,28 @@ export const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
   },
+
+  searchContainer: {
+    zIndex: 999,
+    elevation: 999,
+    marginBottom: 8,
+  },
+  searchInput: {
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingHorizontal: 12,
+    backgroundColor: "#fff",
+  },
+  searchListView: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    marginTop: 6,
+    backgroundColor: "#fff",
+  },
+
   mapContainer: {
     height: 300,
     marginTop: 12,
@@ -46,4 +68,6 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+
 })
