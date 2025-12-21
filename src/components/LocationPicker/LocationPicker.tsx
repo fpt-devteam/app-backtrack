@@ -1,11 +1,11 @@
-import { useGetCurrentPosition } from "@/src/hooks/useGetCurrentLocation";
-import useGetFormattedLocation from "@/src/hooks/useGetFormattedLocation";
+import useGetDetailLocation from "@/src/hooks/useGetDetailLocation";
 import React, { useEffect, useRef } from "react";
 import { Text, View } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import MapView, { Marker, MarkerDragStartEndEvent, Region } from "react-native-maps";
 import { Button } from "react-native-paper";
 
+import { useGetDetailCurrentLocation } from "@/src/hooks/useGetDetailCurrentLocation";
 import { GoogleMapDetailLocation } from "../../types/location.type";
 import { styles } from "./styles";
 
@@ -39,30 +39,26 @@ const getRegionFromLocation = (detailLocation: GoogleMapDetailLocation | null): 
   };
 };
 
-const LocationPicker = ({ location: detailLocation, changeLocation: changeDetailLocation }: LocationPickerProps) => {
+const LocationPicker = (locationPickerProps: LocationPickerProps) => {
+  const { location: detailLocation, changeLocation: changeDetailLocation } = locationPickerProps;
+
   const mapRef = useRef<MapView>(null);
   const placesRef = useRef<GooglePlacesAutocompleteRef>(null);
 
-  const { loading, getCurrentPosition, error: currentPositionError } = useGetCurrentPosition();
-  const { formatLocation } = useGetFormattedLocation();
+  const { loading, getDetailCurrentLocation } = useGetDetailCurrentLocation();
+  const { formatLocation } = useGetDetailLocation();
 
   useEffect(() => {
-    const placeStr: string = detailLocation?.displayAddress || "";
-    const newRegion: Region = getRegionFromLocation(detailLocation);
+    const placeStr = detailLocation?.displayAddress || "";
+    const newRegion = getRegionFromLocation(detailLocation);
 
     placesRef.current?.setAddressText(placeStr);
     mapRef.current?.animateToRegion(newRegion, ANIMATE_TO_DURATION);
   }, [detailLocation]);
 
   const handleGetCurrentLocation = async () => {
-    const fetchedDetailLocation: GoogleMapDetailLocation | null = await getCurrentPosition();
-
-    if (!fetchedDetailLocation) {
-      console.error("Error getting current position:", currentPositionError);
-      return;
-    };
-
-    changeDetailLocation(fetchedDetailLocation);
+    const fetchedData = await getDetailCurrentLocation();
+    changeDetailLocation(fetchedData);
   };
 
   const handleMarkerDragEnd = async (e: MarkerDragStartEndEvent) => {
@@ -74,8 +70,8 @@ const LocationPicker = ({ location: detailLocation, changeLocation: changeDetail
     };
 
     const coords = mapLocation.location;
-    const fetchedDetailLocation: GoogleMapDetailLocation | null = await formatLocation(coords);
-    changeDetailLocation(fetchedDetailLocation);
+    const fetchedData = await formatLocation(coords);
+    changeDetailLocation(fetchedData);
   };
 
   const handlePickPlace = async (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
@@ -119,6 +115,7 @@ const LocationPicker = ({ location: detailLocation, changeLocation: changeDetail
         />
       </View>
 
+      {/* Map View */}
       <View style={styles.mapContainer}>
         <MapView
           ref={mapRef}

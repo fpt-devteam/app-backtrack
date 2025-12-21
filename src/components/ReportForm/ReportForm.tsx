@@ -1,14 +1,19 @@
-import { useUploadImage } from '@/src/hooks/useUploadImage';
-import { ImageAsset } from '@/src/types/firebase.type';
-import { GoogleMapFormattedLocation } from '@/src/types/location.type';
-import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, ScrollView, Text, TextInput, View } from 'react-native';
+import { useUploadImage } from "@/src/hooks/useUploadImage";
+import { ImageAsset } from "@/src/types/firebase.type";
+import { GoogleMapDetailLocation } from "@/src/types/location.type";
+import { yupResolver } from "@hookform/resolvers/yup";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Alert, Button, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import * as yup from "yup";
-import ImagePickerSection from '../ImagePickerSection';
-import LocationPicker from '../LocationPicker/LocationPicker';
-import { styles } from './styles';
+
+import useCreateReport from "@/src/hooks/useCreateReport";
+import { Nullable } from "@/src/types/global.type";
+import { ReportDetails } from "@/src/types/report.type";
+import ImagePickerSection from "../ImagePickerSection/ImagePickerSection";
+import LocationPicker from "../LocationPicker/LocationPicker";
+import { styles } from "./styles";
 
 const reportSchema = yup
   .object({
@@ -16,50 +21,68 @@ const reportSchema = yup
     itemName: yup.string().required("Item name is required"),
     description: yup.string().required("Description is required"),
     eventTime: yup.date().required("Event time is required"),
-    materials: yup.string().nullable().defined(),
-    brands: yup.string().nullable().defined(),
-    colors: yup.string().nullable().defined(),
+    materials: yup.string().required().defined(),
+    brands: yup.string().required().defined(),
+    colors: yup.string().required().defined(),
   })
   .required();
 
 type ReportFormSchema = yup.InferType<typeof reportSchema>;
 
-const ReportForm = () => {
+const ReportForm = (initialData: Nullable<ReportDetails>) => {
+  const [reportData, setReportData] = useState<Nullable<ReportDetails>>(initialData);
+
   const [images, setImages] = useState<ImageAsset[]>([]);
-  const [location, setLocation] = useState<GoogleMapFormattedLocation | null>(null);
+  const [location, setLocation] = useState<Nullable<GoogleMapDetailLocation>>(null);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const { uploadImages } = useUploadImage();
+  const { createNewReport } = useCreateReport();
 
-  const { control, handleSubmit, reset: resetForm, formState: { errors } } = useForm<ReportFormSchema>({
+  const { control, handleSubmit, reset: resetForm, formState: { errors },
+  } = useForm<ReportFormSchema>({
     defaultValues: {
-      postType: "",
-      itemName: "",
-      description: "",
-      materials: "",
-      brands: "",
-      colors: "",
-      eventTime: new Date(),
+      postType: reportData?.postType || "",
+      itemName: reportData?.itemName || "",
+      description: reportData?.description || "",
+      materials: reportData?.materials?.join(", ") || "",
+      brands: reportData?.brands?.join(", ") || "",
+      colors: reportData?.colors?.join(", ") || "",
+      eventTime: reportData?.eventTime ? new Date(reportData.eventTime) : new Date(),
     },
     resolver: yupResolver(reportSchema),
     mode: "onSubmit",
   });
 
-  const pickImages = (newImages: ImageAsset[]) => {
-    setImages([...images, ...newImages]);
-  }
+  useEffect(() => {
+    resetForm({
+      postType: reportData?.postType || "",
+      itemName: reportData?.itemName || "",
+      description: reportData?.description || "",
+      materials: reportData?.materials ? reportData?.materials.join(", ") : "",
+      brands: reportData?.brands ? reportData?.brands.join(", ") : "",
+      colors: reportData?.colors ? reportData?.colors.join(", ") : "",
+      eventTime: reportData?.eventTime ? new Date(reportData.eventTime) : new Date(),
+    });
+  }, [reportData]);
 
-  const changeLocation = (newLocation: GoogleMapFormattedLocation | null) => {
+  const pickImages = useCallback((newImages: ImageAsset[]) => {
+    setImages((prev) => {
+      const map = new Map<string, ImageAsset>();
+      for (const img of prev) map.set(img.uri, img);
+      for (const img of newImages) map.set(img.uri, img);
+      return Array.from(map.values());
+    });
+  }, []);
+
+  const changeLocation = useCallback((newLocation: Nullable<GoogleMapDetailLocation>) => {
     setLocation(newLocation);
     console.log("Location changed: ", newLocation);
-  };
+  }, []);
 
-  const reset = () => {
-    setImages([]);
-    setLocation(null);
-    resetForm();
-  }
-
-  const validateForm = (): boolean => {
+  const validateForm = useCallback((): boolean => {
     if (images.length === 0) {
       Alert.alert("Validation Error", "Please pick at least one image.");
       return false;
@@ -69,37 +92,28 @@ const ReportForm = () => {
       return false;
     }
     return true;
-  };
+  }, [images.length, location]);
 
-  const handleUploadImages = async (): Promise<string[]> => {
-    console.log('Images: ', images);
+  const handleUploadImages = useCallback(async (): Promise<string[]> => {
     const uploadRes = await uploadImages(images);
-    console.log(uploadRes);
-
-    const imageUrls = uploadRes.map(res => res.downloadURL);
-    console.log('Image URLs: ', imageUrls);
-
+    const imageUrls = uploadRes.map((res) => res.downloadURL);
     return imageUrls;
-  }
+  }, [images, uploadImages]);
 
   const onSubmit: SubmitHandler<ReportFormSchema> = async (data) => {
     const isFormValid = validateForm();
-    if (!isFormValid) {
-      return;
-    }
+    if (!isFormValid) return;
 
     try {
-      // Upload images
       const imageUrls = await handleUploadImages();
       if (imageUrls.length === 0) {
         Alert.alert("Error", "Failed to upload images.");
         return;
       }
 
-      // Parse comma-separated strings to arrays
-      const materialsArray = data.materials ? data.materials.split(',').map(s => s.trim()).filter(Boolean) : null;
-      const brandsArray = data.brands ? data.brands.split(',').map(s => s.trim()).filter(Boolean) : null;
-      const colorsArray = data.colors ? data.colors.split(',').map(s => s.trim()).filter(Boolean) : null;
+      const materialsArray = data.materials ? data.materials.split(",").map((s) => s.trim()).filter(Boolean) : null;
+      const brandsArray = data.brands ? data.brands.split(",").map((s) => s.trim()).filter(Boolean) : null;
+      const colorsArray = data.colors ? data.colors.split(",").map((s) => s.trim()).filter(Boolean) : null;
 
       const reportData = {
         postType: data.postType,
@@ -108,27 +122,27 @@ const ReportForm = () => {
         materials: materialsArray,
         brands: brandsArray,
         colors: colorsArray,
-        imageUrls: imageUrls,
-        location: location!,
-        eventTime: data.eventTime,
+        imageUrls,
+        location: location?.location!,
+        externalPlaceId: location?.externalPlaceId || null,
+        displayAddress: location?.displayAddress || null,
+        eventTime: data.eventTime || new Date(),
       };
 
       console.log("Report data to submit:", reportData);
+      const reportDetails = await createNewReport(reportData);
+      setReportData(reportDetails);
       Alert.alert("Success", "Report submitted successfully!");
-      reset();
     } catch (error) {
       console.error("Submit error:", error);
       Alert.alert("Error", "Failed to submit report. Please try again.");
     }
-  }
+  };
 
-  return (
-    <ScrollView style={styles.scrollView}>
+  const content = useMemo(
+    () => (
       <View style={styles.container}>
-        <ImagePickerSection
-          images={images}
-          pickImages={pickImages}
-        />
+        <ImagePickerSection images={images} pickImages={pickImages} />
 
         <View style={styles.formSection}>
           <Text style={styles.sectionTitle}>Item Details</Text>
@@ -139,14 +153,20 @@ const ReportForm = () => {
             <Controller
               control={control}
               name="postType"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[styles.input, errors.postType && styles.inputError]}
-                  placeholder="e.g., Lost or Found"
-                  value={value}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                />
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.radioGroup}>
+                  <Button
+                    title="Lost"
+                    onPress={() => onChange("Lost")}
+                    color={value === "Lost" ? "#007AFF" : "#8E8E93"}
+                  />
+                  <View style={{ width: 12 }} />
+                  <Button
+                    title="Found"
+                    onPress={() => onChange("Found")}
+                    color={value === "Found" ? "#007AFF" : "#8E8E93"}
+                  />
+                </View>
               )}
             />
             {errors.postType && <Text style={styles.errorText}>{errors.postType.message}</Text>}
@@ -161,7 +181,7 @@ const ReportForm = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   style={[styles.input, errors.itemName && styles.inputError]}
-                  placeholder="e.g., Blue Backpack, iPhone 14"
+                  placeholder="e.g. Blue Backpack, iPhone 14"
                   value={value}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -180,7 +200,7 @@ const ReportForm = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   style={[styles.textArea, errors.description && styles.inputError]}
-                  placeholder="Describe the item in detail..."
+                  placeholder="Describe the item in detail."
                   value={value}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -190,7 +210,9 @@ const ReportForm = () => {
                 />
               )}
             />
-            {errors.description && <Text style={styles.errorText}>{errors.description.message}</Text>}
+            {errors.description && (
+              <Text style={styles.errorText}>{errors.description.message}</Text>
+            )}
           </View>
 
           {/* Materials */}
@@ -202,7 +224,7 @@ const ReportForm = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   style={styles.input}
-                  placeholder="e.g., Leather, Cotton (comma-separated)"
+                  placeholder="e.g. Leather, Cotton (comma-separated)"
                   value={value || ""}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -220,7 +242,7 @@ const ReportForm = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   style={styles.input}
-                  placeholder="e.g., Nike, Apple (comma-separated)"
+                  placeholder="e.g. Nike, Apple (comma-separated)"
                   value={value || ""}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -238,7 +260,7 @@ const ReportForm = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   style={styles.input}
-                  placeholder="e.g., Blue, Red (comma-separated)"
+                  placeholder="e.g. Blue, Red (comma-separated)"
                   value={value || ""}
                   onBlur={onBlur}
                   onChangeText={onChange}
@@ -253,39 +275,102 @@ const ReportForm = () => {
             <Controller
               control={control}
               name="eventTime"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={[styles.input, errors.eventTime && styles.inputError]}
-                  placeholder="ISO format or date"
-                  value={value ? value.toISOString() : ""}
-                  onChangeText={(text) => {
-                    try {
-                      const date = new Date(text);
-                      if (!Number.isNaN(date.getTime())) {
-                        onChange(date);
-                      }
-                    } catch {
-                      // Invalid date, ignore
-                    }
-                  }}
-                />
-              )}
+              render={({ field: { onChange, value } }) => {
+                const formatDateTime = (date: Date) => {
+                  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+                    return 'Select date and time';
+                  }
+                  const year = date.getFullYear();
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const hours = String(date.getHours()).padStart(2, '0');
+                  const minutes = String(date.getMinutes()).padStart(2, '0');
+                  return `${year}-${month}-${day} : ${hours}:${minutes}`;
+                };
+
+                return (
+                  <>
+                    <Pressable
+                      style={[styles.input, errors.eventTime && styles.inputError]}
+                      onPress={() => setShowDatePicker(true)}
+                    >
+                      <Text style={{ color: value ? '#000' : '#999' }}>
+                        {formatDateTime(value)}
+                      </Text>
+                    </Pressable>
+
+                    {showDatePicker && (
+                      <DateTimePicker
+                        value={value || new Date()}
+                        mode="date"
+                        display="default"
+                        onChange={(event, selectedDate) => {
+                          setShowDatePicker(false);
+                          if (event.type === 'set' && selectedDate) {
+                            // Preserve time from current value
+                            const currentTime = value || new Date();
+                            const newDate = new Date(selectedDate);
+                            newDate.setHours(currentTime.getHours());
+                            newDate.setMinutes(currentTime.getMinutes());
+                            newDate.setSeconds(0);
+                            newDate.setMilliseconds(0);
+                            onChange(newDate);
+                            // Show time picker after date is selected
+                            setTimeout(() => setShowTimePicker(true), 100);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {showTimePicker && (
+                      <DateTimePicker
+                        value={value || new Date()}
+                        mode="time"
+                        display="default"
+                        onChange={(event, selectedTime) => {
+                          setShowTimePicker(false);
+                          if (event.type === 'set' && selectedTime) {
+                            // Preserve date from current value
+                            const currentDate = value || new Date();
+                            const newDateTime = new Date(currentDate);
+                            newDateTime.setHours(selectedTime.getHours());
+                            newDateTime.setMinutes(selectedTime.getMinutes());
+                            newDateTime.setSeconds(0);
+                            newDateTime.setMilliseconds(0);
+                            onChange(newDateTime);
+                          }
+                        }}
+                      />
+                    )}
+                  </>
+                );
+              }}
             />
             {errors.eventTime && <Text style={styles.errorText}>{errors.eventTime.message}</Text>}
           </View>
         </View>
 
-        <LocationPicker
-          location={location}
-          changeLocation={changeLocation}
-        />
+        <LocationPicker location={location} changeLocation={changeLocation} />
 
         <View style={styles.buttonContainer}>
           <Button title="Submit Report" onPress={handleSubmit(onSubmit)} />
         </View>
       </View>
-    </ScrollView>
-  )
-}
+    ),
+    [images, pickImages, control, errors, location, changeLocation, handleSubmit, showDatePicker, showTimePicker]
+  );
 
-export default ReportForm
+  return (
+    <FlatList
+      data={[{ key: "form" }]}
+      keyExtractor={(i) => i.key}
+      renderItem={() => null}
+      ListHeaderComponent={content}
+      keyboardShouldPersistTaps="always"
+      keyboardDismissMode="on-drag"
+      contentContainerStyle={{ paddingBottom: 24 }}
+    />
+  );
+};
+
+export default ReportForm;

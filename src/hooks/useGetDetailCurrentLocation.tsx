@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { ensureLocationPermission, getCurrentPosition } from '../services/googleMap.service';
-import { GoogleMapFormattedLocation } from '../types/location.type';
+import { ensureLocationPermission, getDetailCurrentLocation } from '../services/googleMap.service';
 
-export const useGetCurrentPosition = () => {
+export const useGetDetailCurrentLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getPosition = async (): Promise<GoogleMapFormattedLocation | null> => {
+  const getDetailPosition = async () => {
     setLoading(true);
     setError(null);
 
     const hasPermission = await ensureLocationPermission();
     if (!hasPermission) return null;
 
-    const currentPosition = await getCurrentPosition();
+    const currentPosition = await getDetailCurrentLocation();
     if (!currentPosition) {
       setError('Failed to retrieve position data.');
       setLoading(false);
@@ -24,6 +23,6 @@ export const useGetCurrentPosition = () => {
     return currentPosition;
   };
 
-  return { loading, error, getCurrentPosition: getPosition };
+  return { loading, error, getDetailCurrentLocation: getDetailPosition };
 }
 

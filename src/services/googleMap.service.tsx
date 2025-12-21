@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 import { Alert, Linking, Platform } from 'react-native';
-import { GoogleMapFormattedLocation, LocationCoordinates } from '../types/location.type';
+import { GeocodingResponse, GeocodingStatusValue, GoogleMapDetailLocation, GoogleMapLocation } from '../types/location.type';
 
 export const ensureLocationPermission = async (): Promise<boolean> => {
   const { status, canAskAgain } = await Location.getForegroundPermissionsAsync();
@@ -33,35 +33,75 @@ export const ensureLocationPermission = async (): Promise<boolean> => {
   return false;
 };
 
-export const getFormattedLocation = async (coordinates: LocationCoordinates): Promise<GoogleMapFormattedLocation | null> => {
-  const { latitude: lat, longitude: lng } = coordinates;
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}`;
-
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (data.status !== 'OK') return null;
-
-  const location: GoogleMapFormattedLocation =
-  {
-    latitude: lat,
-    longitude: lng,
-    formattedAddress: data.results[0].formatted_address,
-    placeId: data.results[0].place_id,
-  };
-  return location;
+export const getCurrentPosition = async () => {
+  try {
+    const currentLocation = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    const googleMapLocation: GoogleMapLocation = {
+      latitude: currentLocation.coords.latitude,
+      longitude: currentLocation.coords.longitude,
+    };
+    return googleMapLocation;
+  } catch (error) {
+    console.error('Failed to get current position:', error);
+    return null;
+  }
 };
 
-export const getCurrentPosition = async (): Promise<GoogleMapFormattedLocation | null> => {
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Balanced,
-  });
+export const fetchGeocodingDataAsync = async (location: GoogleMapLocation) => {
+  const { latitude: lat, longitude: lng } = location;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}`;
+  const res = await fetch(url);
 
-  const coordinates: LocationCoordinates = {
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude
-  };
+  if (!res.ok) {
+    console.error('Geocoding API request failed:', res.status, res.statusText);
+    return null;
+  }
 
-  const formattedLocation = await getFormattedLocation(coordinates);
-  return formattedLocation;
+  const data: GeocodingResponse = await res.json();
+
+  if (data.status !== GeocodingStatusValue.OK) {
+    console.error('Geocoding API error:', data.status, data.error_message);
+    return null;
+  }
+
+  if (data.results.length === 0) {
+    console.warn('No geocoding results found');
+    return null;
+  }
+
+  const result = data.results[0];
+  return result;
+};
+
+export const getDetailLocation = async (googleMapLocation: GoogleMapLocation) => {
+  const { latitude: lat, longitude: lng } = googleMapLocation;
+
+  try {
+    const result = await fetchGeocodingDataAsync({ latitude: lat, longitude: lng });
+    if (!result) return null;
+
+    const detailLocation: GoogleMapDetailLocation = {
+      location: {
+        latitude: lat,
+        longitude: lng,
+      },
+      displayAddress: result.formatted_address,
+      externalPlaceId: result.place_id,
+    };
+
+    return detailLocation;
+  } catch (error) {
+    console.error('Failed to fetch geocoding data:', error);
+    return null;
+  }
+};
+
+export const getDetailCurrentLocation = async () => {
+  const currentLocation = await getCurrentPosition();
+  if (!currentLocation) return null;
+
+  const detailLocation = await getDetailLocation(currentLocation);
+  return detailLocation;
 };
