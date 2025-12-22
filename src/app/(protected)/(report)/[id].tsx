@@ -1,4 +1,4 @@
-import { usePostById } from '@/src/hooks/usePostById';
+import { usePostById } from '@/src/features/report/hooks/usePostById';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import {

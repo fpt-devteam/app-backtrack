@@ -1,6 +1,4 @@
-import { useUploadImage } from "@/src/hooks/useUploadImage";
-import { ImageAsset } from "@/src/types/firebase.type";
-import { GoogleMapDetailLocation } from "@/src/types/location.type";
+import { GoogleMapDetailLocation } from "@/src/shared/types/location.type";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -8,11 +6,13 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Alert, Button, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import * as yup from "yup";
 
-import useCreateReport from "@/src/hooks/useCreateReport";
-import { Nullable } from "@/src/types/global.type";
-import { CreateReportRequest, ReportDetails } from "@/src/types/report.type";
-import ImagePickerSection from "../ImagePickerSection/ImagePickerSection";
-import LocationPicker from "../LocationPicker/LocationPicker";
+import useCreateReport from "@/src/features/report/hooks/useCreateReport";
+import { CreateReportRequest, ReportDetails } from "@/src/features/report/types/report.type";
+import LocationPicker from "@/src/shared/components/LocationPicker/LocationPicker";
+import { useUploadImage } from "@/src/shared/hooks/useUploadImage";
+import { ImageAsset } from "@/src/shared/types/firebase.type";
+import { Nullable } from "@/src/shared/types/global.type";
+import ImagePickerSection from "../../../../shared/components/ImagePickerSection/ImagePickerSection";
 import { styles } from "./styles";
 
 const reportSchema = yup
@@ -96,6 +96,11 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
 
   const handleUploadImages = useCallback(async (): Promise<string[]> => {
     const uploadRes = await uploadImages(images);
+
+    if (!uploadRes) {
+      return [];
+    }
+
     const imageUrls = uploadRes.map((res) => res.downloadURL);
     return imageUrls;
   }, [images, uploadImages]);

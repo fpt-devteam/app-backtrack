@@ -1,4 +1,4 @@
-import { privateClient } from "../api/common/client";
+import { privateClient } from "@/src/api/common/client";
 import { CreateReportRequest, CreateReportResponse } from "../types/report.type";
 
 export const createReport = async (req: CreateReportRequest): Promise<CreateReportResponse> => {
@@ -7,8 +7,6 @@ export const createReport = async (req: CreateReportRequest): Promise<CreateRepo
       'Content-Type': 'application/json',
     },
   });
-
-  console.log("privateClient", privateClient.defaults);
 
   const res = response.data as CreateReportResponse;
   return res;
