@@ -1,5 +1,5 @@
 import { getDownloadURL, ref, StorageReference, uploadBytes } from "firebase/storage";
-import { firebaseStorage } from "../lib/firebase";
+import { firebaseStorage } from "../../lib/firebase";
 import { ImageUploadRequest, ImageUploadResponse } from "../types/firebase.type";
 
 export async function uploadImageToStorage(req: ImageUploadRequest): Promise<ImageUploadResponse> {
