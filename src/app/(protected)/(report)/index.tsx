@@ -1,5 +1,5 @@
 
-import PostFiltersComponent from '@/src/components/PostFilters';
+import PostFiltersComponent from '@/src/features/report/components/PostFilters/PostFilters';
 import { usePosts } from '@/src/features/report/hooks/usePosts';
 import { PostFilters, PostListItem } from '@/src/features/report/types/report.type';
 import { useRouter } from 'expo-router';

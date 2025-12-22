@@ -1,5 +1,5 @@
 
-import { GetPostsParams, PostResponse } from '@/src/features/report/types/post.type';
+import { GetPostsParams, PostResponse } from '@/src/features/report/types/report.type';
 import { ApiResponse, PagedResponse } from '@/src/shared/types/global.type';
 import { privateClient } from '../common/client';
 

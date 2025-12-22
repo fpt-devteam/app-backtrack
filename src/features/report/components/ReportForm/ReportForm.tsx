@@ -101,7 +101,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
       return [];
     }
 
-    const imageUrls = uploadRes.map((res) => res.downloadURL);
+    const imageUrls = uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
     return imageUrls;
   }, [images, uploadImages]);
 
@@ -282,7 +282,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
               name="eventTime"
               render={({ field: { onChange, value } }) => {
                 const formatDateTime = (date: Date) => {
-                  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+                  if (!date || !(date instanceof Date) || Number.isNaN(date.getTime())) {
                     return 'Select date and time';
                   }
                   const year = date.getFullYear();

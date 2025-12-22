@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { AUTH_STORAGE_KEY } from "../constants/auth.constant";
-import { AuthState } from "../types/auth.type";
+import { AuthState } from "../features/auth/types/auth.type";
 
 type AuthContextType = AuthState & {
   isAppReady: boolean;

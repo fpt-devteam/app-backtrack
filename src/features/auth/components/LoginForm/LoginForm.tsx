@@ -1,5 +1,5 @@
-import { useLogin } from "@/src/hooks/useLogin";
-import type { LoginRequest } from "@/src/types/auth.type";
+import { useLogin } from "@/src/features/auth/hooks/useLogin";
+import type { LoginRequest } from "@/src/features/auth/types/auth.type";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "expo-router";
