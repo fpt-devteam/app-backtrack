@@ -1,32 +1,18 @@
-import useGetDetailLocation from "@/src/hooks/useGetDetailLocation";
+import useGetDetailLocation from "@/src/shared/hooks/useGetDetailLocation";
 import React, { useEffect, useRef } from "react";
 import { Text, View } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import MapView, { Marker, MarkerDragStartEndEvent, Region } from "react-native-maps";
 import { Button } from "react-native-paper";
 
-import { useGetDetailCurrentLocation } from "@/src/hooks/useGetDetailCurrentLocation";
+import { useGetDetailCurrentLocation } from "@/src/shared/hooks/useGetDetailCurrentLocation";
+import { ANIMATE_TO_DURATION, DEFAULT_REGION, QUERY_CONFIG } from "../../constants/location.constant";
 import { GoogleMapDetailLocation } from "../../types/location.type";
 import { styles } from "./styles";
 
 type LocationPickerProps = {
   location: GoogleMapDetailLocation | null;
   changeLocation: (location: GoogleMapDetailLocation | null) => void;
-};
-
-const DEFAULT_REGION: Region = {
-  latitude: 10.762622,
-  longitude: 106.660172,
-  latitudeDelta: 0.03,
-  longitudeDelta: 0.03,
-};
-
-const ANIMATE_TO_DURATION = 600;
-
-const queryConfig = {
-  key: process.env.EXPO_PUBLIC_GOOGLE_API_KEY as string,
-  language: "vi",
-  components: "country:vn",
 };
 
 const getRegionFromLocation = (detailLocation: GoogleMapDetailLocation | null): Region => {
@@ -104,7 +90,7 @@ const LocationPicker = (locationPickerProps: LocationPickerProps) => {
           fetchDetails
           debounce={300}
           enablePoweredByContainer={false}
-          query={queryConfig}
+          query={QUERY_CONFIG}
           onPress={handlePickPlace}
           keyboardShouldPersistTaps="always"
           styles={{

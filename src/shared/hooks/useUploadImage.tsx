@@ -1,4 +1,4 @@
-import { Nullable } from "@/src/types/global.type";
+import { Nullable } from "@/src/shared/types/global.type";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { auth } from "../../lib/firebase";
