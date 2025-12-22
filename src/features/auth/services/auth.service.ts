@@ -4,8 +4,8 @@ import {
   UserCredential
 } from "firebase/auth";
 
-import { publicClient } from "../api/common/client";
-import { auth } from "../lib/firebase";
+import { publicClient } from "../../../api/common/client";
+import { auth } from "../../../lib/firebase";
 import { LoginRequest, LoginResponse, RegisterFirebaseRequest, RegisterFirebaseResponse, SyncRequest, SyncResponse } from "../types/auth.type";
 
 export const loginFirebase = async (req: LoginRequest): Promise<LoginResponse> => {

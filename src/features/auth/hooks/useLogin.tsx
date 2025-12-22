@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../providers/AuthProvider";
+import { useAuth } from "../../../providers/AuthProvider";
 import { loginFirebase, syncUser } from "../services/auth.service";
 import { AuthState, LoginRequest, SyncRequest } from "../types/auth.type";
 

@@ -1,6 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { useState } from "react";
-import { useAuth } from "../providers/AuthProvider";
+import { useAuth } from "../../../providers/AuthProvider";
 import { registerFirebase, syncUser } from "../services/auth.service";
 import { AuthState, RegisterFirebaseRequest, RegisterFirebaseResponse, RegisterRequest, SyncRequest } from "../types/auth.type";
 export function useRegister() {

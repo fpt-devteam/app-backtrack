@@ -1,5 +1,5 @@
-import { useRegister } from '@/src/hooks/useRegister'
-import { RegisterRequest } from '@/src/types/auth.type'
+import { useRegister } from '@/src/features/auth/hooks/useRegister'
+import { RegisterRequest } from '@/src/features/auth/types/auth.type'
 import React, { useState } from 'react'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
