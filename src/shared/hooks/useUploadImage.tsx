@@ -1,0 +1,74 @@
+import { Nullable } from "@/src/types/global.type";
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { auth } from "../../lib/firebase";
+import {
+  MAX_IMAGE_UPLOAD,
+  MIN_IMAGE_UPLOAD,
+  UPLOAD_IMAGE_API,
+} from "../constants/firebase.constant";
+import { uploadImageToStorage } from "../services/firebase.service";
+import type {
+  ImageAsset,
+  ImageUploadRequest,
+  ImageUploadResponse,
+} from "../types/firebase.type";
+
+export function useUploadImage() {
+  const [progress, setProgress] = useState(0);
+
+  const mutation = useMutation<Nullable<ImageUploadResponse[]>, Error, ImageAsset[]>(
+    {
+      mutationKey: ["firebase", "uploadImages"],
+
+      onMutate: () => {
+        setProgress(0);
+      },
+
+      mutationFn: async (imageAssets) => {
+        const user = auth.currentUser;
+        if (!user) throw new Error("Not authenticated");
+
+        const total = imageAssets.length;
+        const isValidSize = total >= MIN_IMAGE_UPLOAD && total <= MAX_IMAGE_UPLOAD;
+        if (!isValidSize) throw new Error("Invalid image count");
+
+        const uid = user.uid;
+        const results = [] as ImageUploadResponse[];
+
+        for (let i = 0; i < total; i++) {
+          const img = imageAssets[i];
+          if (!img?.uri) continue;
+
+          const fileName = `img_${Date.now()}_${i}`;
+          const response = await fetch(img.uri);
+          const blob = await response.blob();
+
+          const req: ImageUploadRequest = {
+            filename: fileName,
+            firebaseUid: uid,
+            uri: img.uri,
+            blob,
+            path: `${UPLOAD_IMAGE_API}/${uid}/${fileName}`,
+          };
+
+          const res = await uploadImageToStorage(req);
+          results.push(res);
+
+          setProgress((i + 1) / total);
+        }
+
+        return results;
+      },
+    }
+  );
+
+  return {
+    uploading: mutation.isPending,
+    progress,
+    uploadImages: mutation.mutateAsync,
+    error: mutation.error,
+    data: mutation.data,
+    reset: mutation.reset,
+  };
+}

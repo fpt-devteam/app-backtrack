@@ -1,0 +1,6 @@
+const UPLOAD_IMAGE_API = "posts/images";
+const MIN_IMAGE_UPLOAD = 1;
+const MAX_IMAGE_UPLOAD = 5;
+
+export { MAX_IMAGE_UPLOAD, MIN_IMAGE_UPLOAD, UPLOAD_IMAGE_API };
+

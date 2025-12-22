@@ -1,7 +1,7 @@
-import { ImageAsset } from '@/src/types/firebase.type';
 import { getMediaLibraryPermissionsAsync, launchImageLibraryAsync, PermissionStatus, requestMediaLibraryPermissionsAsync, type ImagePickerOptions } from 'expo-image-picker';
 import React from 'react';
 import { Alert, Button, Image, Linking, Platform, View } from 'react-native';
+import { ImageAsset } from '../../types/firebase.type';
 import { styles } from './styles';
 
 const ImagePickerSection = ({ images, pickImages }: { images: ImageAsset[], pickImages: (images: ImageAsset[]) => void }) => {
