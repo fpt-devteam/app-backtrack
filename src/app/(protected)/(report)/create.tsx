@@ -1,4 +1,4 @@
-import ReportForm from '@/src/components/ReportForm/ReportForm';
+import ReportForm from '@/src/features/report/components/ReportForm/ReportForm';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 

@@ -1,10 +1,7 @@
 import { getPosts } from '@/src/api/posts';
-import type {
-  PostFilters,
-  PostListItem,
-} from '@/src/types/post.type';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ApiResponse, PagedResponse } from '../types/global.type';
+import { PostFilters, PostListItem } from '../types/report.type';
+import { ApiResponse, PagedResponse } from '@/src/shared/types/global.type';
 
 interface UsePostsState {
   posts: PostListItem[];

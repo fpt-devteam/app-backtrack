@@ -1,7 +1,7 @@
 
 import PostFiltersComponent from '@/src/components/PostFilters';
-import { usePosts } from '@/src/hooks/usePosts';
-import { PostFilters, PostListItem } from '@/src/types/post.type';
+import { usePosts } from '@/src/features/report/hooks/usePosts';
+import { PostFilters, PostListItem } from '@/src/features/report/types/report.type';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -179,7 +179,7 @@ const ReportScreen = () => {
 
       {/* Filters */}
       {showFilters && (
-        <PostFiltersComponent                                                                       
+        <PostFiltersComponent
           filters={filters}
           onApplyFilters={(newFilters: PostFilters) => {
             setFilters(newFilters);

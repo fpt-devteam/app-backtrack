@@ -1,6 +1,7 @@
 import { getPostById } from '@/src/api/posts';
-import type { ApiResponse, PostDetail } from '@/src/types/post.type';
+import { ApiResponse } from '@/src/shared/types/global.type';
 import { useCallback, useEffect, useState } from 'react';
+import { PostDetail } from '../types/report.type';
 
 interface UsePostByIdState {
   post: PostDetail | null;
