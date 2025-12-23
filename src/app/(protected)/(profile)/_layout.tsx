@@ -5,6 +5,7 @@ const ProfileLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="index" />
+      <Stack.Screen name="profileInformation" />
     </Stack>
   )
 }
