@@ -1,12 +1,27 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import ItemInfinityScrollView from '@/src/features/item/components/ItemInfinityScrollView/ItemInfinityScrollView';
+import { router } from 'expo-router';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
+import { Text } from 'react-native-paper';
 
-const QrLayout = () => {
+const ItemScreen = () => {
   return (
-    <View>
-      <Text>QrLayout  </Text>
-    </View>
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
+        <ItemInfinityScrollView />
+      </View>
+
+      <View style={{ padding: 16, gap: 16, borderTopWidth: 1, borderTopColor: '#e0e0e0', backgroundColor: '#fff' }}>
+        <TouchableOpacity onPress={() => router.push('/(qr)/item-link')} >
+          <Text>Generate QR Code</Text>
+        </TouchableOpacity >
+
+        <TouchableOpacity onPress={() => router.push('/(qr)/item-link')} >
+          <Text>Link Item to QR Code</Text>
+        </TouchableOpacity >
+      </View>
+    </View >
   )
 }
 
-export default QrLayout
+export default ItemScreen

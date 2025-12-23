@@ -3,7 +3,11 @@ import React from 'react'
 
 const QrLayout = () => {
   return (
-    <Stack />
+    <Stack
+      screenOptions={{
+        // headerShown: false,
+      }}
+    />
   )
 }
 
