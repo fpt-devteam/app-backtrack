@@ -26,7 +26,6 @@ const dateTimeValidate = {
 
 
 export default function DateTimePickerField({
-  label = "Date & Time Lost",
   value,
   onChange,
   placeholder = "mm/dd/yyyy, --:--",
@@ -93,8 +92,6 @@ export default function DateTimePickerField({
 
   return (
     <View style={styles.wrapper}>
-      {!!label && <Text style={styles.label}>{label}</Text>}
-
       <Pressable
         onPress={openModal}
         disabled={disabled}
@@ -116,8 +113,6 @@ export default function DateTimePickerField({
         <View style={styles.sheet}>
           {/* Header */}
           <View style={styles.sheetHeader}>
-            <Text style={styles.sheetTitle}>{label}</Text>
-
             <View style={styles.headerActions}>
               {/* Clear button */}
               <Pressable onPress={onPressClear} style={styles.headerBtn}>
@@ -146,6 +141,8 @@ export default function DateTimePickerField({
                 display="spinner"
                 onChange={onChangeDate}
                 style={styles.picker}
+                themeVariant="light"
+                textColor="#334155"
               />
             </View>
           </View>
@@ -161,6 +158,8 @@ export default function DateTimePickerField({
                 is24Hour
                 onChange={onChangeTime}
                 style={styles.picker}
+                themeVariant="light"
+                textColor="#334155"
               />
             </View>
           </View>
