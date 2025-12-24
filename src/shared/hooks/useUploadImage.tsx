@@ -6,6 +6,7 @@ import {
   MAX_IMAGE_UPLOAD,
   MIN_IMAGE_UPLOAD,
   UPLOAD_IMAGE_API,
+  UPLOAD_IMAGE_QUERY_KEY,
 } from "../constants/firebase.constant";
 import { uploadImageToStorage } from "../services/firebase.service";
 import type {
@@ -19,12 +20,8 @@ export function useUploadImage() {
 
   const mutation = useMutation<Nullable<ImageUploadResponse[]>, Error, ImageAsset[]>(
     {
-      mutationKey: ["firebase", "uploadImages"],
-
-      onMutate: () => {
-        setProgress(0);
-      },
-
+      mutationKey: [UPLOAD_IMAGE_QUERY_KEY],
+      onMutate: () => setProgress(0),
       mutationFn: async (imageAssets) => {
         const user = auth.currentUser;
         if (!user) throw new Error("Not authenticated");
@@ -64,7 +61,7 @@ export function useUploadImage() {
   );
 
   return {
-    uploading: mutation.isPending,
+    isUploadingImages: mutation.isPending,
     progress,
     uploadImages: mutation.mutateAsync,
     error: mutation.error,
