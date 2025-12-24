@@ -1,6 +1,7 @@
-const UPLOAD_IMAGE_API = "posts/images";
 const MIN_IMAGE_UPLOAD = 1;
 const MAX_IMAGE_UPLOAD = 5;
+const UPLOAD_IMAGE_API = "posts/images";
+const UPLOAD_IMAGE_QUERY_KEY = "firebase-upload-images";
 
-export { MAX_IMAGE_UPLOAD, MIN_IMAGE_UPLOAD, UPLOAD_IMAGE_API };
+export { MAX_IMAGE_UPLOAD, MIN_IMAGE_UPLOAD, UPLOAD_IMAGE_API, UPLOAD_IMAGE_QUERY_KEY };
 
