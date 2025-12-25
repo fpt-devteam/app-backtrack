@@ -1,5 +1,6 @@
-import { Nullable } from "../../../shared/types/global.type";
-import { GoogleMapDetailLocation, GoogleMapLocation } from "../../../shared/types/location.type";
+import { ApiResponse, Nullable } from "../../../shared/types/global.type";
+import { GoogleMapDetailLocation } from "../../../shared/types/location.type";
+import { ReportType } from "./report.enum";
 
 export enum PostType {
   Lost = 'Lost',
@@ -49,31 +50,6 @@ export interface PostFilters {
 export type PostListItem = PostResponse;
 export type PostDetail = PostResponse;
 
-
-export type CreateReportRequest = {
-  postType: string;
-  itemName: string;
-  description: string;
-  imageUrls: string[];
-
-  materials: string[] | null;
-  brands: string[] | null;
-  colors: string[] | null;
-
-  location: GoogleMapLocation | null;
-  externalPlaceId: string | null;
-  displayAddress: string | null;
-
-  eventTime: Date; // UTC 0
-};
-
-export type CreateReportResponse = {
-  success: boolean;
-  data: ReportDetails | null,
-  error: string | null,
-  correlationId: string | null,
-};
-
 export type ReportDetails = {
   id: string;
   postType: string;
@@ -89,3 +65,25 @@ export type ReportDetails = {
   eventTime: Date;
   createdAt: Date;
 };
+
+export type ReportPost = {
+  id: string;
+  postType: ReportType;
+  itemName: string;
+  imageUrls: string[];
+  description: string | null;
+  distinctiveMarks: string | null;
+  eventTime: Date;
+  createdAt: Date;
+} & GoogleMapDetailLocation;
+
+export type ReportCreateRequest = {
+  postType: ReportType;
+  itemName: string;
+  description: string;
+  imageUrls: string[];
+  distinctiveMarks: string | null;
+  eventTime: Date;
+} & GoogleMapDetailLocation;
+
+export type ReportCreateResponse = ApiResponse<ReportPost>;

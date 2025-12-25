@@ -1,6 +1,6 @@
 import useGetDetailLocation from "@/src/shared/hooks/useGetDetailLocation";
 import React, { useEffect, useRef } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import MapView, { Marker, MarkerDragStartEndEvent, Region } from "react-native-maps";
 import { Button } from "react-native-paper";
@@ -10,9 +10,9 @@ import { ANIMATE_TO_DURATION, DEFAULT_REGION, QUERY_CONFIG } from "../../constan
 import { GoogleMapDetailLocation } from "../../types/location.type";
 import { styles } from "./styles";
 
-type LocationPickerProps = {
-  location: GoogleMapDetailLocation | null;
-  changeLocation: (location: GoogleMapDetailLocation | null) => void;
+type LocationFieldProps = {
+  value: GoogleMapDetailLocation | null;
+  onChange: (location: GoogleMapDetailLocation | null) => void;
 };
 
 const getRegionFromLocation = (detailLocation: GoogleMapDetailLocation | null): Region => {
@@ -25,8 +25,8 @@ const getRegionFromLocation = (detailLocation: GoogleMapDetailLocation | null): 
   };
 };
 
-const LocationPicker = (locationPickerProps: LocationPickerProps) => {
-  const { location: detailLocation, changeLocation: changeDetailLocation } = locationPickerProps;
+const LocationField = (locationFieldProps: LocationFieldProps) => {
+  const { value: detailLocation, onChange } = locationFieldProps;
 
   const mapRef = useRef<MapView>(null);
   const placesRef = useRef<GooglePlacesAutocompleteRef>(null);
@@ -44,7 +44,7 @@ const LocationPicker = (locationPickerProps: LocationPickerProps) => {
 
   const handleGetCurrentLocation = async () => {
     const fetchedData = await getDetailCurrentLocation();
-    changeDetailLocation(fetchedData);
+    onChange(fetchedData);
   };
 
   const handleMarkerDragEnd = async (e: MarkerDragStartEndEvent) => {
@@ -57,7 +57,7 @@ const LocationPicker = (locationPickerProps: LocationPickerProps) => {
 
     const coords = mapLocation.location;
     const fetchedData = await formatLocation(coords);
-    changeDetailLocation(fetchedData);
+    onChange(fetchedData);
   };
 
   const handlePickPlace = async (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
@@ -75,13 +75,11 @@ const LocationPicker = (locationPickerProps: LocationPickerProps) => {
 
     const coords = mapLocation.location;
     const formattedLocation: GoogleMapDetailLocation | null = await formatLocation(coords);
-    changeDetailLocation(formattedLocation);
+    onChange(formattedLocation);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Last Seen Location</Text>
-
       {/* Search bar */}
       <View style={styles.searchContainer}>
         <GooglePlacesAutocomplete
@@ -135,4 +133,4 @@ const LocationPicker = (locationPickerProps: LocationPickerProps) => {
   );
 };
 
-export default LocationPicker;
+export default LocationField;

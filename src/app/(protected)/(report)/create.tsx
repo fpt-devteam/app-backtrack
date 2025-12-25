@@ -5,7 +5,9 @@ import { StyleSheet, View } from 'react-native';
 const CreateReportScreen = () => {
   return (
     <View style={styles.container}>
-      <ReportForm />
+      <ReportForm
+        mode={'create' as ('create' | 'edit')}
+        initialData={null} />
     </View>
   )
 }

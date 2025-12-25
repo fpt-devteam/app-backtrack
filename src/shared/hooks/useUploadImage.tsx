@@ -1,5 +1,6 @@
 import { Nullable } from "@/src/shared/types/global.type";
 import { useMutation } from "@tanstack/react-query";
+import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
 import { auth } from "../../lib/firebase";
 import {
@@ -10,15 +11,14 @@ import {
 } from "../constants/firebase.constant";
 import { uploadImageToStorage } from "../services/firebase.service";
 import type {
-  ImageAsset,
   ImageUploadRequest,
-  ImageUploadResponse,
+  ImageUploadResponse
 } from "../types/firebase.type";
 
 export function useUploadImage() {
   const [progress, setProgress] = useState(0);
 
-  const mutation = useMutation<Nullable<ImageUploadResponse[]>, Error, ImageAsset[]>(
+  const mutation = useMutation<Nullable<ImageUploadResponse[]>, Error, ImagePickerAsset[]>(
     {
       mutationKey: [UPLOAD_IMAGE_QUERY_KEY],
       onMutate: () => setProgress(0),
