@@ -25,9 +25,11 @@ export const styles = StyleSheet.create({
     color: '#1f2a44',
     marginBottom: 16,
   },
+
   fieldContainer: {
     marginBottom: 16,
   },
+
   label: {
     fontSize: 14,
     fontWeight: '600',

@@ -1,141 +1,122 @@
-import { GoogleMapDetailLocation } from "@/src/shared/types/location.type";
-import { yupResolver } from "@hookform/resolvers/yup";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Alert, Button, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import ImageField from '@/src/shared/components/ImageField/ImageField';
+import LocationField from '@/src/shared/components/LocationField/LocationField';
+import { useUploadImage } from '@/src/shared/hooks/useUploadImage';
+import { Nullable } from '@/src/shared/types/global.type';
+import { GoogleMapDetailLocation } from '@/src/shared/types/location.type';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { ImagePickerAsset } from 'expo-image-picker';
+import React, { useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Alert, Button, FlatList, Text, TextInput, View } from 'react-native';
 import * as yup from "yup";
+import useCreateReport from '../../hooks/useCreateReport';
+import { ReportType } from '../../types/report.enum';
+import { ReportCreateRequest, ReportPost } from '../../types/report.type';
+import DateTimePickerField from '../DateTimeField/DateTimeField';
+import { styles } from './styles';
 
-import useCreateReport from "@/src/features/report/hooks/useCreateReport";
-import { CreateReportRequest, ReportDetails } from "@/src/features/report/types/report.type";
-import LocationPicker from "@/src/shared/components/LocationPicker/LocationPicker";
-import { useUploadImage } from "@/src/shared/hooks/useUploadImage";
-import { ImageAsset } from "@/src/shared/types/firebase.type";
-import { Nullable } from "@/src/shared/types/global.type";
-import ImagePickerSection from "../../../../shared/components/ImagePickerSection/ImagePickerSection";
-import { styles } from "./styles";
 
 const reportSchema = yup
   .object({
-    postType: yup.string().required("Post type is required"),
     itemName: yup.string().required("Item name is required"),
     description: yup.string().required("Description is required"),
     eventTime: yup.date().required("Event time is required"),
-    materials: yup.string().required().defined(),
-    brands: yup.string().required().defined(),
-    colors: yup.string().required().defined(),
+    distinctiveMarks: yup.string().required("Distinctive marks is required"),
+    images: yup
+      .array()
+      .of(
+        yup
+          .mixed<ImagePickerAsset>().defined()
+          .test("has-uri", "Invalid image (missing uri).", (asset) => {
+            return !!asset && typeof asset === "object" && !!asset.uri;
+          })
+          .test("mime", "Only JPG/PNG/WebP images are allowed.", (asset) => {
+            if (!asset) return true;
+
+            const mime = asset.mimeType;
+            if (!mime) return true;
+
+            const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
+            return allowedMimes.includes(mime);
+          })
+          .test("size", "Image is too large (max 5 MB).", (asset) => {
+            if (!asset) return true;
+
+            const size = asset.fileSize;
+            if (typeof size !== "number") return true;
+
+            const maxImageSize = 5 * 1024 * 1024; // 5 MB
+            return size <= maxImageSize;
+          })
+      )
+      .min(1, "Please select at least 1 image.")
+      .max(5, "You can select up to 5 images.")
+      .required("Images are required."),
+    detailLocation: yup.mixed<GoogleMapDetailLocation>().required("Location is required"),
   })
   .required();
 
 type ReportFormSchema = yup.InferType<typeof reportSchema>;
 
-const ReportForm = (initialData: Nullable<ReportDetails>) => {
-  const [reportData, setReportData] = useState<Nullable<ReportDetails>>(initialData);
+type ReportFormProps = {
+  mode: 'create' | 'edit',
+  initialData: Nullable<ReportPost>;
+};
 
-  const [images, setImages] = useState<ImageAsset[]>([]);
-  const [location, setLocation] = useState<Nullable<GoogleMapDetailLocation>>(null);
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-
+const ReportForm = ({ mode, initialData }: ReportFormProps) => {
+  const [reportData, setReportData] = useState<Nullable<ReportPost>>(initialData);
   const { uploadImages } = useUploadImage();
-  const { createNewReport } = useCreateReport();
+  const { createReport } = useCreateReport();
 
-  const { control, handleSubmit, reset: resetForm, formState: { errors },
-  } = useForm<ReportFormSchema>({
+  const { control, handleSubmit, formState: { errors }, } = useForm<ReportFormSchema>({
     defaultValues: {
-      postType: reportData?.postType ?? "",
       itemName: reportData?.itemName ?? "",
       description: reportData?.description ?? "",
-      materials: reportData?.materials?.join(", ") ?? "",
-      brands: reportData?.brands?.join(", ") ?? "",
-      colors: reportData?.colors?.join(", ") ?? "",
-      eventTime: reportData?.eventTime ? new Date(reportData.eventTime) : new Date(),
+      distinctiveMarks: reportData?.distinctiveMarks ?? "",
+      eventTime: reportData?.eventTime ? new Date(reportData.eventTime) : undefined,
+      detailLocation: reportData?.location ? {
+        location: reportData?.location,
+        externalPlaceId: reportData?.externalPlaceId ?? null,
+        displayAddress: reportData?.displayAddress ?? null,
+      } : undefined,
+      images: [] as ImagePickerAsset[],
     },
     resolver: yupResolver(reportSchema),
     mode: "onSubmit",
   });
 
-  useEffect(() => {
-    resetForm({
-      postType: reportData?.postType ?? "",
-      itemName: reportData?.itemName ?? "",
-      description: reportData?.description ?? "",
-      materials: reportData?.materials ? reportData?.materials.join(", ") : "",
-      brands: reportData?.brands ? reportData?.brands.join(", ") : "",
-      colors: reportData?.colors ? reportData?.colors.join(", ") : "",
-      eventTime: reportData?.eventTime ? new Date(reportData.eventTime) : new Date(),
-    });
-  }, [reportData]);
-
-  const pickImages = useCallback((newImages: ImageAsset[]) => {
-    setImages((prev) => {
-      const map = new Map<string, ImageAsset>();
-      for (const img of prev) map.set(img.uri, img);
-      for (const img of newImages) map.set(img.uri, img);
-      return Array.from(map.values());
-    });
-  }, []);
-
-  const changeLocation = useCallback((newLocation: Nullable<GoogleMapDetailLocation>) => {
-    setLocation(newLocation);
-    console.log("Location changed: ", newLocation);
-  }, []);
-
-  const validateForm = useCallback((): boolean => {
-    if (images.length === 0) {
-      Alert.alert("Validation Error", "Please pick at least one image.");
-      return false;
-    }
-    if (!location) {
-      Alert.alert("Validation Error", "Please select a location.");
-      return false;
-    }
-    return true;
-  }, [images.length, location]);
-
-  const handleUploadImages = useCallback(async (): Promise<string[]> => {
+  const handleUploadImages = async (images: ImagePickerAsset[]) => {
     const uploadRes = await uploadImages(images);
-
-    if (!uploadRes) {
-      return [];
-    }
+    if (!uploadRes) return [];
 
     const imageUrls = uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
     return imageUrls;
-  }, [images, uploadImages]);
+  };
 
   const onSubmit: SubmitHandler<ReportFormSchema> = async (data: ReportFormSchema) => {
-    const isFormValid = validateForm();
-    if (!isFormValid) return;
-
     try {
-      const imageUrls = await handleUploadImages();
+      const imageUrls = await handleUploadImages(data.images);
       if (imageUrls.length === 0) {
         Alert.alert("Error", "Failed to upload images.");
         return;
       }
 
-      const materialsArray = data.materials ? data.materials.split(",").map((s) => s.trim()).filter(Boolean) : null;
-      const brandsArray = data.brands ? data.brands.split(",").map((s) => s.trim()).filter(Boolean) : null;
-      const colorsArray = data.colors ? data.colors.split(",").map((s) => s.trim()).filter(Boolean) : null;
+      console.log('Submit data: ', data);
 
-      const reportData: CreateReportRequest = {
-        postType: data.postType,
+      const reportData: ReportCreateRequest = {
+        postType: ReportType.LOST,
         itemName: data.itemName,
         description: data.description,
-        materials: materialsArray,
-        brands: brandsArray,
-        colors: colorsArray,
         imageUrls,
-        location: location?.location!,
-        externalPlaceId: location?.externalPlaceId || null,
-        displayAddress: location?.displayAddress || null,
-        eventTime: data.eventTime || new Date(),
+        location: data.detailLocation?.location,
+        externalPlaceId: data.detailLocation?.externalPlaceId,
+        displayAddress: data.detailLocation?.displayAddress,
+        distinctiveMarks: data.distinctiveMarks,
+        eventTime: data.eventTime,
       };
 
       console.log("Report data to submit:", reportData);
-      const reportDetails = await createNewReport(reportData);
+      const reportDetails = await createReport(reportData);
       setReportData(reportDetails);
       Alert.alert("Success", "Report submitted successfully!");
     } catch (error) {
@@ -144,227 +125,125 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
     }
   };
 
-  const content = useMemo(
-    () => (
-      <View style={styles.container}>
-        <ImagePickerSection images={images} pickImages={pickImages} />
-
-        <View style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Item Details</Text>
-
-          {/* Post Type */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Post Type*</Text>
-            <Controller
-              control={control}
-              name="postType"
-              render={({ field: { onChange, value } }) => (
-                <View style={styles.radioGroup}>
-                  <Button
-                    title="Lost"
-                    onPress={() => onChange("Lost")}
-                    color={value === "Lost" ? "#007AFF" : "#8E8E93"}
-                  />
-                  <View style={{ width: 12 }} />
-                  <Button
-                    title="Found"
-                    onPress={() => onChange("Found")}
-                    color={value === "Found" ? "#007AFF" : "#8E8E93"}
-                  />
-                </View>
-              )}
-            />
-            {errors.postType && <Text style={styles.errorText}>{errors.postType.message}</Text>}
-          </View>
-
-          {/* Item Name */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Item Name*</Text>
-            <Controller
-              control={control}
-              name="itemName"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[styles.input, errors.itemName && styles.inputError]}
-                  placeholder="e.g. Blue Backpack, iPhone 14"
-                  value={value}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-            {errors.itemName && <Text style={styles.errorText}>{errors.itemName.message}</Text>}
-          </View>
-
-          {/* Description */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Description*</Text>
-            <Controller
-              control={control}
-              name="description"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={[styles.textArea, errors.description && styles.inputError]}
-                  placeholder="Describe the item in detail."
-                  value={value}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-              )}
-            />
-            {errors.description && (
-              <Text style={styles.errorText}>{errors.description.message}</Text>
-            )}
-          </View>
-
-          {/* Materials */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Materials</Text>
-            <Controller
-              control={control}
-              name="materials"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. Leather, Cotton (comma-separated)"
-                  value={value ?? ""}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-          </View>
-
-          {/* Brands */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Brands</Text>
-            <Controller
-              control={control}
-              name="brands"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. Nike, Apple (comma-separated)"
-                  value={value ?? ""}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-          </View>
-
-          {/* Colors */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Colors</Text>
-            <Controller
-              control={control}
-              name="colors"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="e.g. Blue, Red (comma-separated)"
-                  value={value ?? ""}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                />
-              )}
-            />
-          </View>
-
-          {/* Event Time */}
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Event Time*</Text>
-            <Controller
-              control={control}
-              name="eventTime"
-              render={({ field: { onChange, value } }) => {
-                const formatDateTime = (date: Date) => {
-                  if (!date || !(date instanceof Date) || Number.isNaN(date.getTime())) {
-                    return 'Select date and time';
-                  }
-                  const year = date.getFullYear();
-                  const month = String(date.getMonth() + 1).padStart(2, '0');
-                  const day = String(date.getDate()).padStart(2, '0');
-                  const hours = String(date.getHours()).padStart(2, '0');
-                  const minutes = String(date.getMinutes()).padStart(2, '0');
-                  return `${year}-${month}-${day} : ${hours}:${minutes}`;
-                };
-
-                return (
-                  <>
-                    <Pressable
-                      style={[styles.input, errors.eventTime && styles.inputError]}
-                      onPress={() => setShowDatePicker(true)}
-                    >
-                      <Text style={{ color: value ? '#000' : '#999' }}>
-                        {formatDateTime(value)}
-                      </Text>
-                    </Pressable>
-
-                    {showDatePicker && (
-                      <DateTimePicker
-                        value={value || new Date()}
-                        mode="date"
-                        display="default"
-                        onChange={(event, selectedDate) => {
-                          setShowDatePicker(false);
-                          if (event.type === 'set' && selectedDate) {
-                            // Preserve time from current value
-                            const currentTime = value || new Date();
-                            const newDate = new Date(selectedDate);
-                            newDate.setHours(currentTime.getHours());
-                            newDate.setMinutes(currentTime.getMinutes());
-                            newDate.setSeconds(0);
-                            newDate.setMilliseconds(0);
-                            onChange(newDate);
-                            // Show time picker after date is selected
-                            setTimeout(() => setShowTimePicker(true), 100);
-                          }
-                        }}
-                      />
-                    )}
-
-                    {showTimePicker && (
-                      <DateTimePicker
-                        value={value || new Date()}
-                        mode="time"
-                        display="default"
-                        onChange={(event, selectedTime) => {
-                          setShowTimePicker(false);
-                          if (event.type === 'set' && selectedTime) {
-                            // Preserve date from current value
-                            const currentDate = value || new Date();
-                            const newDateTime = new Date(currentDate);
-                            newDateTime.setHours(selectedTime.getHours());
-                            newDateTime.setMinutes(selectedTime.getMinutes());
-                            newDateTime.setSeconds(0);
-                            newDateTime.setMilliseconds(0);
-                            onChange(newDateTime);
-                          }
-                        }}
-                      />
-                    )}
-                  </>
-                );
-              }}
-            />
-            {errors.eventTime && <Text style={styles.errorText}>{errors.eventTime.message}</Text>}
-          </View>
-        </View>
-
-        <LocationPicker location={location} changeLocation={changeLocation} />
-
-        <View style={styles.buttonContainer}>
-          <Button title="Submit Report" onPress={handleSubmit(onSubmit)} />
-        </View>
+  const content = (<View style={styles.container}>
+    {/* Form Fields */}
+    <View style={styles.formSection}>
+      {/* Image Picker */}
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Photos of the item</Text>
+        <Controller
+          control={control}
+          name="images"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <ImageField value={value} onChange={onChange} />
+          )}
+        />
+        {errors.images && (<Text style={styles.errorText}>{errors.images.message}</Text>)}
       </View>
-    ),
-    [images, pickImages, control, errors, location, changeLocation, handleSubmit, showDatePicker, showTimePicker]
-  );
 
+      <Text style={styles.sectionTitle}>Item Details</Text>
+      {/* Item Name */}
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Item Name</Text>
+        <Controller
+          control={control}
+          name="itemName"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={[styles.input, errors.itemName && styles.inputError]}
+              placeholder="e.g. Blue Backpack, iPhone 14"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+            />
+          )}
+        />
+        {errors.itemName && <Text style={styles.errorText}>{errors.itemName.message}</Text>}
+      </View>
+
+      {/* Description */}
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Description</Text>
+        <Controller
+          control={control}
+          name="description"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={[styles.textArea, errors.description && styles.inputError]}
+              placeholder="Describe the item in detail."
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          )}
+        />
+        {errors.description && (
+          <Text style={styles.errorText}>{errors.description.message}</Text>
+        )}
+      </View>
+
+      {/* Distinctive Marks */}
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Distinctive Marks</Text>
+        <Controller
+          control={control}
+          name="distinctiveMarks"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TextInput
+              style={[styles.textArea, errors.distinctiveMarks && styles.inputError]}
+              placeholder="Any unique marks, scratches, or identifying features (optional)"
+              value={value}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          )}
+        />
+        {errors.distinctiveMarks && (
+          <Text style={styles.errorText}>{errors.distinctiveMarks.message}</Text>
+        )}
+      </View>
+
+      {/* Event Time */}
+      <View style={styles.fieldContainer}>
+        <Text style={styles.label}>Event Time</Text>
+        <Controller
+          control={control}
+          name="eventTime"
+          render={({ field: { onChange, value } }) => (
+            <DateTimePickerField
+              value={value}
+              onChange={onChange}
+              placeholder="Select event date and time"
+            />
+          )}
+        />
+        {errors.eventTime && (<Text style={styles.errorText}>{errors.eventTime.message}</Text>)}
+      </View>
+
+      {/* Location Picker */}
+      <View style={styles.fieldContainer}>
+        <Controller
+          control={control}
+          name="detailLocation"
+          render={({ field: { onChange, value } }) => (
+            <LocationField value={value} onChange={onChange} />
+          )}
+        />
+        {errors.detailLocation && (<Text style={styles.errorText}>{errors.detailLocation.message}</Text>)}
+      </View>
+    </View>
+
+    {/* Submit Button */}
+    <View style={styles.buttonContainer}>
+      <Button title="Submit Report" onPress={handleSubmit(onSubmit)} />
+    </View>
+  </View>)
   return (
     <FlatList
       data={[{ key: "form" }]}
@@ -375,7 +254,7 @@ const ReportForm = (initialData: Nullable<ReportDetails>) => {
       keyboardDismissMode="on-drag"
       contentContainerStyle={{ paddingBottom: 24 }}
     />
-  );
-};
+  )
+}
 
-export default ReportForm;
+export default ReportForm

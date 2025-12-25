@@ -1,7 +1,9 @@
 
 import PostFiltersComponent from '@/src/features/report/components/PostFilters/PostFilters';
+import ReportCard from '@/src/features/report/components/ReportCard/ReportCard';
 import { usePosts } from '@/src/features/report/hooks/usePosts';
-import { PostFilters, PostListItem } from '@/src/features/report/types/report.type';
+import { ReportType } from '@/src/features/report/types/report.enum';
+import { PostFilters, PostListItem, ReportPost } from '@/src/features/report/types/report.type';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import {
@@ -14,6 +16,26 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+
+const mockData: ReportPost = {
+  id: "44e47df5-f9d2-4bf5-86a4-3909b611e6b4",
+  postType: ReportType.FOUND,
+  itemName: "Brown Leather Wallet",
+  description: "Found near the main entrance benches",
+  imageUrls: [
+    "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2FHIUWX1kdWbT9CeUqZwGohfkuKTF2%2Fimg_1766562266113_0?alt=media&token=4bfbbf51-4e71-4d78-977c-86f47210a0ac",
+    "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2FHIUWX1kdWbT9CeUqZwGohfkuKTF2%2Fimg_1766562266113_0?alt=media&token=4bfbbf51-4e71-4d78-977c-86f47210a0ac"
+  ],
+  location: {
+    latitude: 10.843052770806777,
+    longitude: 106.77179778724106
+  },
+  distinctiveMarks: "Worn edges and a small tear on the left side",
+  externalPlaceId: "ChIJm0qMwQkndTERc5s0xiK131M",
+  displayAddress: "702 Võ Nguyên Giáp, Hiệp Phú, Thủ Đức, Thành phố Hồ Chí Minh 70000, Vietnam",
+  eventTime: new Date("2025-12-24T07:44:00.299+00:00"),
+  createdAt: new Date("2025-12-24T07:44:28.626187+00:00")
+}
 
 const ReportScreen = () => {
   const router = useRouter();
@@ -92,18 +114,6 @@ const ReportScreen = () => {
             📍 {item.location.latitude.toFixed(4)}, {item.location.longitude.toFixed(4)}
           </Text>
         )}
-
-        {item.material.length > 0 && (
-          <Text style={styles.tags} numberOfLines={1}>
-            Material: {item.material.join(', ')}
-          </Text>
-        )}
-
-        {item.colors.length > 0 && (
-          <Text style={styles.tags} numberOfLines={1}>
-            Colors: {item.colors.join(', ')}
-          </Text>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -153,6 +163,18 @@ const ReportScreen = () => {
     </View>
   );
 
+  const handlePressCreate = (type: ReportType) => {
+    router.push(
+      {
+        pathname: '/(protected)/(report)/create',
+        params: {
+          reportType: type,
+          mode: 'create',
+        }
+      }
+    );
+  };
+
   if (error && !posts.length) {
     return renderErrorState();
   }
@@ -188,6 +210,10 @@ const ReportScreen = () => {
         />
       )}
 
+      {/* <View>
+        <ReportCard item={mockData} />
+      </View> */}
+
       {/* List */}
       {loading && !refreshing && posts.length === 0 ? (
         renderLoadingSkeleton()
@@ -212,14 +238,14 @@ const ReportScreen = () => {
         />
       )}
 
-      {/* Create Button */}
+      {/* Create Buttons */}
       <TouchableOpacity
         style={styles.createButton}
-        onPress={() => router.push('/(protected)/(report)/create')}
+        onPress={() => handlePressCreate(ReportType.LOST)}
       >
-        <Text style={styles.createButtonText}>+ Create Report</Text>
+        <Text style={styles.createButtonText}>Report Lost</Text>
       </TouchableOpacity>
-    </View>
+    </View >
   );
 };
 
@@ -406,6 +432,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 8,
   },
+
   createButton: {
     position: 'absolute',
     bottom: 20,
@@ -420,6 +447,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
+
   createButtonText: {
     color: '#FFF',
     fontSize: 16,
