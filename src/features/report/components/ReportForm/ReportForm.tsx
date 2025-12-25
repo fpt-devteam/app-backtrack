@@ -12,7 +12,7 @@ import * as yup from "yup";
 import useCreateReport from '../../hooks/useCreateReport';
 import { ReportType } from '../../types/report.enum';
 import { ReportCreateRequest, ReportPost } from '../../types/report.type';
-import DateTimePickerField from '../DateTimeField/DateTimeField';
+import DateTimePickerField from '../../../../shared/components/DateTimeField/DateTimeField';
 import { styles } from './styles';
 
 
