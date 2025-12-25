@@ -1,4 +1,4 @@
-import { auth } from '@/src/lib/firebase';
+import { auth } from '@/src/shared/lib/firebase';
 import axios from 'axios';
 
 export const publicClient = axios.create({
