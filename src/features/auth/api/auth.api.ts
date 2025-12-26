@@ -3,8 +3,8 @@ import { ApiResponse } from "@/src/shared/types/global.type";
 import { MeResponse, SyncRequest, SyncResponse } from "../types";
 
 const AUTH = {
-  me: "/auth/users",
-  sync: "/auth/users",
+  me: "/core/users",
+  sync: "/core/users",
 };
 
 export async function meApi() {
