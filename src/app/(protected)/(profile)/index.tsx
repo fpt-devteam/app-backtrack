@@ -1,4 +1,4 @@
-import { useAuth } from "@/src/features/auth/providers/AuthProvider";
+import { useAuth } from "@/src/features/auth/providers";
 import { auth } from "@/src/shared/lib/firebase";
 import { signOut } from "firebase/auth";
 import React from "react";

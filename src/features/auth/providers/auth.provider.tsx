@@ -1,7 +1,8 @@
 import { AUTH_STORAGE_KEY } from "@/src/features/auth/constants/auth.constant";
-import { AuthState } from "@/src/features/auth/types/auth.type";
+import { auth } from "@/src/shared/lib";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { AuthState } from "../types";
 
 type AuthContextType = AuthState & {
   isAppReady: boolean;
@@ -15,26 +16,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAppReady, setIsAppReady] = useState(false);
   const [authState, setAuthState] = useState<AuthState>({
     isLoggedIn: false,
-    idToken: "",
   });
 
   useEffect(() => {
     const restoreSession = async () => {
-      await new Promise((res) => setTimeout(() => res(null), 1000));
       try {
-        const data = await AsyncStorage.getItem(AUTH_STORAGE_KEY);
-        if (data !== null) {
-          const state: AuthState = {
-            ...authState,
-            idToken: JSON.parse(data).idToken,
-            isLoggedIn: true,
-          };
-          setAuthState(state);
+        const user = auth.currentUser;
+
+        if (!user) {
+          setIsAppReady(true);
+          await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
+          setAuthState({ isLoggedIn: false });
+          return;
         }
+
+        await user.getIdToken(true);
+        setAuthState({ isLoggedIn: true });
       } catch (error) {
+        setIsAppReady(true);
+        setAuthState({ isLoggedIn: false });
+        await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
         console.log("Error fetching from storage", error);
       }
-      setIsAppReady(true);
     };
     restoreSession();
   }, []);
@@ -46,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function clearSession() {
     await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-    const state: AuthState = { isLoggedIn: false, idToken: "" };
+    const state: AuthState = { isLoggedIn: false};
     setAuthState(state);
   }
 

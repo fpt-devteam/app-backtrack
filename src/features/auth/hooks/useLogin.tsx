@@ -3,8 +3,10 @@ import { useMutation } from "@tanstack/react-query";
 import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
+
+import { LOGIN_QUERY_KEY } from "../constants";
+import { useSync } from "../hooks";
 import type { LoginRequest, LoginResponse } from "../types";
-import { useSync } from "./useSync";
 
 function mapLoginError(error: unknown): Error {
   if (error instanceof FirebaseError) {
@@ -25,7 +27,7 @@ export function useLogin() {
   const { syncUser } = useSync();
 
   const mutation = useMutation<LoginResponse, Error, LoginRequest>({
-    mutationKey: ["auth", "login"],
+    mutationKey: LOGIN_QUERY_KEY,
     mutationFn: async (req) => {
       const email = req.email.trim();
       const password = req.password;
@@ -34,11 +36,9 @@ export function useLogin() {
       const idToken = await cred.user.getIdToken();
 
       if (!idToken) throw new Error("Failed to get ID token.");
-      return { idToken } as LoginResponse;
-    },
+      await syncUser({ idToken: idToken });
 
-    onSuccess: async (data) => {
-      await syncUser({ idToken: data.idToken });
+      return { idToken } as LoginResponse;
     },
 
     onError: (err) => {

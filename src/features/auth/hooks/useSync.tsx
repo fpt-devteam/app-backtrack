@@ -1,14 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { syncUserApi } from "../api/auth.api";
-import { useAuth } from "../providers/AuthProvider";
+import { SYNC_QUERY_KEY } from "../constants";
+import { useAuth } from "../providers/auth.provider";
 import { AuthState, SyncRequest, SyncResponse } from "../types";
 
 export function useSync() {
   const auth = useAuth();
 
   const mutation = useMutation<SyncResponse, Error, SyncRequest>({
-    mutationKey: ["auth", "sync"],
+    mutationKey: SYNC_QUERY_KEY,
 
     mutationFn: async (req: SyncRequest) => {
       if (!req?.idToken) throw new Error("No token");

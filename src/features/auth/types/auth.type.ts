@@ -32,5 +32,4 @@ export type RegisterCredentials = LoginRequest & {
 
 export type AuthState = {
   isLoggedIn: boolean;
-  idToken: string;
 };

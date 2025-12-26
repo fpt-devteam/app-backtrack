@@ -37,12 +37,13 @@ privateClient.interceptors.response.use(
       original._retry = true;
 
       const user = auth.currentUser;
-      if (user) {
-        const token = await user.getIdToken(true);
-        original.headers.Authorization = `Bearer ${token}`;
-        return privateClient.request(original);
-      }
+      if (!user) return Promise.reject(error);
+
+      const token = await user.getIdToken(true);
+      original.headers.Authorization = `Bearer ${token}`;
+      return privateClient.request(original);
     }
+
     return Promise.reject(error);
   }
-)
+);

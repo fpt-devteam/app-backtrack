@@ -1,19 +1,14 @@
-import { useAuth } from "@/src/features/auth/providers/AuthProvider";
+import { useAuth } from "@/src/features/auth/providers";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 
 export default function ProtectedLayout() {
   const { isAppReady, isLoggedIn } = useAuth();
+  console.log("Protected layout");
 
-  console.log("heheh");
+  if (!isAppReady) return null;
 
-  if (!isAppReady) {
-    return null;
-  }
-
-  if (!isLoggedIn) {
-    return <Redirect href="/login" />;
-  }
+  if (!isLoggedIn) return <Redirect href="/login" />;
 
   return (
     <Tabs screenOptions={{ headerShown: false }}>

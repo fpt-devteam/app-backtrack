@@ -1,5 +1,4 @@
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
-import type { LoginRequest } from "@/src/features/auth/types/auth.type";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "expo-router";
@@ -7,6 +6,7 @@ import React, { useMemo, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import * as yup from "yup";
+import { LoginRequest } from "../../types";
 import { styles } from "./styles";
 
 const loginFormSchema = yup
@@ -29,17 +29,23 @@ export default function LoginForm() {
     mode: "onSubmit",
   });
 
-  const feedback = useMemo(
-    () => {
-      return localError ?? errors.email?.message ?? errors.password?.message ?? error ?? null
-    },
-    [localError, errors.email?.message, errors.password?.message, error]
-  );
+  const feedback = useMemo(() => {
+    return (
+      localError ??
+      errors.email?.message ??
+      errors.password?.message ??
+      error?.message ??
+      null
+    );
+  }, [localError, errors.email?.message, errors.password?.message, error?.message]);
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
     setLocalError(null);
     try {
-      const req: LoginRequest = { email: data.email.trim(), password: data.password };
+      const req: LoginRequest = {
+        email: data.email,
+        password: data.password
+      };
       await login(req);
     } catch (err: any) {
       if (err?.message) setLocalError(err.message);
