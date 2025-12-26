@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import 'react-native-get-random-values';
-import { AuthProvider } from "../providers/AuthProvider";
+import { AuthProvider } from "../features/auth/providers/AuthProvider";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

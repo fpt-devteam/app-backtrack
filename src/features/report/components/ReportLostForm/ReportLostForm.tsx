@@ -5,14 +5,15 @@ import { Nullable } from '@/src/shared/types/global.type';
 import { GoogleMapDetailLocation } from '@/src/shared/types/location.type';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ImagePickerAsset } from 'expo-image-picker';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Alert, Button, FlatList, Text, TextInput, View } from 'react-native';
 import * as yup from "yup";
+import DateTimePickerField from '../../../../shared/components/DateTimeField/DateTimeField';
 import useCreateReport from '../../hooks/useCreateReport';
 import { ReportType } from '../../types/report.enum';
 import { ReportCreateRequest, ReportPost } from '../../types/report.type';
-import DateTimePickerField from '../../../../shared/components/DateTimeField/DateTimeField';
 import { styles } from './styles';
 
 
@@ -56,19 +57,19 @@ const reportSchema = yup
   })
   .required();
 
-type ReportFormSchema = yup.InferType<typeof reportSchema>;
+type ReportLostFormSchema = yup.InferType<typeof reportSchema>;
 
-type ReportFormProps = {
+type ReportLostFormProps = {
   mode: 'create' | 'edit',
   initialData: Nullable<ReportPost>;
 };
 
-const ReportForm = ({ mode, initialData }: ReportFormProps) => {
+const ReportLostForm = ({ mode, initialData }: ReportLostFormProps) => {
   const [reportData, setReportData] = useState<Nullable<ReportPost>>(initialData);
   const { uploadImages } = useUploadImage();
   const { createReport } = useCreateReport();
 
-  const { control, handleSubmit, formState: { errors }, } = useForm<ReportFormSchema>({
+  const { control, handleSubmit, formState: { errors }, } = useForm<ReportLostFormSchema>({
     defaultValues: {
       itemName: reportData?.itemName ?? "",
       description: reportData?.description ?? "",
@@ -93,15 +94,13 @@ const ReportForm = ({ mode, initialData }: ReportFormProps) => {
     return imageUrls;
   };
 
-  const onSubmit: SubmitHandler<ReportFormSchema> = async (data: ReportFormSchema) => {
+  const onSubmit: SubmitHandler<ReportLostFormSchema> = async (data: ReportLostFormSchema) => {
     try {
       const imageUrls = await handleUploadImages(data.images);
       if (imageUrls.length === 0) {
         Alert.alert("Error", "Failed to upload images.");
         return;
       }
-
-      console.log('Submit data: ', data);
 
       const reportData: ReportCreateRequest = {
         postType: ReportType.LOST,
@@ -118,7 +117,11 @@ const ReportForm = ({ mode, initialData }: ReportFormProps) => {
       console.log("Report data to submit:", reportData);
       const reportDetails = await createReport(reportData);
       setReportData(reportDetails);
-      Alert.alert("Success", "Report submitted successfully!");
+
+      router.push({
+        pathname: '/(protected)/(report)/matching',
+        params: { reportId: reportDetails?.id }
+      });
     } catch (error) {
       console.error("Submit error:", error);
       Alert.alert("Error", "Failed to submit report. Please try again.");
@@ -257,4 +260,4 @@ const ReportForm = ({ mode, initialData }: ReportFormProps) => {
   )
 }
 
-export default ReportForm
+export default ReportLostForm

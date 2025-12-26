@@ -1,9 +1,11 @@
-import { useAuth } from "@/src/providers/AuthProvider";
+import { useAuth } from "@/src/features/auth/providers/AuthProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 
 export default function ProtectedLayout() {
   const { isAppReady, isLoggedIn } = useAuth();
+
+  console.log("heheh");
 
   if (!isAppReady) {
     return null;
