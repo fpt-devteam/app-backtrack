@@ -87,3 +87,13 @@ export type ReportCreateRequest = {
 } & GoogleMapDetailLocation;
 
 export type ReportCreateResponse = ApiResponse<ReportPost>;
+
+export type ReportFilters = {
+  authorId: Nullable<string>;
+  reportType: Nullable<ReportType>;
+  longitude: Nullable<number>;
+  latitude: Nullable<number>;
+  radiusInKm: Nullable<number>;
+  page: number;
+  pageSize: number;
+};

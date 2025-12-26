@@ -4,8 +4,9 @@ import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { PREFIX_PATH_REPORT } from "../../constants/report.constant";
-import { ReportType, type ReportPost } from "../../types/report.type";
+import { type ReportPost } from "../../types/report.type";
 import styles from "./style";
+import { ReportType } from "../../types/report.enum";
 
 interface ReportCardProps {
   item: ReportPost;

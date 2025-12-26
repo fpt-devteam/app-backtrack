@@ -2,13 +2,13 @@ import { Nullable } from "@/src/shared/types/global.type";
 import { useMutation } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
-import { auth } from "../../lib/firebase";
 import {
   MAX_IMAGE_UPLOAD,
   MIN_IMAGE_UPLOAD,
   UPLOAD_IMAGE_API,
   UPLOAD_IMAGE_QUERY_KEY,
 } from "../constants/firebase.constant";
+import { auth } from "../lib/firebase";
 import { uploadImageToStorage } from "../services/firebase.service";
 import type {
   ImageUploadRequest,
