@@ -3,7 +3,7 @@ import type {
   GetPreviousPageParamFunction,
 } from '@tanstack/react-query';
 
-import type { PaginateQuery } from '../types';
+import type { PaginateQuery } from './api.types';
 
 type KeyParams = {
   [key: string]: any;
