@@ -1,11 +1,11 @@
-import ReportForm from '@/src/features/report/components/ReportForm/ReportForm';
+import ReportLostForm from '@/src/features/report/components/ReportLostForm/ReportLostForm';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 const CreateReportScreen = () => {
   return (
     <View style={styles.container}>
-      <ReportForm
+      <ReportLostForm
         mode={'create' as ('create' | 'edit')}
         initialData={null} />
     </View>

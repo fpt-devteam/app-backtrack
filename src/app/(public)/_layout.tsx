@@ -1,4 +1,4 @@
-import { useAuth } from '@/src/providers/AuthProvider';
+import { useAuth } from '@/src/features/auth/providers/AuthProvider';
 import { Redirect, Slot } from 'expo-router';
 import React from 'react';
 

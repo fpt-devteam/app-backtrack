@@ -3,7 +3,7 @@ import { Platform } from "expo-modules-core";
 import { getDownloadURL, ref, StorageReference, uploadBytes } from "firebase/storage";
 import { Alert } from "react-native/Libraries/Alert/Alert";
 import { Linking } from "react-native/Libraries/Linking/Linking";
-import { firebaseStorage } from "../../lib/firebase";
+import { firebaseStorage } from "../lib/firebase";
 import { ImageUploadRequest, ImageUploadResponse } from "../types/firebase.type";
 
 export async function uploadImageToStorage(req: ImageUploadRequest): Promise<ImageUploadResponse> {
