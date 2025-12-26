@@ -32,14 +32,17 @@ privateClient.interceptors.request.use(
 privateClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+
       const user = auth.currentUser;
       if (user) {
         const token = await user.getIdToken(true);
-        error.config.headers.Authorization = `Bearer ${token}`;
-        return privateClient.request(error.config);
+        original.headers.Authorization = `Bearer ${token}`;
+        return privateClient.request(original);
       }
     }
     return Promise.reject(error);
   }
-);
+)
