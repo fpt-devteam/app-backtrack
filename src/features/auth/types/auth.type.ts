@@ -1,14 +1,12 @@
 import { Auth } from "firebase/auth";
+import { LoginRequest } from "./auth.dto";
 
-export type LoginRequest = {
+export type UserProfile = {
+  id: string;
   email: string;
-  password: string;
+  displayName: string;
 };
 
-export type LoginResponse = {
-  status: boolean;
-  idToken: string;
-};
 
 export type RegisterFirebaseRequest = {
   auth: Auth;
@@ -28,20 +26,6 @@ export type RegisterResponse = {
   idToken: string;
 };
 
-export type SyncRequest = {
-  idToken: string;
-};
-
-export type SyncResponse = {
-  data: UserProfile;
-};
-
-export type UserProfile = {
-  id: string;
-  email: string;
-  displayName: string;
-};
-
 export type RegisterCredentials = LoginRequest & {
   displayName?: string;
 };
@@ -50,6 +34,3 @@ export type AuthState = {
   isLoggedIn: boolean;
   idToken: string;
 };
-
-
-

@@ -4,11 +4,11 @@ import {
   UserCredential
 } from "firebase/auth";
 
-import { publicClient } from "../../../api/common/client";
-import { auth } from "../../../lib/firebase";
-import { LoginRequest, LoginResponse, RegisterFirebaseRequest, RegisterFirebaseResponse, SyncRequest, SyncResponse } from "../types/auth.type";
+import { auth } from "../../../shared/lib/firebase";
+import { LoginRequest, LoginResponse } from "../types";
+import { RegisterFirebaseRequest, RegisterFirebaseResponse } from "../types/auth.type";
 
-export const loginFirebase = async (req: LoginRequest): Promise<LoginResponse> => {
+export const loginFirebase = async (req: LoginRequest) => {
   const { email, password } = req;
 
   const res: LoginResponse = {
@@ -26,19 +26,6 @@ export const loginFirebase = async (req: LoginRequest): Promise<LoginResponse> =
   return res;
 };
 
-export const syncUser = async (req: SyncRequest): Promise<SyncResponse> => {
-  const { idToken } = req;
-  const response = await publicClient.post('core/users', {}, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${idToken}`,
-    },
-  });
-
-  const res = response.data as SyncResponse;
-  return res;
-};
-
 export const registerFirebase = async (req: RegisterFirebaseRequest): Promise<RegisterFirebaseResponse> => {
   const { auth, email, password } = req;
   const cred: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -46,4 +33,4 @@ export const registerFirebase = async (req: RegisterFirebaseRequest): Promise<Re
     idToken: await cred.user.getIdToken()
   };
   return res;
-}
+};
