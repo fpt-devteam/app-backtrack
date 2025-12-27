@@ -1,4 +1,4 @@
-import { Nullable } from "@/src/shared/types/global.type";
+import { Nullable } from "@/src/shared/types";
 import { useMutation } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
@@ -7,9 +7,9 @@ import {
   MIN_IMAGE_UPLOAD,
   UPLOAD_IMAGE_API,
   UPLOAD_IMAGE_QUERY_KEY,
-} from "../constants/firebase.constant";
-import { auth } from "../lib/firebase";
-import { uploadImageToStorage } from "../services/firebase.service";
+} from "../constants";
+import { auth } from "../lib";
+import { uploadImageToStorage } from "../services";
 import type {
   ImageUploadRequest,
   ImageUploadResponse

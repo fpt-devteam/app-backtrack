@@ -1,7 +1,7 @@
 import { ImagePickerAsset, launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
 import React from 'react';
 import { Button, Image, View } from 'react-native';
-import { ensureMediaPermission } from '../../services/firebase.service';
+import { ensureMediaPermission } from '../../services';
 import { styles } from './styles';
 
 type ImageFieldProps = {
@@ -44,5 +44,4 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
     </View>
   )
 }
-
-export default ImageField
+export default ImageField;

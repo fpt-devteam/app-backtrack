@@ -4,7 +4,7 @@ import { getDownloadURL, ref, StorageReference, uploadBytes } from "firebase/sto
 import { Alert } from "react-native/Libraries/Alert/Alert";
 import { Linking } from "react-native/Libraries/Linking/Linking";
 import { firebaseStorage } from "../lib/firebase";
-import { ImageUploadRequest, ImageUploadResponse } from "../types/firebase.type";
+import { ImageUploadRequest, ImageUploadResponse } from "../types";
 
 export async function uploadImageToStorage(req: ImageUploadRequest): Promise<ImageUploadResponse> {
   const { path, blob } = req;

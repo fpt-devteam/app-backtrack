@@ -1,4 +1,4 @@
-import { formatDateTime } from "@/src/shared/utils/datetime.utils";
+import { formatDateTime } from "@/src/shared/utils";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import React, { useMemo, useState } from "react";
@@ -9,7 +9,6 @@ import {
   View
 } from "react-native";
 import styles from "./styles";
-
 
 type Props = Readonly<{
   label?: string;
@@ -24,13 +23,12 @@ const dateTimeValidate = {
   maxDate: new Date(),
 };
 
-
-export default function DateTimePickerField({
+const DateTimePickerField = ({
   value,
   onChange,
   placeholder = "mm/dd/yyyy, --:--",
   disabled = false,
-}: Props) {
+}: Props) => {
   const [open, setOpen] = useState(false);
   const [temp, setTemp] = useState<Date>(value ?? new Date());
   const [error, setError] = useState<string | null>(null);
@@ -169,3 +167,4 @@ export default function DateTimePickerField({
   );
 }
 
+export default DateTimePickerField;

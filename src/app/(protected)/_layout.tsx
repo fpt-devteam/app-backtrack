@@ -13,7 +13,7 @@ export default function ProtectedLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
-        name="(report)"
+        name="(posts)"
         options={{
           title: "Lost & Found",
           tabBarIcon: ({ color, size }) => (

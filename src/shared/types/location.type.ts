@@ -1,26 +1,9 @@
+import { LatLng } from "react-native-maps";
+
 export type GoogleMapDetailLocation = {
-  location: GoogleMapLocation;
+  location: LatLng;
   displayAddress?: string | null;
   externalPlaceId?: string | null;
-};
-
-export type GoogleMapLocation = {
-  latitude: number;
-  longitude: number;
-};
-
-export type LocationCoordinates = {
-  latitude: number;
-  longitude: number;
-};
-
-export type GoogleMapFormattedLocation = {
-  latitude: number;
-  longitude: number;
-  displayAddress?: string;
-  formattedAddress?: string;
-  placeId?: string;
-  externalPlaceId?: string;
 };
 
 export const GeocodingStatusValue = {
@@ -39,11 +22,6 @@ export type AddressComponent = {
   long_name: string;
   short_name: string;
   types: string[];
-};
-
-export type LatLng = {
-  lat: number;
-  lng: number;
 };
 
 export type Viewport = {
