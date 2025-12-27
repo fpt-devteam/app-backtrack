@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { syncUserApi } from "../api/auth.api";
 import { SYNC_QUERY_KEY } from "../constants";
-import { useAuth } from "../providers/auth.provider";
+import { useAuth } from "../providers";
 import { AuthState, SyncRequest, SyncResponse } from "../types";
 
 export function useSync() {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ensureLocationPermission, getDetailCurrentLocation } from '../services/googleMap.service';
+import { ensureLocationPermission, getDetailCurrentLocation } from '../services';
 
 export const useGetDetailCurrentLocation = () => {
   const [loading, setLoading] = useState(false);

@@ -1,1 +1,0 @@
-export const REPORT_CREATE_KEY = ["report-create"] as const;

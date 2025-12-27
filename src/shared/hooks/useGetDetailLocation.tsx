@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { getDetailLocation } from '../services/googleMap.service';
-import { GoogleMapLocation } from '../types/location.type';
+import { LatLng } from 'react-native-maps';
+import { getDetailLocation } from '../services';
 
-export default function useGetDetailLocation() {
+export const useGetDetailLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const formatLocation = async (mapLocation: GoogleMapLocation) => {
+  const formatLocation = async (mapLocation: LatLng) => {
     setLoading(true);
     setError(null);
 

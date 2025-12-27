@@ -1,5 +1,5 @@
 import { privateClient, publicClient } from "@/src/api/common";
-import { ApiResponse } from "@/src/shared/types/global.type";
+import { ApiResponse } from "@/src/shared/types";
 import { MeResponse, SyncRequest, SyncResponse } from "../types";
 
 const AUTH = {

@@ -1,13 +1,11 @@
-import useGetDetailLocation from "@/src/shared/hooks/useGetDetailLocation";
+import { useGetDetailCurrentLocation, useGetDetailLocation } from "@/src/shared/hooks";
 import React, { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import MapView, { Marker, MarkerDragStartEndEvent, Region } from "react-native-maps";
-import { Button } from "react-native-paper";
-
-import { useGetDetailCurrentLocation } from "@/src/shared/hooks/useGetDetailCurrentLocation";
-import { ANIMATE_TO_DURATION, DEFAULT_REGION, QUERY_CONFIG } from "../../constants/location.constant";
-import { GoogleMapDetailLocation } from "../../types/location.type";
+import { Icon, IconButton } from "react-native-paper";
+import { ANIMATE_TO_DURATION, DEFAULT_REGION, QUERY_CONFIG } from "../../constants";
+import { GoogleMapDetailLocation } from "../../types";
 import { styles } from "./styles";
 
 type LocationFieldProps = {
@@ -67,10 +65,7 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
     if (typeof lat !== "number" || typeof lng !== "number") return;
 
     const mapLocation: GoogleMapDetailLocation = {
-      location: {
-        latitude: lat,
-        longitude: lng,
-      },
+      location: { latitude: lat, longitude: lng },
     };
 
     const coords = mapLocation.location;
@@ -81,24 +76,42 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
   return (
     <View style={styles.container}>
       {/* Search bar */}
-      <View style={styles.searchContainer}>
-        <GooglePlacesAutocomplete
-          ref={placesRef}
-          placeholder="Search location..."
-          fetchDetails
-          debounce={300}
-          enablePoweredByContainer={false}
-          query={QUERY_CONFIG}
-          onPress={handlePickPlace}
-          keyboardShouldPersistTaps="always"
-          styles={{
-            container: { flex: 0 },
-            textInput: styles.searchInput,
-            listView: styles.searchListView,
-          }}
+      <View style={styles.searchRow}>
+        <View style={styles.searchCol}>
+          <GooglePlacesAutocomplete
+            ref={placesRef}
+            placeholder="Enter location (e.g. Central Park)"
+            fetchDetails
+            debounce={300}
+            enablePoweredByContainer={false}
+            query={QUERY_CONFIG}
+            onPress={handlePickPlace}
+            keyboardShouldPersistTaps="always"
+            renderLeftButton={() => (
+              <View style={styles.searchLeftIcon}>
+                <Icon source="map-marker" size={18} color="#94A3B8" />
+              </View>
+            )}
+            styles={{
+              container: { flex: 1 },
+              textInputContainer: styles.searchInputContainer,
+              textInput: styles.searchInput,
+              listView: styles.searchListView,
+              row: styles.searchRowItem,
+              separator: styles.searchSeparator,
+              description: styles.searchDesc,
+            }}
+          />
+        </View>
+
+        <IconButton
+          style={styles.currentBtnIcon}
+          icon={loading ? "loading" : "crosshairs-gps"}
+          onPress={handleGetCurrentLocation}
+          disabled={loading}
+          mode="outlined"
         />
       </View>
-
       {/* Map View */}
       <View style={styles.mapContainer}>
         <MapView
@@ -119,15 +132,7 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
           )}
         </MapView>
 
-        <Button
-          style={styles.button}
-          onPress={handleGetCurrentLocation}
-          disabled={loading}
-          mode="outlined"
-          icon={loading ? "loading" : "crosshairs-gps"}
-        >
-          {loading ? "Getting location..." : "Use Current Location"}
-        </Button>
+
       </View>
     </View>
   );

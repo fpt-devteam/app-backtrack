@@ -1,4 +1,4 @@
-import { AUTH_STORAGE_KEY } from "@/src/features/auth/constants/auth.constant";
+import { AUTH_STORAGE_KEY } from "@/src/features/auth/constants";
 import { auth } from "@/src/shared/lib";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function clearSession() {
     await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-    const state: AuthState = { isLoggedIn: false};
+    const state: AuthState = { isLoggedIn: false };
     setAuthState(state);
   }
 

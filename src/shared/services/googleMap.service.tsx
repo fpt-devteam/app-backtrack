@@ -1,6 +1,7 @@
 import { Accuracy, getCurrentPositionAsync, getForegroundPermissionsAsync, PermissionStatus, requestForegroundPermissionsAsync } from 'expo-location';
 import { Alert, Linking, Platform } from 'react-native';
-import { GeocodingResponse, GeocodingStatusValue, GoogleMapDetailLocation, GoogleMapLocation } from '../types/location.type';
+import { LatLng } from 'react-native-maps';
+import { GeocodingResponse, GeocodingStatusValue, GoogleMapDetailLocation } from '../types';
 
 export const ensureLocationPermission = async () => {
   const { status, canAskAgain } = await getForegroundPermissionsAsync();
@@ -37,7 +38,7 @@ export const getCurrentPosition = async () => {
     const currentLocation = await getCurrentPositionAsync({
       accuracy: Accuracy.Balanced,
     });
-    const googleMapLocation: GoogleMapLocation = {
+    const googleMapLocation: LatLng = {
       latitude: currentLocation.coords.latitude,
       longitude: currentLocation.coords.longitude,
     };
@@ -48,9 +49,9 @@ export const getCurrentPosition = async () => {
   }
 };
 
-export const fetchGeocodingDataAsync = async (location: GoogleMapLocation) => {
-  const { latitude: lat, longitude: lng } = location;
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}`;
+export const fetchGeocodingDataAsync = async (location: LatLng) => {
+  const { latitude, longitude } = location;
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.EXPO_PUBLIC_GOOGLE_API_KEY}`;
   const res = await fetch(url);
 
   if (!res.ok) {
@@ -74,18 +75,15 @@ export const fetchGeocodingDataAsync = async (location: GoogleMapLocation) => {
   return result;
 };
 
-export const getDetailLocation = async (googleMapLocation: GoogleMapLocation) => {
-  const { latitude: lat, longitude: lng } = googleMapLocation;
+export const getDetailLocation = async (googleMapLocation: LatLng) => {
+  const { latitude, longitude } = googleMapLocation;
 
   try {
-    const result = await fetchGeocodingDataAsync({ latitude: lat, longitude: lng });
+    const result = await fetchGeocodingDataAsync({ latitude, longitude });
     if (!result) return null;
 
     const detailLocation = {
-      location: {
-        latitude: lat,
-        longitude: lng,
-      },
+      location: { latitude, longitude },
       displayAddress: result.formatted_address,
       externalPlaceId: result.place_id,
     } as GoogleMapDetailLocation;
