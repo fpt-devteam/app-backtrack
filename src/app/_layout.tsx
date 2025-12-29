@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaperProvider } from "react-native-paper";
 import "../../global.css";
 import { AuthProvider } from "../features/auth/providers";
+import { UserProvider } from "../features/auth/providers/user.provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,15 +22,17 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <PaperProvider>
-        <QueryClientProvider client={queryClient}>
-          <StatusBar style="auto" />
-          <Stack screenOptions={{ headerShown: false }} >
-            <Stack.Screen name="(protected)" />
-            <Stack.Screen name="(public)" />
-          </Stack>
-        </QueryClientProvider>
-      </PaperProvider>
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <PaperProvider>
+            <StatusBar style="auto" />
+            <Stack screenOptions={{ headerShown: false }} >
+              <Stack.Screen name="(protected)" />
+              <Stack.Screen name="(public)" />
+            </Stack>
+          </PaperProvider>
+        </UserProvider>
+      </QueryClientProvider>
     </AuthProvider>
   );
 }

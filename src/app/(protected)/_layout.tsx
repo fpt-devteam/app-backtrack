@@ -9,7 +9,6 @@ export default function ProtectedLayout() {
   console.log("Protected layout");
 
   if (!isAppReady) return null;
-
   if (!isLoggedIn) return <Redirect href="/login" />;
 
   return (

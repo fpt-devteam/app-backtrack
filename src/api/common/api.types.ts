@@ -22,6 +22,12 @@ export type ApiError = {
 export type ApiResponse<T> = {
   success: boolean;
   data: T | null;
-  error: ApiError | null;
-  correlationId: string | null;
+  error?: ApiError | null;
+  correlationId?: string | null;
+}
+
+export type CursorScrollResponse<T> = {
+  items: T[];
+  nextCursor: string | null;
+  hasMore: boolean;
 }
