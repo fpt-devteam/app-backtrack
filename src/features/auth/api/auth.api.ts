@@ -20,6 +20,6 @@ export async function syncUserApi(body: SyncRequest) {
       'Authorization': `Bearer ${idToken}`,
     },
   });
-  return res.data as ApiResponse<SyncResponse>;
+  return res.data as SyncResponse;
 }
 

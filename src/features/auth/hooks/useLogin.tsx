@@ -5,7 +5,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
 
 import { LOGIN_QUERY_KEY } from "../constants";
-import { useSync } from "../hooks";
 import type { LoginRequest, LoginResponse } from "../types";
 
 function mapLoginError(error: unknown): Error {
@@ -24,8 +23,6 @@ function mapLoginError(error: unknown): Error {
 }
 
 export function useLogin() {
-  const { syncUser } = useSync();
-
   const mutation = useMutation<LoginResponse, Error, LoginRequest>({
     mutationKey: LOGIN_QUERY_KEY,
     mutationFn: async (req) => {
@@ -36,8 +33,6 @@ export function useLogin() {
       const idToken = await cred.user.getIdToken();
 
       if (!idToken) throw new Error("Failed to get ID token.");
-      await syncUser({ idToken: idToken });
-
       return { idToken } as LoginResponse;
     },
 

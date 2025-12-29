@@ -1,12 +1,14 @@
+import { Nullable } from "@/src/shared/types";
 import { Auth } from "firebase/auth";
 import { LoginRequest } from "./auth.dto";
 
-export type UserProfile = {
+export type AppUser = {
   id: string;
-  email: string;
-  displayName: string;
+  email: string | null;
+  displayName: string | null;
+  avatar?: string | null;
+  globalRole: string;
 };
-
 
 export type RegisterFirebaseRequest = {
   auth: Auth;
@@ -31,5 +33,10 @@ export type RegisterCredentials = LoginRequest & {
 };
 
 export type AuthState = {
+  isAppReady: boolean;
   isLoggedIn: boolean;
+};
+
+export type UserGlobalData = {
+  user: Nullable<AppUser>;
 };

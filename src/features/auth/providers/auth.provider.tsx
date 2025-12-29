@@ -1,77 +1,48 @@
-import { AUTH_STORAGE_KEY } from "@/src/features/auth/constants";
-import { auth } from "@/src/shared/lib";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { AuthState } from "../types";
+import { auth } from '@/src/shared/lib'
+import { onAuthStateChanged } from 'firebase/auth'
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { AuthState } from '../types'
 
-type AuthContextType = AuthState & {
-  isAppReady: boolean;
-  setSession: (authState: AuthState) => Promise<void>;
-  clearSession: () => Promise<void>;
-};
+type AuthContextType = AuthState
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const emptyAuthState: AuthState = {
+  isAppReady: false,
+  isLoggedIn: false,
+}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAppReady, setIsAppReady] = useState(false);
-  const [authState, setAuthState] = useState<AuthState>({
-    isLoggedIn: false,
-  });
+  const [authState, setAuthState] = useState<AuthState>(emptyAuthState)
+  const mountedRef = useRef(true)
 
   useEffect(() => {
-    const restoreSession = async () => {
+    mountedRef.current = true;
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
-        const user = auth.currentUser;
-
-        if (!user) {
-          setIsAppReady(true);
-          await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-          setAuthState({ isLoggedIn: false });
+        if (!firebaseUser) {
+          if (mountedRef.current) setAuthState({ isAppReady: true, isLoggedIn: false });
           return;
         }
 
-        await user.getIdToken(true);
-        setAuthState({ isLoggedIn: true });
-      } catch (error) {
-        setIsAppReady(true);
-        setAuthState({ isLoggedIn: false });
-        await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-        console.log("Error fetching from storage", error);
+        if (mountedRef.current) setAuthState({ isAppReady: true, isLoggedIn: true });
+      } catch (e) {
+        console.log('Auth sync failed:', e);
+        if (mountedRef.current) setAuthState({ isAppReady: true, isLoggedIn: false });
       }
-    };
-    restoreSession();
+    })
+
+    return () => {
+      mountedRef.current = false;
+      unsub();
+    }
   }, []);
 
-  async function setSession(state: AuthState) {
-    setAuthState(state);
-    await AsyncStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(state));
-  }
-
-  async function clearSession() {
-    await AsyncStorage.removeItem(AUTH_STORAGE_KEY);
-    const state: AuthState = { isLoggedIn: false };
-    setAuthState(state);
-  }
-
-  const contextValue = useMemo(
-    () => ({
-      ...authState,
-      isAppReady,
-      setSession,
-      clearSession,
-    }),
-    [authState, isAppReady]
-  );
-
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const contextValue = useMemo(() => ({ ...authState }), [authState])
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+}
 
 export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
-};
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider')
+  return ctx
+}

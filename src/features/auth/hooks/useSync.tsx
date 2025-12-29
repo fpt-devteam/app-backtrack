@@ -2,11 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { syncUserApi } from "../api/auth.api";
 import { SYNC_QUERY_KEY } from "../constants";
-import { useAuth } from "../providers";
-import { AuthState, SyncRequest, SyncResponse } from "../types";
+import { SyncRequest, SyncResponse } from "../types";
 
 export function useSync() {
-  const auth = useAuth();
 
   const mutation = useMutation<SyncResponse, Error, SyncRequest>({
     mutationKey: SYNC_QUERY_KEY,
@@ -17,16 +15,7 @@ export function useSync() {
       const response = await syncUserApi(req);
       if (!response) throw new Error("Sync user failed");
       if (!response.success || !response.data) throw new Error(response.error?.message ?? "Sync user failed");
-      return response.data;
-    },
-
-    onSuccess: async (data: SyncResponse, variables: SyncRequest) => {
-      const next: AuthState = {
-        isAppReady: true,
-        isLoggedIn: true,
-        idToken: variables.idToken,
-      } as AuthState;
-      await auth.setSession(next);
+      return response;
     },
 
     onError: async (err) => {
@@ -43,7 +32,6 @@ export function useSync() {
     syncUser: mutation.mutateAsync,
     loading: mutation.isPending,
     error,
-    data: mutation.data,
     reset: mutation.reset,
   };
 }
