@@ -19,6 +19,7 @@ export type Post = {
   distinctiveMarks: string | null;
   eventTime: Date;
   createdAt: Date;
+  authorId: string;
 } & GoogleMapDetailLocation;
 
 export type SimilarPost = Post & {
