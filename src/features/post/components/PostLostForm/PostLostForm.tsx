@@ -3,11 +3,12 @@ import { useUploadImage } from '@/src/shared/hooks';
 import { GoogleMapDetailLocation, Nullable } from '@/src/shared/types';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ImagePickerAsset } from 'expo-image-picker';
-import { router } from 'expo-router';
+import { ExternalPathString, RelativePathString, router } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Alert, Button, FlatList, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import * as yup from "yup";
+import { POST_ROUTE } from '../../constants';
 import { useCreatePost } from '../../hooks';
 import { Post, PostCreateRequest, PostType } from '../../types';
 import { styles } from './styles';
@@ -112,11 +113,14 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
       console.log("Post data to submit:", postCreateRequest);
       const postDetails = await createPost(postCreateRequest);
       setPostData(postDetails);
+      console.log("Post created successfully:", postDetails);
+      const postId = postDetails?.id;
+      if (!postId) {
+        Alert.alert("Error", "Failed to create post. Please try again.");
+        return;
+      }
 
-      router.push({
-        pathname: '/(protected)/(posts)/matching',
-        params: { postId: postDetails?.id }
-      });
+      router.push(POST_ROUTE.matching(postId) as RelativePathString | ExternalPathString);
     } catch (error) {
       console.error("Submit error:", error);
       Alert.alert("Error", "Failed to submit post. Please try again.");

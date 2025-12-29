@@ -20,7 +20,7 @@ const PostScreen = () => {
   const handlePressCreate = (type: PostType) => {
     router.push(
       {
-        pathname: '/(protected)/(posts)/create',
+        pathname: '/(protected)/posts/create',
         params: {
           postType: type,
           mode: 'create',
@@ -46,7 +46,7 @@ const PostScreen = () => {
       <PostInfinityScrollView filters={filters} />
 
       {/* Create Buttons */}
-      <CreateFabDropdown handlePressCreate={handlePressCreate} />
+      {/* <CreateFabDropdown handlePressCreate={handlePressCreate} /> */}
     </View>
   );
 };

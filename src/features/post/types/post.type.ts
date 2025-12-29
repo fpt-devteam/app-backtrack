@@ -21,3 +21,7 @@ export type Post = {
   createdAt: Date;
 } & GoogleMapDetailLocation;
 
+export type SimilarPost = Post & {
+  similarityScore: number;
+}
+

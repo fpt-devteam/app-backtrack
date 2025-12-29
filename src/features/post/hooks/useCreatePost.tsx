@@ -1,8 +1,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { createPost } from '../api';
 import { POST_CREATE_KEY, POSTS_QUERY_KEY } from '../constants';
-import { createPost } from '../services/post.service';
 import { PostCreateRequest } from '../types';
 
 export const useCreatePost = () => {
@@ -12,7 +12,7 @@ export const useCreatePost = () => {
     mutationKey: POST_CREATE_KEY,
     mutationFn: async (request: PostCreateRequest) => {
       const response = await createPost(request);
-      if (!response) return null;
+      if (!response.success) throw new Error("Create post failed");
       return response.data;
     },
 

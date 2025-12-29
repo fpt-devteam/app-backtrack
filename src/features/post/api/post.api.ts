@@ -1,13 +1,10 @@
 import { privateClient } from "@/src/api/common/client";
-import type { PostsRequest, PostsResponse } from "@/src/features/post/types";
-
-const POSTS = {
-  filter: "/core/posts",
-  detail: (id: string) => `/core/posts/${id}`,
-} as const;
+import type { MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
+import { ApiResponse } from "@/src/shared/types";
+import { POST_API } from "../constants";
 
 export async function filterPostsApi(params: PostsRequest = {}) {
-  const response = await privateClient.get<PostsResponse>(POSTS.filter, {
+  const response = await privateClient.get<PostsResponse>(POST_API.filter, {
     params: {
       page: params.page ?? 1,
       pageSize: params.pageSize ?? 10,
@@ -22,7 +19,21 @@ export async function filterPostsApi(params: PostsRequest = {}) {
   return response.data;
 }
 
-// export async function getPostByIdApi(id: string) {
-//   const response = await privateClient.get<ApiResponse<PostResponse>>(POSTS.detail(id));
-//   return response.data;
-// }
+export const createPost = async (req: PostCreateRequest) => {
+  const response = await privateClient.post(POST_API.create, req, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return response.data as ApiResponse<Post>;
+};
+
+export async function getPostByIdApi(postId: string) {
+  const response = await privateClient.get<ApiResponse<Post>>(POST_API.detail(postId));
+  return response.data;
+}
+
+export async function matchingPostsApi(req: MatchingPostsRequest) {
+  const response = await privateClient.get<MatchingPostsResponse>(POST_API.matching(req.postId));
+  return response.data;
+}

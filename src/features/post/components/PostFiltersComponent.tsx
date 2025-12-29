@@ -1,14 +1,15 @@
 import { PostFilters } from '@/src/features/post/types/post.type';
 import { LocationField } from '@/src/shared/components';
 import { GoogleMapDetailLocation } from '@/src/shared/types/location.type';
+import { Ionicons } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal';
-import { Icon, SegmentedButtons, TextInput } from 'react-native-paper';
+import { SegmentedButtons } from 'react-native-paper';
 import * as yup from 'yup';
-import { PostType } from '../../types';
+import { PostType } from '../types';
 import { styles } from './styles';
 
 const filterSchema = yup.object({
@@ -24,7 +25,7 @@ type PostFiltersProps = {
   onFilterChange: (filters: PostFilters) => void;
 }
 
-export const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => {
+const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const { control, handleSubmit, reset } = useForm<FilterFormSchema>({
@@ -43,7 +44,6 @@ export const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersPro
   };
 
   const onSubmit: SubmitHandler<FilterFormSchema> = async (data: FilterFormSchema) => {
-
     const newFilters: PostFilters = {
       postType: data.postType ?? undefined,
       searchTerm: data.searchTerm ?? undefined,
@@ -58,46 +58,42 @@ export const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersPro
   };
 
   return (
-    <View style={styles.root}>
-      <View style={styles.topRow}>
-        {/* Search Input */}
-        <View style={styles.searchPill}>
-          <View style={styles.searchIconWrap}>
-            <Icon source="magnify" size={18} color="#94A3B8" />
-          </View>
-
-          <View style={styles.searchInputWrap}>
-            <Controller
-              control={control}
-              name="searchTerm"
-              render={({ field: { value, onChange } }) => (
-                <TextInput
-                  value={value ?? ''}
-                  onChangeText={onChange}
-                  placeholder="Search items..."
-                  placeholderTextColor="#94A3B8"
-                  mode="flat"
-                  underlineColor="transparent"
-                  activeUnderlineColor="transparent"
-                  style={styles.searchInput}
-                  contentStyle={styles.searchInputContent}
-                  returnKeyType="search"
-                  onBlur={handleSubmit(onSubmit)}
-                />
-              )}
+    <View className="flex-row items-center px-4 py-3">
+      {/* Search Input */}
+      <View className="flex-1 flex-row items-center rounded-full bg-white px-3 py-2 mr-3">
+        <Ionicons name="search" size={16} color="#64748B" />
+        <Controller
+          control={control}
+          name="searchTerm"
+          render={({ field: { value, onChange } }) => (
+            <TextInput
+              className="ml-2 flex-1 text-sm text-slate-900"
+              value={value ?? ''}
+              onChangeText={onChange}
+              placeholder="Search items..."
+              placeholderTextColor="#94A3B8"
+              returnKeyType="search"
+              onBlur={handleSubmit(onSubmit)}
             />
-          </View>
-        </View>
-
-        {/* Filter button */}
-        <TouchableOpacity
-          style={styles.filterFab}
-          activeOpacity={0.9}
-          onPress={() => setIsVisible(true)}
-        >
-          <Icon source="tune-variant" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
+          )}
+        />
       </View>
+
+      {/* Filter button */}
+      <TouchableOpacity
+        onPress={() => setIsVisible(true)}
+        activeOpacity={0.85}
+        className="h-12 w-12 items-center justify-center rounded-full bg-sky-500"
+        style={{
+          shadowColor: '#000',
+          shadowOpacity: 0.12,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 6 },
+          elevation: 3,
+        }}
+      >
+        <Ionicons name="options-outline" size={18} color="#fff" />
+      </TouchableOpacity>
 
       {/* ===== FILTER MODAL ===== */}
       <View style={styles.rootModal}>
@@ -157,3 +153,5 @@ export const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersPro
     </View>
   );
 };
+
+export default PostFiltersComponent;
