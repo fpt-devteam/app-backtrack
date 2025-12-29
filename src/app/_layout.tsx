@@ -5,6 +5,7 @@ import 'react-native-get-random-values';
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaperProvider } from "react-native-paper";
+import "../../global.css";
 import { AuthProvider } from "../features/auth/providers";
 
 const queryClient = new QueryClient({

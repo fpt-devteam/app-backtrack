@@ -4,7 +4,6 @@ import { useUploadImage } from "@/src/shared/hooks";
 import { GoogleMapDetailLocation, Nullable } from "@/src/shared/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ImagePickerAsset } from "expo-image-picker";
-import { router } from "expo-router";
 import { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Alert, Button, FlatList, TextInput, View } from "react-native";
@@ -114,11 +113,6 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
       console.log("Post data to submit:", postCreateRequest);
       const postDetails = await createPost(postCreateRequest);
       setPostData(postDetails);
-
-      router.push({
-        pathname: '/(protected)/(posts)/matching',
-        params: { postId: postDetails?.id }
-      });
     } catch (error) {
       console.error("Submit error:", error);
       Alert.alert("Error", "Failed to submit post. Please try again.");
