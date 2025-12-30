@@ -1,8 +1,9 @@
+import { useAppUser } from '@/src/features/auth/providers/user.provider';
 import PostDetails from '@/src/features/post/components/PostDetails/PostDetails';
 import useGetPostById from '@/src/features/post/hooks/useGetPostById';
 import { PostType } from '@/src/features/post/types';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { Button } from 'react-native-paper';
 
@@ -11,6 +12,12 @@ const PostDetailScreen = () => {
   const postId = Array.isArray(params.postId) ? params.postId[0] : params.postId;
 
   const { data, isLoading, error } = useGetPostById({ postId: postId || "" });
+  const { user, isUserReady } = useAppUser();
+
+  console.log('data:', data);
+  console.log('user:', user);
+
+  const isOwner = useMemo(() => data?.authorId === user?.id, [data, user]);
 
   if (!postId) return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -18,7 +25,7 @@ const PostDetailScreen = () => {
     </View>
   );
 
-  if (isLoading) return (
+  if (!isUserReady || isLoading) return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <ActivityIndicator size="large" color="#0ea5e9" />
       <Text style={{ marginTop: 10 }}>Loading...</Text>
@@ -52,12 +59,12 @@ const PostDetailScreen = () => {
           Start Chat with {data.postType === PostType.Lost ? 'Seeker' : 'Finder'}
         </Button>
 
-        <Button mode="contained" onPress={() => {
+        {!isOwner && <Button mode="contained" onPress={() => {
           router.push(`/posts/${postId}/matching`);
           console.log("Move to matching screen");
         }}>
           Start Matching
-        </Button>
+        </Button>}
       </View>
     </View>
   )

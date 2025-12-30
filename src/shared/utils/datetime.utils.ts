@@ -57,3 +57,10 @@ export const formatDateTime = (d: Date) => {
   const min = pad2(d.getMinutes());
   return `${mm}/${dd}/${yyyy}, ${hh}:${min}`;
 };
+
+export function formatTime<T extends Intl.DateTimeFormatOptions>(
+  d: Date,
+  options: T
+): string {
+  return d.toLocaleTimeString([], options);
+}
