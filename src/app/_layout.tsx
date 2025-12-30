@@ -6,8 +6,7 @@ import 'react-native-get-random-values';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaperProvider } from "react-native-paper";
 import "../../global.css";
-import { AuthProvider } from "../features/auth/providers";
-import { UserProvider } from "../features/auth/providers/user.provider";
+import { AuthProvider, UserProvider } from "../features/auth/providers";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,18 +20,23 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <UserProvider>
           <PaperProvider>
             <StatusBar style="auto" />
-            <Stack screenOptions={{ headerShown: false }} >
+            <Stack screenOptions={{
+              headerShown: false,
+              contentStyle: {
+                padding: 16,
+              },
+            }}>
               <Stack.Screen name="(protected)" />
               <Stack.Screen name="(public)" />
             </Stack>
           </PaperProvider>
         </UserProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
