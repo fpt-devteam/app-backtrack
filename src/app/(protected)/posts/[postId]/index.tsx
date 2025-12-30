@@ -1,5 +1,5 @@
 import { useAppUser } from '@/src/features/auth/providers/user.provider';
-import PostDetails from '@/src/features/post/components/PostDetails/PostDetails';
+import PostDetails from '@/src/features/post/components/PostDetails';
 import useGetPostById from '@/src/features/post/hooks/useGetPostById';
 import { PostType } from '@/src/features/post/types';
 import { router, useLocalSearchParams } from 'expo-router';

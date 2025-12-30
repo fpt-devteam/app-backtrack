@@ -27,9 +27,6 @@ export default function RootLayout() {
             <StatusBar style="auto" />
             <Stack screenOptions={{
               headerShown: false,
-              contentStyle: {
-                padding: 16,
-              },
             }}>
               <Stack.Screen name="(protected)" />
               <Stack.Screen name="(public)" />
