@@ -63,7 +63,7 @@ export default function LoginForm() {
     >
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerClassName="h-full px-2"
+        contentContainerClassName="h-full px-6 py-6"
       >
         {/* Center wrapper */}
         <View className="flex-1">

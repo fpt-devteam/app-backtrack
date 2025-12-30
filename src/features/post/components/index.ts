@@ -1,7 +1,9 @@
-export * from './PostCard/PostCard';
+export { default as PostCard } from './PostCard';
+export { default as PostDetails } from './PostDetails';
 export { default as PostFiltersComponent } from './PostFiltersComponent';
 export * from './PostFoundForm/PostFoundForm';
+export { default as PostInfinityScrollView } from './PostInfinityScrollView';
 export * from './PostLostForm/PostLostForm';
 export { default as PostMatchCard } from './PostMatchCard';
-export * from './PostsInfinityScrollView/PostInfinityScrollView';
+export { default as PostStatusBadge } from './PostStatusBadge';
 

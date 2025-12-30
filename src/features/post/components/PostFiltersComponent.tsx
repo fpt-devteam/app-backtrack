@@ -10,7 +10,6 @@ import Modal from 'react-native-modal';
 import { SegmentedButtons } from 'react-native-paper';
 import * as yup from 'yup';
 import { PostType } from '../types';
-import { styles } from './styles';
 
 const filterSchema = yup.object({
   searchTerm: yup.string().nullable().defined(),
@@ -27,7 +26,6 @@ type PostFiltersProps = {
 
 const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
-
   const { control, handleSubmit, reset } = useForm<FilterFormSchema>({
     defaultValues: {
       searchTerm: null,
@@ -37,9 +35,12 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
     resolver: yupResolver(filterSchema),
     mode: 'onSubmit',
   });
-
   const handleClear = () => {
-    reset();
+    reset({
+      searchTerm: null,
+      postType: null,
+      location: null,
+    });
     onFilterChange({});
   };
 
@@ -75,8 +76,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
               returnKeyType="search"
               onBlur={handleSubmit(onSubmit)}
             />
-          )}
-        />
+          )} />
       </View>
 
       {/* Filter button */}
@@ -96,27 +96,27 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
       </TouchableOpacity>
 
       {/* ===== FILTER MODAL ===== */}
-      <View style={styles.rootModal}>
+      <View className="bg-white max-h-[520px]">
         <Modal
           isVisible={isVisible}
           onBackdropPress={() => setIsVisible(false)}
           onBackButtonPress={() => setIsVisible(false)}
-          style={styles.modal}
+          className="m-0 justify-end"
         >
-          <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.content}>
+          <View className="bg-white border border-gray-300 rounded-xl p-3">
+            <ScrollView contentContainerClassName="p-4">
               {/* Post Type Filter */}
-              <View style={styles.section}>
-                <Text style={styles.label}>Post Type</Text>
+              <View className="mb-5 gap-2">
+                <Text className="text-base font-semibold text-black mb-2">Post Type</Text>
                 <Controller
                   control={control}
                   name="postType"
                   render={({ field: { onChange, value } }) => (
                     <SegmentedButtons
-                      value={value ?? null}
-                      onValueChange={onChange}
+                      value={value ?? 'all'}
+                      onValueChange={(selectedValue) => onChange(selectedValue === 'all' ? null : selectedValue)}
                       buttons={[
-                        { value: null, label: 'All' },
+                        { value: 'all', label: 'All' },
                         { value: PostType.Lost, label: 'Lost' },
                         { value: PostType.Found, label: 'Found' },
                       ]}
@@ -126,8 +126,8 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
               </View>
 
               {/* Location Filter */}
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Location</Text>
+              <View>
+                <Text className="text-base font-semibold text-black mb-2">Location</Text>
                 <Controller
                   control={control}
                   name="location"
@@ -138,12 +138,18 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
               </View>
 
               {/* Action Buttons */}
-              <View style={styles.buttonsContainer}>
-                <TouchableOpacity style={styles.applyButton} onPress={handleSubmit(onSubmit)}>
-                  <Text style={styles.applyButtonText}>Apply</Text>
+              <View className="flex-row gap-3 mt-2">
+                <TouchableOpacity
+                  className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
+                  onPress={handleSubmit(onSubmit)}
+                >
+                  <Text className="text-base font-semibold text-white">Apply</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
-                  <Text style={styles.clearButtonText}>Clear All</Text>
+                <TouchableOpacity
+                  className="flex-1 h-11 rounded-[10px] border border-red-500 items-center justify-center bg-white"
+                  onPress={handleClear}
+                >
+                  <Text className="text-base font-semibold text-red-500">Clear All</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>

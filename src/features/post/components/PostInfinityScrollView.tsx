@@ -1,16 +1,16 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect } from 'react';
 import { FlatList, Text } from 'react-native';
-import { PostCard } from '..';
-import { POSTS_QUERY_KEY } from '../../constants';
-import { usePosts } from '../../hooks';
-import { PostFilters } from '../../types';
+import { PostCard } from '.';
+import { POSTS_QUERY_KEY } from '../constants';
+import { usePosts } from '../hooks';
+import { PostFilters } from '../types';
 
 type Props = {
   filters: PostFilters;
 };
 
-export const PostInfinityScrollView = ({ filters }: Props) => {
+const PostInfinityScrollView = ({ filters }: Props) => {
   const {
     items,
     hasMore,
@@ -23,7 +23,6 @@ export const PostInfinityScrollView = ({ filters }: Props) => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    console.log('Filters changed in Infinity Scroll View: ', filters);
     queryClient.invalidateQueries({ queryKey: POSTS_QUERY_KEY });
   }, [filters, queryClient]);
 
@@ -34,7 +33,7 @@ export const PostInfinityScrollView = ({ filters }: Props) => {
 
   const handleFooter = useCallback(() => {
     if (isLoading || isLoadingNextPage) return <Text>Loading...</Text>;
-    if (!hasMore) return <Text style={{ textAlign: 'center', padding: 16 }}>No more to load!</Text>;
+    if (!hasMore) return null;
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
 
@@ -46,6 +45,10 @@ export const PostInfinityScrollView = ({ filters }: Props) => {
       onEndReachedThreshold={0.5}
       onEndReached={handleEndReached}
       ListFooterComponent={handleFooter}
+      contentContainerStyle={{
+        padding: 6,
+      }}
     />
   );
 }
+export default PostInfinityScrollView;
