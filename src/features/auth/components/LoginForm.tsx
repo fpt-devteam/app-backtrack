@@ -58,17 +58,17 @@ export default function LoginForm() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-background-light"
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerClassName="h-full px-5 py-10"
+        contentContainerClassName="h-full px-2"
       >
         {/* Center wrapper */}
         <View className="flex-1">
           {/* Header */}
-          <View className="w-full mt-20 mb-16">
+          <View className="w-full mt-12 mb-12">
             <View className="items-center">
               <View className="h-16 w-16 items-center justify-center rounded-full bg-white border border-slate-100">
                 <Image
@@ -88,7 +88,7 @@ export default function LoginForm() {
           </View>
 
           {/* Form */}
-          <View className="w-full max-w-[420px] rounded-xl px-3">
+          <View className="mb-12 w-full max-w-[420px] rounded-xl">
             {/* Email */}
             <Text className="mb-2 text-sm text-slate-700">Email</Text>
             <View className="flex-row items-center rounded-lg border border-slate-200 bg-white px-3 py-3">

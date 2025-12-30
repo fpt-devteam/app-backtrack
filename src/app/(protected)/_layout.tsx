@@ -18,8 +18,14 @@ export default function ProtectedLayout() {
         onPressBell={() => { }}
       />
 
+      {/*App Footer*/}
       <Tabs screenOptions={{
-        headerShown: false
+        headerShown: false,
+        tabBarStyle: {
+          height: 50,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+        },
       }}>
         <Tabs.Screen
           name="posts"
@@ -42,7 +48,7 @@ export default function ProtectedLayout() {
         />
 
         <Tabs.Screen
-          name="(message)"
+          name="chat"
           options={{
             title: "Message",
             tabBarIcon: ({ color, size }) => (
