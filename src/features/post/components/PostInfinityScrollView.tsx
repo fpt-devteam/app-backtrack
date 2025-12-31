@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect } from 'react';
-import { FlatList, Text } from 'react-native';
+import { FlatList, Text, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { PostCard } from '.';
 import { POSTS_QUERY_KEY } from '../constants';
 import { usePosts } from '../hooks';
@@ -8,9 +8,17 @@ import { PostFilters } from '../types';
 
 type Props = {
   filters: PostFilters;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollEventThrottle?: number;
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
 };
 
-const PostInfinityScrollView = ({ filters }: Props) => {
+const PostInfinityScrollView = ({
+  filters,
+  onScroll,
+  scrollEventThrottle = 16,
+  ListHeaderComponent
+}: Props) => {
   const {
     items,
     hasMore,
@@ -45,6 +53,9 @@ const PostInfinityScrollView = ({ filters }: Props) => {
       onEndReachedThreshold={0.5}
       onEndReached={handleEndReached}
       ListFooterComponent={handleFooter}
+      ListHeaderComponent={ListHeaderComponent}
+      onScroll={onScroll}
+      scrollEventThrottle={scrollEventThrottle}
       contentContainerStyle={{
         padding: 6,
       }}
