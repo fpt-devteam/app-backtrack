@@ -1,4 +1,4 @@
-import ImageField from "@/src/shared/components/ImageField/ImageField";
+import { ImageField } from "@/src/shared/components";
 import { useUploadImage } from "@/src/shared/hooks/useUploadImage";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ImagePickerAsset } from "expo-image-picker";
@@ -174,4 +174,4 @@ const ItemLinkForm = () => {
   )
 }
 
-export default ItemLinkForm                                                           
+export default ItemLinkForm

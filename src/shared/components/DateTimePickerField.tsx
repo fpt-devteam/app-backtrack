@@ -8,17 +8,16 @@ import {
   Text,
   View
 } from "react-native";
-import styles from "./styles";
 
 type Props = Readonly<{
   label?: string;
   value: Date | null;
   onChange: (next: Date | null) => void;
-  placeholder?: string; // "mm/dd/yyyy, --:--"
+  placeholder?: string;
   disabled?: boolean;
 }>;
 
-const dateTimeValidate = {
+const DATE_TIME_VALIDATE = {
   minDate: new Date(2000, 0, 1),
   maxDate: new Date(),
 };
@@ -45,12 +44,12 @@ const DateTimePickerField = ({
   };
 
   const onPressDone = () => {
-    if (temp.getTime() > dateTimeValidate.maxDate.getTime()) {
+    if (temp.getTime() > DATE_TIME_VALIDATE.maxDate.getTime()) {
       setError("Date and time cannot be in the future.");
       return;
     }
 
-    if (temp.getTime() < dateTimeValidate.minDate.getTime()) {
+    if (temp.getTime() < DATE_TIME_VALIDATE.minDate.getTime()) {
       setError("Date and time cannot be before Jan 1, 2000.");
       return;
     }
@@ -89,56 +88,70 @@ const DateTimePickerField = ({
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View className="border-blue-500">
       <Pressable
         onPress={openModal}
         disabled={disabled}
-        style={styles.input}
+        className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-white px-3.5 flex-row items-center gap-3"
       >
         <Ionicons name="calendar-outline" size={18} color="#94A3B8" />
-        <Text style={[styles.valueText, !value && styles.placeholderText]} numberOfLines={1}>{displayText}</Text>
+        <Text
+          className={`text-[15px] ${value ? 'text-slate-900' : 'text-slate-400'}`}
+          numberOfLines={1}
+        >
+          {displayText}
+        </Text>
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={onPressClose}>
-        <Pressable style={styles.backdrop} onPress={onPressClose} />
+        <Pressable className="flex-1 bg-[rgba(15,23,42,0.35)]" onPress={onPressClose} />
 
         {error && (
-          <View style={[styles.errorBox]}>
-            <Text style={styles.errorText}>{error}</Text>
+          <View className="absolute top-[50px] left-5 right-5 bg-red-400 p-2.5 rounded-lg z-[1000]">
+            <Text className="text-white font-bold text-center">{error}</Text>
           </View>
         )}
 
-        <View style={styles.sheet}>
+        <View className="absolute left-3.5 right-3.5 bottom-4 rounded-[18px] bg-white border border-[rgba(15,23,42,0.10)] p-3">
           {/* Header */}
-          <View style={styles.sheetHeader}>
-            <View style={styles.headerActions}>
+          <View className="px-1.5 pt-1 pb-2.5">
+            <View className="flex-row justify-end flex-wrap">
               {/* Clear button */}
-              <Pressable onPress={onPressClear} style={styles.headerBtn}>
-                <Text style={styles.headerBtnTextSecondary}>Clear</Text>
+              <Pressable
+                onPress={onPressClear}
+                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-white ml-2.5 mb-2"
+              >
+                <Text className="text-[13px] font-bold text-slate-900">Clear</Text>
               </Pressable>
 
               {/* Cancel button */}
-              <Pressable onPress={onPressClose} style={styles.headerBtn}>
-                <Text style={styles.headerBtnTextSecondary}>Cancel</Text>
+              <Pressable
+                onPress={onPressClose}
+                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-white ml-2.5 mb-2"
+              >
+                <Text className="text-[13px] font-bold text-slate-900">Cancel</Text>
               </Pressable>
 
               {/* Done button */}
-              <Pressable onPress={onPressDone} style={[styles.headerBtn, styles.doneBtn]}>
-                <Text style={styles.headerBtnTextPrimary}>Done</Text>
+              <Pressable
+                onPress={onPressDone}
+                className="px-3 py-2 rounded-xl border border-[rgba(14,165,233,0.35)] bg-sky-500 ml-2.5 mb-2"
+              >
+                <Text className="text-[13px] font-extrabold text-white">Done</Text>
               </Pressable>
             </View>
           </View>
 
           {/* Date Picker */}
-          <View style={styles.pickerBlock}>
-            <Text style={styles.sectionLabel}>Date</Text>
-            <View style={styles.pickerCard}>
+          <View className="px-1.5 pb-2.5">
+            <Text className="text-[13px] font-extrabold text-slate-600 mb-1.5">Date</Text>
+            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-white">
               <DateTimePicker
                 value={temp}
                 mode="date"
                 display="spinner"
                 onChange={onChangeDate}
-                style={styles.picker}
+                style={{ width: '100%', backgroundColor: '#FFFFFF' }}
                 themeVariant="light"
                 textColor="#334155"
               />
@@ -146,16 +159,16 @@ const DateTimePickerField = ({
           </View>
 
           {/* Time Picker */}
-          <View style={styles.pickerBlock}>
-            <Text style={styles.sectionLabel}>Time</Text>
-            <View style={styles.pickerCard}>
+          <View className="px-1.5 pb-2.5">
+            <Text className="text-[13px] font-extrabold text-slate-600 mb-1.5">Time</Text>
+            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-white">
               <DateTimePicker
                 value={temp}
                 mode="time"
                 display="spinner"
                 is24Hour
                 onChange={onChangeTime}
-                style={styles.picker}
+                style={{ width: '100%', backgroundColor: '#FFFFFF' }}
                 themeVariant="light"
                 textColor="#334155"
               />
@@ -165,6 +178,7 @@ const DateTimePickerField = ({
       </Modal>
     </View>
   );
-}
+};
 
 export default DateTimePickerField;
+
