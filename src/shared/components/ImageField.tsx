@@ -1,8 +1,7 @@
 import { ImagePickerAsset, launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
 import React from 'react';
 import { Button, Image, View } from 'react-native';
-import { ensureMediaPermission } from '../../services';
-import { styles } from './styles';
+import { ensureMediaPermission } from '../services';
 
 type ImageFieldProps = {
   value: ImagePickerAsset[];
@@ -33,15 +32,17 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Button title="Pick an image from camera roll" onPress={handlePickImages} />
+    <View className="border border-black p-2.5 m-2.5">
+      <Button title="Pick an image from camera roll" onPress={handlePickImages} disabled={disabled} />
 
       {value.length > 0 && value.map((image) => (
-        <View key={image.uri} >
-          <Image source={{ uri: image.uri }} style={styles.image} />
+        <View key={image.uri}>
+          <Image source={{ uri: image.uri }} className="w-[200px] h-[200px]" />
         </View>
       ))}
     </View>
-  )
-}
+  );
+};
+
 export default ImageField;
+
