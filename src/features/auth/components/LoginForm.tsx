@@ -2,7 +2,7 @@ import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
@@ -28,31 +28,34 @@ const loginFormSchema = yup
 type LoginFormSchema = yup.InferType<typeof loginFormSchema>;
 
 export default function LoginForm() {
-  const { login, loading, error } = useLogin();
+  const { login, loading, error, reset } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
 
   const {
     control: formControl,
     handleSubmit,
     formState: { errors },
+    clearErrors,
   } = useForm<LoginFormSchema>({
     defaultValues: { email: "", password: "" },
     resolver: yupResolver(loginFormSchema),
     mode: "onSubmit",
   });
 
-  const feedback = useMemo(() => {
-    return localError ?? errors.email?.message ?? errors.password?.message ?? error?.message ?? null;
-  }, [localError, errors.email?.message, errors.password?.message, error?.message]);
+  const handleInputChange = (field: 'email' | 'password') => {
+    if (errors[field]) {
+      clearErrors(field);
+    }
+    if (error) {
+      reset();
+    }
+  };
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
-    setLocalError(null);
     try {
       const req: LoginRequest = { email: data.email, password: data.password };
       await login(req);
-    } catch (err: any) {
-      if (err?.message) setLocalError(err.message);
+    } catch {
     }
   };
 
@@ -63,12 +66,12 @@ export default function LoginForm() {
     >
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerClassName="h-full px-6 py-6"
+        contentContainerStyle={{ flexGrow: 1 }}
+        className="px-6"
       >
-        {/* Center wrapper */}
-        <View className="flex-1">
-          {/* Header */}
-          <View className="w-full mt-12 mb-12">
+        <View className="flex-1 justify-between py-6">
+          {/* Header - 40% */}
+          <View className="justify-end items-center " style={{ flex: 0.4 }}>
             <View className="items-center">
               <View className="h-16 w-16 items-center justify-center rounded-full bg-white border border-slate-100">
                 <Image
@@ -78,130 +81,181 @@ export default function LoginForm() {
                 />
               </View>
 
-              <Text className="mt-2 font-display text-4xl text-slate-900">
+              <Text className="mt-4 font-display text-4xl text-slate-900">
                 Backtrack
               </Text>
-              <Text className="mt-0.5 text-center text-slate-500">
+              <Text className="mt-2 text-center text-slate-500 text-base">
                 Find what matters. Log in to continue.
               </Text>
             </View>
           </View>
 
-          {/* Form */}
-          <View className="mb-12 w-full max-w-[420px] rounded-xl">
-            {/* Email */}
-            <Text className="mb-2 text-sm text-slate-700">Email</Text>
-            <View className="flex-row items-center rounded-lg border border-slate-200 bg-white px-3 py-3">
-              <Ionicons name="mail-outline" size={18} color="#70819a" />
-              <View className="w-2" />
-              <Controller
-                control={formControl}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    className="flex-1 text-slate-900"
-                    placeholder="user@example.com"
-                    placeholderTextColor="#a0a9b8"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
+          {/* Form - 40% */}
+          <View className="w-full justify-center " style={{ flex: 0.4 }}>
+            <View className="w-full max-w-[420px] self-center">
+              {/* Global Error Banner */}
+              {error ? (
+                <View className="mb-4 rounded-lg bg-red-50 px-4 py-3 flex-row items-start">
+                  <Ionicons name="alert-circle" size={20} color="#dc2626" style={{ marginTop: 1 }} />
+                  <View className="flex-1 ml-3">
+                    <Text className="text-sm font-medium text-red-900">Authentication Error</Text>
+                    <Text className="text-sm text-red-700 mt-0.5">{error}</Text>
+                  </View>
+                </View>
+              ) : null}
+
+              {/* Email */}
+              <View className="mb-4">
+                <Text className="mb-2 text-sm font-medium text-slate-700">Email</Text>
+                <View
+                  className={`flex-row items-center rounded-lg border bg-white px-3 py-3 ${
+                    errors.email ? "border-red-300 bg-red-50" : "border-slate-200"
+                  }`}
+                >
+                  <Ionicons
+                    name="mail-outline"
+                    size={18}
+                    color={errors.email ? "#dc2626" : "#70819a"}
                   />
-                )}
-              />
-            </View>
-
-            {/* Password */}
-            <Text className="mb-2 mt-4 text-sm text-slate-700">Password</Text>
-            <View className="flex-row items-center rounded-lg border border-slate-200 bg-white px-3 py-3">
-              <Ionicons name="lock-closed-outline" size={18} color="#70819a" />
-              <View className="w-2" />
-
-              <Controller
-                control={formControl}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    className="flex-1 text-slate-900"
-                    placeholder="***********"
-                    placeholderTextColor="#a0a9b8"
-                    secureTextEntry={!showPassword}
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
+                  <View className="w-2" />
+                  <Controller
+                    control={formControl}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        className="flex-1 text-slate-900"
+                        placeholder="user@example.com"
+                        placeholderTextColor="#a0a9b8"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(text) => {
+                          handleInputChange('email');
+                          onChange(text);
+                        }}
+                      />
+                    )}
                   />
+                  {errors.email && (
+                    <Ionicons name="close-circle" size={18} color="#dc2626" />
+                  )}
+                </View>
+                {errors.email && (
+                  <View className="flex-row items-center mt-1.5 px-1">
+                    <Text className="text-xs text-red-600">{errors.email.message}</Text>
+                  </View>
                 )}
-              />
-
-              <TouchableOpacity onPress={() => setShowPassword((p) => !p)} hitSlop={12}>
-                <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="#70819a"
-                />
-              </TouchableOpacity>
-            </View>
-
-            {/* Forgot */}
-            <View className="mt-3 items-end">
-              <Link href="/forgot-password" className="text-sm text-primary">
-                Forgot Password?
-              </Link>
-            </View>
-
-            {/* Error */}
-            {feedback ? (
-              <View className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-                <Text className="text-sm text-red-600">{feedback}</Text>
               </View>
-            ) : null}
 
-            {/* Submit */}
-            <TouchableOpacity
-              className={`mt-5 flex-row items-center justify-center rounded-lg bg-primary px-4 py-3 ${loading ? "opacity-70" : ""
-                }`}
-              onPress={handleSubmit(onSubmit)}
-              disabled={loading}
-              activeOpacity={0.9}
-            >
-              {loading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <>
-                  <Text className="mr-2 font-display text-base text-white">Login</Text>
-                  <Ionicons name="arrow-forward" size={18} color="#ffffff" />
-                </>
-              )}
-            </TouchableOpacity>
+              {/* Password */}
+              <View className="mb-3">
+                <Text className="mb-2 text-sm font-medium text-slate-700">Password</Text>
+                <View
+                  className={`flex-row items-center rounded-lg border bg-white px-3 py-3 ${
+                    errors.password ? "border-red-300 bg-red-50" : "border-slate-200"
+                  }`}
+                >
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={18}
+                    color={errors.password ? "#dc2626" : "#70819a"}
+                  />
+                  <View className="w-2" />
 
-            {/* Divider */}
-            <View className="mt-6 flex-row items-center">
-              <View className="h-px flex-1 bg-slate-200" />
-              <Text className="mx-3 text-xs text-slate-500">or continue with</Text>
-              <View className="h-px flex-1 bg-slate-200" />
-            </View>
+                  <Controller
+                    control={formControl}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <TextInput
+                        className="flex-1 text-slate-900"
+                        placeholder="***********"
+                        placeholderTextColor="#a0a9b8"
+                        secureTextEntry={!showPassword}
+                        value={value}
+                        onBlur={onBlur}
+                        onChangeText={(text) => {
+                          handleInputChange('password');
+                          onChange(text);
+                        }}
+                      />
+                    )}
+                  />
 
-            {/* Social */}
-            <View className="mt-4">
+                  <TouchableOpacity onPress={() => setShowPassword((p) => !p)} hitSlop={12}>
+                    <Ionicons
+                      name={showPassword ? "eye-outline" : "eye-off-outline"}
+                      size={20}
+                      color={errors.password ? "#dc2626" : "#70819a"}
+                    />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && (
+                  <View className="flex-row items-center mt-1.5 px-1">
+                    <Text className="text-xs text-red-600">{errors.password.message}</Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Forgot */}
+              <View className="mb-4 items-end">
+                <Link href="/forgot-password" className="text-sm text-primary font-medium">
+                  Forgot Password?
+                </Link>
+              </View>
+
+              {/* Submit */}
               <TouchableOpacity
-                className="flex-row items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3"
+                className={`flex-row items-center justify-center rounded-lg bg-primary px-4 py-3.5 ${
+                  loading ? "opacity-70" : ""
+                }`}
+                onPress={handleSubmit(onSubmit)}
                 disabled={loading}
-                activeOpacity={0.9}
+                activeOpacity={0.8}
               >
-                <Ionicons name="logo-google" size={18} color="#e5453b" />
-                <Text className="ml-2 text-slate-700">Google</Text>
+                {loading ? (
+                  <View className="flex-row items-center">
+                    <ActivityIndicator color="#ffffff" size="small" />
+                    <Text className="ml-2 font-medium text-base text-white">Signing in...</Text>
+                  </View>
+                ) : (
+                  <>
+                    <Text className="mr-2 font-medium text-base text-white">Sign In</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#ffffff" />
+                  </>
+                )}
               </TouchableOpacity>
+
+              {/* Divider */}
+              <View className="mt-5 flex-row items-center">
+                <View className="h-px flex-1 bg-slate-200" />
+                <Text className="mx-3 text-xs text-slate-500 font-medium">or continue with</Text>
+                <View className="h-px flex-1 bg-slate-200" />
+              </View>
+
+              {/* Social */}
+              <View className="mt-4">
+                <TouchableOpacity
+                  className="flex-row items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3"
+                  disabled={loading}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="logo-google" size={18} color="#e5453b" />
+                  <Text className="ml-2 text-slate-700 font-medium">Google</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
-          {/* Footer */}
-          <View className="mt-6 flex-row justify-center items-center">
-            <Text className="text-slate-600">Don&apos;t have an account?</Text>
-            <Link href="/register" className="ml-2 font-display text-primary">
-              Sign Up
-            </Link>
+          {/* Footer - 20% */}
+          <View className="justify-center items-center" style={{ flex: 0.2 }}>
+            <View className="flex-row justify-center items-center">
+              <Text className="text-slate-600">Don&apos;t have an account?</Text>
+              <Link href="/register" className="ml-2 font-display text-primary">
+                Sign Up
+              </Link>
+            </View>
           </View>
         </View>
       </ScrollView>
