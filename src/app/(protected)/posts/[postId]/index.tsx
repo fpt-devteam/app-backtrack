@@ -2,7 +2,9 @@ import { useAppUser } from '@/src/features/auth/providers/user.provider';
 import PostDetails from '@/src/features/post/components/PostDetails';
 import useGetPostById from '@/src/features/post/hooks/useGetPostById';
 import { PostType } from '@/src/features/post/types';
-import { router, useLocalSearchParams } from 'expo-router';
+import ImageCarousel from '@/src/shared/components/ImageCarousel';
+import { POST_ROUTE } from '@/src/shared/constants';
+import { ExternalPathString, RelativePathString, router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { Button } from 'react-native-paper';
@@ -18,41 +20,46 @@ const PostDetailScreen = () => {
   console.log('user:', user);
 
   const isOwner = useMemo(() => data?.authorId === user?.id, [data, user]);
-
   if (!postId) return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View className="flex-1 justify-center items-center">
       <Text>Missing postId</Text>
     </View>
   );
 
   if (!isUserReady || isLoading) return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View className="flex-1 justify-center items-center">
       <ActivityIndicator size="large" color="#0ea5e9" />
-      <Text style={{ marginTop: 10 }}>Loading...</Text>
+      <Text className="mt-2.5">Loading...</Text>
     </View>
   );
 
   if (error) return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-      <Text style={{ color: '#ef4444', textAlign: 'center' }}>{error.message}</Text>
+    <View className="flex-1 justify-center items-center p-5">
+      <Text className="text-red-500 text-center">{error.message}</Text>
     </View>
   );
 
   if (!data) return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View className="flex-1 justify-center items-center">
       <Text>Item not found</Text>
     </View>
   );
-
   return (
-    <View>
+    <View className="flex-1 bg-gray-50">
       {/* Image Carousel */}
-      <View>
+      <View className="bg-white">
+        <ImageCarousel
+          data={data.imageUrls}
+          showLoadingIndicator={true}
+          autoScrollInterval={4000}
+        />
       </View>
+
       {/* Post Details */}
       <PostDetails post={data} />
+
       {/* Footer */}
-      <View>
+      <View className="p-4 bg-white border-t border-gray-200 gap-3">
         <Button mode="contained" onPress={() => {
           console.log("Move to chat screen");
         }}>
@@ -60,8 +67,7 @@ const PostDetailScreen = () => {
         </Button>
 
         {!isOwner && <Button mode="contained" onPress={() => {
-          router.push(`/posts/${postId}/matching`);
-          console.log("Move to matching screen");
+          router.push(POST_ROUTE.matching(postId) as ExternalPathString | RelativePathString);
         }}>
           Start Matching
         </Button>}
