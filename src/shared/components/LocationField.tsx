@@ -1,6 +1,6 @@
 import { useGetDetailCurrentLocation, useGetDetailLocation } from "@/src/shared/hooks";
-import React, { useEffect, useRef } from "react";
-import { View } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import MapView, { Marker, MarkerDragStartEndEvent, Region } from "react-native-maps";
 import { Icon, IconButton } from "react-native-paper";
@@ -11,6 +11,95 @@ type LocationFieldProps = {
   value: GoogleMapDetailLocation | null;
   onChange: (location: GoogleMapDetailLocation | null) => void;
 };
+
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  labelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2a44',
+    marginBottom: 8,
+  },
+  hintText: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 12,
+  },
+  searchBarWrapper: {
+    marginBottom: 16,
+    zIndex: 1000,
+    elevation: 1000,
+  },
+  searchBarContainer: {
+    flex: 1,
+  },
+  leftIconContainer: {
+    height: 44,
+    width: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  searchInputContainer: {
+    flex: 1,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  searchInput: {
+    height: 44,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 0,
+    borderWidth: 0,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    paddingLeft: 0,
+    paddingRight: 12,
+    color: '#0F172A',
+    fontSize: 14,
+  },
+  mapContainer: {
+    height: 250,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
+  },
+  currentLocationButton: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 12,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 const getRegionFromLocation = (detailLocation: GoogleMapDetailLocation | null): Region => {
   if (!detailLocation) return DEFAULT_REGION;
@@ -27,6 +116,9 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
 
   const mapRef = useRef<MapView>(null);
   const placesRef = useRef<GooglePlacesAutocompleteRef>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isFormatting, setIsFormatting] = useState(false);
+  const [listViewDisplayed, setListViewDisplayed] = useState<boolean | 'auto'>(false);
 
   const { loading, getDetailCurrentLocation } = useGetDetailCurrentLocation();
   const { formatLocation } = useGetDetailLocation();
@@ -39,12 +131,26 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
     mapRef.current?.animateToRegion(newRegion, ANIMATE_TO_DURATION);
   }, [detailLocation]);
 
+  const closeDropdown = useCallback(() => {
+    setShowDropdown(false);
+    setListViewDisplayed(false);
+    Keyboard.dismiss();
+
+    setTimeout(() => {
+      placesRef.current?.blur();
+    }, 100);
+  }, []);
+
   const handleGetCurrentLocation = async () => {
+    closeDropdown();
     const fetchedData = await getDetailCurrentLocation();
     onChange(fetchedData);
   };
 
   const handleMarkerDragEnd = async (e: MarkerDragStartEndEvent) => {
+    if (isFormatting) return;
+
+    setIsFormatting(true);
     const mapLocation: GoogleMapDetailLocation = {
       location: {
         latitude: e.nativeEvent.coordinate.latitude,
@@ -53,8 +159,12 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
     };
 
     const coords = mapLocation.location;
-    const fetchedData = await formatLocation(coords);
-    onChange(fetchedData);
+    try {
+      const fetchedData = await formatLocation(coords);
+      onChange(fetchedData);
+    } finally {
+      setIsFormatting(false);
+    }
   };
 
   const handlePickPlace = async (data: GooglePlaceData, details: GooglePlaceDetail | null) => {
@@ -63,107 +173,184 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
 
     if (typeof lat !== "number" || typeof lng !== "number") return;
 
+
+    setListViewDisplayed(false);
+    setShowDropdown(false);
+    Keyboard.dismiss();
+    placesRef.current?.blur();
+
+    setIsFormatting(true);
     const mapLocation: GoogleMapDetailLocation = {
       location: { latitude: lat, longitude: lng },
     };
 
     const coords = mapLocation.location;
-    const formattedLocation: GoogleMapDetailLocation | null = await formatLocation(coords);
-    onChange(formattedLocation);
+    try {
+      const formattedLocation: GoogleMapDetailLocation | null = await formatLocation(coords);
+      onChange(formattedLocation);
+    } finally {
+      setIsFormatting(false);
+    }
+  };
+
+  const handleTextChange = (text: string) => {
+
+    if (text.length > 0) {
+      setShowDropdown(true);
+      setListViewDisplayed('auto');
+    } else {
+      setShowDropdown(false);
+      setListViewDisplayed(false);
+    }
+  };
+
+  const handleFocus = () => {
+    setShowDropdown(true);
+
+    const currentText = placesRef.current?.getAddressText?.();
+    if (currentText && currentText.length > 0) {
+      setListViewDisplayed('auto');
+    }
+  };
+
+  const handleBlur = () => {
+
+    setTimeout(() => {
+      setShowDropdown(false);
+      setListViewDisplayed(false);
+    }, 200);
   };
 
   return (
-    <View className="p-3">
-      {/* Search bar */}
-      <View className="flex-row items-center gap-3">
-        <View className="flex-1 min-w-0">
-          <GooglePlacesAutocomplete
-            ref={placesRef}
-            placeholder="Enter location (e.g. Central Park)"
-            fetchDetails
-            debounce={300}
-            enablePoweredByContainer={false}
-            query={QUERY_CONFIG}
-            onPress={handlePickPlace}
-            keyboardShouldPersistTaps="always"
-            renderLeftButton={() => (
-              <View className="h-11 w-9 justify-center items-center bg-slate-100 rounded-tl-xl rounded-bl-xl">
-                <Icon source="map-marker" size={18} color="#94A3B8" />
+    <TouchableWithoutFeedback onPress={closeDropdown}>
+      <View>
+        <Text style={styles.labelText}>Location</Text>
+        <Text style={styles.hintText}>Search for a location or use your current location</Text>
+
+        <View style={styles.container}>
+          {/* Search bar - with proper z-index layering */}
+          <View style={styles.searchBarWrapper}>
+            <GooglePlacesAutocomplete
+              ref={placesRef}
+              placeholder="Enter location (e.g. Central Park)"
+              fetchDetails
+              debounce={300}
+              enablePoweredByContainer={false}
+              query={QUERY_CONFIG}
+              onPress={handlePickPlace}
+              keyboardShouldPersistTaps="handled"
+              keepResultsAfterBlur={false}
+              listViewDisplayed={listViewDisplayed}
+              suppressDefaultStyles={false}
+              onFail={(error) => console.log('GooglePlacesAutocomplete Error:', error)}
+              onTimeout={() => console.log('GooglePlacesAutocomplete Timeout')}
+              textInputProps={{
+                onChangeText: handleTextChange,
+                onFocus: handleFocus,
+                onBlur: handleBlur,
+                editable: !isFormatting,
+                returnKeyType: 'search',
+              }}
+              renderLeftButton={() => (
+                <View style={styles.leftIconContainer}>
+                  <Icon source="map-marker" size={18} color="#94A3B8" />
+                </View>
+              )}
+              styles={{
+                container: {
+                  flex: 1,
+                  zIndex: 1000,
+                  elevation: 1000,
+                },
+                textInputContainer: styles.searchInputContainer,
+                textInput: styles.searchInput,
+                listView: {
+                  position: 'absolute',
+                  top: 52,
+                  left: 0,
+                  right: 0,
+                  marginTop: 0,
+                  borderRadius: 12,
+                  backgroundColor: '#FFFFFF',
+                  borderWidth: 1,
+                  borderColor: 'rgba(15,23,42,0.08)',
+                  overflow: 'hidden',
+                  maxHeight: 250,
+                  zIndex: 2000,
+                  elevation: 2000,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.15,
+                  shadowRadius: 8,
+                },
+                row: {
+                  paddingVertical: 12,
+                  paddingHorizontal: 16,
+                  backgroundColor: '#FFFFFF',
+                },
+                separator: {
+                  height: 0.5,
+                  backgroundColor: 'rgba(15,23,42,0.08)',
+                },
+                description: {
+                  color: '#0F172A',
+                  fontSize: 14,
+                },
+                predefinedPlacesDescription: {
+                  color: '#6B7280',
+                },
+              }}
+            />
+          </View>
+
+          {/* Map View - with proper pointer events control */}
+          <View style={styles.mapContainer}>
+            <MapView
+              ref={mapRef}
+              style={{ width: '100%', height: '100%' }}
+              showsUserLocation
+              showsMyLocationButton={false}
+              initialRegion={getRegionFromLocation(detailLocation)}
+              mapType="standard"
+              scrollEnabled={!showDropdown}
+              zoomEnabled={!showDropdown}
+              pitchEnabled={!showDropdown}
+              rotateEnabled={!showDropdown}
+              pointerEvents={showDropdown ? 'none' : 'auto'}
+            >
+              {detailLocation && (
+                <Marker
+                  coordinate={detailLocation.location}
+                  draggable={!isFormatting}
+                  onDragEnd={handleMarkerDragEnd}
+                  title="Selected Location"
+                  description="Drag to adjust position"
+                />
+              )}
+            </MapView>
+
+            {/* Current Location Button - Bottom Right */}
+            <IconButton
+              icon={loading ? "loading" : "crosshairs-gps"}
+              onPress={handleGetCurrentLocation}
+              disabled={loading || isFormatting}
+              mode="contained"
+              size={24}
+              iconColor="#6B7280"
+              style={styles.currentLocationButton}
+            />
+
+            {/* Loading overlay for map */}
+            {isFormatting && (
+              <View style={styles.loadingOverlay}>
+                <Icon source="loading" size={24} color="#6B7280" />
               </View>
             )}
-            styles={{
-              container: { flex: 1 },
-              textInputContainer: {
-                flex: 1,
-                paddingHorizontal: 0,
-                paddingVertical: 0,
-              },
-              textInput: {
-                height: 44,
-                backgroundColor: '#F1F5F9',
-                borderRadius: 0,
-                borderWidth: 0,
-                borderTopRightRadius: 12,
-                borderBottomRightRadius: 12,
-                paddingLeft: 0,
-                paddingRight: 12,
-                color: '#0F172A',
-              },
-              listView: {
-                marginTop: 8,
-                borderRadius: 12,
-                backgroundColor: '#FFFFFF',
-                borderWidth: 1,
-                borderColor: 'rgba(15,23,42,0.08)',
-                overflow: 'hidden',
-              },
-              row: {
-                paddingVertical: 12,
-                paddingHorizontal: 12,
-              },
-              separator: {
-                height: 0.5,
-                backgroundColor: 'rgba(15,23,42,0.08)',
-              },
-              description: {
-                color: '#0F172A',
-              },
-            }}
-          />
+          </View>
         </View>
-
-        <IconButton
-          className="w-11 h-11 m-0 p-0 rounded-xl justify-center items-center"
-          icon={loading ? "loading" : "crosshairs-gps"}
-          onPress={handleGetCurrentLocation}
-          disabled={loading}
-          mode="outlined"
-        />
       </View>
-
-      {/* Map View */}
-      <View className="h-[300px] mt-3 rounded-lg overflow-hidden relative">
-        <MapView
-          ref={mapRef}
-          className="w-full h-[70%] rounded-xl"
-          showsUserLocation
-          showsMyLocationButton
-          initialRegion={getRegionFromLocation(detailLocation)}
-        >
-          {detailLocation && (
-            <Marker
-              coordinate={detailLocation.location}
-              draggable
-              onDragEnd={handleMarkerDragEnd}
-              title="Selected Location"
-              description="Drag to adjust"
-            />
-          )}
-        </MapView>
-      </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
 export default LocationField;
-
