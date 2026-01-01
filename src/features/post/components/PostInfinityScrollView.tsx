@@ -1,6 +1,7 @@
+import { Loader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect } from 'react';
-import { FlatList, Text, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { FlatList, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { PostCard } from '.';
 import { POSTS_QUERY_KEY } from '../constants';
 import { usePosts } from '../hooks';
@@ -40,7 +41,7 @@ const PostInfinityScrollView = ({
   }, [hasMore, loadMore]);
 
   const handleFooter = useCallback(() => {
-    if (isLoading || isLoadingNextPage) return <Text>Loading...</Text>;
+    if (isLoading || isLoadingNextPage) return <Loader loading={isLoading || isLoadingNextPage} />;
     if (!hasMore) return null;
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
