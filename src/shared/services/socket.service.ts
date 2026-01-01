@@ -1,13 +1,13 @@
-import { MessageItem } from '@/src/features/chat/types';
-import { SOCKET_CONFIG } from '@/src/shared/constants';
-import { io, Socket } from 'socket.io-client';
+import { MessageItem } from "@/src/features/chat/types";
+import { SOCKET_CONFIG } from "@/src/shared/constants";
+import { io, Socket } from "socket.io-client";
 
 export class SocketService {
   private socket: Socket | null = null;
   private readonly serverUrl: string;
 
   constructor(serverUrl?: string) {
-    this.serverUrl = serverUrl || SOCKET_CONFIG.getServerUrl();
+    this.serverUrl = serverUrl || SOCKET_CONFIG.getServerUrl() || "";
   }
 
   connect(): Promise<void> {
@@ -23,18 +23,18 @@ export class SocketService {
         timeout: SOCKET_CONFIG.TIMEOUT,
       });
 
-      this.socket.on('connect', () => {
-        console.log('✅ Socket connected:', this.socket?.id);
+      this.socket.on("connect", () => {
+        console.log("✅ Socket connected:", this.socket?.id);
         resolve();
       });
 
-      this.socket.on('connect_error', (error) => {
-        console.error('❌ Socket connection error:', error);
+      this.socket.on("connect_error", (error) => {
+        console.error("❌ Socket connection error:", error);
         reject(error);
       });
 
-      this.socket.on('disconnect', (reason) => {
-        console.log('🔌 Socket disconnected:', reason);
+      this.socket.on("disconnect", (reason) => {
+        console.log("🔌 Socket disconnected:", reason);
       });
     });
   }
@@ -48,12 +48,12 @@ export class SocketService {
 
   joinConversation(conversationId: string): void {
     if (!this.socket?.connected) {
-      console.warn('Socket not connected, cannot join conversation');
+      console.warn("Socket not connected, cannot join conversation");
       return;
     }
 
-    this.socket.emit('join_conversation', conversationId);
-    console.log('🏠 Joined conversation:', conversationId);
+    this.socket.emit("join_conversation", conversationId);
+    console.log("🏠 Joined conversation:", conversationId);
   }
 
   leaveConversation(conversationId: string): void {
@@ -61,20 +61,20 @@ export class SocketService {
       return;
     }
 
-    this.socket.emit('leave_conversation', conversationId);
-    console.log('🚪 Left conversation:', conversationId);
+    this.socket.emit("leave_conversation", conversationId);
+    console.log("🚪 Left conversation:", conversationId);
   }
 
   onReceiveMessage(callback: (message: MessageItem) => void): () => void {
     if (!this.socket) {
-      console.warn('Socket not initialized');
+      console.warn("Socket not initialized");
       return () => {};
     }
 
-    this.socket.on('receive_message', callback);
+    this.socket.on("receive_message", callback);
 
     return () => {
-      this.socket?.off('receive_message', callback);
+      this.socket?.off("receive_message", callback);
     };
   }
 

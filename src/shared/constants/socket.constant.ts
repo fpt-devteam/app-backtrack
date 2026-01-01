@@ -1,8 +1,8 @@
 export const SOCKET_CONFIG = {
-  DEV_URL: 'http://localhost:3000',
-  PROD_URL: 'http://localhost:3000',
-  PATH: '/hub',
-  TRANSPORTS: ['websocket', 'polling'] as const,
+  DEV_URL: process.env.EXPO_PUBLIC_RAILWAY_STATIC_URL,
+  PROD_URL: process.env.EXPO_PUBLIC_RAILWAY_STATIC_URL,
+  PATH: "/api/chat/hub",
+  TRANSPORTS: ["websocket", "polling"] as const,
   TIMEOUT: 5000,
   getServerUrl: () => {
     return __DEV__ ? SOCKET_CONFIG.DEV_URL : SOCKET_CONFIG.PROD_URL;

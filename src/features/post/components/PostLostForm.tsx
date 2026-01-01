@@ -6,12 +6,11 @@ import { ImagePickerAsset } from 'expo-image-picker';
 import { ExternalPathString, RelativePathString, router } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, Button, FlatList, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as yup from "yup";
-import { POST_ROUTE } from '../../constants';
-import { useCreatePost } from '../../hooks';
-import { Post, PostCreateRequest, PostType } from '../../types';
-import { styles } from './styles';
+import { POST_ROUTE } from '../constants';
+import { useCreatePost } from '../hooks';
+import { Post, PostCreateRequest, PostType } from '../types';
 
 const postSchema = yup
   .object({
@@ -128,13 +127,23 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
   };
 
   const content = (
+    <ScrollView className="p-4">
 
-    <ScrollView style={styles.container}>
+
       {/* Form Fields */}
-      <View style={styles.formSection}>
+      <View className="bg-white rounded-3xl p-4 my-3 shadow-lg border border-slate-300"
+        style={{
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 3,
+        }}
+      >
+
+
         {/* Image Picker */}
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Photos of the item</Text>
+        <View className="mb-4">
           <Controller
             control={control}
             name="images"
@@ -142,39 +151,48 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
               <ImageField value={value} onChange={onChange} />
             )}
           />
-          {errors.images && (<Text style={styles.errorText}>{errors.images.message}</Text>)}
+          {errors.images && (
+            <Text className="text-red-500 text-xs mt-1">{errors.images.message}</Text>
+          )}
         </View>
 
-        <Text style={styles.sectionTitle}>Item Details</Text>
+        <Text className="text-xl font-bold text-slate-800 mb-4">Item Details</Text>
+
         {/* Item Name */}
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Item Name</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-slate-800 mb-2">Item Name</Text>
           <Controller
             control={control}
             name="itemName"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={[styles.input, errors.itemName && styles.inputError]}
+                className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? 'border-red-500' : 'border-slate-300'
+                  }`}
                 placeholder="e.g. Blue Backpack, iPhone 14"
+                placeholderTextColor="#64748b"
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
               />
             )}
           />
-          {errors.itemName && <Text style={styles.errorText}>{errors.itemName.message}</Text>}
+          {errors.itemName && (
+            <Text className="text-red-500 text-xs mt-1">{errors.itemName.message}</Text>
+          )}
         </View>
 
         {/* Description */}
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Description</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-slate-800 mb-2">Description</Text>
           <Controller
             control={control}
             name="description"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={[styles.textArea, errors.description && styles.inputError]}
+                className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? 'border-red-500' : 'border-slate-300'
+                  }`}
                 placeholder="Describe the item in detail."
+                placeholderTextColor="#64748b"
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
@@ -185,20 +203,22 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
             )}
           />
           {errors.description && (
-            <Text style={styles.errorText}>{errors.description.message}</Text>
+            <Text className="text-red-500 text-xs mt-1">{errors.description.message}</Text>
           )}
         </View>
 
         {/* Distinctive Marks */}
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Distinctive Marks</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-slate-800 mb-2">Distinctive Marks</Text>
           <Controller
             control={control}
             name="distinctiveMarks"
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
-                style={[styles.textArea, errors.distinctiveMarks && styles.inputError]}
+                className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.distinctiveMarks ? 'border-red-500' : 'border-slate-300'
+                  }`}
                 placeholder="Any unique marks, scratches, or identifying features (optional)"
+                placeholderTextColor="#64748b"
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
@@ -209,13 +229,15 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
             )}
           />
           {errors.distinctiveMarks && (
-            <Text style={styles.errorText}>{errors.distinctiveMarks.message}</Text>
+            <Text className="text-red-500 text-xs mt-1">{errors.distinctiveMarks.message}</Text>
           )}
         </View>
 
+
+
         {/* Event Time */}
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Event Time</Text>
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-slate-800 mb-2">Event Time</Text>
           <Controller
             control={control}
             name="eventTime"
@@ -227,11 +249,15 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
               />
             )}
           />
-          {errors.eventTime && (<Text style={styles.errorText}>{errors.eventTime.message}</Text>)}
+          {errors.eventTime && (
+            <Text className="text-red-500 text-xs mt-1">{errors.eventTime.message}</Text>
+          )}
         </View>
 
+
+
         {/* Location Picker */}
-        <View style={styles.fieldContainer}>
+        <View className="mb-4">
           <Controller
             control={control}
             name="detailLocation"
@@ -239,22 +265,30 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
               <LocationField value={value} onChange={onChange} />
             )}
           />
-          {errors.detailLocation && (<Text style={styles.errorText}>{errors.detailLocation.message}</Text>)}
+          {errors.detailLocation && (
+            <Text className="text-red-500 text-xs mt-1">{errors.detailLocation.message}</Text>
+          )}
+        </View>
+
+
+
+        {/* Submit Button */}
+        <View className="my-5 px-4">
+          <TouchableOpacity
+            className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text className="text-base font-semibold text-white">Submit</Text>
+          </TouchableOpacity>
         </View>
       </View>
-
-      {/* Submit Button */}
-      <View style={styles.buttonContainer}>
-        <Button title="Submit" onPress={handleSubmit(onSubmit)} />
-      </View>
     </ScrollView>
+  );
 
-  )
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-
       <FlatList
         data={[{ key: "form" }]}
         keyExtractor={(i) => i.key}
@@ -265,6 +299,7 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
         contentContainerStyle={{ paddingBottom: 24 }}
       />
     </KeyboardAvoidingView>
+  );
+};
 
-  )
-}
+export default PostLostForm;
