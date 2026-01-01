@@ -127,7 +127,6 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
 
               {/* Location Filter */}
               <View>
-                <Text className="text-base font-semibold text-black mb-2">Location</Text>
                 <Controller
                   control={control}
                   name="location"

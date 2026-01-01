@@ -225,8 +225,6 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
     <TouchableWithoutFeedback onPress={closeDropdown}>
       <View>
         <Text style={styles.labelText}>Location</Text>
-        <Text style={styles.hintText}>Search for a location or use your current location</Text>
-
         <View style={styles.container}>
           {/* Search bar - with proper z-index layering */}
           <View style={styles.searchBarWrapper}>
