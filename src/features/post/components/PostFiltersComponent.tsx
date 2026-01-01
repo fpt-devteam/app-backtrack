@@ -35,6 +35,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
     resolver: yupResolver(filterSchema),
     mode: 'onSubmit',
   });
+
   const handleClear = () => {
     reset({
       searchTerm: null,
@@ -52,7 +53,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
         latitude: data.location?.location.latitude ? Number(data.location.location.latitude.toFixed(4)) : undefined,
         longitude: data.location?.location.longitude ? Number(data.location.location.longitude.toFixed(4)) : undefined,
       },
-      radiusInKm: (data.location?.location.latitude && data.location?.location.longitude) ? 10 : undefined, // default radius
+      radiusInKm: (data.location?.location.latitude && data.location?.location.longitude) ? 10 : undefined,
     };
     setIsVisible(false);
     onFilterChange(newFilters);
@@ -81,8 +82,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
 
       {/* Filter button */}
       <TouchableOpacity
-        onPress={() => setIsVisible(true)}
-        activeOpacity={0.85}
+        onPress={() => setIsVisible(true)} activeOpacity={0.85}
         className="h-12 w-12 items-center justify-center rounded-full bg-sky-500"
         style={{
           shadowColor: '#000',
@@ -96,65 +96,97 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
       </TouchableOpacity>
 
       {/* ===== FILTER MODAL ===== */}
-      <View className="bg-white max-h-[520px]">
-        <Modal
-          isVisible={isVisible}
-          onBackdropPress={() => setIsVisible(false)}
-          onBackButtonPress={() => setIsVisible(false)}
-          className="m-0 justify-end"
-        >
-          <View className="bg-white border border-gray-300 rounded-xl p-3">
-            <ScrollView contentContainerClassName="p-4">
-              {/* Post Type Filter */}
-              <View className="mb-5 gap-2">
-                <Text className="text-base font-semibold text-black mb-2">Post Type</Text>
-                <Controller
-                  control={control}
-                  name="postType"
-                  render={({ field: { onChange, value } }) => (
-                    <SegmentedButtons
-                      value={value ?? 'all'}
-                      onValueChange={(selectedValue) => onChange(selectedValue === 'all' ? null : selectedValue)}
-                      buttons={[
-                        { value: 'all', label: 'All' },
-                        { value: PostType.Lost, label: 'Lost' },
-                        { value: PostType.Found, label: 'Found' },
-                      ]}
-                    />
-                  )}
-                />
-              </View>
+      <Modal
+        isVisible={isVisible}
+        onBackdropPress={() => setIsVisible(false)}
+        onBackButtonPress={() => setIsVisible(false)}
+        style={{ margin: 0, justifyContent: 'flex-end' }}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        animationInTiming={400}
+        animationOutTiming={400}
+        backdropTransitionInTiming={400}
+        backdropTransitionOutTiming={400}
+        avoidKeyboard={true}
+      >
+        <View className="bg-white border border-gray-300 rounded-t-xl p-5 max-h-[80%]">
+          <ScrollView contentContainerClassName="">
+            {/* Post Type Filter */}
+            <View className="mb-5 gap-2">
+              <Text className="text-base font-semibold text-black mb-2">Post Type</Text>
+              <Controller
+                control={control}
+                name="postType"
+                render={({ field: { onChange, value } }) => (
+                  <SegmentedButtons
+                    value={value ?? 'all'}
+                    onValueChange={(selectedValue) => onChange(selectedValue === 'all' ? null : selectedValue)}
+                    buttons={[
+                      {
+                        value: 'all',
+                        label: 'All',
+                        style: {
+                          backgroundColor: (value ?? 'all') === 'all' ? '#3B82F6' : 'white',
+                        },
+                        labelStyle: {
+                          color: (value ?? 'all') === 'all' ? 'white' : 'black'
+                        }
+                      },
+                      {
+                        value: PostType.Lost,
+                        label: 'Lost',
+                        style: {
+                          backgroundColor: value === PostType.Lost ? '#3B82F6' : 'white',
+                        },
+                        labelStyle: {
+                          color: value === PostType.Lost ? 'white' : 'black'
+                        }
+                      },
+                      {
+                        value: PostType.Found,
+                        label: 'Found',
+                        style: {
+                          backgroundColor: value === PostType.Found ? '#3B82F6' : 'white',
+                        },
+                        labelStyle: {
+                          color: value === PostType.Found ? 'white' : 'black'
+                        }
+                      },
+                    ]}
+                  />
+                )}
+              />
+            </View>
 
-              {/* Location Filter */}
-              <View>
-                <Controller
-                  control={control}
-                  name="location"
-                  render={({ field: { onChange, value } }) => (
-                    <LocationField value={value} onChange={onChange} />
-                  )}
-                />
-              </View>
+            {/* Location Filter */}
+            <View>
+              <Controller
+                control={control}
+                name="location"
+                render={({ field: { onChange, value } }) => (
+                  <LocationField value={value} onChange={onChange} />
+                )}
+              />
+            </View>
 
-              {/* Action Buttons */}
-              <View className="flex-row gap-3 mt-2">
-                <TouchableOpacity
-                  className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
-                  onPress={handleSubmit(onSubmit)}
-                >
-                  <Text className="text-base font-semibold text-white">Apply</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="flex-1 h-11 rounded-[10px] border border-red-500 items-center justify-center bg-white"
-                  onPress={handleClear}
-                >
-                  <Text className="text-base font-semibold text-red-500">Clear All</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </Modal>
-      </View>
+            {/* Action Buttons */}
+            <View className="flex-row gap-3 mt-6 mb-6">
+              <TouchableOpacity
+                className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
+                onPress={handleSubmit(onSubmit)}
+              >
+                <Text className="text-base font-semibold text-white">Apply</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 h-11 rounded-[10px] border border-red-500 items-center justify-center bg-white"
+                onPress={handleClear}
+              >
+                <Text className="text-base font-semibold text-red-500">Clear All</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 };
