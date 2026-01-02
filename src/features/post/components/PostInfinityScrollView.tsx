@@ -1,4 +1,4 @@
-import { Loader } from '@/src/shared/components';
+import { EndOfFeedFooter, Loader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect } from 'react';
 import { FlatList, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
@@ -37,12 +37,14 @@ const PostInfinityScrollView = ({
 
   const handleEndReached = useCallback(() => {
     if (!hasMore) return;
-    loadMore();
+    setTimeout(() => {
+      loadMore();
+    }, 3000);
   }, [hasMore, loadMore]);
 
   const handleFooter = useCallback(() => {
-    if (isLoading || isLoadingNextPage) return <Loader loading={isLoading || isLoadingNextPage} />;
-    if (!hasMore) return null;
+    if (isLoading || isLoadingNextPage) return <Loader />;
+    if (!hasMore) return <EndOfFeedFooter />;
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
 
@@ -51,16 +53,14 @@ const PostInfinityScrollView = ({
       data={items}
       keyExtractor={item => item.id}
       renderItem={({ item }) => <PostCard item={item} />}
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={0.01}
       onEndReached={handleEndReached}
       ListFooterComponent={handleFooter}
       ListHeaderComponent={ListHeaderComponent}
       onScroll={onScroll}
       scrollEventThrottle={scrollEventThrottle}
-      contentContainerStyle={{
-        padding: 6,
-      }}
     />
   );
-}
+};
+
 export default PostInfinityScrollView;
