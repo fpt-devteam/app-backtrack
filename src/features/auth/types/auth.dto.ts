@@ -6,6 +6,7 @@ export type SyncRequest = {
 };
 
 export type SyncResponse = ApiResponse<AppUser>;
+
 export type MeResponse = ApiResponse<AppUser>;
 
 export type LoginRequest = {
@@ -14,5 +15,14 @@ export type LoginRequest = {
 };
 
 export type LoginResponse = {
+  idToken: string;
+};
+
+export type RegisterRequest = {
+  email: string;
+  password: string;
+};
+
+export type RegisterResponse = {
   idToken: string;
 };

@@ -1,7 +1,11 @@
-import React from 'react'
-import { Image, Text, View } from 'react-native'
+import React from 'react';
+import { Image, Text, View } from 'react-native';
 
-const BrandHeader = () => {
+type BrandHeaderProps = {
+  message: string;
+};
+
+const BrandHeader = ({ message }: BrandHeaderProps) => {
   return (
     <View className="w-full items-center">
       {/* Logo */}
@@ -20,7 +24,7 @@ const BrandHeader = () => {
 
       {/* Slogan */}
       <Text className="mt-2 text-center text-slate-500 text-sm leading-5">
-        Find what matters. Log in to continue.
+        {message}
       </Text>
     </View>
   )
