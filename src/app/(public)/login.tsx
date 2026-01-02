@@ -17,7 +17,7 @@ export default function LoginScreen() {
       >
         {/* Brand */}
         <View className="w-full p-8">
-          <BrandHeader />
+          <BrandHeader message="Find what matters. Please log in to continue." />
         </View>
 
         {/* Form Card */}
