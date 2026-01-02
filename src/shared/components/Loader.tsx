@@ -1,174 +1,121 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Image, ImageSourcePropType, Pressable, Text, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Animated, Easing, View } from "react-native";
 
 type LoaderProps = {
-  loading: boolean;
-  icon?: ImageSourcePropType;
-  height?: number;
-  variant?: "full" | "footer";
-  error?: boolean;
-  onRetry?: () => void;
-  endMessage?: string;
+  readonly size?: number;
+  readonly gap?: number;
+  readonly colorClass?: string;
 };
 
-const FADE_IN_DELAY_MS = 200;
-
-const Loader = ({
-  loading,
-  icon = require("@/assets/images/splash-icon.png"),
-  height = 84,
-  variant = "full",
-  error = false,
-  onRetry,
-  endMessage,
-}: LoaderProps) => {
-  const containerOpacity = useRef(new Animated.Value(0)).current;
-  const iconScale = useRef(new Animated.Value(1)).current;
-  const iconOpacity = useRef(new Animated.Value(1)).current;
-  const sweep = useRef(new Animated.Value(0)).current;
-
-  const pulseLoop = useRef<Animated.CompositeAnimation | null>(null);
-  const sweepLoop = useRef<Animated.CompositeAnimation | null>(null);
-  const fadeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const [shouldShow, setShouldShow] = useState(false);
+export function Loader({
+  size = 28,
+  gap = 6,
+  colorClass = "bg-primary",
+}: LoaderProps) {
+  const t = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const stop = () => {
-      pulseLoop.current?.stop();
-      sweepLoop.current?.stop();
-      pulseLoop.current = null;
-      sweepLoop.current = null;
-      if (fadeTimeout.current) {
-        clearTimeout(fadeTimeout.current);
-        fadeTimeout.current = null;
-      }
-    };
+    const anim = Animated.loop(
+      Animated.timing(t, {
+        toValue: 1,
+        duration: 900,
+        easing: Easing.inOut(Easing.quad),
+        useNativeDriver: true,
+      })
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [t]);
 
-    if (loading) {
-      fadeTimeout.current = setTimeout(() => {
-        setShouldShow(true);
-        Animated.timing(containerOpacity, {
-          toValue: 1,
-          duration: 140,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }).start();
-      }, FADE_IN_DELAY_MS);
-
-      iconScale.setValue(1);
-      iconOpacity.setValue(1);
-      sweep.setValue(0);
-
-      pulseLoop.current = Animated.loop(
-        Animated.sequence([
-          Animated.timing(iconScale, {
-            toValue: 1.1,
-            duration: 520,
-            easing: Easing.out(Easing.quad),
-            useNativeDriver: true,
-          }),
-          Animated.timing(iconScale, {
-            toValue: 0.95,
-            duration: 520,
-            easing: Easing.inOut(Easing.quad),
-            useNativeDriver: true,
-          }),
-        ])
-      );
-      pulseLoop.current.start();
-
-      sweepLoop.current = Animated.loop(
-        Animated.timing(sweep, {
-          toValue: 1,
-          duration: 850,
-          easing: Easing.inOut(Easing.quad),
-          useNativeDriver: true,
-        })
-      );
-      sweepLoop.current.start();
-    } else {
-      stop();
-      setShouldShow(false);
-      Animated.parallel([
-        Animated.timing(iconOpacity, {
-          toValue: 0,
-          duration: 120,
-          useNativeDriver: true,
-        }),
-        Animated.timing(containerOpacity, {
-          toValue: 0,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        iconOpacity.setValue(1);
-        iconScale.setValue(1);
-        sweep.setValue(0);
-      });
-    }
-
-    return stop;
-  }, [loading, containerOpacity, iconOpacity, iconScale, sweep]);
-
-  const sweepTranslate = sweep.interpolate({
+  const rotate = t.interpolate({
     inputRange: [0, 1],
-    outputRange: [-120, 120],
+    outputRange: ["0deg", "360deg"],
   });
 
-  if (error && onRetry) {
-    return (
-      <View style={{ height }} className="items-center justify-center">
-        <Pressable
-          onPress={onRetry}
-          className="px-6 py-3 bg-slate-100 rounded-full active:bg-slate-200"
-        >
-          <Text className="text-sm font-semibold text-slate-700">
-            Failed to load. Tap to retry
-          </Text>
-        </Pressable>
-      </View>
-    );
-  }
+  const spread = t.interpolate({
+    inputRange: [0, 0.35, 0.65, 1],
+    outputRange: [0, 1, 1, 0],
+  });
 
-  if (endMessage) {
-    return (
-      <View style={{ height }} className="items-center justify-center">
-        <Text className="text-sm text-slate-500">{endMessage}</Text>
-      </View>
-    );
-  }
+  const dx = Animated.multiply(spread, gap);
+  const dy = Animated.multiply(spread, gap);
 
-  if (!shouldShow && !loading) {
-    return null;
-  }
-
-  const footerHeight = variant === "footer" ? 64 : height;
+  const s = Math.floor((size - 2) / 2);
 
   return (
-    <View style={{ height: footerHeight }}>
+    <View className="items-center justify-center mt-4 mb-4">
       <Animated.View
-        className="flex-1 items-center justify-center gap-2"
-        style={{ opacity: containerOpacity }}
+        style={{
+          width: size,
+          height: size,
+          transform: [{ rotate }],
+        }}
+        className="items-center justify-center"
       >
-        <Animated.View
-          style={{ transform: [{ scale: iconScale }], opacity: iconOpacity }}
+        {/* 4 squares in a 2x2 grid, each animates outwards */}
+        <View
+          style={{ width: size, height: size }}
+          className="relative"
         >
-          <Image
-            source={icon}
-            resizeMode="contain"
-            className="w-7 h-7"
-          />
-        </Animated.View>
-
-        <View className="w-[60%] max-w-[260px] h-1.5 rounded-full bg-slate-200 overflow-hidden">
+          {/* top-left */}
           <Animated.View
-            className="absolute left-1/2 w-[40%] h-full rounded-full bg-blue-500"
-            style={{ transform: [{ translateX: sweepTranslate }] }}
+            className={`absolute rounded-[4px] ${colorClass}`}
+            style={{
+              width: s,
+              height: s,
+              left: (size / 2) - s,
+              top: (size / 2) - s,
+              transform: [
+                { translateX: Animated.multiply(dx, -1) },
+                { translateY: Animated.multiply(dy, -1) },
+              ],
+            }}
           />
-        </View>
-      </Animated.View>
-    </View>
+
+          {/* top-right */}
+          <Animated.View
+            className={`absolute rounded-[4px] ${colorClass}`}
+            style={{
+              width: s,
+              height: s,
+              left: size / 2,
+              top: (size / 2) - s,
+              transform: [
+                { translateX: dx },
+                { translateY: Animated.multiply(dy, -1) },
+              ],
+            }}
+          />
+
+          {/* bottom-left */}
+          <Animated.View
+            className={`absolute rounded-[4px] ${colorClass}`}
+            style={{
+              width: s,
+              height: s,
+              left: (size / 2) - s,
+              top: size / 2,
+              transform: [
+                { translateX: Animated.multiply(dx, -1) },
+                { translateY: dy },
+              ],
+            }}
+          />
+
+          {/* bottom-right */}
+          <Animated.View
+            className={`absolute rounded-[4px] ${colorClass}`}
+            style={{
+              width: s,
+              height: s,
+              left: size / 2,
+              top: size / 2,
+              transform: [{ translateX: dx }, { translateY: dy }],
+            }}
+          />
+        </View >
+      </Animated.View >
+    </View >
   );
-};
+}
 export default Loader;
