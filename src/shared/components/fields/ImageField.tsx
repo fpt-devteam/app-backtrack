@@ -1,8 +1,8 @@
+import { ensureMediaPermission } from '@/src/shared/services';
 import { Ionicons } from '@expo/vector-icons';
 import { ImagePickerAsset, launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { ensureMediaPermission } from '../services';
 
 const MAX_IMAGES = 5;
 
