@@ -26,3 +26,11 @@ export type RegisterRequest = {
 export type RegisterResponse = {
   idToken: string;
 };
+
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
+export type ForgotPasswordResponse = {
+  ok: true;
+};
