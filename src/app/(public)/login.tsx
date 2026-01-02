@@ -28,7 +28,7 @@ export default function LoginScreen() {
         <View className="flex-1" />
 
         {/* Footer */}
-        <View className="flex-row gap-4 justify-center items-center">
+        <View className="flex-row gap-2 justify-center items-center">
           <Text className="text-normal text-base">Don&apos;t have an account?</Text>
           <Link href="/register" className="text-base font-display text-primary">
             Sign Up
