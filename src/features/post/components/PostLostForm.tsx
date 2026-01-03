@@ -6,7 +6,7 @@ import { ImagePickerAsset } from 'expo-image-picker';
 import { ExternalPathString, RelativePathString, router } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Alert, FlatList, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as yup from "yup";
 import { POST_ROUTE } from '../constants';
 import { useCreatePost } from '../hooks';
@@ -141,7 +141,6 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
         }}
       >
 
-
         {/* Image Picker */}
         <View className="mb-4">
           <Controller
@@ -233,8 +232,6 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
           )}
         </View>
 
-
-
         {/* Event Time */}
         <View className="mb-4">
           <Text className="text-sm font-semibold text-slate-800 mb-2">Event Time</Text>
@@ -254,8 +251,6 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
           )}
         </View>
 
-
-
         {/* Location Picker */}
         <View className="mb-4">
           <Controller
@@ -270,8 +265,6 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
           )}
         </View>
 
-
-
         {/* Submit Button */}
         <View className="my-5 px-4">
           <TouchableOpacity
@@ -282,23 +275,20 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
           </TouchableOpacity>
         </View>
       </View>
+
     </ScrollView>
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <FlatList
-        data={[{ key: "form" }]}
-        keyExtractor={(i) => i.key}
-        renderItem={() => null}
-        ListHeaderComponent={content}
-        keyboardShouldPersistTaps="always"
-        keyboardDismissMode="on-drag"
-        contentContainerStyle={{ paddingBottom: 24 }}
-      />
-    </KeyboardAvoidingView>
+    <FlatList
+      data={[{ key: "form" }]}
+      keyExtractor={(i) => i.key}
+      renderItem={() => null}
+      ListHeaderComponent={content}
+      keyboardShouldPersistTaps="always"
+      keyboardDismissMode="on-drag"
+      contentContainerStyle={{ paddingBottom: 24 }}
+    />
   );
 };
 

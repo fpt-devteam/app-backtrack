@@ -1,6 +1,7 @@
 import { PostMatchCard } from '@/src/features/post/components';
 import useGetPostById from '@/src/features/post/hooks/useGetPostById';
 import useMatchingPost from '@/src/features/post/hooks/useMatchingPost';
+import { WaitingMatchingScreen } from '@/src/shared/components';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
@@ -36,11 +37,7 @@ const MatchingScreen = () => {
 }
 
 const MatchingLoadingScreen = () => {
-  return (
-    <View>
-      <Text>Matching in progress...</Text>
-    </View>
-  );
+  return <WaitingMatchingScreen />
 }
 
 const MatchingErrorScreen = () => {
