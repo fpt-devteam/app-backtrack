@@ -63,11 +63,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "b7f7ee19-90e9-49bb-b5b3-aeb645c8944e"
-      }
-    },
-    "owner": "kokodudus-organization"
+      "router": {}
+    }
   }
 }
