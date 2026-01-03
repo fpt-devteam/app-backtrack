@@ -254,16 +254,16 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
             <Text className="text-red-500 text-xs mt-1">{errors.detailLocation.message}</Text>
           )}
         </View>
+      </View>
 
-        {/* Submit Button */}
-        <View className="my-5 px-4">
-          <TouchableOpacity
-            className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
-            onPress={handleSubmit(onSubmit)}
-          >
-            <Text className="text-base font-semibold text-white">Submit</Text>
-          </TouchableOpacity>
-        </View>
+      {/* Submit Button */}
+      <View className="my-5 px-4">
+        <TouchableOpacity
+          className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
+          onPress={handleSubmit(onSubmit)}
+        >
+          <Text className="text-base font-semibold text-white">Submit</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

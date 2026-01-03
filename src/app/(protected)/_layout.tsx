@@ -1,9 +1,10 @@
 import { useAuth } from "@/src/features/auth/providers";
-import { AppFooter, AppHeader } from "@/src/shared/components";
+import { AppHeader } from "@/src/shared/components";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import React, { createContext, useCallback, useContext, useRef, useState } from "react";
 import { Animated, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const HEADER_HEIGHT = 64;
 const ANIMATION_DURATION = 200;
@@ -14,7 +15,7 @@ interface ChromeVisibilityContextType {
 }
 
 const ChromeVisibilityContext = createContext<ChromeVisibilityContextType>({
-  setChromeVisible: () => {},
+  setChromeVisible: () => { },
   isChromeVisible: true,
 });
 
@@ -79,28 +80,46 @@ export default function ProtectedLayout() {
   if (!isLoggedIn) return <Redirect href="/login" />;
 
   return (
-    <ChromeVisibilityProvider>
-      <ChromeAwareTabs />
-    </ChromeVisibilityProvider>
+    <SafeAreaView className="flex-1 bg-white">
+      <ChromeVisibilityProvider>
+        <AppFooterTabBar />
+      </ChromeVisibilityProvider>
+    </SafeAreaView>
   );
 }
 
-function ChromeAwareTabs() {
-  const { isChromeVisible } = useChromeVisibility();
-
+function AppFooterTabBar() {
   return (
     <Tabs
-      tabBar={(props) => <AppFooter {...props} isChromeVisible={isChromeVisible} />}
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
+
+        tabBarStyle: {
+          backgroundColor: "white",
+          height: 56,
+          borderTopWidth: 1,
+          borderTopColor: "rgba(15,23,42,0.08)",
+        },
+
+        tabBarActiveTintColor: "#007AFF",
+        tabBarInactiveTintColor: "#8E8E93",
+
+        tabBarLabelStyle: {
+          fontSize: 10,
+        },
       }}
     >
       <Tabs.Screen
         name="posts"
         options={{
-          title: "Lost & Found",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="location-outline" size={size} color={color} />
+          title: "Reports",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "location" : "location-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -108,9 +127,13 @@ function ChromeAwareTabs() {
       <Tabs.Screen
         name="(qr)"
         options={{
-          title: "QR",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="qr-code-outline" size={size} color={color} />
+          title: "QRs",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "qr-code" : "qr-code-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -118,22 +141,33 @@ function ChromeAwareTabs() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: "Message",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="chatbox-outline" size={size} color={color} />
+          title: "Chat",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "chatbox" : "chatbox-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="(profile)"
+        name="notification"
         options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
+          title: "Inbox",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "notifications" : "notifications-outline"}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
+
+      {/* Ẩn profile khỏi tab bar */}
+      <Tabs.Screen name="(profile)" options={{ href: null }} />
     </Tabs>
   );
 }
