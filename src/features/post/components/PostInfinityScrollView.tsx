@@ -1,4 +1,4 @@
-import { EndOfFeedFooter, Loader } from '@/src/shared/components';
+import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect } from 'react';
 import { FlatList, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
@@ -43,8 +43,8 @@ const PostInfinityScrollView = ({
   }, [hasMore, loadMore]);
 
   const handleFooter = useCallback(() => {
-    if (isLoading || isLoadingNextPage) return <Loader />;
-    if (!hasMore) return <EndOfFeedFooter />;
+    if (isLoading || isLoadingNextPage) return <AppLoader />;
+    if (!hasMore) return <AppEndOfFeed />;
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
 

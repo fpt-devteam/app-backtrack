@@ -2,7 +2,7 @@ import { useAppUser } from '@/src/features/auth/providers/user.provider';
 import PostDetails from '@/src/features/post/components/PostDetails';
 import useGetPostById from '@/src/features/post/hooks/useGetPostById';
 import { PostType } from '@/src/features/post/types';
-import ImageCarousel from '@/src/shared/components/ImageCarousel';
+import ImageCarousel from '@/src/shared/components/ui/ImageCarousel';
 import { POST_ROUTE } from '@/src/shared/constants';
 import { ExternalPathString, RelativePathString, router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
