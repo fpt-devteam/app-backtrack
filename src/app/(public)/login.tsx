@@ -1,5 +1,5 @@
 import { LoginForm } from "@/src/features/auth/components";
-import { BrandHeader } from "@/src/shared/components";
+import { AppBrandHeader } from "@/src/shared/components";
 import { Link } from "expo-router";
 import React from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
@@ -17,7 +17,7 @@ export default function LoginScreen() {
       >
         {/* Brand */}
         <View className="w-full p-8">
-          <BrandHeader message="Find what matters. Please log in to continue." />
+          <AppBrandHeader message="Find what matters. Please log in to continue." />
         </View>
 
         {/* Form Card */}
