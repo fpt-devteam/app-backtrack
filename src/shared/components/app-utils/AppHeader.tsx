@@ -16,9 +16,9 @@ import {
 } from 'react-native';
 import { Portal } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { POST_ROUTE, PROFILE_ROUTE } from '../constants/route.constant';
+import { POST_ROUTE, PROFILE_ROUTE } from '../../constants/route.constant';
+import AppAvatarIcon from './AppAvatarIcon';
 import AppBrand from './AppBrand';
-import AvatarIcon from './AvatarIcon';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -54,7 +54,7 @@ const AppHeader = () => {
             onPress={() => router.push(PROFILE_ROUTE.index)}
             activeOpacity={0.7}
           >
-            <AvatarIcon
+            <AppAvatarIcon
               size={40}
               avatarUrl={user?.avatar || undefined}
             />

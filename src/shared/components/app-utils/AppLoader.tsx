@@ -7,7 +7,7 @@ type LoaderProps = {
   readonly colorClass?: string;
 };
 
-export function Loader({
+export function AppLoader({
   size = 28,
   gap = 6,
   colorClass = "bg-primary",
@@ -118,4 +118,4 @@ export function Loader({
     </View >
   );
 }
-export default Loader;
+export default AppLoader;

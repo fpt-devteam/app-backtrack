@@ -1,7 +1,6 @@
 import { useAuth } from "@/src/features/auth/providers";
-import { AppHeader } from "@/src/shared/components";
-import { Ionicons } from "@expo/vector-icons";
-import { Redirect, Tabs } from "expo-router";
+import { AppFooter, AppHeader } from "@/src/shared/components";
+import { Redirect } from "expo-router";
 import React, { createContext, useCallback, useContext, useRef, useState } from "react";
 import { Animated, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -82,92 +81,8 @@ export default function ProtectedLayout() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ChromeVisibilityProvider>
-        <AppFooterTabBar />
+        <AppFooter />
       </ChromeVisibilityProvider>
     </SafeAreaView>
-  );
-}
-
-function AppFooterTabBar() {
-  return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarHideOnKeyboard: true,
-
-        tabBarStyle: {
-          backgroundColor: "white",
-          height: 56,
-          borderTopWidth: 1,
-          borderTopColor: "rgba(15,23,42,0.08)",
-        },
-
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "#8E8E93",
-
-        tabBarLabelStyle: {
-          fontSize: 10,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="posts"
-        options={{
-          title: "Reports",
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons
-              name={focused ? "location" : "location-outline"}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="(qr)"
-        options={{
-          title: "QRs",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "qr-code" : "qr-code-outline"}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="chat"
-        options={{
-          title: "Chat",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "chatbox" : "chatbox-outline"}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="notification"
-        options={{
-          title: "Inbox",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "notifications" : "notifications-outline"}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-
-      {/* Ẩn profile khỏi tab bar */}
-      <Tabs.Screen name="(profile)" options={{ href: null }} />
-    </Tabs>
   );
 }
