@@ -8,7 +8,7 @@ interface EndOfFeedFooterProps {
   readonly hint?: string;
 }
 
-const EndOfFeedFooter = ({
+const AppEndOfFeed = ({
   title = "You’re all caught up",
   hint = "Try changing filters or searching nearby to see more.",
 }: EndOfFeedFooterProps) => {
@@ -29,4 +29,4 @@ const EndOfFeedFooter = ({
   );
 }
 
-export default EndOfFeedFooter;
+export default AppEndOfFeed;
