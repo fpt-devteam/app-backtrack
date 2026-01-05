@@ -4,7 +4,7 @@ export type AppUser = {
   id: string;
   email: string | null;
   displayName: string | null;
-  avatar?: string | null;
+  avatar: string;
   globalRole: string;
 };
 

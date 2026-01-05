@@ -21,10 +21,10 @@ type FilterFormSchema = yup.InferType<typeof filterSchema>;
 
 type PostFiltersProps = {
   filters: PostFilters;
-  onFilterChange: (filters: PostFilters) => void;
+  onFiltersChange: (filters: PostFilters) => void;
 }
 
-const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => {
+const PostFiltersComponent = ({ filters, onFiltersChange }: PostFiltersProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const { control, handleSubmit, reset } = useForm<FilterFormSchema>({
     defaultValues: {
@@ -42,7 +42,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
       postType: null,
       location: null,
     });
-    onFilterChange({});
+    onFiltersChange({});
   };
 
   const onSubmit: SubmitHandler<FilterFormSchema> = async (data: FilterFormSchema) => {
@@ -56,7 +56,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
       radiusInKm: (data.location?.location.latitude && data.location?.location.longitude) ? 10 : undefined,
     };
     setIsVisible(false);
-    onFilterChange(newFilters);
+    onFiltersChange(newFilters);
   };
 
   return (
@@ -72,7 +72,7 @@ const PostFiltersComponent = ({ filters, onFilterChange }: PostFiltersProps) => 
               className="ml-2 flex-1 text-sm text-slate-900"
               value={value ?? ''}
               onChangeText={onChange}
-              placeholder="Search items..."
+              placeholder="Search..."
               placeholderTextColor="#94A3B8"
               returnKeyType="search"
               onBlur={handleSubmit(onSubmit)}
