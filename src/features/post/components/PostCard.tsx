@@ -1,115 +1,56 @@
-import { timeSincePast } from "@/src/shared/utils";
+import { formatIsoDate } from "@/src/shared/utils";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Image, Pressable, Text, View } from "react-native";
-import { PREFIX_PATH_POST } from "../constants/post.constant";
+import { Animated, Easing, Image, Pressable, Text, View } from "react-native";
+import { PREFIX_PATH_POST } from "../constants";
 import { Post } from "../types";
 import PostStatusBadge from "./PostStatusBadge";
 
 interface PostCardProps {
   item: Post;
-  isLoading?: boolean;
+  isFetching: boolean;
 }
 
-const IMAGE_HEIGHT = 170;
+const IMAGE_HEIGHT = 400;
 
-function PostCardSkeleton({ opacity }: { opacity: Animated.Value }) {
-  return (
-    <Animated.View
-      pointerEvents="none"
-      className="bg-white rounded-[18px] overflow-hidden border border-slate-200"
-      style={{ opacity }}
-    >
-      <View className="w-full bg-slate-200" style={{ height: IMAGE_HEIGHT }} />
-
-      <View className="p-4 gap-3">
-        <View className="flex-row items-center justify-between gap-2.5">
-          <View className="h-5 bg-slate-200 rounded-md flex-1 mr-3" />
-          <View className="h-6 w-16 bg-slate-200 rounded-full" />
-        </View>
-
-        <View className="gap-2">
-          <View className="h-4 bg-slate-200 rounded-md w-full" />
-          <View className="h-4 bg-slate-200 rounded-md w-[85%]" />
-        </View>
-
-        <View className="flex-row items-center gap-2">
-          <View className="h-4 w-4 bg-slate-200 rounded" />
-          <View className="h-4 bg-slate-200 rounded-md flex-1" />
-        </View>
-
-        <View className="flex-row items-center gap-2">
-          <View className="h-4 w-4 bg-slate-200 rounded" />
-          <View className="h-4 bg-slate-200 rounded-md w-[45%]" />
-        </View>
-      </View>
-    </Animated.View>
-  );
-}
-
-const PostCard = React.memo(({ item }: PostCardProps) => {
-  const postedAgo = useMemo(() => timeSincePast(item.createdAt), [item.createdAt]);
-  const imageUrl = item.imageUrls?.[0];
-
-
-  const [imgReady, setImgReady] = useState(false);
-
+const PostCard = ({ item, isFetching }: PostCardProps) => {
+  const eventTimeStr = useMemo(() => formatIsoDate(item.eventTime), [item.eventTime]);
+  const imageUrl = useMemo(() => item.imageUrls?.[0], [item.imageUrls]);
+  const [imgLoading, setImgLoading] = useState(true);
 
   const skeletonOpacity = useRef(new Animated.Value(1)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
 
-
-  const shimmer = useRef(new Animated.Value(0.55)).current;
   useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmer, { toValue: 0.9, duration: 700, useNativeDriver: true }),
-        Animated.timing(shimmer, { toValue: 0.55, duration: 700, useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [shimmer]);
+    if (imgLoading || isFetching) return;
 
+    Animated.timing(skeletonOpacity, {
+      toValue: 0,
+      duration: 500,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
 
-  useEffect(() => {
-    const shouldWaitImage = !!imageUrl;
-    setImgReady(!shouldWaitImage);
-
-    skeletonOpacity.setValue(1);
-    contentOpacity.setValue(shouldWaitImage ? 0 : 1);
-  }, [item.id, imageUrl, skeletonOpacity, contentOpacity]);
+    Animated.timing(contentOpacity, {
+      toValue: 1,
+      duration: 500,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, [isFetching, imgLoading, skeletonOpacity, contentOpacity,]);
 
   const handleOpenDetail = useCallback(() => {
     router.push(`${PREFIX_PATH_POST}/${item.id}`);
   }, [item.id]);
 
-  const reveal = useCallback(() => {
-    if (imgReady) return;
-    setImgReady(true);
-
-    Animated.parallel([
-      Animated.timing(skeletonOpacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(contentOpacity, {
-        toValue: 1,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [imgReady, skeletonOpacity, contentOpacity]);
-
   return (
+
     <View className="m-4" style={{ position: "relative" }}>
-      {/* Content (real card) */}
       <Animated.View style={{ opacity: contentOpacity }}>
         <Pressable
           onPress={handleOpenDetail}
-          className="bg-white rounded-[18px] overflow-hidden border border-slate-300 shadow-lg"
+          className="bg-white rounded-[18px] overflow-hidden border border-slate-300"
           style={{
             shadowColor: "#000",
             shadowOpacity: 0.08,
@@ -118,20 +59,17 @@ const PostCard = React.memo(({ item }: PostCardProps) => {
             elevation: 3,
           }}
         >
-          {/* Image header with fixed height to prevent layout shift */}
+          {/* Image header */}
           <View className="relative" style={{ height: IMAGE_HEIGHT }}>
-            {imageUrl ? (
-              <Image
-                source={{ uri: imageUrl }}
-                className="w-full"
-                style={{ height: IMAGE_HEIGHT }}
-                resizeMode="cover"
-                onLoadEnd={reveal}
-                onError={reveal}
-              />
-            ) : (
-              <View className="w-full bg-slate-200" style={{ height: IMAGE_HEIGHT }} />
-            )}
+            <Image
+              source={{ uri: imageUrl }}
+              className="w-full"
+              style={{ height: IMAGE_HEIGHT }}
+              resizeMode="cover"
+              onLoadStart={() => setImgLoading(true)}
+              onLoadEnd={() => setImgLoading(false)}
+              onError={() => setImgLoading(false)}
+            />
           </View>
 
           {/* Content */}
@@ -143,20 +81,16 @@ const PostCard = React.memo(({ item }: PostCardProps) => {
               <PostStatusBadge status={item.postType} />
             </View>
 
-            <Text className="text-[13px] leading-[18px] text-slate-500" numberOfLines={2}>
-              {item.description}
-            </Text>
-
-            <View className="flex-row items-center gap-2">
-              <Ionicons name="location-outline" size={16} color="#64748B" />
-              <Text className="flex-1 text-[13px] text-slate-600" numberOfLines={1}>
-                {item.displayAddress ?? "Near here"}
-              </Text>
-            </View>
-
+            {/* Event Time */}
             <View className="flex-row items-center gap-2">
               <Ionicons name="time-outline" size={16} color="#64748B" />
-              <Text className="flex-1 text-[13px] text-slate-600">Posted {postedAgo}</Text>
+              <Text className="flex-1 text-sm text-slate-600">{eventTimeStr}</Text>
+            </View>
+
+            {/* Location */}
+            <View className="flex-row items-center gap-2">
+              <Ionicons name="location-outline" size={16} color="#64748B" />
+              <Text className="flex-1 text-sm text-slate-600" numberOfLines={1}>{item.displayAddress ?? "Near here"}</Text>
             </View>
           </View>
         </Pressable>
@@ -173,12 +107,68 @@ const PostCard = React.memo(({ item }: PostCardProps) => {
           opacity: skeletonOpacity,
         }}
       >
-        <PostCardSkeleton opacity={shimmer} />
+        <PostCardSkeleton />
       </Animated.View>
-    </View>
+    </View >
   );
-});
+};
 
-PostCard.displayName = "PostCard";
+const PostCardSkeleton = () => {
+  const opacity = useRef(new Animated.Value(0.5)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 0.9,
+          duration: 700,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0.55,
+          duration: 700,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    loop.start();
+    return () => loop.stop();
+  }, [opacity]);
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      className="bg-white rounded-[18px] overflow-hidden border border-slate-200"
+      style={{ opacity }}
+    >
+      {/* Image skeleton  */}
+      <View className="w-full bg-slate-200" style={{ height: IMAGE_HEIGHT }} />
+
+      {/* Content skeleton  */}
+      <View className="p-4">
+        {/* Title + badge */}
+        <View className="flex-row items-center justify-between gap-2">
+          <View className="h-8 bg-slate-200 rounded-md flex-1 mr-3" />
+          <View className="h-8 w-16 bg-slate-200 rounded-full" />
+        </View>
+
+        {/* Event time skeleton */}
+        <View className="flex-row items-center gap-2 mt-2">
+          <View className="h-4 w-4 bg-slate-200 rounded" />
+          <View className="h-4 bg-slate-200 rounded-md w-[55%]" />
+        </View>
+
+        {/* Location  */}
+        <View className="flex-row items-center gap-2 mt-3">
+          <View className="h-4 w-4 bg-slate-200 rounded" />
+          <View className="h-4 bg-slate-200 rounded-md flex-1" />
+        </View>
+      </View>
+    </Animated.View>
+  );
+};
 
 export default PostCard;

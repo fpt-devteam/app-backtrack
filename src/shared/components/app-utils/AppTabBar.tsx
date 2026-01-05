@@ -1,7 +1,8 @@
+import PostCreateButton from "@/src/features/post/components/PostCreateButton";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
-const AppFooter = () => {
+const AppTabBar = () => {
   return (
     <Tabs
       screenOptions={{
@@ -12,7 +13,7 @@ const AppFooter = () => {
           backgroundColor: "white",
           height: 56,
           borderTopWidth: 1,
-          borderTopColor: "rgba(15,23,42,0.08)",
+          borderTopColor: "#E5E5EA",
         },
 
         tabBarActiveTintColor: "#007AFF",
@@ -26,10 +27,10 @@ const AppFooter = () => {
       <Tabs.Screen
         name="posts"
         options={{
-          title: "Reports",
+          title: "Home",
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
-              name={focused ? "location" : "location-outline"}
+              name={focused ? "home" : "home-outline"}
               size={24}
               color={color}
             />
@@ -48,6 +49,13 @@ const AppFooter = () => {
               color={color}
             />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="create-post"
+        options={{
+          tabBarButton: () => <PostCreateButton />,
         }}
       />
 
@@ -84,4 +92,4 @@ const AppFooter = () => {
   );
 }
 
-export default AppFooter;
+export default AppTabBar;

@@ -1,6 +1,6 @@
 export type TimeSincePastOptions = {
   /** "just now" if within this many seconds */
-  justNowSeconds?: number; // default 10
+  justNowSeconds?: number;
 };
 
 const DEFAULTS: Required<TimeSincePastOptions> = {
@@ -24,28 +24,23 @@ export function timeSincePast(
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
 
-  const formatString = (str: string, value: number) => {
-    const c = value === 1 ? '' : 's';
-    return `${value} ${str}${c} ago`;
-  }
-
   const seconds = Math.floor(diffMs / 1000);
   if (seconds <= o.justNowSeconds) return "just now";
 
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return formatString("minute", minutes);
+  if (minutes < 60) return `${minutes}m`;
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return formatString("hour", hours);
+  if (hours < 24) return `${hours}h`;
 
   const days = Math.floor(hours / 24);
-  if (days < 30) return formatString("day", days);
+  if (days < 30) return `${days}d`;
 
   const months = Math.floor(days / 30);
-  if (months < 12) return formatString("month", months);
+  if (months < 12) return `${months}mo`;
 
   const years = Math.floor(months / 12);
-  return formatString("year", years);
+  return `${years}y`;
 }
 
 export const formatDateTime = (d: Date) => {
@@ -63,4 +58,50 @@ export function formatTime<T extends Intl.DateTimeFormatOptions>(
   options: T
 ): string {
   return d.toLocaleTimeString([], options);
+}
+
+
+/**
+ * Format ISO date string (e.g. 2026-01-01T13:31:50.117+00:00) into custom pattern.
+ * Supported tokens: yyyy, MM, dd, HH, mm, ss
+ *
+ * Example:
+ * formatIsoDate("2026-01-01T13:31:50.117+00:00", "HH:mm dd/MM/yyyy") -> " 20:31 01/01/2026"
+ */
+export function formatIsoDate(
+  input: Date,
+  pattern = "HH:mm dd/MM/yyyy",
+) {
+  const locale = "vi-VN";
+  const timeZone = "Asia/Ho_Chi_Minh";
+  const d = input instanceof Date ? input : new Date(String(input).trim());
+
+  if (Number.isNaN(d.getTime())) {
+    console.warn("formatIsoDate: Invalid date input =", input);
+    return "";
+  }
+
+  const parts = new Intl.DateTimeFormat(locale, {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+
+  const map: Record<string, string> = {};
+  for (const p of parts) map[p.type] = p.value;
+
+  const tokens: Record<string, string> = {
+    HH: map.hour ?? "",
+    mm: map.minute ?? "",
+    dd: map.day ?? "",
+    MM: map.month ?? "",
+    yyyy: map.year ?? "",
+  };
+
+  return pattern.replace(/HH|mm|dd|MM|yyyy/g, (t) => tokens[t] ?? t);
 }

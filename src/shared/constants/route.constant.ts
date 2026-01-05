@@ -7,6 +7,7 @@ export const POST_ROUTE = {
   create: "/(protected)/posts/create",
   details: (postId: string) => `/(protected)/posts/${postId}`,
   matching: (postId: string) => `/(protected)/posts/${postId}/matching`,
+  search: "/(protected)/posts/search",
 } as const;
 
 export const CHAT_ROUTE = {
