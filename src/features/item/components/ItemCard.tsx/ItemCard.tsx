@@ -1,22 +1,49 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { ItemCardProps } from '../../types/item.type';
 import { styles } from './styles';
 
-interface ItemCardComponentProps {
-  item: ItemCardProps;
+export interface ItemCardComponentProps {
+  item: {
+    item: {
+      id: string;
+      name: string;
+      imageUrls: string[];
+      updatedAt: string | null;
+      createdAt?: string;
+    };
+    qrCode: {
+      id: string;
+      createdAt: string;
+      publicCode: string;
+    };
+  };
 }
 
-const ItemCard = ({ item }: ItemCardComponentProps) => {
+const ItemCard = ({ item: data }: ItemCardComponentProps) => {
   const router = useRouter();
-  const handlePress = () => router.push(`/(protected)/(qr)/${item.id}`);
+  
+  // Bóc tách dữ liệu từ cấu trúc lồng nhau của API
+  const itemInfo = data.item;
+  const qrInfo = data.qrCode;
 
-  const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : 'https://via.placeholder.com/150';
+  // Điều hướng bằng ID của qrCode để khớp với route [id].tsx
+  const handlePress = () => router.push(`/(protected)/(qr)/${qrInfo.id}`);
+
+  const imageUrl = itemInfo.imageUrls && itemInfo.imageUrls.length > 0 
+    ? itemInfo.imageUrls[0] 
+    : 'https://via.placeholder.com/150';
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
 
   return (
     <TouchableOpacity style={styles.card} onPress={handlePress} activeOpacity={0.7}>
-      {/* Image Carousel Section */}
       <View style={styles.imageContainer}>
         <Image
           source={{ uri: imageUrl }}
@@ -25,13 +52,16 @@ const ItemCard = ({ item }: ItemCardComponentProps) => {
         />
       </View>
 
-      {/* Info Section */}
       <View style={styles.infoContainer}>
         <Text style={styles.itemName} numberOfLines={1}>
-          {item.name}
+          {itemInfo.name || 'Unnamed Item'}
         </Text>
         <Text style={styles.itemId} numberOfLines={1}>
-          Create at: {item.createdAt}
+          Created at: {formatDate(qrInfo.createdAt)}
+        </Text>
+        {/* Hiển thị thêm Public Code để dễ nhận biết */}
+        <Text style={{ fontSize: 10, color: '#2979ff', marginTop: 2 }}>
+          ID: {qrInfo.publicCode}
         </Text>
       </View>
     </TouchableOpacity>

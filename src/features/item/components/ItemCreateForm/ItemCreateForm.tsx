@@ -1,53 +1,51 @@
 import { ImageField } from "@/src/shared/components";
 import { useUploadImage } from "@/src/shared/hooks/useUploadImage";
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ImagePickerAsset } from "expo-image-picker";
 import { router } from "expo-router";
-import React from 'react';
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import * as yup from "yup";
-import { API_ITEM_ACTIVATED } from "../../constant/item.constant";
 import useLinkQrItem from "../../hooks/useLinkQrItem";
 import { ItemCreateRequest } from "../../types/item.type";
 import { styles } from "./styles";
 
-const qrSchema = yup
-  .object({
-    name: yup.string().required("Name is required"),
-    description: yup.string().required("Description is required"),
-    images: yup
-      .array()
-      .of(
-        yup
-          .mixed<ImagePickerAsset>().defined()
-          .test("has-uri", "Invalid image (missing uri).", (asset) => {
-            return !!asset && typeof asset === "object" && !!asset.uri;
-          })
-          .test("mime", "Only JPG/PNG/WebP images are allowed.", (asset) => {
-            if (!asset) return true;
-
-            const mime = asset.mimeType;
-            if (!mime) return true;
-
-            const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
-            return allowedMimes.includes(mime);
-          })
-          .test("size", "Image is too large (max 5 MB).", (asset) => {
-            if (!asset) return true;
-
-            const size = asset.fileSize;
-            if (typeof size !== "number") return true;
-
-            const maxImageSize = 5 * 1024 * 1024; // 5 MB
-            return size <= maxImageSize;
-          })
-      )
-      .min(1, "Please select at least 1 image.")
-      .max(5, "You can select up to 5 images.")
-      .required("Images are required."),
-  })
-  .required();
+/* =======================
+   Validation Schema
+======================= */
+const qrSchema = yup.object({
+  name: yup.string().required("Name is required"),
+  description: yup.string().required("Description is required"),
+  images: yup
+    .array()
+    .of(
+      yup
+        .mixed<ImagePickerAsset>()
+        .defined()
+        .test("has-uri", "Invalid image (missing uri).", (asset) => {
+          return !!asset && typeof asset === "object" && !!asset.uri;
+        })
+        .test("mime", "Only JPG/PNG/WebP images are allowed.", (asset) => {
+          if (!asset?.mimeType) return true;
+          return ["image/jpeg", "image/png", "image/webp"].includes(asset.mimeType);
+        })
+        .test("size", "Image is too large (max 5 MB).", (asset) => {
+          if (!asset?.fileSize) return true;
+          return asset.fileSize <= 5 * 1024 * 1024;
+        })
+    )
+    .min(1, "Please select at least 1 image.")
+    .max(5, "You can select up to 5 images.")
+    .required("Images are required."),
+}).required();
 
 type ItemSchema = yup.InferType<typeof qrSchema>;
 
@@ -55,105 +53,140 @@ const ItemLinkForm = () => {
   const { uploadImages } = useUploadImage();
   const { linkItemToQr } = useLinkQrItem();
 
+  const { control, handleSubmit, formState: { errors } } =
+    useForm<ItemSchema>({
+      defaultValues: {
+        name: "",
+        description: "",
+        images: [],
+      },
+      resolver: yupResolver(qrSchema),
+      mode: "onSubmit",
+    });
+
   const handleUploadImages = async (images: ImagePickerAsset[]) => {
     const uploadRes = await uploadImages(images);
     if (!uploadRes) return [];
-
-    const imageUrls = uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
-    return imageUrls;
+    return uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
   };
 
-  const { control, handleSubmit, formState: { errors },
-  } = useForm<ItemSchema>({
-    defaultValues: {
-      name: "",
-      description: "",
-      images: [] as ImagePickerAsset[],
-    },
-    resolver: yupResolver(qrSchema),
-    mode: "onSubmit",
-  });
+  /* =======================
+     Submit Handler (FIXED)
+  ======================= */
+  const onSubmit: SubmitHandler<ItemSchema> = async (data) => {
+    try {
+      const imageUrls = await handleUploadImages(data.images);
+      if (!imageUrls.length) {
+        Alert.alert("Error", "Failed to upload images.");
+        return;
+      }
 
-  const onSubmit: SubmitHandler<ItemSchema> = async (data: ItemSchema) => {
-    const imageUrls = await handleUploadImages(data.images);
-    if (!imageUrls) {
-      Alert.alert("Error", "Failed to upload images.");
-      return;
-    }
+      const payload: ItemCreateRequest = {
+        name: data.name,
+        description: data.description,
+        imageUrls,
+      };
 
-    const itemCreateRequest: ItemCreateRequest = {
-      name: data.name,
-      description: data.description,
-      imageUrls: imageUrls,
-    };
+      const response = await linkItemToQr(payload);
 
-    const response = await linkItemToQr(itemCreateRequest);
-    if (response) {
-      const publicCode = response.qrCode.publicCode;
-      router.push({
-        pathname: API_ITEM_ACTIVATED,
-        params: { publicCode: String(publicCode) },
-      });
-    }
-    else {
-      Alert.alert("Error", "Failed to link item to QR code.");
+      if (response?.qrCode?.id) {
+        router.push(`/(protected)/(qr)/${response.qrCode.id}`);
+      } else {
+        Alert.alert("Error", "Failed to link item to QR code.");
+      }
+
+    } catch (err: any) {
+      console.error("Link item to QR failed:", err);
+      const status = err?.response?.status;
+
+      if (status === 401) {
+        Alert.alert("Unauthorized", "Your session has expired. Please log in again.");
+      } else if (status === 404) {
+        Alert.alert("Not Found", "API endpoint not found.");
+      } else {
+        Alert.alert("Error", err?.message || "Unexpected error occurred.");
+      }
     }
   };
 
+  /* =======================
+     UI – GIỮ NGUYÊN
+  ======================= */
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Create QR Code for Item</Text>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Item Profile</Text>
+        <View style={{ width: 40 }} />
+      </View>
 
-        {/* Image Picker */}
+      <View style={styles.formContainer}>
+        {/* Photos */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Photos of the Item *</Text>
           <Controller
             control={control}
             name="images"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <ImageField value={value} onChange={onChange} />
+            render={({ field }) => (
+              <ImageField value={field.value} onChange={field.onChange} />
             )}
           />
-          {errors.images && (<Text style={styles.errorText}>{errors.images.message}</Text>)}
+          {errors.images && <Text style={styles.errorText}>{errors.images.message}</Text>}
         </View>
 
         {/* Item Name */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Item Name *</Text>
+          <View style={styles.labelRow}>
+            <MaterialCommunityIcons
+              name="tag-outline"
+              size={20}
+              color="#00b4d8"
+              style={styles.labelIcon}
+            />
+            <Text style={styles.label}>Item Name</Text>
+          </View>
+
           <Controller
             control={control}
             name="name"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field }) => (
               <TextInput
                 style={[styles.input, errors.name && styles.inputError]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="Enter item name"
+                value={field.value}
+                onChangeText={field.onChange}
+                placeholder="e.g., Blue Samsonite Suitcase"
+                placeholderTextColor="#9ca3af"
               />
             )}
           />
-          {errors.name && (
-            <Text style={styles.errorText}>{errors.name.message}</Text>
-          )}
+          {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
         </View>
 
         {/* Description */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Description *</Text>
+          <View style={styles.labelRow}>
+            <Ionicons
+              name="star-outline"
+              size={20}
+              color="#00b4d8"
+              style={styles.labelIcon}
+            />
+            <Text style={styles.label}>Description</Text>
+          </View>
+
           <Controller
             control={control}
             name="description"
-            render={({ field: { onChange, onBlur, value } }) => (
+            render={({ field }) => (
               <TextInput
                 style={[styles.input, styles.textArea, errors.description && styles.inputError]}
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="Enter description"
+                value={field.value}
+                onChangeText={field.onChange}
+                placeholder="Scratches on the back, sticker on lid..."
+                placeholderTextColor="#9ca3af"
                 multiline
-                numberOfLines={4}
               />
             )}
           />
@@ -162,16 +195,40 @@ const ItemLinkForm = () => {
           )}
         </View>
 
-        {/* Submit Button */}
+        {/* Fee Box */}
+        <View style={styles.feeContainer}>
+          <View style={styles.feeIconCircle}>
+            <Ionicons name="card-outline" size={20} color="#00b4d8" />
+          </View>
+          <View style={styles.feeTextContainer}>
+            <Text style={styles.feeTitle}>Activation Fee</Text>
+            <Text style={styles.feeSubtitle}>
+              One-time payment for lifetime protection
+            </Text>
+          </View>
+          <Text style={styles.feeAmount}>$0.99</Text>
+        </View>
+
+        {/* Submit */}
         <TouchableOpacity
           style={styles.submitButton}
           onPress={handleSubmit(onSubmit)}
+          activeOpacity={0.8}
         >
-          <Text style={styles.submitButtonText}>Activate & Protected Item</Text>
+          <Ionicons name="shield-checkmark-outline" size={20} color="#fff" />
+          <Text style={styles.submitButtonText}>Create</Text>
         </TouchableOpacity>
+
+        {/* Secure Footer */}
+        <View style={styles.secureFooter}>
+          <Ionicons name="lock-closed" size={14} color="#94a3b8" />
+          <Text style={styles.secureText}>
+            Secure 256-bit SSL Encrypted Payment
+          </Text>
+        </View>
       </View>
     </ScrollView>
-  )
-}
+  );
+};
 
-export default ItemLinkForm
+export default ItemLinkForm;

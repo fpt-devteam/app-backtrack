@@ -1,115 +1,133 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Item } from '../../types/item.type';
+import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './styles';
 
 interface ItemDetailProps {
-  item: Item;
+  data: {
+    item: {
+      id: string;
+      name: string;
+      description: string;
+      imageUrls: string[];
+      createdAt: string;
+      updatedAt: string | null;
+    };
+    qrCode: {
+      id: string;
+      publicCode: string;
+      linkedAt: string;
+      createdAt: string; //
+    };
+  };
 }
 
-const ItemDetail = ({ item }: ItemDetailProps) => {
+const ItemDetail = ({ data }: ItemDetailProps) => {
   const router = useRouter();
-  const imageUrl = item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : 'https://via.placeholder.com/400';
+  const { item, qrCode } = data;
 
-  const formatDate = (dateString: string | null) => {
+  const imageUrl = item?.imageUrls && item.imageUrls.length > 0 
+    ? item.imageUrls[0] 
+    : 'https://via.placeholder.com/400';
+
+  // Sửa lại hàm format để lấy thời gian từ server
+  const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-
-  const handleEdit = () => {
-    router.push(`/(protected)/(qr)/edit-item/${item.id}`);
-  };
-
-  const handleShare = () => {
-    console.log('Share item:', item.qrCode.publicCode);
-  };
-
-  const handlePrint = () => {
-    console.log('Print QR code:', item.qrCode.publicCode);
+    }) + `, ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}`;
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      {/* Main Image */}
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: imageUrl }}
-          style={styles.mainImage}
-          resizeMode="cover"
-        />
-      </View>
-
-      {/* Item Name */}
-      <View style={styles.section}>
-        <Text style={styles.itemName}>{item.name}</Text>
-      </View>
-
-      {/* Description Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Description</Text>
-        <Text style={styles.description}>{item.description}</Text>
-      </View>
-
-      {/* Linked QR Code Section */}
-      <View style={styles.section}>
-        <View style={styles.qrHeader}>
-          <Text style={styles.sectionLabel}>Linked QR Code</Text>
-          <View style={styles.statusBadge}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Active</Text>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      {/* Để nội dung tràn lên status bar */}
+      <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
+      
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+        {/* Header Image Section */}
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUrl }} style={styles.mainImage} resizeMode="cover" />
+          
+          {/* Nút Back và Menu đè lên ảnh */}
+          <View style={styles.headerButtonsContainer}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
+              <Ionicons name="chevron-back" size={24} color="#000" />
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.circleBtn}>
+              <Ionicons name="ellipsis-horizontal" size={24} color="#000" />
+            </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.qrContainer}>
-          {/* QR Code Image/Icon */}
-          <View style={styles.qrCodeBox}>
-            <Ionicons name="qr-code" size={60} color="#0ea5e9" />
+        <View style={styles.contentWrapper}>
+          <Text style={styles.itemName}>{item?.name}</Text>
+
+          {/* Card thông tin chi tiết */}
+          <View style={styles.card}>
+            <Text style={styles.sectionLabel}>Description</Text>
+            <Text style={styles.description}>{item?.description}</Text>
           </View>
 
-          {/* QR Details */}
-          <View style={styles.qrDetails}>
-            <Text style={styles.qrLabel}>UNIQUE ID</Text>
-            <Text style={styles.qrCode}>{item.qrCode.publicCode}</Text>
+          <View style={styles.card}>
+            <View style={styles.qrHeader}>
+              <Text style={styles.sectionLabel}>Linked QR Code</Text>
+              <View style={styles.statusBadge}>
+                <View style={styles.statusDot} />
+                <Text style={styles.statusText}>Active</Text>
+              </View>
+            </View>
 
-            {/* Action Buttons */}
-            <View style={styles.actionButtons}>
-              <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-                <Ionicons name="share-social" size={16} color="#0ea5e9" />
-                <Text style={styles.actionButtonText}>Share</Text>
-              </TouchableOpacity>
+            <View style={styles.qrRow}>
+              <View style={styles.qrInfo}>
+                <Text style={styles.qrLabel}>UNIQUE ID</Text>
+                <Text style={styles.qrValue}>{qrCode?.publicCode}</Text>
+              </View>
+              
+              {/* Nút View QR để sang trang download */}
+              <TouchableOpacity 
+  style={styles.viewQrButton}
+  onPress={() => {
+    // Đảm bảo dữ liệu qrCode và item đã tồn tại trước khi điều hướng
+    if (qrCode?.publicCode && item?.name) {
+      router.push({
+        pathname: "/(protected)/(qr)/download-qr",
+        params: { 
+          code: qrCode.publicCode, 
+          name: item.name 
+        }
+      });
+    }
+  }}
+>
+  <Ionicons name="qr-code-outline" size={18} color="#4b5563" />
+  <Text style={styles.viewQrText}>View QR</Text>
+</TouchableOpacity>
+            </View>
 
-              <TouchableOpacity style={styles.actionButton} onPress={handlePrint}>
-                <Ionicons name="print" size={16} color="#6b7280" />
-                <Text style={styles.actionButtonText}>Print</Text>
-              </TouchableOpacity>
+            {/* Hiển thị thời gian cập nhật thực tế từ Server */}
+            <View style={styles.timeRow}>
+              <Ionicons name="time-outline" size={16} color="#9ca3af" />
+              <Text style={styles.timeText}>
+                Last Updated: {formatDate(item?.updatedAt || qrCode?.linkedAt || qrCode?.createdAt)}
+              </Text>
             </View>
           </View>
+
+          <TouchableOpacity 
+            style={styles.editBtn}
+            onPress={() => router.push(`/(protected)/(qr)/edit-item/${item?.id}`)}
+          >
+            <MaterialCommunityIcons name="pencil" size={20} color="#374151" />
+            <Text style={styles.editBtnText}>Edit Item Details</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-
-      {/* Last Updated */}
-      <View style={styles.lastUpdatedContainer}>
-        <Ionicons name="time-outline" size={16} color="#6b7280" />
-        <Text style={styles.lastUpdated}>
-          Last Updated: {formatDate(item.updatedAt || item.createdAt)}
-        </Text>
-      </View>
-
-      {/* Edit Button */}
-      <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-        <Ionicons name="create-outline" size={20} color="#374151" />
-        <Text style={styles.editButtonText}>Edit Item Details</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

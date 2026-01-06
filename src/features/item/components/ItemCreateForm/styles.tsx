@@ -3,94 +3,138 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff', 
+  },
+ 
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    marginBottom: 10,
+  },
+  
+  backButton: {
+    padding: 8,
   },
   formContainer: {
-    padding: 16,
+    padding: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#1f2937",
+    flex: 1, 
   },
   fieldContainer: {
-    marginBottom: 20,
+    marginBottom: 24,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  labelIcon: {
+    marginRight: 8, 
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    marginBottom: 8,
-    color: '#333',
+    color: '#374151',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: '#e5e7eb', 
+    borderRadius: 12, 
+    padding: 14,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#f9fafb', 
+    color: '#111827',
   },
   inputError: {
-    borderColor: '#ff4444',
+    borderColor: '#ef4444',
   },
   textArea: {
-    minHeight: 100,
+    minHeight: 120,
     textAlignVertical: 'top',
   },
   errorText: {
-    color: '#ff4444',
-    fontSize: 14,
-    marginTop: 4,
+    color: '#ef4444',
+    fontSize: 13,
+    marginTop: 6,
   },
-  categoryContainer: {
+  feeContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  categoryButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    alignItems: 'center',
+    backgroundColor: '#f0f9ff',
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#e0f2fe',
+    marginBottom: 30,
+  },
+  
+  feeIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0f2fe',
   },
-  categoryButtonActive: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+  feeTextContainer: {
+    flex: 1,
+    marginLeft: 12,
   },
-  categoryButtonText: {
+  feeTitle: {
     fontSize: 14,
-    color: '#333',
+    fontWeight: '700',
+    color: '#1e293b',
   },
-  categoryButtonTextActive: {
-    color: '#fff',
-    fontWeight: '600',
+  feeSubtitle: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  feeAmount: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1e293b',
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#0ea5e9', 
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    shadowColor: '#0ea5e9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitButtonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '700',
+    marginLeft: 8,
   },
-  qrContainer: {
-    marginTop: 30,
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+  // Chỉnh sửa lại phần footer để icon và text nằm cùng hàng
+  secureFooter: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 19,
   },
-  qrTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
-    color: '#333',
-  },
+  secureText: {
+    textAlign: 'center',
+    color: '#94a3b8',
+    fontSize: 12,
+    marginLeft: 4,
+    marginTop: 8, // Khoảng cách với icon ổ khóa
+  }
 });
