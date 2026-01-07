@@ -1,7 +1,6 @@
 import ItemDetail from '@/src/features/item/components/ItemDetail/ItemDetail';
 import useGetItemById from '@/src/features/item/hooks/useGetItemById';
 import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
 const ItemDetailScreen = () => {
