@@ -14,13 +14,12 @@ export const styles = StyleSheet.create({
   mainImage: {
     width: '100%',
     height: '100%',
-    // Chỉ bo góc phía dưới để tạo hiệu ứng tràn viền bên trên
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
   },
   headerButtonsContainer: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 30, // Điều chỉnh theo status bar
+    top: Platform.OS === 'ios' ? 50 : 30, 
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -32,7 +31,7 @@ export const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Mờ nhẹ để nổi bật trên ảnh
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', 
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: "#000",

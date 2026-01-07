@@ -22,11 +22,11 @@ export interface ItemCardComponentProps {
 const ItemCard = ({ item: data }: ItemCardComponentProps) => {
   const router = useRouter();
   
-  // Bóc tách dữ liệu từ cấu trúc lồng nhau của API
+  
   const itemInfo = data.item;
   const qrInfo = data.qrCode;
 
-  // Điều hướng bằng ID của qrCode để khớp với route [id].tsx
+
   const handlePress = () => router.push(`/(protected)/(qr)/${qrInfo.id}`);
 
   const imageUrl = itemInfo.imageUrls && itemInfo.imageUrls.length > 0 
@@ -59,7 +59,7 @@ const ItemCard = ({ item: data }: ItemCardComponentProps) => {
         <Text style={styles.itemId} numberOfLines={1}>
           Created at: {formatDate(qrInfo.createdAt)}
         </Text>
-        {/* Hiển thị thêm Public Code để dễ nhận biết */}
+        
         <Text style={{ fontSize: 10, color: '#2979ff', marginTop: 2 }}>
           ID: {qrInfo.publicCode}
         </Text>

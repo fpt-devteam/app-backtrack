@@ -13,12 +13,12 @@ const DownloadQRScreen = () => {
   const params = useLocalSearchParams();
   const viewShotRef = useRef<any>(null);
 
-  // Lấy dữ liệu truyền từ trang Detail
+ 
   const publicCode = params.code as string;
   const itemName = params.name as string;
 
   const handleDownload = async () => {
-    // Xin quyền truy cập thư viện ảnh
+   
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert("Permission Required", "Please allow access to your photos to download the QR code.");
@@ -26,7 +26,7 @@ const DownloadQRScreen = () => {
     }
 
     try {
-      // Chụp vùng ViewShot và lưu thành file
+      
       const uri = await viewShotRef.current.capture();
       await MediaLibrary.saveToLibraryAsync(uri);
       Alert.alert("Success", "QR Code has been saved to your gallery!");
@@ -49,7 +49,7 @@ const DownloadQRScreen = () => {
       </View>
 
       <View style={styles.content}>
-        {/* Vùng sẽ được chụp lại để tải về */}
+       
         <ViewShot 
           ref={viewShotRef} 
           options={{ format: "jpg", quality: 1.0 }}
@@ -71,7 +71,7 @@ const DownloadQRScreen = () => {
         <Text style={styles.uniqueIdText}>Unique ID: {publicCode}</Text>
       </View>
 
-      {/* Nút Download ở dưới cùng */}
+      
       <View style={styles.footer}>
         <TouchableOpacity style={styles.downloadButton} onPress={handleDownload}>
           <Ionicons name="download-outline" size={20} color="#fff" />
@@ -118,16 +118,16 @@ const styles = StyleSheet.create({
   },
   captureContainer: {
     padding: 20,
-    backgroundColor: '#F9FAFB', // Màu nền ảnh khi tải về
+    backgroundColor: '#F9FAFB', 
   },
   qrWrapper: {
     width: width * 0.75,
     height: width * 0.75,
     backgroundColor: '#fff',
-    borderRadius: 40, // Bo góc khung QR theo thiết kế
+    borderRadius: 40, 
     justifyContent: 'center',
     alignItems: 'center',
-    // Đổ bóng cho khung QR
+    
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.1,
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   qrBackground: {
     padding: 15,
-    backgroundColor: '#2DD4BF', // Màu xanh nền của QR theo thiết kế
+    backgroundColor: '#2DD4BF', 
     borderRadius: 20,
   },
   uniqueIdText: {
@@ -152,8 +152,7 @@ const styles = StyleSheet.create({
   },
   downloadButton: {
     flexDirection: 'row',
-    backgroundColor: '#0EA5E9', // Màu nút download xanh dương
-    height: 56,
+    backgroundColor: '#0EA5E9', 
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',

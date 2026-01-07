@@ -18,9 +18,7 @@ import useLinkQrItem from "../../hooks/useLinkQrItem";
 import { ItemCreateRequest } from "../../types/item.type";
 import { styles } from "./styles";
 
-/* =======================
-   Validation Schema
-======================= */
+
 const qrSchema = yup.object({
   name: yup.string().required("Name is required"),
   description: yup.string().required("Description is required"),
@@ -70,9 +68,7 @@ const ItemLinkForm = () => {
     return uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
   };
 
-  /* =======================
-     Submit Handler (FIXED)
-  ======================= */
+ 
   const onSubmit: SubmitHandler<ItemSchema> = async (data) => {
     try {
       const imageUrls = await handleUploadImages(data.images);
@@ -109,9 +105,6 @@ const ItemLinkForm = () => {
     }
   };
 
-  /* =======================
-     UI – GIỮ NGUYÊN
-  ======================= */
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}

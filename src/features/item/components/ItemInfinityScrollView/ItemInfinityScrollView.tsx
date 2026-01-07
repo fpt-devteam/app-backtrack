@@ -31,7 +31,6 @@ const ItemInfinityScrollView = () => {
       return <ActivityIndicator style={{ padding: 20 }} color="#2979ff" />;
     }
     
-    // FIX LỖI: Kiểm tra undefined an toàn cho data?.pages
     const hasItems = data?.pages?.[0]?.items && data.pages[0].items.length > 0;
     if (!hasNextPage && hasItems) {
       return (
@@ -109,10 +108,10 @@ const ItemInfinityScrollView = () => {
     </View>
   ), [insets.top]);
 
-  // FIX LỖI: Sử dụng 'unknown' để ép kiểu an toàn khi hai kiểu dữ liệu không chồng lấp
+  
   const allItems = useMemo(() => {
     const flattened = data?.pages.flatMap(page => page.items) || [];
-    // Ép kiểu qua unknown để tránh lỗi "neither type sufficiently overlaps"
+    
     return (flattened as unknown) as ItemCardComponentProps['item'][];
   }, [data]);
 
@@ -127,7 +126,7 @@ const ItemInfinityScrollView = () => {
   return (
     <FlatList
       data={allItems}
-      // Sử dụng ID từ qrCode theo đúng dữ liệu Postman
+      
       keyExtractor={(item) => item.qrCode.id} 
       renderItem={({ item }) => <ItemCard item={item} />} 
       onEndReachedThreshold={0.3}

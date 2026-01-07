@@ -123,7 +123,7 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 8,
   },
-  // Chỉnh sửa lại phần footer để icon và text nằm cùng hàng
+  
   secureFooter: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -135,6 +135,6 @@ export const styles = StyleSheet.create({
     color: '#94a3b8',
     fontSize: 12,
     marginLeft: 4,
-    marginTop: 8, // Khoảng cách với icon ổ khóa
+    marginTop: 8, 
   }
 });

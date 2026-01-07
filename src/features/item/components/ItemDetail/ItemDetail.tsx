@@ -30,7 +30,6 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
     ? item.imageUrls[0] 
     : 'https://via.placeholder.com/400';
 
-  // Sửa lại hàm format để lấy thời gian từ server
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -44,15 +43,15 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      {/* Để nội dung tràn lên status bar */}
+     
       <StatusBar barStyle="dark-content" translucent backgroundColor="transparent" />
       
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        {/* Header Image Section */}
+       
         <View style={styles.imageContainer}>
           <Image source={{ uri: imageUrl }} style={styles.mainImage} resizeMode="cover" />
           
-          {/* Nút Back và Menu đè lên ảnh */}
+         
           <View style={styles.headerButtonsContainer}>
             <TouchableOpacity onPress={() => router.back()} style={styles.circleBtn}>
               <Ionicons name="chevron-back" size={24} color="#000" />
@@ -67,7 +66,7 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
         <View style={styles.contentWrapper}>
           <Text style={styles.itemName}>{item?.name}</Text>
 
-          {/* Card thông tin chi tiết */}
+      
           <View style={styles.card}>
             <Text style={styles.sectionLabel}>Description</Text>
             <Text style={styles.description}>{item?.description}</Text>
@@ -88,11 +87,11 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
                 <Text style={styles.qrValue}>{qrCode?.publicCode}</Text>
               </View>
               
-              {/* Nút View QR để sang trang download */}
+            
               <TouchableOpacity 
   style={styles.viewQrButton}
   onPress={() => {
-    // Đảm bảo dữ liệu qrCode và item đã tồn tại trước khi điều hướng
+    
     if (qrCode?.publicCode && item?.name) {
       router.push({
         pathname: "/(protected)/(qr)/download-qr",
@@ -109,7 +108,7 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
 </TouchableOpacity>
             </View>
 
-            {/* Hiển thị thời gian cập nhật thực tế từ Server */}
+            
             <View style={styles.timeRow}>
               <Ionicons name="time-outline" size={16} color="#9ca3af" />
               <Text style={styles.timeText}>
