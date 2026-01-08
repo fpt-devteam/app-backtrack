@@ -1,17 +1,17 @@
-import { DateTimePickerField, ImageField, LocationField } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
-import { useUploadImage } from "@/src/shared/hooks";
-import { GoogleMapDetailLocation, Nullable } from "@/src/shared/types";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { ImagePickerAsset } from "expo-image-picker";
-import { ExternalPathString, RelativePathString, router } from "expo-router";
-import { useState } from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Alert, FlatList, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { DateTimePickerField, ImageField, LocationField } from '@/src/shared/components';
+import { useUploadImage } from '@/src/shared/hooks';
+import { GoogleMapDetailLocation, Nullable } from '@/src/shared/types';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { ImagePickerAsset } from 'expo-image-picker';
+import { ExternalPathString, RelativePathString, router } from 'expo-router';
+import React, { useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as yup from "yup";
-import { useCreatePost } from "../hooks";
-import { Post, PostCreateRequest, PostType } from "../types";
 
+import { useCreatePost } from '@/src/features/post/hooks';
+import { Post, PostCreateRequest, PostType } from '@/src/features/post/types';
+import { POST_ROUTE } from '@/src/shared/constants';
 
 const postSchema = yup
   .object({
@@ -53,19 +53,19 @@ const postSchema = yup
   })
   .required();
 
-type PostFoundFormSchema = yup.InferType<typeof postSchema>;
+type PostLostFormSchema = yup.InferType<typeof postSchema>;
 
-type PostFoundFormProps = {
+type PostLostFormProps = {
   mode: 'create' | 'edit',
   initialData: Nullable<Post>;
 };
 
-export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
+export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
   const [postData, setPostData] = useState<Nullable<Post>>(initialData);
   const { uploadImages } = useUploadImage();
   const { createPost } = useCreatePost();
 
-  const { control, handleSubmit, formState: { errors }, } = useForm<PostFoundFormSchema>({
+  const { control, handleSubmit, formState: { errors }, } = useForm<PostLostFormSchema>({
     defaultValues: {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
@@ -90,7 +90,7 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
     return imageUrls;
   };
 
-  const onSubmit: SubmitHandler<PostFoundFormSchema> = async (data: PostFoundFormSchema) => {
+  const onSubmit: SubmitHandler<PostLostFormSchema> = async (data: PostLostFormSchema) => {
     try {
       const imageUrls = await handleUploadImages(data.images);
       if (imageUrls.length === 0) {
@@ -99,7 +99,7 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
       }
 
       const postCreateRequest: PostCreateRequest = {
-        postType: PostType.Found,
+        postType: PostType.Lost,
         itemName: data.itemName,
         description: data.description,
         imageUrls,
@@ -113,7 +113,6 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
       console.log("Post data to submit:", postCreateRequest);
       const postDetails = await createPost(postCreateRequest);
       setPostData(postDetails);
-
       console.log("Post created successfully:", postDetails);
       const postId = postDetails?.id;
       if (!postId) {
@@ -128,9 +127,8 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
     }
   };
 
-  const content = (
-    <View className="p-4">
-
+  return (
+    <ScrollView className="p-4">
       {/* Form Fields */}
       <View className="bg-white rounded-3xl p-4 my-3 shadow-lg border border-slate-300"
         style={{
@@ -265,31 +263,30 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
             <Text className="text-red-500 text-xs mt-1">{errors.detailLocation.message}</Text>
           )}
         </View>
-      </View>
 
-      {/* Submit Button */}
-      <View className="my-5 px-4">
-        <TouchableOpacity
-          className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text className="text-base font-semibold text-white">Submit</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+        {/* Button Container */}
+        <View className="flex-col px-4">
+          {/* Create Button */}
+          <TouchableOpacity
+            className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text className="text-base font-semibold text-white">Create</Text>
+          </TouchableOpacity>
 
-  return (
-    <FlatList
-      data={[{ key: "form" }]}
-      keyExtractor={(i) => i.key}
-      renderItem={() => null}
-      ListHeaderComponent={content}
-      keyboardShouldPersistTaps="always"
-      keyboardDismissMode="on-drag"
-      contentContainerStyle={{ paddingBottom: 24 }}
-    />
+          {/* Cancel Button */}
+          <TouchableOpacity
+            className="flex-1 h-11 rounded-[10px] items-center  justify-center"
+            onPress={() => {
+              // Handle cancel action
+            }}
+          >
+            <Text className="text-base font-semibold text-gray-500">Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
   );
 };
 
-export default PostFoundForm;
+export default PostLostForm;

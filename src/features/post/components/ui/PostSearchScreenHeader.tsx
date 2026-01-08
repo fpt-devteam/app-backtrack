@@ -1,8 +1,8 @@
+import { PostFiltersComponent } from '@/src/features/post/components';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import PostFiltersComponent from './PostFiltersComponent';
 
 const PostSearchScreenHeader = () => {
   const [filters, setFilters] = useState({});

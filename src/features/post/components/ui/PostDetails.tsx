@@ -1,3 +1,9 @@
+import { useAppUser } from '@/src/features/auth/providers'
+import { useCreateConversation } from '@/src/features/chat/hooks'
+import { ConversationCreateRequest } from '@/src/features/chat/types'
+import { PostStatusBadge, SimilarPostCard } from '@/src/features/post/components'
+import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks'
+import { PostType } from '@/src/features/post/types'
 import { ImageCarousel } from '@/src/shared/components'
 import { CHAT_ROUTE, POST_ROUTE } from '@/src/shared/constants'
 import { formatIsoDate } from '@/src/shared/utils'
@@ -6,14 +12,6 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import { Animated, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps'
 import { Icon } from 'react-native-paper'
-import { useAppUser } from '../../auth/providers'
-import { useCreateConversation } from '../../chat/hooks'
-import { ConversationCreateRequest } from '../../chat/types'
-import useGetPostById from '../hooks/useGetPostById'
-import useMatchingPost from '../hooks/useMatchingPost'
-import { PostType } from '../types'
-import PostStatusBadge from './PostStatusBadge'
-import SimilarPostCard from './SimilarPostCard'
 
 type PostDetailsProps = {
   postId: string
@@ -90,8 +88,8 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
   const { isLoading, data: post } = useGetPostById({ postId })
   const { isMatching, similarPosts } = useMatchingPost(postId)
 
-  const { createConversation, isCreatingConversation, error } = useCreateConversation();
-  const { user, isUserReady } = useAppUser();
+  const { createConversation, isCreatingConversation } = useCreateConversation();
+  const { user } = useAppUser();
 
   const isOwner = useMemo(() => post?.authorId === user?.id, [post, user]);
 
@@ -100,9 +98,11 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
 
     const req = {
       partnerId: post.authorId,
-      creatorKeyName: post.postType,
-      partnerKeyName: post.postType === PostType.Lost ? PostType.Lost : PostType.Found,
+      creatorKeyName: post.postType === PostType.Found ? PostType.Lost : PostType.Found,
+      partnerKeyName: post.postType,
     } as ConversationCreateRequest;
+
+    console.log(req);
 
     try {
       const response = await createConversation(req);

@@ -1,8 +1,5 @@
-import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen } from '@/src/features/post/components';
-import SimilarPostCard from '@/src/features/post/components/SimilarPostCard';
-
-import useGetPostById from '@/src/features/post/hooks/useGetPostById';
-import useMatchingPost from '@/src/features/post/hooks/useMatchingPost';
+import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen, SimilarPostCard } from '@/src/features/post/components';
+import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';

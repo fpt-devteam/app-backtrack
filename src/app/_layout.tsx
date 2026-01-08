@@ -1,3 +1,4 @@
+import '@/global.css';
 import { AuthProvider, UserProvider } from "@/src/features/auth/providers";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
@@ -6,7 +7,6 @@ import React from "react";
 import 'react-native-get-random-values';
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import "../../global.css";
 
 const queryClient = new QueryClient({
   defaultOptions: {
