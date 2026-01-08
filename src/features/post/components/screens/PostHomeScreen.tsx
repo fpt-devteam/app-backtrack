@@ -1,10 +1,10 @@
+import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
+import { usePosts } from '@/src/features/post/hooks';
 import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
-import { PostCard } from '.';
-import { POSTS_QUERY_KEY } from '../constants';
-import { usePosts } from '../hooks';
+import { PostCard } from '..';
 
 const PostHomeScreen = () => {
   const queryClient = useQueryClient();
@@ -35,15 +35,17 @@ const PostHomeScreen = () => {
   }, [queryClient]);
 
   const renderFooter = useCallback(() => {
-    if (isLoading || isLoadingNextPage) return (
-      <View className="border-2">
+    if (isLoadingNextPage) return (
+      <View>
         <AppLoader />
       </View>
     );
 
     if (!hasMore) return (
       <View>
-        <AppEndOfFeed />
+        <View>
+          <AppEndOfFeed />
+        </View>
       </View>
     );
 

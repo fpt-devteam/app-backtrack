@@ -1,10 +1,10 @@
+import { SimilarPost } from '@/src/features/post/types'
 import { POST_ROUTE } from '@/src/shared/constants'
 import { formatIsoDate } from '@/src/shared/utils'
 import { Ionicons } from '@expo/vector-icons'
 import { ExternalPathString, RelativePathString, router } from 'expo-router'
 import React from 'react'
 import { Image, Pressable, Text, View } from 'react-native'
-import { SimilarPost } from '../types'
 
 type SimilarPostCardProps = {
   postId: string

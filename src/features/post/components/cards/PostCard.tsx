@@ -1,11 +1,11 @@
+import { PostStatusBadge } from "@/src/features/post/components";
+import { Post } from "@/src/features/post/types";
+import { POST_ROUTE } from "@/src/shared/constants";
 import { formatIsoDate } from "@/src/shared/utils";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { ExternalPathString, RelativePathString, router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Image, Pressable, Text, View } from "react-native";
-import { PREFIX_PATH_POST } from "../constants";
-import { Post } from "../types";
-import PostStatusBadge from "./PostStatusBadge";
 
 interface PostCardProps {
   item: Post;
@@ -41,7 +41,7 @@ const PostCard = ({ item, isFetching }: PostCardProps) => {
   }, [isFetching, imgLoading, skeletonOpacity, contentOpacity,]);
 
   const handleOpenDetail = useCallback(() => {
-    router.push(`${PREFIX_PATH_POST}/${item.id}`);
+    router.push(POST_ROUTE.details(item.id) as ExternalPathString | RelativePathString);
   }, [item.id]);
 
   return (

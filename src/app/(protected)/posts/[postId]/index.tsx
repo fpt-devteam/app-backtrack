@@ -1,5 +1,5 @@
-import PostDetails from '@/src/features/post/components/PostDetails';
-import useGetPostById from '@/src/features/post/hooks/useGetPostById';
+import { PostDetails } from '@/src/features/post/components';
+import { useGetPostById } from '@/src/features/post/hooks';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';

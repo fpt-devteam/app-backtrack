@@ -1,6 +1,6 @@
-import { PostFilters } from '@/src/features/post/types/post.type';
+import { PostFilters, PostType } from '@/src/features/post/types';
 import { LocationField } from '@/src/shared/components';
-import { GoogleMapDetailLocation } from '@/src/shared/types/location.type';
+import { GoogleMapDetailLocation } from '@/src/shared/types';
 import { Ionicons } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useState } from 'react';
@@ -9,7 +9,7 @@ import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import Modal from 'react-native-modal';
 import { SegmentedButtons } from 'react-native-paper';
 import * as yup from 'yup';
-import { PostType } from '../types';
+
 
 const filterSchema = yup.object({
   searchTerm: yup.string().nullable().defined(),

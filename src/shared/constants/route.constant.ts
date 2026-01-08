@@ -9,10 +9,10 @@ export const POST_ROUTE = {
   matching: (postId: string) => `/(protected)/posts/${postId}/matching`,
   detailMatch: (postId: string, otherPostId: string) => `/(protected)/posts/${postId}/matching/${otherPostId}`,
   search: "/(protected)/posts/search",
+  searchLocation: "/(protected)/posts/search/location",
 } as const;
 
 export const CHAT_ROUTE = {
   conversations: `/(protected)/chat/conversations`,
-  message: (conversationId: string) =>
-    `/(protected)/chat/conversations/${conversationId}`,
+  message: (conversationId: string) =>`/(protected)/chat/conversations/${conversationId}`,
 } as const;
