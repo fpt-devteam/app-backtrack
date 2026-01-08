@@ -8,32 +8,23 @@ const AppTabBar = () => {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-
         tabBarStyle: {
           backgroundColor: "white",
           height: 56,
           borderTopWidth: 1,
           borderTopColor: "#E5E5EA",
         },
-
         tabBarActiveTintColor: "#007AFF",
         tabBarInactiveTintColor: "#8E8E93",
-
-        tabBarLabelStyle: {
-          fontSize: 10,
-        },
+        tabBarLabelStyle: { fontSize: 10 },
       }}
     >
       <Tabs.Screen
         name="posts"
         options={{
           title: "Home",
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
-              size={24}
-              color={color}
-            />
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
           ),
         }}
       />

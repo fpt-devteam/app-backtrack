@@ -7,7 +7,6 @@ export default function PostsStackLayout() {
     }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="create" />
-      <Stack.Screen name="search" />
     </Stack>
   );
 }
