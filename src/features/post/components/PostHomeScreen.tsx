@@ -1,4 +1,4 @@
-import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
+import { AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, NativeScrollEvent, NativeSyntheticEvent, RefreshControl, View } from 'react-native';
@@ -12,8 +12,6 @@ const PostHomeScreen = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const isEndOfFeedRef = useRef(false);
-  const currentOffset = useRef(0);
-  const isScrollingDownRef = useRef(false);
 
   const handleEndReached = useCallback(() => {
     if (!hasMore) return;
@@ -43,11 +41,11 @@ const PostHomeScreen = () => {
       </View>
     );
 
-    if (!hasMore) return (
-      <View className="border-2">
-        <AppEndOfFeed />
-      </View>
-    );
+    // if (!hasMore) return (
+    //   <View>
+    //     <AppEndOfFeed />
+    //   </View>
+    // );
 
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);

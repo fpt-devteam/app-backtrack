@@ -45,6 +45,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const idToken = await firebaseUser.getIdToken();
 
     const backendUser = (await syncUser({ idToken })).data;
+
+    console.log('Syncing user with UID:', uid);
+    console.log('idToken:', idToken);
     console.log('User synced:', backendUser);
 
     if (!mountedRef.current) return;

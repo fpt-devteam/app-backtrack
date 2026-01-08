@@ -1,14 +1,17 @@
-import { PostMatchCard } from '@/src/features/post/components';
+import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen } from '@/src/features/post/components';
+import SimilarPostCard from '@/src/features/post/components/SimilarPostCard';
+
 import useGetPostById from '@/src/features/post/hooks/useGetPostById';
 import useMatchingPost from '@/src/features/post/hooks/useMatchingPost';
-import { WaitingMatchingScreen } from '@/src/shared/components';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 const MatchingScreen = () => {
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { postId } = useLocalSearchParams<{ postId: string }>();
+
+  console.log("PostId for matching:", postId);
 
   const { isMatching, similarPosts, error } = useMatchingPost(postId);
   const { data: yourItem } = useGetPostById({ postId });
@@ -21,37 +24,28 @@ const MatchingScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (applyingInterval || isMatching || !yourItem) return <MatchingLoadingScreen />;
+  if (applyingInterval || isMatching || !yourItem) return <MatchingWaitingScreen />;
 
   if (error) return <MatchingErrorScreen />;
 
-  if (similarPosts.length === 0) return <MatchingNoResultsScreen />;
+  if (similarPosts.length === 0) return <MatchingNoResultScreen />;
 
-  return (
-    <FlatList
-      data={similarPosts}
-      renderItem={({ item }) => <PostMatchCard yourItem={yourItem} matchedItem={item} />}
-      keyExtractor={(item) => item.id}
-    />
-  );
-}
-
-const MatchingLoadingScreen = () => {
-  return <WaitingMatchingScreen />
-}
-
-const MatchingErrorScreen = () => {
   return (
     <View>
-      <Text>Error occurred while matching posts.</Text>
-    </View>
-  );
-}
+      {/* Header */}
+      <View>
+      </View>
 
-const MatchingNoResultsScreen = () => {
-  return (
-    <View>
-      <Text>No similar posts found.</Text>
+      {/* Results */}
+      <FlatList
+        data={similarPosts}
+        renderItem={({ item }) => <SimilarPostCard matchPost={item} postId={postId} />}
+        keyExtractor={(item) => item.id}
+      />
+
+      {/* Footer */}
+      <View>
+      </View>
     </View>
   );
 }

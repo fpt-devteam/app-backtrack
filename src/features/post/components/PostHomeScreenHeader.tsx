@@ -1,9 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 
 import { AppBrand, AppUserAvatarIcon } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
-import { router } from "expo-router";
 
 const PostHomeScreenHeader = () => {
   return (
@@ -14,14 +11,15 @@ const PostHomeScreenHeader = () => {
 
       {/* Search and Avatar */}
       <View className="flex-row gap-3 items-center">
-        <View className="h-full justify-center">
+        {/* Search Icon */}
+        {/* <View className="h-full justify-center">
           <Pressable onPress={() => {
             console.log("Search pressed");
-            router.push(POST_ROUTE.search);
+            router.push(POST_ROUTE.searchLocation);
           }}>
             <Ionicons name="search-outline" size={24} color="black" />
           </Pressable>
-        </View>
+        </View> */}
 
         {/* User Avatar */}
         <View className="h-full justify-center">

@@ -63,23 +63,6 @@ const PostMatchCard = ({
 
       {/* Images row */}
       <View className="relative mb-4 flex-row items-center justify-between">
-        {/* Left image */}
-        <View className="h-28 w-[48%] overflow-hidden rounded-2xl bg-slate-100">
-          {!!yourImage && (
-            <Image source={{ uri: yourImage }} className="h-full w-full" resizeMode="cover" />
-          )}
-          <View className="absolute bottom-2 left-2 rounded-full bg-black/35 px-2 py-1">
-            <Text className="text-[10px] font-bold text-white">YOUR ITEM</Text>
-          </View>
-        </View>
-
-        {/* Arrow in the middle */}
-        <View className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <View className="h-8 w-8 items-center justify-center rounded-full bg-white">
-            <Ionicons name="swap-horizontal" size={16} color="#94A3B8" />
-          </View>
-        </View>
-
         {/* Right image */}
         <View className="h-28 w-[48%] overflow-hidden rounded-2xl bg-slate-100">
           {!!matchedImage && (
@@ -89,7 +72,6 @@ const PostMatchCard = ({
             <Text className="text-[10px] font-bold text-white">FOUND ITEM</Text>
           </View>
 
-          {/* subtle bottom highlight giống hình */}
           <View className="absolute bottom-0 left-0 right-0 h-8 bg-sky-400/20" />
         </View>
       </View>

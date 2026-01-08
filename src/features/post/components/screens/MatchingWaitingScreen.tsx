@@ -58,13 +58,13 @@ function Ripple({ delayMs, size }: RippleProps) {
   );
 }
 
-export default function WaitingMatchingScreen({
+const MatchingWaitingScreen = ({
   title = "Matching in progress",
   subtitle = "We’re comparing Lost & Found posts near you",
   hint = "This usually takes a few seconds…",
   onCancel,
   showCancel = true,
-}: Props) {
+}: Props) => {
   const pulse = useRef(new Animated.Value(0)).current;
   const wiggle = useRef(new Animated.Value(0)).current;
 
@@ -207,3 +207,4 @@ export default function WaitingMatchingScreen({
     </View>
   );
 }
+export default MatchingWaitingScreen;
