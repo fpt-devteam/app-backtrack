@@ -1,7 +1,7 @@
-import { AppLoader } from '@/src/shared/components';
+import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, NativeScrollEvent, NativeSyntheticEvent, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { PostCard } from '.';
 import { POSTS_QUERY_KEY } from '../constants';
 import { usePosts } from '../hooks';
@@ -41,21 +41,14 @@ const PostHomeScreen = () => {
       </View>
     );
 
-    // if (!hasMore) return (
-    //   <View>
-    //     <AppEndOfFeed />
-    //   </View>
-    // );
+    if (!hasMore) return (
+      <View>
+        <AppEndOfFeed />
+      </View>
+    );
 
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const direction = event.nativeEvent.contentOffset.y > currentOffset.current ? 'down' : 'up';
-    currentOffset.current = event.nativeEvent.contentOffset.y;
-    isScrollingDownRef.current = direction === 'down';
-    console.log(`Scrolling ${direction}`);
-  };
 
   return (
     <FlatList
@@ -65,7 +58,6 @@ const PostHomeScreen = () => {
       onEndReachedThreshold={0.01}
       onEndReached={handleEndReached}
       ListFooterComponent={renderFooter}
-      onScroll={handleScroll}
       scrollEventThrottle={16}
       bounces={true}
       refreshControl={<RefreshControl
