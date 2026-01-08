@@ -1,10 +1,10 @@
+import { PostCard } from '@/src/features/post/components';
 import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
 import { usePosts } from '@/src/features/post/hooks';
 import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
-import { PostCard } from '..';
 
 const PostHomeScreen = () => {
   const queryClient = useQueryClient();
