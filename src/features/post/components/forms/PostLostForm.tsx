@@ -1,4 +1,5 @@
 import { DateTimePickerField, ImageField, LocationField } from '@/src/shared/components';
+import { AppHeader } from '@/src/shared/components/app-utils';
 import { useUploadImage } from '@/src/shared/hooks';
 import { GoogleMapDetailLocation, Nullable } from '@/src/shared/types';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -128,8 +129,11 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
   };
 
   return (
-    <ScrollView className="p-4">
-      {/* Form Fields */}
+    <View className="flex-1 bg-white">
+      <AppHeader title="Add Lost Item" />
+
+      <ScrollView className="flex-1 p-4">
+        {/* Form Fields */}
       <View className="bg-white rounded-3xl p-4 my-3 shadow-lg border border-slate-300"
         style={{
           shadowColor: '#000',
@@ -285,7 +289,8 @@ export const PostLostForm = ({ mode, initialData }: PostLostFormProps) => {
           </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

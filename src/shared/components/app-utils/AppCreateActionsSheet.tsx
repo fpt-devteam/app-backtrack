@@ -1,7 +1,8 @@
 import { POST_ROUTE } from "@/src/shared/constants";
 import { router } from "expo-router";
-import { PackageIcon } from "phosphor-react-native";
+import { BinocularsIcon, PackageIcon } from "phosphor-react-native";
 import { Pressable, Text, View } from "react-native";
+import colors from "../../theme/colors";
 import { BottomSheet } from "../ui";
 
 type AppCreateActionsSheetProps = {
@@ -22,7 +23,7 @@ const AppCreateActionsSheet = ({ isVisible, onClose }: AppCreateActionsSheetProp
     <BottomSheet isVisible={isVisible} onClose={onClose}>
       <View className="px-6 pb-6">
         {/* Title */}
-        <Text className="text-2xl font-bold text-primary mb-4">
+        <Text className="text-xl font-bold text-gray-900 mb-4">
           Add a New Post
         </Text>
 
@@ -35,9 +36,9 @@ const AppCreateActionsSheet = ({ isVisible, onClose }: AppCreateActionsSheetProp
             style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           >
             <View className="mb-3">
-              <PackageIcon size={56} color="#000" weight="duotone" />
+              <BinocularsIcon size={56} color={colors.black} weight="regular" />
             </View>
-            <Text className="text-base font-bold text-gray-900 mb-1 text-center">
+            <Text className="text-base font-medium text-gray-900 mb-1 text-center">
               Add Lost Item
             </Text>
           </Pressable>
@@ -49,9 +50,9 @@ const AppCreateActionsSheet = ({ isVisible, onClose }: AppCreateActionsSheetProp
             style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
           >
             <View className="mb-3">
-              <PackageIcon size={56} color="#000" weight="duotone" />
+              <PackageIcon size={56} color={colors.black} weight="regular" />
             </View>
-            <Text className="text-base font-bold text-gray-900 mb-1 text-center">
+            <Text className="text-base font-medium text-gray-900 mb-1 text-center">
               Add Found Item
             </Text>
           </Pressable>

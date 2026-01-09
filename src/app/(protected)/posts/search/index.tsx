@@ -1,14 +1,17 @@
+import { LocationSearchBar } from "@/src/features/post/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import type { IconProps } from "phosphor-react-native";
 import {
-  ArrowLeft,
+  ArrowLeftIcon,
   Clock,
+  ClockIcon,
   MagnifyingGlass,
+  MagnifyingGlassIcon,
   X,
-  XCircle,
+  XCircleIcon
 } from "phosphor-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import type { GestureResponderEvent } from "react-native";
@@ -145,7 +148,7 @@ type SuggestRowProps = {
 };
 
 function SuggestRow({
-  IconComponent = Clock,
+  IconComponent = ClockIcon,
   text,
   onPress,
   onRemove,
@@ -311,19 +314,19 @@ export default function SearchScreen() {
         {/* Top row: Back + Search bar */}
         <View className="flex-row items-center">
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => router.replace(POST_ROUTE.index)}
             hitSlop={10}
             className="mr-2 h-12 w-12 items-center justify-center rounded-2xl border-2"
             style={{ borderColor: colors.slate[200] }}
           >
-            <ArrowLeft size={20} color={colors.slate[700]} />
+            <ArrowLeftIcon size={20} color={colors.slate[700]} />
           </Pressable>
 
           <View
             className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
-            style={{ borderColor: isFocused ? colors.blue[500] : colors.slate[200] }}
+            style={{ borderColor: isFocused ? colors.primary : colors.slate[200] }}
           >
-            <MagnifyingGlass size={20} color={colors.slate[500]} />
+            <MagnifyingGlassIcon size={20} color={colors.slate[500]} />
 
             <TextInput
               ref={inputRef}
@@ -345,11 +348,13 @@ export default function SearchScreen() {
                 }}
                 hitSlop={10}
               >
-                <XCircle size={20} color={colors.slate[400]} />
+                <XCircleIcon size={20} color={colors.slate[400]} />
               </Pressable>
             ) : null}
           </View>
+          {/* Location Search Bar */}
         </View>
+        <LocationSearchBar />
 
         {/* Divider */}
         <View className="h-[1px] mt-4" style={{ backgroundColor: colors.gray[100] }} />
@@ -361,7 +366,7 @@ export default function SearchScreen() {
 
             {displayType === "recent" && recent.length > 0 ? (
               <Pressable onPress={clearRecent} hitSlop={10}>
-                <Text className="text-blue-600 font-semibold">Clear</Text>
+                <Text className="text-primary font-semibold">Clear</Text>
               </Pressable>
             ) : null}
           </View>
@@ -371,7 +376,7 @@ export default function SearchScreen() {
             <View className="mt-3">
               {displayData.length === 0 ? (
                 <View className="p-3">
-                  <Text className="text-[#6B7280]">
+                  <Text className="text-sm text-gray-500">
                     {displayType === "suggest" ? "No suggestions." : "No recent searches."}
                   </Text>
                 </View>

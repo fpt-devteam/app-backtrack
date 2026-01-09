@@ -1,6 +1,7 @@
 import { useCreatePost } from "@/src/features/post/hooks";
 import { Post, PostCreateRequest, PostType } from "@/src/features/post/types";
 import { DateTimePickerField, ImageField, LocationField } from "@/src/shared/components";
+import { AppHeader } from "@/src/shared/components/app-utils";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
 import { GoogleMapDetailLocation, Nullable } from "@/src/shared/types";
@@ -129,8 +130,11 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
   };
 
   return (
-    <ScrollView className="p-4">
-      {/* Form Fields */}
+    <View className="flex-1 bg-white">
+      <AppHeader title="Add Found Item" />
+
+      <ScrollView className="flex-1 p-4">
+        {/* Form Fields */}
       <View className="bg-white rounded-3xl p-4 my-3 shadow-lg border border-slate-300"
         style={{
           shadowColor: '#000',
@@ -286,7 +290,8 @@ export const PostFoundForm = ({ mode, initialData }: PostFoundFormProps) => {
           <Text className="text-base font-semibold text-gray-500">Cancel</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

@@ -1,11 +1,15 @@
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import React, { useState } from "react";
 import AppCreateActionsSheet from "../AppCreateActionsSheet";
 import { TabBarContent } from "./TabBarContent";
 
 const BottomTabBar = () => {
   const [openSheet, setOpenSheet] = useState(false);
+  const pathname = usePathname();
+
   const closeSheet = () => setOpenSheet(false);
+  const hiddenRoutes = ["/posts/create", "/posts/search", "/posts/search/result", "/posts/search/location"];
+  const shouldHideTabBar = hiddenRoutes.some(route => pathname.startsWith(route));
 
   return (
     <>
@@ -14,9 +18,11 @@ const BottomTabBar = () => {
           headerShown: false,
           tabBarHideOnKeyboard: true,
         }}
-        tabBar={(props) => (
-          <TabBarContent {...props} onCreatePress={() => setOpenSheet(true)} />
-        )}
+        tabBar={(props) =>
+          shouldHideTabBar ? null : (
+            <TabBarContent {...props} onCreatePress={() => setOpenSheet(true)} />
+          )
+        }
       >
         <Tabs.Screen name="posts" options={{ title: "Home" }} />
         <Tabs.Screen name="(qr)" options={{ title: "QRs" }} />

@@ -1,4 +1,5 @@
 import { MinimalPostCard } from "@/src/features/post/components";
+import { LocationSearchBar } from "@/src/features/post/components/ui";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
@@ -6,7 +7,7 @@ import { AppEndOfFeed, AppLoader } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { router, useLocalSearchParams } from "expo-router";
-import { ArrowLeft, Funnel, MagnifyingGlass, MapPin } from "phosphor-react-native";
+import { ArrowLeftIcon, FunnelIcon, MagnifyingGlassIcon } from "phosphor-react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 
@@ -37,16 +38,8 @@ export default function PostSearchResultScreen() {
     });
   };
 
-  const handleLocationSearchPress = () => {
-    router.push(POST_ROUTE.searchLocation);
-  };
-
   const handlePostTypeChange = (type: PostType | "All") => {
-    setSelectedPostType(type);
-    setFilters((prev) => ({
-      ...prev,
-      postType: type === "All" ? undefined : type,
-    }));
+
   };
 
   const renderFooter = useCallback(() => {
@@ -71,12 +64,12 @@ export default function PostSearchResultScreen() {
       <View className="p-4 pb-2">
         <View className="flex-row items-center">
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => router.replace(POST_ROUTE.search)}
             hitSlop={10}
             className="mr-2 h-12 w-12 items-center justify-center rounded-2xl border-2"
             style={{ borderColor: colors.slate[200] }}
           >
-            <ArrowLeft size={20} color={colors.slate[700]} />
+            <ArrowLeftIcon size={20} color={colors.slate[700]} />
           </Pressable>
 
           {/* Search Query Bar */}
@@ -85,7 +78,7 @@ export default function PostSearchResultScreen() {
             className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
             style={{ borderColor: colors.slate[200] }}
           >
-            <MagnifyingGlass size={20} color={colors.slate[500]} />
+            <MagnifyingGlassIcon size={20} color={colors.slate[500]} />
             <Text
               className="flex-1 ml-2 text-base"
               style={{ color: colors.slate[900] }}
@@ -97,25 +90,7 @@ export default function PostSearchResultScreen() {
         </View>
 
         {/* Location Search Bar */}
-        <View className="flex-row items-center mt-3">
-          {/* Spacer to align with search bar above */}
-          <View className="mr-2 w-12" />
-
-          <Pressable
-            onPress={handleLocationSearchPress}
-            className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
-            style={{ borderColor: colors.slate[200] }}
-          >
-            <MapPin size={20} color={colors.slate[500]} />
-            <Text
-              className="flex-1 ml-2 text-base"
-              style={{ color: colors.slate[400] }}
-              numberOfLines={1}
-            >
-              Search by location...
-            </Text>
-          </Pressable>
-        </View>
+        <LocationSearchBar />
 
         {/* Filter Chips */}
         <ScrollView
@@ -129,7 +104,7 @@ export default function PostSearchResultScreen() {
             className="mr-2 h-9 px-3 rounded-full items-center justify-center flex-row"
             style={{ backgroundColor: colors.sky[50] }}
           >
-            <Funnel size={16} color={colors.blue[600]} weight="bold" />
+            <FunnelIcon size={16} color={colors.blue[600]} weight="bold" />
           </View>
 
           {/* All Chip */}
