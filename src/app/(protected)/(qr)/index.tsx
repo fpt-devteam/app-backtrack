@@ -1,8 +1,7 @@
 import ItemInfinityScrollView from '@/src/features/item/components/ItemInfinityScrollView/ItemInfinityScrollView';
 import { router } from 'expo-router';
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 const ItemScreen = () => {
   return (

@@ -1,16 +1,21 @@
-import { MinimalPostCard, PostFiltersComponent } from "@/src/features/post/components";
+import { MinimalPostCard } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
-import { PostFilters } from "@/src/features/post/types";
+import type { PostFilters } from "@/src/features/post/types";
+import { PostType } from "@/src/features/post/types";
 import { AppEndOfFeed, AppLoader } from "@/src/shared/components";
-import { useLocalSearchParams } from "expo-router";
+import { POST_ROUTE } from "@/src/shared/constants";
+import { colors } from "@/src/shared/theme";
+import { router, useLocalSearchParams } from "expo-router";
+import { ArrowLeft, Funnel, MagnifyingGlass, MapPin } from "phosphor-react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 
 export default function PostSearchResultScreen() {
-  const { searchTerm } = useLocalSearchParams<{ searchTerm?: string }>();
-  const searchTermData = (searchTerm ?? "").toString();
+  const { termSearch } = useLocalSearchParams<{ termSearch?: string }>();
+  const searchTermData = (termSearch ?? "").toString();
   const isEndOfFeedRef = useRef(false);
 
+  const [selectedPostType, setSelectedPostType] = useState<PostType | "All">("All");
   const [filters, setFilters] = useState<PostFilters>({ searchTerm: searchTermData });
   const { items, isLoading, hasMore, loadMore, isLoadingNextPage } = usePosts({ filters });
 
@@ -25,18 +30,35 @@ export default function PostSearchResultScreen() {
     }, 3000);
   }, [hasMore, loadMore]);
 
+  const handleSearchBarPress = () => {
+    router.push({
+      pathname: POST_ROUTE.search,
+      params: { initialQuery: searchTermData },
+    });
+  };
+
+  const handleLocationSearchPress = () => {
+    router.push(POST_ROUTE.searchLocation);
+  };
+
+  const handlePostTypeChange = (type: PostType | "All") => {
+    setSelectedPostType(type);
+    setFilters((prev) => ({
+      ...prev,
+      postType: type === "All" ? undefined : type,
+    }));
+  };
+
   const renderFooter = useCallback(() => {
     if (isLoading || isLoadingNextPage) return (
-      <View>
+      <View className="mt-4">
         <AppLoader />
       </View>
     );
 
     if (!hasMore) return (
-      <View>
-        <View>
-          <AppEndOfFeed />
-        </View>
+      <View className="mt-4">
+        <AppEndOfFeed />
       </View>
     );
 
@@ -44,17 +66,140 @@ export default function PostSearchResultScreen() {
   }, [isLoadingNextPage, hasMore, isLoading]);
 
   return (
-    <FlatList
-      data={items}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <MinimalPostCard post={item} />}
-      onEndReached={handleEndReached}
-      scrollEventThrottle={16}
-      ListHeaderComponent={<PostFiltersComponent filters={filters} onFiltersChange={setFilters} />}
-      ListFooterComponent={renderFooter}
-      contentContainerStyle={{ padding: 16 }}
-      showsVerticalScrollIndicator={false}
-      ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-    />
+    <View className="bg-white flex-1">
+      {/* Header with Search Bar */}
+      <View className="p-4 pb-2">
+        <View className="flex-row items-center">
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={10}
+            className="mr-2 h-12 w-12 items-center justify-center rounded-2xl border-2"
+            style={{ borderColor: colors.slate[200] }}
+          >
+            <ArrowLeft size={20} color={colors.slate[700]} />
+          </Pressable>
+
+          {/* Search Query Bar */}
+          <Pressable
+            onPress={handleSearchBarPress}
+            className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
+            style={{ borderColor: colors.slate[200] }}
+          >
+            <MagnifyingGlass size={20} color={colors.slate[500]} />
+            <Text
+              className="flex-1 ml-2 text-base"
+              style={{ color: colors.slate[900] }}
+              numberOfLines={1}
+            >
+              {searchTermData || "Search..."}
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* Location Search Bar */}
+        <View className="flex-row items-center mt-3">
+          {/* Spacer to align with search bar above */}
+          <View className="mr-2 w-12" />
+
+          <Pressable
+            onPress={handleLocationSearchPress}
+            className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
+            style={{ borderColor: colors.slate[200] }}
+          >
+            <MapPin size={20} color={colors.slate[500]} />
+            <Text
+              className="flex-1 ml-2 text-base"
+              style={{ color: colors.slate[400] }}
+              numberOfLines={1}
+            >
+              Search by location...
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* Filter Chips */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mt-3"
+          contentContainerStyle={{ paddingHorizontal: 2 }}
+        >
+          {/* Filter Icon Chip */}
+          <View
+            className="mr-2 h-9 px-3 rounded-full items-center justify-center flex-row"
+            style={{ backgroundColor: colors.sky[50] }}
+          >
+            <Funnel size={16} color={colors.blue[600]} weight="bold" />
+          </View>
+
+          {/* All Chip */}
+          <Pressable
+            onPress={() => handlePostTypeChange("All")}
+            className="mr-2 h-9 px-4 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: selectedPostType === "All" ? colors.blue[500] : colors.slate[100],
+            }}
+          >
+            <Text
+              className="text-sm font-semibold"
+              style={{
+                color: selectedPostType === "All" ? "#fff" : colors.slate[700],
+              }}
+            >
+              All
+            </Text>
+          </Pressable>
+
+          {/* Lost Chip */}
+          <Pressable
+            onPress={() => handlePostTypeChange(PostType.Lost)}
+            className="mr-2 h-9 px-4 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: selectedPostType === PostType.Lost ? colors.blue[500] : colors.slate[100],
+            }}
+          >
+            <Text
+              className="text-sm font-semibold"
+              style={{
+                color: selectedPostType === PostType.Lost ? "#fff" : colors.slate[700],
+              }}
+            >
+              Lost
+            </Text>
+          </Pressable>
+
+          {/* Found Chip */}
+          <Pressable
+            onPress={() => handlePostTypeChange(PostType.Found)}
+            className="mr-2 h-9 px-4 rounded-full items-center justify-center"
+            style={{
+              backgroundColor: selectedPostType === PostType.Found ? colors.blue[500] : colors.slate[100],
+            }}
+          >
+            <Text
+              className="text-sm font-semibold"
+              style={{
+                color: selectedPostType === PostType.Found ? "#fff" : colors.slate[700],
+              }}
+            >
+              Found
+            </Text>
+          </Pressable>
+        </ScrollView>
+      </View>
+
+      {/* Post List */}
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <MinimalPostCard post={item} />}
+        onEndReached={handleEndReached}
+        scrollEventThrottle={16}
+        ListFooterComponent={renderFooter}
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+      />
+    </View>
   );
 }

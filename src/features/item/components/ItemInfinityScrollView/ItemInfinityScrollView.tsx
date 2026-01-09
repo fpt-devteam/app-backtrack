@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
-import { FlatList } from 'react-native';
-import { Text } from 'react-native-paper';
+import { FlatList, Text } from 'react-native';
 import useItems from '../../hooks/useItems';
 import ItemCard from '../ItemCard.tsx/ItemCard';
 

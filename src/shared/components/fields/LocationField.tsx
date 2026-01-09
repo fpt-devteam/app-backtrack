@@ -1,11 +1,12 @@
 import { ANIMATE_TO_DURATION, DEFAULT_REGION, QUERY_CONFIG } from "@/src/shared/constants";
 import { useGetDetailCurrentLocation, useGetDetailLocation } from "@/src/shared/hooks";
-import { GoogleMapDetailLocation } from "@/src/shared/types";
+import type { GoogleMapDetailLocation } from "@/src/shared/types";
+import { MagnifyingGlass } from "phosphor-react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
-import { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocomplete, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
-import MapView, { Marker, MarkerDragStartEndEvent, Region } from "react-native-maps";
-import { Icon, IconButton } from "react-native-paper";
+import { ActivityIndicator, Keyboard, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import type { GooglePlaceData, GooglePlaceDetail, GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import MapView, { Marker, type MarkerDragStartEndEvent, type Region } from "react-native-maps";
 
 type LocationFieldProps = {
   value: GoogleMapDetailLocation | null;
@@ -250,7 +251,7 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
               }}
               renderLeftButton={() => (
                 <View style={styles.leftIconContainer}>
-                  <Icon source="map-marker" size={18} color="#94A3B8" />
+                  <MagnifyingGlass size={18} color="#94A3B8" />
                 </View>
               )}
               styles={{
@@ -327,20 +328,22 @@ const LocationField = (locationFieldProps: LocationFieldProps) => {
             </MapView>
 
             {/* Current Location Button - Bottom Right */}
-            <IconButton
-              icon={loading ? "loading" : "crosshairs-gps"}
+            <Pressable
               onPress={handleGetCurrentLocation}
               disabled={loading || isFormatting}
-              mode="contained"
-              size={24}
-              iconColor="#6B7280"
               style={styles.currentLocationButton}
-            />
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#6B7280" />
+              ) : (
+                <Text style={{ fontSize: 20 }}>📍</Text>
+              )}
+            </Pressable>
 
             {/* Loading overlay for map */}
             {isFormatting && (
               <View style={styles.loadingOverlay}>
-                <Icon source="loading" size={24} color="#6B7280" />
+                <ActivityIndicator size="large" color="#3B82F6" />
               </View>
             )}
           </View>

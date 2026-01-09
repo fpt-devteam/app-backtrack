@@ -1,14 +1,15 @@
-import { PostFilters, PostType } from '@/src/features/post/types';
+import type { PostFilters } from '@/src/features/post/types';
+import { PostType } from '@/src/features/post/types';
 import { LocationField } from '@/src/shared/components';
 import BottomSheet from '@/src/shared/components/ui/BottomSheet';
-import { GoogleMapDetailLocation } from '@/src/shared/types';
+import type { GoogleMapDetailLocation } from '@/src/shared/types';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { MagnifyingGlass, SlidersHorizontal } from 'phosphor-react-native';
 import React, { useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { SegmentedButtons } from 'react-native-paper';
+import type { SubmitHandler } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
+import { Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as yup from 'yup';
 
 
@@ -105,78 +106,91 @@ const PostFiltersComponent = ({ filters, onFiltersChange }: PostFiltersProps) =>
       >
         <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
           {/* Post Type Filter */}
-            <View className="mb-5 gap-2">
-              <Text className="text-base font-semibold text-black mb-2">Post Type</Text>
-              <Controller
-                control={control}
-                name="postType"
-                render={({ field: { onChange, value } }) => (
-                  <SegmentedButtons
-                    value={value ?? 'all'}
-                    onValueChange={(selectedValue) => onChange(selectedValue === 'all' ? null : selectedValue)}
-                    buttons={[
-                      {
-                        value: 'all',
-                        label: 'All',
-                        style: {
-                          backgroundColor: (value ?? 'all') === 'all' ? '#3B82F6' : 'white',
-                        },
-                        labelStyle: {
-                          color: (value ?? 'all') === 'all' ? 'white' : 'black'
-                        }
-                      },
-                      {
-                        value: PostType.Lost,
-                        label: 'Lost',
-                        style: {
-                          backgroundColor: value === PostType.Lost ? '#3B82F6' : 'white',
-                        },
-                        labelStyle: {
-                          color: value === PostType.Lost ? 'white' : 'black'
-                        }
-                      },
-                      {
-                        value: PostType.Found,
-                        label: 'Found',
-                        style: {
-                          backgroundColor: value === PostType.Found ? '#3B82F6' : 'white',
-                        },
-                        labelStyle: {
-                          color: value === PostType.Found ? 'white' : 'black'
-                        }
-                      },
-                    ]}
-                  />
-                )}
-              />
-            </View>
+          <View className="mb-5 gap-2">
+            <Text className="text-base font-semibold text-black mb-2">Post Type</Text>
+            <Controller
+              control={control}
+              name="postType"
+              render={({ field: { onChange, value } }) => (
+                <View className="flex-row gap-2">
+                  <Pressable
+                    onPress={() => onChange(null)}
+                    className="flex-1 h-11 rounded-xl items-center justify-center border"
+                    style={{
+                      backgroundColor: (value ?? 'all') === 'all' ? '#3B82F6' : 'white',
+                      borderColor: (value ?? 'all') === 'all' ? '#3B82F6' : '#E5E7EB',
+                    }}
+                  >
+                    <Text
+                      className="text-sm font-semibold"
+                      style={{ color: (value ?? 'all') === 'all' ? 'white' : 'black' }}
+                    >
+                      All
+                    </Text>
+                  </Pressable>
 
-            {/* Location Filter */}
-            <View>
-              <Controller
-                control={control}
-                name="location"
-                render={({ field: { onChange, value } }) => (
-                  <LocationField value={value} onChange={onChange} />
-                )}
-              />
-            </View>
+                  <Pressable
+                    onPress={() => onChange(PostType.Lost)}
+                    className="flex-1 h-11 rounded-xl items-center justify-center border"
+                    style={{
+                      backgroundColor: value === PostType.Lost ? '#3B82F6' : 'white',
+                      borderColor: value === PostType.Lost ? '#3B82F6' : '#E5E7EB',
+                    }}
+                  >
+                    <Text
+                      className="text-sm font-semibold"
+                      style={{ color: value === PostType.Lost ? 'white' : 'black' }}
+                    >
+                      Lost
+                    </Text>
+                  </Pressable>
 
-            {/* Action Buttons */}
-            <View className="flex-row gap-3 mt-6 mb-6">
-              <TouchableOpacity
-                className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
-                onPress={handleSubmit(onSubmit)}
-              >
-                <Text className="text-base font-semibold text-white">Apply</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="flex-1 h-11 rounded-[10px] border border-red-500 items-center justify-center bg-white"
-                onPress={handleClear}
-              >
-                <Text className="text-base font-semibold text-red-500">Clear All</Text>
-              </TouchableOpacity>
-            </View>
+                  <Pressable
+                    onPress={() => onChange(PostType.Found)}
+                    className="flex-1 h-11 rounded-xl items-center justify-center border"
+                    style={{
+                      backgroundColor: value === PostType.Found ? '#3B82F6' : 'white',
+                      borderColor: value === PostType.Found ? '#3B82F6' : '#E5E7EB',
+                    }}
+                  >
+                    <Text
+                      className="text-sm font-semibold"
+                      style={{ color: value === PostType.Found ? 'white' : 'black' }}
+                    >
+                      Found
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+            />
+          </View>
+
+          {/* Location Filter */}
+          <View>
+            <Controller
+              control={control}
+              name="location"
+              render={({ field: { onChange, value } }) => (
+                <LocationField value={value} onChange={onChange} />
+              )}
+            />
+          </View>
+
+          {/* Action Buttons */}
+          <View className="flex-row gap-3 mt-6 mb-6">
+            <TouchableOpacity
+              className="flex-1 h-11 rounded-[10px] bg-blue-500 items-center justify-center"
+              onPress={handleSubmit(onSubmit)}
+            >
+              <Text className="text-base font-semibold text-white">Apply</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-1 h-11 rounded-[10px] border border-red-500 items-center justify-center bg-white"
+              onPress={handleClear}
+            >
+              <Text className="text-base font-semibold text-red-500">Clear All</Text>
+            </TouchableOpacity>
+          </View>
         </BottomSheetScrollView>
       </BottomSheet>
     </View>
