@@ -5,7 +5,7 @@ const AppBrand = () => {
 
   return (
     <View>
-      <Text className="font-medium text-3xl color-[#0ea5e9]">Backtrack</Text>
+      <Text className="font-medium text-3xl text-primary">Backtrack</Text>
     </View>
   );
 };

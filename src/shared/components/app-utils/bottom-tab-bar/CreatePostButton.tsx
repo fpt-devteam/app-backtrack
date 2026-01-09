@@ -1,3 +1,5 @@
+import { metrics } from "@/src/shared/theme";
+import colors from "@/src/shared/theme/colors";
 import * as Haptics from "expo-haptics";
 import { PlusCircleIcon } from "phosphor-react-native";
 import React from "react";
@@ -8,7 +10,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { metrics } from "@/src/shared/theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -45,7 +46,7 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
 
   // Match TabBarButton pattern for icon color until theme hook is available
   // Colors match global.css --tab-bar-active / --tab-bar-inactive
-  const iconColor = isFocused ? "#137fec" : "#65676B";
+  const iconColor = isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive;
 
   return (
     <AnimatedPressable
@@ -65,13 +66,13 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
       )}
 
       <View style={styles.iconContainer}>
-        <View 
+        <View
           style={[
-            styles.iconBackground, 
+            styles.iconBackground,
             isFocused && styles.iconBackgroundActive
           ]}
         >
-          <PlusCircleIcon size={metrics.tabBar.iconSize} color={iconColor} weight="regular" />
+          <PlusCircleIcon size={metrics.tabBar.iconSize} color={iconColor} weight="bold" />
         </View>
       </View>
 
@@ -81,7 +82,7 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
           styles.label,
           {
             fontSize: metrics.tabBar.labelSize,
-            fontWeight: isFocused ? "600" : "400",
+            fontWeight: isFocused ? "800" : "600",
           },
         ]}
       >
