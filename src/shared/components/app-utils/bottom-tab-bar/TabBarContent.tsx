@@ -1,9 +1,10 @@
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { Bell, ChatCircle, House, IconProps, QrCode } from "phosphor-react-native";
+import { metrics } from "@/src/shared/theme";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { IconProps } from "phosphor-react-native";
+import { Bell, ChatCircle, House, QrCode } from "phosphor-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { metrics } from "@/src/shared/theme";
 import { CreatePostButton } from "./CreatePostButton";
 import { TabBarButton } from "./TabBarButton";
 
@@ -57,7 +58,7 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
   // - insets.bottom * 0.3 (very close)
   // - 8 (fixed small padding)
   // - 0 (flush to bottom - not recommended)
-  const bottomPadding = insets.bottom > 0 ? insets.bottom * 0.5 : 0;
+  const bottomPadding = insets.bottom * 0.5;
 
   return (
     <View
@@ -71,7 +72,7 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
       ]}
     >
       {/* Subtle top border */}
-      <View className="absolute top-0 left-0 right-0 border-t border-tab-bar-border" />
+      {/* <View className="absolute top-0 left-0 right-0 border-t border-tab-bar-border" /> */}
 
       {/* Tab buttons */}
       <View style={styles.tabsContainer}>

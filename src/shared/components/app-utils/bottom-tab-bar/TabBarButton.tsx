@@ -8,22 +8,23 @@
  * - Press feedback
  */
 
-import * as Haptics from "expo-haptics";
-import React from "react";
-import { Pressable, Text, StyleSheet, View, Platform } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-} from "react-native-reanimated";
 import { metrics } from "@/src/shared/theme";
-import { IconProps } from "phosphor-react-native";
+import type { NavigationRoute, ParamListBase } from "@react-navigation/native";
+import * as Haptics from "expo-haptics";
+import type { IconProps } from "phosphor-react-native";
+import React from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type Props = {
-  route: any;
+  route: NavigationRoute<ParamListBase, string>;
   isFocused: boolean;
   Icon: React.ElementType<IconProps>;
   label: string;
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
   },
   indicator: {
     position: "absolute",
-    top: 0,
+    top: -8,
     left: "50%",
     marginLeft: -(metrics.tabBar.indicatorWidth / 2), // Center the indicator
     width: metrics.tabBar.indicatorWidth,
