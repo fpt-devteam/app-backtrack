@@ -1,8 +1,8 @@
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { AppInlineError, EmailField, PasswordField } from "@/src/shared/components";
-import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "expo-router";
+import { ArrowRight, GoogleLogo } from "phosphor-react-native";
 import React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -127,7 +127,7 @@ export default function LoginForm() {
                 ) : (
                   <>
                     <Text className="mr-2 font-medium text-base text-white">Sign In</Text>
-                    <Ionicons name="arrow-forward" size={18} color="#ffffff" />
+                    <ArrowRight size={18} color="#ffffff" />
                   </>
                 )}
               </TouchableOpacity>
@@ -147,7 +147,7 @@ export default function LoginForm() {
                 disabled={loading}
                 activeOpacity={0.8}
               >
-                <Ionicons name="logo-google" size={18} color="#e5453b" />
+                <GoogleLogo size={18} color="#e5453b" />
                 <Text className="ml-2 text-slate-700 font-medium">Google</Text>
               </TouchableOpacity>
             </View>

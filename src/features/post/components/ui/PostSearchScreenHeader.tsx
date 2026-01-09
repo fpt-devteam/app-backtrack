@@ -1,6 +1,6 @@
 import { PostFiltersComponent } from '@/src/features/post/components';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { ArrowLeft } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -16,7 +16,7 @@ const PostSearchScreenHeader = () => {
       {/* Back button */}
       <View>
         <Pressable onPress={handleBackPress}>
-          <Ionicons name="arrow-back-outline" size={24} color="black" />
+          <ArrowLeft size={24} color="black" />
         </Pressable>
       </View>
 

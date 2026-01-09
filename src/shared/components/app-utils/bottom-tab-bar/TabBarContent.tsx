@@ -1,4 +1,5 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { Bell, ChatCircle, House, IconProps, QrCode } from "phosphor-react-native";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,36 +12,30 @@ import { TabBarButton } from "./TabBarButton";
 // ============================================================================
 
 type TabIcon = {
-  activeIcon: string;
-  inactiveIcon: string;
+  Icon: React.ElementType<IconProps>;
   label: string;
 };
 
 // Route name → icon mapping (customize for your app)
 const TAB_ICONS: Record<string, TabIcon> = {
   posts: {
-    activeIcon: "home", // Filled icon when active
-    inactiveIcon: "home-outline", // Outline icon when inactive
+    Icon: House,
     label: "Home",
   },
   "(qr)": {
-    activeIcon: "qr-code",
-    inactiveIcon: "qr-code-outline",
+    Icon: QrCode,
     label: "QRs",
   },
   "create-post": {
-    activeIcon: "add",
-    inactiveIcon: "add",
-    label: "", // Empty for create button
+    Icon: House, // Placeholder, not used (rendered via CreatePostButton)
+    label: "",
   },
   chat: {
-    activeIcon: "chatbubbles",
-    inactiveIcon: "chatbubbles-outline",
+    Icon: ChatCircle,
     label: "Chat",
   },
   notification: {
-    activeIcon: "notifications",
-    inactiveIcon: "notifications-outline",
+    Icon: Bell,
     label: "Inbox",
   },
 };
@@ -104,8 +99,7 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
               key={route.key}
               route={route}
               isFocused={isFocused}
-              activeIcon={tabConfig.activeIcon}
-              inactiveIcon={tabConfig.inactiveIcon}
+              Icon={tabConfig.Icon}
               label={tabConfig.label}
               onPress={() => navigation.navigate(route.name)}
             />

@@ -1,5 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '@/src/shared/theme';
 import { useRouter } from 'expo-router';
+import { Clock, Pencil, Printer, QrCode, ShareNetwork } from 'phosphor-react-native';
 import React from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Item } from '../../types/item.type';
@@ -72,7 +73,7 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
         <View style={styles.qrContainer}>
           {/* QR Code Image/Icon */}
           <View style={styles.qrCodeBox}>
-            <Ionicons name="qr-code" size={60} color="#0ea5e9" />
+            <QrCode size={60} color={COLORS.sky[500]} />
           </View>
 
           {/* QR Details */}
@@ -83,12 +84,12 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
             {/* Action Buttons */}
             <View style={styles.actionButtons}>
               <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-                <Ionicons name="share-social" size={16} color="#0ea5e9" />
+                <ShareNetwork size={16} color={COLORS.sky[500]} />
                 <Text style={styles.actionButtonText}>Share</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.actionButton} onPress={handlePrint}>
-                <Ionicons name="print" size={16} color="#6b7280" />
+                <Printer size={16} color={COLORS.slate[500]} />
                 <Text style={styles.actionButtonText}>Print</Text>
               </TouchableOpacity>
             </View>
@@ -98,7 +99,7 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
 
       {/* Last Updated */}
       <View style={styles.lastUpdatedContainer}>
-        <Ionicons name="time-outline" size={16} color="#6b7280" />
+        <Clock size={16} color={COLORS.slate[500]} />
         <Text style={styles.lastUpdated}>
           Last Updated: {formatDate(item.updatedAt || item.createdAt)}
         </Text>
@@ -106,7 +107,7 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
 
       {/* Edit Button */}
       <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-        <Ionicons name="create-outline" size={20} color="#374151" />
+        <Pencil size={20} color={COLORS.slate[700]} />
         <Text style={styles.editButtonText}>Edit Item Details</Text>
       </TouchableOpacity>
     </ScrollView>

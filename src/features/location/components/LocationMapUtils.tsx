@@ -1,5 +1,6 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS } from '@/src/shared/theme';
 import Slider from '@react-native-community/slider';
+import { Crosshair, Target } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -36,15 +37,15 @@ const LocationMapUtils = ({
       <View>
         {/* Get current position */}
         <View className="h-12 w-12 bg-white rounded-lg" >
-          <Pressable onPress={onGetCurrentPosition} className='h-full w-full items-center justify-center'>
-            <Ionicons name="locate-sharp" size={24} color="black" disabled={loadingLocate} />
+          <Pressable onPress={onGetCurrentPosition} disabled={loadingLocate} className='h-full w-full items-center justify-center'>
+            <Crosshair size={24} color={COLORS.black} />
           </Pressable>
         </View>
 
         {/* Change radius */}
         <View className="h-12 w-12 bg-white rounded-lg" >
           <Pressable onPress={handlePress} className='h-full w-full items-center justify-center'>
-            <MaterialCommunityIcons name="radius-outline" size={24} color="black" />
+            <Target size={24} color={COLORS.black} />
           </Pressable>
         </View>
 
@@ -54,7 +55,7 @@ const LocationMapUtils = ({
           onBackdropPress={handlePress}
           onBackButtonPress={handlePress}
           backdropOpacity={0.35}
-          backdropColor="#000"
+          backdropColor={COLORS.black}
           style={{ margin: 0, justifyContent: 'flex-end' }}
           useNativeDriver
         >
@@ -91,9 +92,9 @@ const LocationMapUtils = ({
                 step={1}
                 minimumValue={1}
                 maximumValue={10}
-                minimumTrackTintColor="#111827"
-                maximumTrackTintColor="#D1D5DB"
-                thumbTintColor="#111827"
+                minimumTrackTintColor={COLORS.gray[900]}
+                maximumTrackTintColor={COLORS.gray[300]}
+                thumbTintColor={COLORS.gray[900]}
               />
 
               {/* Quick picks */}
