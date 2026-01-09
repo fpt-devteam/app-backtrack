@@ -8,7 +8,7 @@
  * - Press feedback
  */
 
-import { metrics } from "@/src/shared/theme";
+import { colors, metrics } from "@/src/shared/theme";
 import type { NavigationRoute, ParamListBase } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import type { IconProps } from "phosphor-react-native";
@@ -79,9 +79,9 @@ export const TabBarButton = ({
       {/* Icon */}
       <View style={styles.iconContainer}>
         <Icon
-          weight={isFocused ? "fill" : "regular"}
+          weight={isFocused ? "fill" : "bold"}
           size={metrics.tabBar.iconSize}
-          color={isFocused ? "#137fec" : "#65676B"} // Will be replaced by theme hook
+          color={isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive}
         />
       </View>
 
@@ -92,7 +92,7 @@ export const TabBarButton = ({
           styles.label,
           {
             fontSize: metrics.tabBar.labelSize,
-            fontWeight: isFocused ? "600" : "400",
+            fontWeight: isFocused ? "800" : "600",
           },
         ]}
         numberOfLines={1}

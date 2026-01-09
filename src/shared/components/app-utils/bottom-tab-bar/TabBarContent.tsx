@@ -1,7 +1,7 @@
 import { metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import type { IconProps } from "phosphor-react-native";
-import { Bell, ChatCircle, House, QrCode } from "phosphor-react-native";
+import { BellIcon, ChatCircleIcon, HouseIcon, QrCodeIcon } from "phosphor-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,23 +20,23 @@ type TabIcon = {
 // Route name → icon mapping (customize for your app)
 const TAB_ICONS: Record<string, TabIcon> = {
   posts: {
-    Icon: House,
+    Icon: HouseIcon,
     label: "Home",
   },
   "(qr)": {
-    Icon: QrCode,
+    Icon: QrCodeIcon,
     label: "QRs",
   },
   "create-post": {
-    Icon: House, // Placeholder, not used (rendered via CreatePostButton)
+    Icon: HouseIcon, // Placeholder, not used (rendered via CreatePostButton)
     label: "",
   },
   chat: {
-    Icon: ChatCircle,
+    Icon: ChatCircleIcon,
     label: "Chat",
   },
   notification: {
-    Icon: Bell,
+    Icon: BellIcon,
     label: "Inbox",
   },
 };

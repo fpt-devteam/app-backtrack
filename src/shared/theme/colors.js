@@ -1,109 +1,86 @@
-
-module.exports = {
-  // Brand Colors
-  primary: "#137fec",
-  secondary: "#6c757d",
-  success: "#28a745",
-  error: "#dc2626",
-  warning: "#ffc107",
-  info: "#17a2b8",
-
-  // UI Colors
-  background: {
-    light: "#f6f7f8",
-    dark: "#101922",
-  },
-  "background-light": "#f6f7f8",
-  "background-dark": "#101922",
-
-  placeholder: "#a0a9b8",
-  input: "#0f172a", // Also slate-900
-  label: "#0f172a", // slate-900
-  normal: "#334155", // slate-700
-
-  // Standard Palette (Hex values for Native compatibility)
+const palette = {
   white: "#ffffff",
   black: "#000000",
   transparent: "transparent",
 
   slate: {
-    50: "#f8fafc",
-    100: "#f1f5f9",
-    200: "#e2e8f0",
-    300: "#cbd5e1",
-    400: "#94a3b8",
-    500: "#64748b",
-    600: "#475569",
-    700: "#334155",
-    800: "#1e293b",
-    900: "#0f172a",
+    50: "#f8fafc", 100: "#f1f5f9", 200: "#e2e8f0", 300: "#cbd5e1",
+    400: "#94a3b8", 500: "#64748b", 600: "#475569", 700: "#334155",
+    800: "#1e293b", 900: "#0f172a",
   },
-
   gray: {
-    100: "#f3f4f6",
-    200: "#e5e7eb",
-    300: "#d1d5db",
-    400: "#9ca3af",
-    500: "#6b7280",
-    600: "#4b5563",
-    800: "#1f2937",
-    900: "#111827",
+    100: "#f3f4f6", 200: "#e5e7eb", 300: "#d1d5db", 400: "#9ca3af",
+    500: "#6b7280", 600: "#4b5563", 800: "#1f2937", 900: "#111827",
   },
+  sky: { 50: "#f0f9ff", 100: "#e0f2fe", 500: "#0ea5e9", 600: "#0284c7" },
+  blue: { 500: "#3b82f6", 600: "#2563eb", highlight: "#137fec" },
+  red: { 400: "#f87171", 500: "#ef4444", 600: "#dc2626" },
+  emerald: { 100: "#d1fae5", 600: "#059669" },
+  amber: { 500: "#ffc107" },
+  cyan: { 500: "#17a2b8" },
+};
 
-  sky: {
-    50: "#f0f9ff",
-    100: "#e0f2fe",
-    500: "#0ea5e9",
-    600: "#0284c7",
+const semantic = {
+  primary: palette.sky[500],
+  secondary: palette.gray[500],
+  success: palette.emerald[600],
+  error: palette.red[600],
+  warning: palette.amber[500],
+  info: palette.cyan[500],
+
+  // Layout & UI
+  background: {
+    DEFAULT: "#f6f7f8",
+    dark: "#101922",
   },
-
-  blue: {
-    500: "#3b82f6",
-    600: "#2563eb",
+  text: {
+    DEFAULT: palette.slate[900], // label, input
+    muted: palette.slate[500],   // placeholder
+    normal: palette.slate[700],
   },
+  border: palette.slate[200],
+  ring: palette.blue.highlight,
+};
 
-  red: {
-    400: "#f87171",
-    500: "#ef4444",
-    600: "#dc2626",
-  },
-
-  emerald: {
-    100: "#d1fae5",
-    600: "#059669",
-  },
-
-  // Tab Bar
+const components = {
   "tab-bar": {
-    background: "#FFFFFF",
-    active: "#137fec",
-    inactive: "#65676B",
-    indicator: "#137fec",
+    background: palette.white,
+    active: semantic.primary,
+    inactive: palette.black,
+    indicator: semantic.primary,
     border: "rgba(0, 0, 0, 0.1)",
   },
-
-  // Semantic mappings (formerly CSS vars)
-  // Using slate palette approximations for consistency
   card: {
-    DEFAULT: "#ffffff",
-    foreground: "#0f172a", // slate-900
+    DEFAULT: palette.white,
+    foreground: semantic.text.DEFAULT,
   },
   popover: {
-    DEFAULT: "#ffffff",
-    foreground: "#0f172a",
+    DEFAULT: palette.white,
+    foreground: semantic.text.DEFAULT,
   },
   muted: {
-    DEFAULT: "#f1f5f9", // slate-100
-    foreground: "#64748b", // slate-500
+    DEFAULT: palette.slate[100],
+    foreground: semantic.text.muted,
   },
   accent: {
-    DEFAULT: "#f1f5f9", // slate-100
-    foreground: "#137fec", // primary
+    DEFAULT: palette.slate[100],
+    foreground: palette.blue.highlight,
   },
   destructive: {
-    DEFAULT: "#ef4444", // red-500
-    foreground: "#ffffff",
+    DEFAULT: palette.red[500],
+    foreground: palette.white,
   },
-  border: "#e2e8f0", // slate-200
-  ring: "#137fec", // primary
+};
+
+module.exports = {
+  ...palette,
+  ...semantic,
+  ...components,
+
+  placeholder: semantic.text.muted,
+  input: semantic.text.DEFAULT,
+  label: semantic.text.DEFAULT,
+  normal: semantic.text.normal,
+  "background-light": semantic.background.DEFAULT,
+  "background-dark": semantic.background.dark,
 };
