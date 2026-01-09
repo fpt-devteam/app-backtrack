@@ -1,7 +1,8 @@
 import { POST_ROUTE } from "@/src/shared/constants";
-import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/src/shared/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { Clock, IconProps, MagnifyingGlass, X, XCircle } from "phosphor-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -16,8 +17,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
   const [debounced, setDebounced] = useState(value);
@@ -133,13 +132,13 @@ const RecentListService = {
 };
 
 type SuggestRowProps = {
-  readonly icon?: IconName;
+  readonly IconComponent?: React.ElementType<IconProps>;
   readonly text: string;
   readonly onPress: () => void;
   readonly onRemove?: () => void;
 };
 
-function SuggestRow({ icon = "time-outline", text, onPress, onRemove }: SuggestRowProps) {
+function SuggestRow({ IconComponent = Clock, text, onPress, onRemove }: SuggestRowProps) {
   const handleRemove = (e: GestureResponderEvent) => {
     e.stopPropagation();
     onRemove?.();
@@ -147,14 +146,14 @@ function SuggestRow({ icon = "time-outline", text, onPress, onRemove }: SuggestR
 
   return (
     <TouchableOpacity onPress={onPress} className="flex-row items-center p-2">
-      <Ionicons name={icon} size={18} color="#6B7280" />
+      <IconComponent size={18} color={colors.slate[500]} />
       <Text style={{ fontSize: 15, marginLeft: 10, flex: 1 }} numberOfLines={1}>
         {text}
       </Text>
 
       {onRemove ? (
         <TouchableOpacity onPress={handleRemove} hitSlop={10}>
-          <Ionicons name="close" size={18} color="#9CA3AF" />
+          <X size={18} color={colors.slate[400]} />
         </TouchableOpacity>
       ) : null}
     </TouchableOpacity>
@@ -302,9 +301,9 @@ export default function SearchScreen() {
         {/* Search bar */}
         <View
           className="flex-row items-center border-[2px] rounded-2xl px-3 h-12"
-          style={{ borderColor: isFocused ? "#3B82F6" : "#E5E7EB" }}
+          style={{ borderColor: isFocused ? colors.blue[500] : colors.slate[200] }}
         >
-          <Ionicons name="search-outline" size={20} color="#6B7280" />
+          <MagnifyingGlass size={20} color={colors.slate[500]} />
 
           <TextInput
             ref={inputRef}
@@ -325,13 +324,13 @@ export default function SearchScreen() {
               }}
               hitSlop={10}
             >
-              <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+              <XCircle size={20} color={colors.slate[400]} />
             </Pressable>
           ) : null}
         </View>
 
         {/* Divider */}
-        <View className="h-[1px] bg-[#F3F4F6] mt-4" />
+        <View className="h-[1px] mt-4" style={{ backgroundColor: colors.gray[100] }} />
 
         {/* Header */}
         <View className="mt-4">
@@ -364,7 +363,7 @@ export default function SearchScreen() {
                       const isSearchFallback = item.startsWith('Search "');
                       return (
                         <SuggestRow
-                          icon="search-outline"
+                          IconComponent={MagnifyingGlass}
                           text={item}
                           onPress={() => goToResults(isSearchFallback ? query : item)}
                         />
@@ -373,7 +372,7 @@ export default function SearchScreen() {
 
                     return (
                       <SuggestRow
-                        icon="time-outline"
+                        IconComponent={Clock}
                         text={item}
                         onPress={() => applyQueryOnly(item)}
                         onRemove={() => removeRecentItem(item)}

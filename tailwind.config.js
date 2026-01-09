@@ -1,4 +1,16 @@
 /** @type {import('tailwindcss').Config} */
+const themeColors = require("./src/shared/theme/colors");
+const themeMetrics = require("./src/shared/theme/metrics");
+const themeTypography = require("./src/shared/theme/typography");
+
+/**
+ * Tailwind Config - Design System Integration
+ *
+ * Imports design tokens from the centralized source of truth:
+ * - colors.js: Color palette and semantic color mappings
+ * - metrics.js: Spacing, border radius, and layout dimensions
+ * - typography.js: Font families, sizes, weights, and line heights
+ */
 module.exports = {
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
@@ -9,43 +21,42 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#137fec",
-        secondary: "#6c757d",
-        success: "#28a745",
-        error: "#dc2626",
-        warning: "#ffc107",
-        info: "#17a2b8",
-        placeholder: "#a0a9b8",
-        input: "#0f172a",
-        label: 'slate-900',
-        normal: "slate-700",
-        "background-light": "#f6f7f8",
-        "background-dark": "#101922",
-
-        background: {
-          light: "#f6f7f8",
-          dark: "#101922",
-        },
+        ...themeColors,
       },
 
       fontFamily: {
-        display: ["Manrope", "sans-serif"],
-      },
-
-      borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        full: "9999px",
+        ...themeTypography.fontFamily,
       },
 
       fontSize: {
-        sm: "0.875rem",
-        base: "1rem",
-        lg: "1.125rem",
-        xl: "1.25rem",
-        "2xl": "1.5rem",
-      }
+        ...Object.entries(themeTypography.fontSize).reduce((acc, [key, value]) => {
+          acc[key] = `${value}px`;
+          return acc;
+        }, {}),
+      },
+
+      fontWeight: {
+        ...themeTypography.fontWeight,
+      },
+
+      lineHeight: {
+        ...themeTypography.lineHeight,
+      },
+
+      spacing: {
+        ...themeMetrics.spacing,
+      },
+
+      borderRadius: {
+        ...themeMetrics.borderRadius,
+      },
+
+      transitionDuration: {
+        ...Object.entries(themeMetrics.duration).reduce((acc, [key, value]) => {
+          acc[key] = `${value}ms`;
+          return acc;
+        }, {}),
+      },
     },
   },
   plugins: [],

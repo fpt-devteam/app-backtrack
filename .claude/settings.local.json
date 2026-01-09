@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx expo --version)",
+      "Bash(npx expo install:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx expo:*)",
+      "Bash(timeout /t 10)",
+      "Bash(ping:*)",
+      "Bash(npm install:*)",
+      "Bash(timeout:*)",
+      "Bash(exit 0)",
+      "Bash(if exist \".expo\" rd /s /q \".expo\")",
+      "Bash(if exist \"node_modules\\\\.cache\" rd /s /q \"node_modules\\\\.cache\")",
+      "Bash(find:*)"
+    ]
+  }
+}

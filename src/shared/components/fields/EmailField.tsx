@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Envelope } from 'phosphor-react-native';
 import React from 'react';
 import { Text, TextInput, View } from 'react-native';
 
@@ -13,8 +13,7 @@ const EmailField = ({ value, onChange, error }: EmailFieldProps) => {
     <View>
       <Text className="mb-2 text-base font-medium text-label">Email</Text>
       <View className={`flex-row gap-2 items-center rounded-lg border bg-white px-3 py-3 ${error ? "border-error" : "border-slate-200"}`}>
-        <Ionicons
-          name="mail-outline"
+        <Envelope
           size={20}
           color={error ? "#dc2626" : "#70819a"}
         />

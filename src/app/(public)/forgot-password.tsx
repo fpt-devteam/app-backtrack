@@ -1,9 +1,9 @@
 import { useForgotPassword } from "@/src/features/auth/hooks";
 import type { ForgotPasswordRequest } from "@/src/features/auth/types";
 import { AppInlineError, EmailField } from "@/src/shared/components";
-import { Ionicons } from "@expo/vector-icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, router } from "expo-router";
+import { EnvelopeSimple } from "phosphor-react-native";
 import React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -120,7 +120,7 @@ export default function ForgotPasswordScreen() {
                 ) : (
                   <>
                     <Text className="mr-2 font-medium text-base text-white">Send reset link</Text>
-                    <Ionicons name="mail" size={18} color="#ffffff" />
+                    <EnvelopeSimple size={18} color="#ffffff" />
                   </>
                 )}
               </TouchableOpacity>

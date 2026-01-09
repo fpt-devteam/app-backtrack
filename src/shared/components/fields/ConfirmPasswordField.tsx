@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { CheckCircle, Eye, EyeSlash } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -19,8 +19,7 @@ const ConfirmPasswordField = ({
     <View>
       <Text className="mb-2 text-base font-medium text-label">Confirm Password</Text>
       <View className={`flex-row gap-2 items-center rounded-lg border bg-white px-3 py-3 ${error ? "border-error" : "border-slate-200"}`}>
-        <Ionicons
-          name="checkmark-circle-outline"
+        <CheckCircle
           size={20}
           color={error ? "#dc2626" : "#70819a"}
         />
@@ -41,11 +40,11 @@ const ConfirmPasswordField = ({
           onPress={() => setShow((prev) => !prev)}
           hitSlop={12}
         >
-          <Ionicons
-            name={show ? "eye-outline" : "eye-off-outline"}
-            size={20}
-            color={error ? "#dc2626" : "#70819a"}
-          />
+          {show ? (
+            <Eye size={20} color={error ? "#dc2626" : "#70819a"} />
+          ) : (
+            <EyeSlash size={20} color={error ? "#dc2626" : "#70819a"} />
+          )}
         </TouchableOpacity>
       </View>
 

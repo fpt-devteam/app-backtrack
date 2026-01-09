@@ -3,8 +3,9 @@ import MessageItemCard from '@/src/features/chat/components/MessageItemCard'
 import { useMessages, useSendMessage } from '@/src/features/chat/hooks'
 import { MessageItem } from '@/src/features/chat/types'
 import { socketService } from '@/src/shared/services'
-import { Ionicons } from '@expo/vector-icons'
+import { colors } from '@/src/shared/theme'
 import { useLocalSearchParams, useRouter } from 'expo-router'
+import { ArrowLeft, PaperPlaneRight, WarningCircle } from 'phosphor-react-native'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
@@ -26,7 +27,7 @@ const LoadingFooterComponent = ({ isFetchingNextPage }: { isFetchingNextPage: bo
 
   return (
     <View className="py-4 items-center">
-      <ActivityIndicator size="small" color="#3b82f6" />
+      <ActivityIndicator size="small" color={colors.blue[500]} />
       <Text className="mt-2 text-slate-500 text-sm">Loading more messages...</Text>
     </View>
   )
@@ -141,7 +142,7 @@ export default function ConversationScreen() {
   if (isLoadingMessages) {
     return (
       <View className="flex-1 items-center justify-center bg-background-light">
-        <ActivityIndicator size="large" color="#3b82f6" />
+        <ActivityIndicator size="large" color={colors.blue[500]} />
         <Text className="mt-2 text-slate-500">Loading messages...</Text>
       </View>
     )
@@ -150,7 +151,7 @@ export default function ConversationScreen() {
   if (isMessagesError) {
     return (
       <View className="flex-1 items-center justify-center bg-background-light px-4">
-        <Ionicons name="alert-circle" size={48} color="#ef4444" />
+        <WarningCircle size={48} color={colors.red[500]} />
         <Text className="mt-2 text-center text-slate-900 font-semibold">Failed to load messages</Text>
         <Text className="mt-1 text-center text-slate-500">Please check your connection and try again</Text>
 
@@ -169,7 +170,7 @@ export default function ConversationScreen() {
       {/* Header */}
       <View className="bg-white border-b border-slate-200 px-4 py-3 flex-row items-center">
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <Ionicons name="arrow-back" size={24} color="#64748b" />
+          <ArrowLeft size={24} color={colors.slate[500]} />
         </TouchableOpacity>
         <View className="flex-1">
           <Text className="font-semibold text-lg text-slate-900">Chat</Text>
@@ -199,7 +200,7 @@ export default function ConversationScreen() {
               value={messageText}
               onChangeText={setMessageText}
               placeholder="Type a message..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.slate[400]} 
               multiline
               className="text-slate-900 text-base flex-1"
               textAlignVertical="center"
@@ -215,7 +216,7 @@ export default function ConversationScreen() {
             {isSendingMessage ? (
               <ActivityIndicator size="small" color="white" />
             ) : (
-              <Ionicons name="send" size={18} color="white" />
+              <PaperPlaneRight size={18} color="white" />
             )}
           </TouchableOpacity>
         </View>

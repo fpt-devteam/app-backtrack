@@ -1,53 +1,72 @@
-import React from 'react'
+import BottomSheetPrimitive, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { View } from 'react-native'
-import Modal from 'react-native-modal'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type Props = {
   isVisible: boolean
   onClose: () => void
   children: React.ReactNode
+  snapPoints?: string[]
+  enableDynamicSizing?: boolean
 }
 
-const BottomSheet = ({ isVisible, onClose, children }: Props) => {
-  const insets = useSafeAreaInsets()
+const BottomSheet = ({
+  isVisible,
+  onClose,
+  children,
+  snapPoints: customSnapPoints,
+  enableDynamicSizing = true,
+}: Props) => {
+  const bottomSheetRef = useRef<BottomSheetPrimitive>(null)
+
+  // Default snap points if not using dynamic sizing
+  const snapPoints = useMemo(
+    () => customSnapPoints || ['50%', '75%'],
+    [customSnapPoints]
+  )
+
+  // Handle visibility changes
+  useEffect(() => {
+    if (isVisible) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.close()
+    }
+  }, [isVisible])
+
+  // Render backdrop
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.2}
+      />
+    ),
+    []
+  )
 
   return (
-    <Modal
-      isVisible={isVisible}
-      onBackdropPress={onClose}
-      onBackButtonPress={onClose}
-      style={{
-        margin: 0,
-        justifyContent: 'flex-end'
-      }}
-      backdropOpacity={0.2}
-      useNativeDriver
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      animationInTiming={600}
-      animationOutTiming={600}
-      backdropTransitionInTiming={600}
-      backdropTransitionOutTiming={600}
-      avoidKeyboard
+    <BottomSheetPrimitive
+      ref={bottomSheetRef}
+      index={-1}
+      snapPoints={enableDynamicSizing ? undefined : snapPoints}
+      enableDynamicSizing={enableDynamicSizing}
+      enablePanDownToClose
+      onClose={onClose}
+      backdropComponent={renderBackdrop}
+      backgroundStyle={{ backgroundColor: 'white' }}
+      handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 40, height: 6 }}
     >
-      <View
-        className="bg-white rounded-3xl overflow-hidden"
-        style={{
-          shadowColor: '#000',
-          shadowOpacity: 0.12,
-          shadowRadius: 18,
-          shadowOffset: { width: 0, height: 10 },
-          paddingBottom: Math.max(insets.bottom, 12),
-        }}
-      >
-        <View className="items-center mt-3">
-          <View className="h-1.5 w-10 rounded-full bg-gray-300" />
-        </View>
-
+      <BottomSheetView style={{ paddingBottom: 12 }}>
         {children}
-      </View>
-    </Modal>
+      </BottomSheetView>
+    </BottomSheetPrimitive>
   )
 }
 

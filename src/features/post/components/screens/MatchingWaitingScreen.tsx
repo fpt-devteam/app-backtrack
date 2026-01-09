@@ -1,5 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/src/shared/theme";
 import { router } from "expo-router";
+import { MagnifyingGlass } from "phosphor-react-native";
 import React, { useEffect, useMemo, useRef } from "react";
 import { Animated, Easing, Pressable, Text, View } from "react-native";
 
@@ -168,7 +169,7 @@ const MatchingWaitingScreen = ({
             transform: [{ scale: iconScale }, { rotate: iconRotate }],
           }}
         >
-          <Ionicons name="search" size={34} color="#0F172A" />
+          <MagnifyingGlass size={34} color={colors.slate[900]} />
         </Animated.View>
       </View>
 

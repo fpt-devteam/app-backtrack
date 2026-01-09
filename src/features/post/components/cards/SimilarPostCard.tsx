@@ -1,8 +1,9 @@
 import { SimilarPost } from '@/src/features/post/types'
 import { POST_ROUTE } from '@/src/shared/constants'
+import { colors } from '@/src/shared/theme'
 import { formatIsoDate } from '@/src/shared/utils'
-import { Ionicons } from '@expo/vector-icons'
 import { ExternalPathString, RelativePathString, router } from 'expo-router'
+import { Clock, MapPin } from 'phosphor-react-native'
 import React from 'react'
 import { Image, Pressable, Text, View } from 'react-native'
 
@@ -45,7 +46,7 @@ const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
 
         <View className="flex-col justify-between gap-1">
           <View className="flex-row items-center gap-2">
-            <Ionicons name="location-outline" size={16} color="#64748B" />
+            <MapPin size={16} color={colors.slate[500]} />
             <Text
               className="flex-1 min-w-0 text-[12px] text-slate-600"
               numberOfLines={1}
@@ -55,7 +56,7 @@ const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
           </View>
 
           <View className="flex-row items-center gap-2">
-            <Ionicons name="time-outline" size={16} color="#64748B" />
+            <Clock size={16} color={colors.slate[500]} />
             <Text
               className="flex-1 min-w-0 text-[12px] text-slate-600"
               numberOfLines={1}
