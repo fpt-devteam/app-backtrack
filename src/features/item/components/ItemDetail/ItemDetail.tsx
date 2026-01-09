@@ -1,4 +1,4 @@
-import { COLORS } from '@/src/shared/theme';
+import { colors } from '@/src/shared/theme';
 import { useRouter } from 'expo-router';
 import { Clock, Pencil, Printer, QrCode, ShareNetwork } from 'phosphor-react-native';
 import React from 'react';
@@ -73,7 +73,7 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
         <View style={styles.qrContainer}>
           {/* QR Code Image/Icon */}
           <View style={styles.qrCodeBox}>
-            <QrCode size={60} color={COLORS.sky[500]} />
+            <QrCode size={60} color={colors.sky[500]} />
           </View>
 
           {/* QR Details */}
@@ -84,12 +84,12 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
             {/* Action Buttons */}
             <View style={styles.actionButtons}>
               <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-                <ShareNetwork size={16} color={COLORS.sky[500]} />
+                <ShareNetwork size={16} color={colors.sky[500]} />
                 <Text style={styles.actionButtonText}>Share</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.actionButton} onPress={handlePrint}>
-                <Printer size={16} color={COLORS.slate[500]} />
+                <Printer size={16} color={colors.slate[500]} />
                 <Text style={styles.actionButtonText}>Print</Text>
               </TouchableOpacity>
             </View>
@@ -99,7 +99,7 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
 
       {/* Last Updated */}
       <View style={styles.lastUpdatedContainer}>
-        <Clock size={16} color={COLORS.slate[500]} />
+        <Clock size={16} color={colors.slate[500]} />
         <Text style={styles.lastUpdated}>
           Last Updated: {formatDate(item.updatedAt || item.createdAt)}
         </Text>
@@ -107,7 +107,7 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
 
       {/* Edit Button */}
       <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-        <Pencil size={20} color={COLORS.slate[700]} />
+        <Pencil size={20} color={colors.slate[700]} />
         <Text style={styles.editButtonText}>Edit Item Details</Text>
       </TouchableOpacity>
     </ScrollView>

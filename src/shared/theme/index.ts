@@ -18,9 +18,6 @@ export const colors = colorsJS;
 export const metrics = metricsJS;
 export const typography = typographyJS;
 
-// Export native-specific metrics that cannot be expressed in Tailwind
-export * from './app-metrics';
-
 export type AppTheme = {
   colors: typeof colors;
   metrics: typeof metrics;

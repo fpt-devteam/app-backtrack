@@ -12,7 +12,8 @@
       "Bash(timeout:*)",
       "Bash(exit 0)",
       "Bash(if exist \".expo\" rd /s /q \".expo\")",
-      "Bash(if exist \"node_modules\\\\.cache\" rd /s /q \"node_modules\\\\.cache\")"
+      "Bash(if exist \"node_modules\\\\.cache\" rd /s /q \"node_modules\\\\.cache\")",
+      "Bash(find:*)"
     ]
   }
 }

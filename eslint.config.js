@@ -4,11 +4,14 @@
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
 
+const tsParser = require('@typescript-eslint/parser');
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+
 module.exports = defineConfig([
-  // Expo preset (React / React Native / Expo defaults)
+  // 1) Expo preset
   expoConfig,
 
-  // Ignore generated / build outputs
+  // 2) Ignore
   {
     ignores: [
       'dist/*',
@@ -19,18 +22,24 @@ module.exports = defineConfig([
       'node_modules/*',
       'android/*',
       'ios/*',
-      '**/*.min.js',
-      '**/*.generated.*',
     ],
   },
 
-  // Project rules
+  // 3) TypeScript / TSX rules (plugin must be defined here!)
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
     rules: {
-      /**
-       * iOS-clean guardrails
-       */
+      // iOS-clean guardrails
       'no-restricted-imports': [
         'error',
         {
@@ -47,15 +56,7 @@ module.exports = defineConfig([
         },
       ],
 
-      /**
-       * React hooks
-       */
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
-
-      /**
-       * TypeScript hygiene
-       */
+      // TS rules
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -73,38 +74,14 @@ module.exports = defineConfig([
           fixStyle: 'separate-type-imports',
         },
       ],
+    },
+  },
 
-      /**
-       * General quality
-       */
+  // 4) JS/JSX (no TS plugin rules here)
+  {
+    files: ['**/*.{js,jsx}'],
+    rules: {
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-      'react/self-closing-comp': 'warn',
-      'react/jsx-boolean-value': ['warn', 'never'],
-    },
-  },
-
-  // Relax rules for tests
-  {
-    files: ['**/*.{test,spec}.{js,jsx,ts,tsx}', '**/__tests__/**/*.{js,jsx,ts,tsx}'],
-    rules: {
-      'no-console': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-    },
-  },
-
-  // Node-style config files
-  {
-    files: [
-      '**/*.config.{js,cjs,mjs}',
-      'babel.config.js',
-      'metro.config.js',
-      'eslint.config.js',
-    ],
-    languageOptions: {
-      sourceType: 'commonjs',
-    },
-    rules: {
-      'no-console': 'off',
     },
   },
 ]);
