@@ -246,21 +246,19 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
       </View>
 
       <View className="m-6 mt-0">
-        <TouchableOpacity
+        {!isOwner && <TouchableOpacity
           className="w-full bg-primary rounded-lg py-3 items-center justify-center"
           disabled={isCreatingConversation}
           onPress={handleCreateConversation}
         >
           <Text className="text-white"> Start Chat with {post.postType === PostType.Lost ? 'Seeker' : 'Finder'}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
 
-        {!isOwner &&
-          <TouchableOpacity onPress={() => {
-            router.push(POST_ROUTE.matching(postId) as ExternalPathString | RelativePathString);
-          }}>
-            Start Matching
-          </TouchableOpacity>
-        }
+        <TouchableOpacity onPress={() => {
+          router.push(POST_ROUTE.matching(postId) as ExternalPathString | RelativePathString);
+        }}>
+          <Text className="text-white"> Start Matching</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Similar Posts */}

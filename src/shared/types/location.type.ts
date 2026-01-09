@@ -1,4 +1,4 @@
-import { LatLng } from "react-native-maps";
+import type { LatLng } from "react-native-maps";
 
 export type GoogleMapDetailLocation = {
   location: LatLng;
@@ -67,4 +67,12 @@ export type GeocodingResponse = {
   results: GeocodingResult[];
   status: GeocodingStatus;
   error_message?: string;
+};
+
+export type LocationFilterValue = {
+  readonly lat: number;
+  readonly lng: number;
+  readonly radius: number;
+  readonly label?: string;
+  readonly placeId?: string;
 };
