@@ -1,7 +1,7 @@
 import { AppBrand, AppUserAvatarIcon } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { ExternalPathString, RelativePathString, router } from "expo-router";
-import { MagnifyingGlass } from "phosphor-react-native";
+import { MagnifyingGlassIcon } from "phosphor-react-native";
 import { Pressable, View } from "react-native";
 
 const PostHomeScreenHeader = () => {
@@ -19,7 +19,7 @@ const PostHomeScreenHeader = () => {
             console.log("Search pressed");
             router.push(POST_ROUTE.search as ExternalPathString | RelativePathString);
           }}>
-            <MagnifyingGlass size={24} color="black" />
+            <MagnifyingGlassIcon size={24} color="black" />
           </Pressable>
         </View>
 
