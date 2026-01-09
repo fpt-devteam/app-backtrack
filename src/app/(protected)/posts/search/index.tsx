@@ -1,14 +1,21 @@
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { Clock, IconProps, MagnifyingGlass, X, XCircle } from "phosphor-react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import type { IconProps } from "phosphor-react-native";
+import {
+  ArrowLeft,
+  Clock,
+  MagnifyingGlass,
+  X,
+  XCircle,
+} from "phosphor-react-native";
 import React, { useEffect, useRef, useState } from "react";
+import type { GestureResponderEvent } from "react-native";
 import {
   Animated,
   Easing,
   FlatList,
-  GestureResponderEvent,
   Keyboard,
   Pressable,
   Text,
@@ -57,11 +64,12 @@ async function fetchSuggestionsMock(q: string): Promise<string[]> {
     "Search by item category (Electronics)",
   ];
 
-
   await new Promise((r) => setTimeout(r, 250));
   const query = q.trim().toLowerCase();
   if (!query) return [];
-  return MOCK_SUGGESTIONS_POOL.filter((x) => x.toLowerCase().includes(query)).slice(0, 8);
+  return MOCK_SUGGESTIONS_POOL.filter((x) =>
+    x.toLowerCase().includes(query)
+  ).slice(0, 8);
 }
 
 const RecentListService = {
@@ -96,9 +104,7 @@ const RecentListService = {
   async save(list: string[]) {
     try {
       await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
-    } catch {
-
-    }
+    } catch { }
   },
 
   buildAddedList(current: string[], term: string, max = 10) {
@@ -138,7 +144,12 @@ type SuggestRowProps = {
   readonly onRemove?: () => void;
 };
 
-function SuggestRow({ IconComponent = Clock, text, onPress, onRemove }: SuggestRowProps) {
+function SuggestRow({
+  IconComponent = Clock,
+  text,
+  onPress,
+  onRemove,
+}: SuggestRowProps) {
   const handleRemove = (e: GestureResponderEvent) => {
     e.stopPropagation();
     onRemove?.();
@@ -163,10 +174,11 @@ function SuggestRow({ IconComponent = Clock, text, onPress, onRemove }: SuggestR
 type DisplayType = "recent" | "suggest";
 
 export default function SearchScreen() {
+  const { initialQuery } = useLocalSearchParams<{ initialQuery?: string }>();
   const inputRef = useRef<TextInput>(null);
 
   const [recent, setRecent] = useState<string[]>([]);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState((initialQuery ?? "").toString());
   const debouncedQuery = useDebouncedValue(query, 350);
 
   const [isFocused, setIsFocused] = useState(false);
@@ -205,7 +217,6 @@ export default function SearchScreen() {
       setDisplayData(r);
     })();
   }, []);
-
 
   useEffect(() => {
     if (displayType === "recent") {
@@ -252,7 +263,6 @@ export default function SearchScreen() {
     return () => {
       cancelled = true;
     };
-
   }, [debouncedQuery, isFocused]);
 
   const clearRecent = async () => {
@@ -298,35 +308,47 @@ export default function SearchScreen() {
   return (
     <TouchableWithoutFeedback accessible={false} onPress={handlePressOutside}>
       <View className="bg-white flex-1 p-4">
-        {/* Search bar */}
-        <View
-          className="flex-row items-center border-[2px] rounded-2xl px-3 h-12"
-          style={{ borderColor: isFocused ? colors.blue[500] : colors.slate[200] }}
-        >
-          <MagnifyingGlass size={20} color={colors.slate[500]} />
+        {/* Top row: Back + Search bar */}
+        <View className="flex-row items-center">
+          <Pressable
+            onPress={() => router.back()}
+            hitSlop={10}
+            className="mr-2 h-12 w-12 items-center justify-center rounded-2xl border-2"
+            style={{ borderColor: colors.slate[200] }}
+          >
+            <ArrowLeft size={20} color={colors.slate[700]} />
+          </Pressable>
 
-          <TextInput
-            ref={inputRef}
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search..."
-            returnKeyType="search"
-            onFocus={() => setIsFocused(true)}
-            onSubmitEditing={() => goToResults(query)}
-            className="flex-1 ml-2 p-0 text-base"
-          />
+          <View
+            className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
+            style={{ borderColor: isFocused ? colors.blue[500] : colors.slate[200] }}
+          >
+            <MagnifyingGlass size={20} color={colors.slate[500]} />
 
-          {query.length > 0 ? (
-            <Pressable
-              onPress={() => {
-                setQuery("");
-                inputRef.current?.focus();
-              }}
-              hitSlop={10}
-            >
-              <XCircle size={20} color={colors.slate[400]} />
-            </Pressable>
-          ) : null}
+            <TextInput
+              ref={inputRef}
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search..."
+              returnKeyType="search"
+              onFocus={() => setIsFocused(true)}
+              onSubmitEditing={() => goToResults(query)}
+              className="flex-1 ml-2 p-0 text-base"
+              placeholderTextColor={colors.slate[400]}
+            />
+
+            {query.length > 0 ? (
+              <Pressable
+                onPress={() => {
+                  setQuery("");
+                  inputRef.current?.focus();
+                }}
+                hitSlop={10}
+              >
+                <XCircle size={20} color={colors.slate[400]} />
+              </Pressable>
+            ) : null}
+          </View>
         </View>
 
         {/* Divider */}

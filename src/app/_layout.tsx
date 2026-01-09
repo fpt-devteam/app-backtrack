@@ -7,7 +7,6 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-get-random-values';
-import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const queryClient = new QueryClient({
@@ -27,17 +26,15 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <AuthProvider>
             <UserProvider>
-              <PaperProvider>
-                <BottomSheetModalProvider>
-                  <StatusBar style="auto" />
-                  <Stack screenOptions={{
-                    headerShown: false,
-                  }}>
-                    <Stack.Screen name="(protected)" />
-                    <Stack.Screen name="(public)" />
-                  </Stack>
-                </BottomSheetModalProvider>
-              </PaperProvider>
+              <BottomSheetModalProvider>
+                <StatusBar style="auto" />
+                <Stack screenOptions={{
+                  headerShown: false,
+                }}>
+                  <Stack.Screen name="(protected)" />
+                  <Stack.Screen name="(public)" />
+                </Stack>
+              </BottomSheetModalProvider>
             </UserProvider>
           </AuthProvider>
         </SafeAreaProvider>

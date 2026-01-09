@@ -1,17 +1,19 @@
 import { useAppUser } from '@/src/features/auth/providers'
 import { useCreateConversation } from '@/src/features/chat/hooks'
-import { ConversationCreateRequest } from '@/src/features/chat/types'
+import type { ConversationCreateRequest } from '@/src/features/chat/types'
 import { PostStatusBadge, SimilarPostCard } from '@/src/features/post/components'
 import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks'
 import { PostType } from '@/src/features/post/types'
 import { ImageCarousel } from '@/src/shared/components'
 import { CHAT_ROUTE, POST_ROUTE } from '@/src/shared/constants'
 import { formatIsoDate } from '@/src/shared/utils'
-import { ExternalPathString, RelativePathString, router } from 'expo-router'
+import type { ExternalPathString, RelativePathString } from 'expo-router'
+import { router } from 'expo-router'
+import { Calendar, MapPin, MapTrifold, Tag } from 'phosphor-react-native'
 import React, { useEffect, useMemo, useRef } from 'react'
 import { Animated, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps'
-import { Icon } from 'react-native-paper'
+import type { Region } from 'react-native-maps'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 
 type PostDetailsProps = {
   postId: string
@@ -177,7 +179,9 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
         <View className="p-4 gap-4">
           {/* Last seen location */}
           <View className="flex-row gap-3 items-start">
-            <Icon source="map-marker-outline" size={32} color="#2563EB" />
+            <View className="w-8 h-8 items-center justify-center">
+              <MapPin size={28} color="#2563EB" weight="fill" />
+            </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Last seen location</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -188,7 +192,9 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
 
           {/* Distinctive marks */}
           <View className="flex-row gap-3 items-start">
-            <Icon source="shape-outline" size={32} color="#2563EB" />
+            <View className="w-8 h-8 items-center justify-center">
+              <Tag size={28} color="#2563EB" weight="fill" />
+            </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Distinctive marks</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -199,7 +205,9 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
 
           {/* Event time */}
           <View className="flex-row gap-3 items-start">
-            <Icon source="clock-outline" size={32} color="#2563EB" />
+            <View className="w-8 h-8 items-center justify-center">
+              <Calendar size={28} color="#2563EB" weight="fill" />
+            </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Event time</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -231,7 +239,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
               onPress={openInMaps}
               className="absolute right-3 bottom-3 bg-white/95 rounded-2xl p-3 border border-slate-900/10"
             >
-              <Icon source="map-outline" size={18} color="#2563EB" />
+              <MapTrifold size={20} color="#2563EB" weight="bold" />
             </TouchableOpacity>
           </View>
         </View>
