@@ -3,6 +3,6 @@ export { default as AppBrandHeader } from "./AppBrandHeader";
 export { default as AppEndOfFeed } from "./AppEndOfFeed";
 export { default as AppInlineError } from "./AppInlineError";
 export { default as AppLoader } from './AppLoader';
-export { default as AppTabBar } from "./AppTabBar";
 export { default as AppUserAvatarIcon } from "./AppUserAvatarIcon";
+export { default as BottomTabBar } from "./bottom-tab-bar/BottomTabBar";
 

@@ -17,10 +17,7 @@ const BottomSheet = ({ isVisible, onClose, children }: Props) => {
       isVisible={isVisible}
       onBackdropPress={onClose}
       onBackButtonPress={onClose}
-      style={{
-        margin: 0,
-        justifyContent: 'flex-end'
-      }}
+      style={{ margin: 0, justifyContent: 'flex-end' }}
       backdropOpacity={0.2}
       useNativeDriver
       animationIn="slideInUp"
@@ -38,14 +35,20 @@ const BottomSheet = ({ isVisible, onClose, children }: Props) => {
           shadowOpacity: 0.12,
           shadowRadius: 18,
           shadowOffset: { width: 0, height: 10 },
-          paddingBottom: Math.max(insets.bottom, 12),
         }}
       >
-        <View className="items-center mt-3">
+        {/* Handle/indicator */}
+        <View className="items-center mt-3 mb-2">
           <View className="h-1.5 w-10 rounded-full bg-gray-300" />
         </View>
 
-        {children}
+        {/* Content */}
+        <View style={{ paddingBottom: 12 }}>
+          {children}
+        </View>
+
+        {/* Spacer sits at the VERY bottom */}
+        <View style={{ height: insets.bottom }} />
       </View>
     </Modal>
   )
