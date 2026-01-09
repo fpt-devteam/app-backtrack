@@ -1,9 +1,9 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Bell, ChatCircle, House, IconProps, QrCode } from "phosphor-react-native";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { TAB_BAR, SHADOWS } from "@/src/shared/theme";
+import { metrics } from "@/src/shared/theme";
 import { CreatePostButton } from "./CreatePostButton";
 import { TabBarButton } from "./TabBarButton";
 
@@ -66,7 +66,7 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
         styles.container,
         {
           paddingBottom: bottomPadding,
-          height: TAB_BAR.height + bottomPadding,
+          height: metrics.tabBar.height + bottomPadding,
         },
       ]}
     >
@@ -117,7 +117,7 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
 const styles = StyleSheet.create({
   container: {
     // Colors via className, only shadow/elevation here
-    ...SHADOWS.tabBar,
+    ...(Platform.OS === 'ios' ? metrics.shadows.tabBar.ios : metrics.shadows.tabBar.android),
   },
   tabsContainer: {
     flex: 1,

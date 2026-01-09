@@ -1,12 +1,13 @@
 import { PostFilters, PostType } from '@/src/features/post/types';
 import { LocationField } from '@/src/shared/components';
+import BottomSheet from '@/src/shared/components/ui/BottomSheet';
 import { GoogleMapDetailLocation } from '@/src/shared/types';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { MagnifyingGlass, SlidersHorizontal } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Modal from 'react-native-modal';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SegmentedButtons } from 'react-native-paper';
 import * as yup from 'yup';
 
@@ -95,23 +96,15 @@ const PostFiltersComponent = ({ filters, onFiltersChange }: PostFiltersProps) =>
         <SlidersHorizontal size={18} color="#fff" />
       </TouchableOpacity>
 
-      {/* ===== FILTER MODAL ===== */}
-      <Modal
+      {/* ===== FILTER BOTTOM SHEET ===== */}
+      <BottomSheet
         isVisible={isVisible}
-        onBackdropPress={() => setIsVisible(false)}
-        onBackButtonPress={() => setIsVisible(false)}
-        style={{ margin: 0, justifyContent: 'flex-end' }}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        animationInTiming={400}
-        animationOutTiming={400}
-        backdropTransitionInTiming={400}
-        backdropTransitionOutTiming={400}
-        avoidKeyboard={true}
+        onClose={() => setIsVisible(false)}
+        snapPoints={['80%']}
+        enableDynamicSizing={false}
       >
-        <View className="bg-white border border-gray-300 rounded-t-xl p-5 max-h-[80%]">
-          <ScrollView contentContainerClassName="">
-            {/* Post Type Filter */}
+        <BottomSheetScrollView contentContainerStyle={{ padding: 20 }}>
+          {/* Post Type Filter */}
             <View className="mb-5 gap-2">
               <Text className="text-base font-semibold text-black mb-2">Post Type</Text>
               <Controller
@@ -184,9 +177,8 @@ const PostFiltersComponent = ({ filters, onFiltersChange }: PostFiltersProps) =>
                 <Text className="text-base font-semibold text-red-500">Clear All</Text>
               </TouchableOpacity>
             </View>
-          </ScrollView>
-        </View>
-      </Modal>
+        </BottomSheetScrollView>
+      </BottomSheet>
     </View>
   );
 };

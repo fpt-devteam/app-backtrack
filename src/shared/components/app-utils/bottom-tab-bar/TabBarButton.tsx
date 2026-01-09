@@ -17,7 +17,7 @@ import Animated, {
   withTiming,
   withSequence,
 } from "react-native-reanimated";
-import { TAB_BAR, MOTION } from "@/src/shared/theme";
+import { metrics } from "@/src/shared/theme";
 import { IconProps } from "phosphor-react-native";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -47,8 +47,8 @@ export const TabBarButton = ({
 
     // Quick press animation
     pressOpacity.value = withSequence(
-      withTiming(0.6, { duration: MOTION.press.in }),
-      withTiming(1, { duration: MOTION.press.out })
+      withTiming(0.6, { duration: metrics.motion.press.in }),
+      withTiming(1, { duration: metrics.motion.press.out })
     );
 
     onPress();
@@ -79,7 +79,7 @@ export const TabBarButton = ({
       <View style={styles.iconContainer}>
         <Icon
           weight={isFocused ? "fill" : "regular"}
-          size={TAB_BAR.iconSize}
+          size={metrics.tabBar.iconSize}
           color={isFocused ? "#137fec" : "#65676B"} // Will be replaced by theme hook
         />
       </View>
@@ -90,7 +90,7 @@ export const TabBarButton = ({
         style={[
           styles.label,
           {
-            fontSize: TAB_BAR.labelSize,
+            fontSize: metrics.tabBar.labelSize,
             fontWeight: isFocused ? "600" : "400",
           },
         ]}
@@ -107,18 +107,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: TAB_BAR.padding.top,
-    paddingBottom: TAB_BAR.padding.bottom,
+    paddingTop: metrics.tabBar.padding.top,
+    paddingBottom: metrics.tabBar.padding.bottom,
     position: "relative",
   },
   indicator: {
     position: "absolute",
     top: 0,
     left: "50%",
-    marginLeft: -(TAB_BAR.indicatorWidth / 2), // Center the indicator
-    width: TAB_BAR.indicatorWidth,
-    height: TAB_BAR.indicatorHeight,
-    borderRadius: TAB_BAR.indicatorHeight / 2,
+    marginLeft: -(metrics.tabBar.indicatorWidth / 2), // Center the indicator
+    width: metrics.tabBar.indicatorWidth,
+    height: metrics.tabBar.indicatorHeight,
+    borderRadius: metrics.tabBar.indicatorHeight / 2,
   },
   iconContainer: {
     alignItems: "center",

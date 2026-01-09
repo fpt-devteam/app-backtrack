@@ -1,5 +1,5 @@
 import { POST_ROUTE } from "@/src/shared/constants";
-import { COLORS } from "@/src/shared/theme";
+import { colors } from "@/src/shared/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { Clock, IconProps, MagnifyingGlass, X, XCircle } from "phosphor-react-native";
@@ -146,14 +146,14 @@ function SuggestRow({ IconComponent = Clock, text, onPress, onRemove }: SuggestR
 
   return (
     <TouchableOpacity onPress={onPress} className="flex-row items-center p-2">
-      <IconComponent size={18} color={COLORS.slate[500]} />
+      <IconComponent size={18} color={colors.slate[500]} />
       <Text style={{ fontSize: 15, marginLeft: 10, flex: 1 }} numberOfLines={1}>
         {text}
       </Text>
 
       {onRemove ? (
         <TouchableOpacity onPress={handleRemove} hitSlop={10}>
-          <X size={18} color={COLORS.slate[400]} />
+          <X size={18} color={colors.slate[400]} />
         </TouchableOpacity>
       ) : null}
     </TouchableOpacity>
@@ -301,9 +301,9 @@ export default function SearchScreen() {
         {/* Search bar */}
         <View
           className="flex-row items-center border-[2px] rounded-2xl px-3 h-12"
-          style={{ borderColor: isFocused ? COLORS.blue[500] : COLORS.slate[200] }}
+          style={{ borderColor: isFocused ? colors.blue[500] : colors.slate[200] }}
         >
-          <MagnifyingGlass size={20} color={COLORS.slate[500]} />
+          <MagnifyingGlass size={20} color={colors.slate[500]} />
 
           <TextInput
             ref={inputRef}
@@ -324,13 +324,13 @@ export default function SearchScreen() {
               }}
               hitSlop={10}
             >
-              <XCircle size={20} color={COLORS.slate[400]} />
+              <XCircle size={20} color={colors.slate[400]} />
             </Pressable>
           ) : null}
         </View>
 
         {/* Divider */}
-        <View className="h-[1px] mt-4" style={{ backgroundColor: COLORS.gray[100] }} />
+        <View className="h-[1px] mt-4" style={{ backgroundColor: colors.gray[100] }} />
 
         {/* Header */}
         <View className="mt-4">

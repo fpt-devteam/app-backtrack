@@ -1,7 +1,7 @@
 import { PostStatusBadge } from "@/src/features/post/components";
 import { Post } from "@/src/features/post/types";
 import { POST_ROUTE } from "@/src/shared/constants";
-import { COLORS } from "@/src/shared/theme";
+import { colors } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils";
 import { ExternalPathString, RelativePathString, router } from "expo-router";
 import { Clock, MapPin } from "phosphor-react-native";
@@ -84,13 +84,13 @@ const PostCard = ({ item, isFetching }: PostCardProps) => {
 
             {/* Event Time */}
             <View className="flex-row items-center gap-2">
-              <Clock size={16} color={COLORS.slate[500]} />
+              <Clock size={16} color={colors.slate[500]} />
               <Text className="flex-1 text-sm text-slate-600">{eventTimeStr}</Text>
             </View>
 
             {/* Location */}
             <View className="flex-row items-center gap-2">
-              <MapPin size={16} color={COLORS.slate[500]} />
+              <MapPin size={16} color={colors.slate[500]} />
               <Text className="flex-1 text-sm text-slate-600" numberOfLines={1}>{item.displayAddress ?? "Near here"}</Text>
             </View>
           </View>

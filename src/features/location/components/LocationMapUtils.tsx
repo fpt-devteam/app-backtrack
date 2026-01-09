@@ -1,9 +1,9 @@
-import { COLORS } from '@/src/shared/theme';
+import BottomSheet from '@/src/shared/components/ui/BottomSheet';
+import { colors } from '@/src/shared/theme';
 import Slider from '@react-native-community/slider';
 import { Crosshair, Target } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import Modal from 'react-native-modal';
 
 type Props = {
   radius?: number
@@ -38,33 +38,20 @@ const LocationMapUtils = ({
         {/* Get current position */}
         <View className="h-12 w-12 bg-white rounded-lg" >
           <Pressable onPress={onGetCurrentPosition} disabled={loadingLocate} className='h-full w-full items-center justify-center'>
-            <Crosshair size={24} color={COLORS.black} />
+            <Crosshair size={24} color={colors.black} />
           </Pressable>
         </View>
 
         {/* Change radius */}
         <View className="h-12 w-12 bg-white rounded-lg" >
           <Pressable onPress={handlePress} className='h-full w-full items-center justify-center'>
-            <Target size={24} color={COLORS.black} />
+            <Target size={24} color={colors.black} />
           </Pressable>
         </View>
 
-        {/* Radius Slider Modal */}
-        <Modal
-          isVisible={open}
-          onBackdropPress={handlePress}
-          onBackButtonPress={handlePress}
-          backdropOpacity={0.35}
-          backdropColor={COLORS.black}
-          style={{ margin: 0, justifyContent: 'flex-end' }}
-          useNativeDriver
-        >
-          <View className="bg-white rounded-t-3xl px-4 pt-3 pb-5 shadow-lg">
-            {/* Handle bar */}
-            <View className="items-center mb-3">
-              <View className="h-1.5 w-10 rounded-full bg-gray-300" />
-            </View>
-
+        {/* Radius Slider Bottom Sheet */}
+        <BottomSheet isVisible={open} onClose={handlePress}>
+          <View className="px-4 pb-5">
             {/* Header */}
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-base font-semibold text-gray-900">
@@ -92,9 +79,9 @@ const LocationMapUtils = ({
                 step={1}
                 minimumValue={1}
                 maximumValue={10}
-                minimumTrackTintColor={COLORS.gray[900]}
-                maximumTrackTintColor={COLORS.gray[300]}
-                thumbTintColor={COLORS.gray[900]}
+                minimumTrackTintColor={colors.gray[900]}
+                maximumTrackTintColor={colors.gray[300]}
+                thumbTintColor={colors.gray[900]}
               />
 
               {/* Quick picks */}
@@ -131,7 +118,7 @@ const LocationMapUtils = ({
               </Pressable>
             </View>
           </View>
-        </Modal>
+        </BottomSheet>
       </View>
     </View>
   )

@@ -1,4 +1,4 @@
-import { COLORS } from "@/src/shared/theme";
+import { colors } from "@/src/shared/theme";
 import { router } from "expo-router";
 import { MagnifyingGlass } from "phosphor-react-native";
 import React, { useEffect, useMemo, useRef } from "react";
@@ -169,7 +169,7 @@ const MatchingWaitingScreen = ({
             transform: [{ scale: iconScale }, { rotate: iconRotate }],
           }}
         >
-          <MagnifyingGlass size={34} color={COLORS.slate[900]} />
+          <MagnifyingGlass size={34} color={colors.slate[900]} />
         </Animated.View>
       </View>
 

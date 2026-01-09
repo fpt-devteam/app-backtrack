@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
-import { TAB_BAR, MOTION } from "@/src/shared/theme";
+import { metrics } from "@/src/shared/theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -27,12 +27,12 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
     }
 
     pressOpacity.value = withSequence(
-      withTiming(0.6, { duration: MOTION.press.in }),
-      withTiming(1, { duration: MOTION.press.out })
+      withTiming(0.6, { duration: metrics.motion.press.in }),
+      withTiming(1, { duration: metrics.motion.press.out })
     );
     scale.value = withSequence(
-      withTiming(0.9, { duration: MOTION.press.in }),
-      withTiming(1, { duration: MOTION.press.out })
+      withTiming(0.9, { duration: metrics.motion.press.in }),
+      withTiming(1, { duration: metrics.motion.press.out })
     );
 
     onPress();
@@ -71,7 +71,7 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
             isFocused && styles.iconBackgroundActive
           ]}
         >
-          <PlusCircleIcon size={TAB_BAR.iconSize} color={iconColor} weight="regular" />
+          <PlusCircleIcon size={metrics.tabBar.iconSize} color={iconColor} weight="regular" />
         </View>
       </View>
 
@@ -80,7 +80,7 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
         style={[
           styles.label,
           {
-            fontSize: TAB_BAR.labelSize,
+            fontSize: metrics.tabBar.labelSize,
             fontWeight: isFocused ? "600" : "400",
           },
         ]}
@@ -96,18 +96,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: TAB_BAR.padding.top,
-    paddingBottom: TAB_BAR.padding.bottom,
+    paddingTop: metrics.tabBar.padding.top,
+    paddingBottom: metrics.tabBar.padding.bottom,
     position: "relative",
   },
   indicator: {
     position: "absolute",
     top: 0,
     left: "50%",
-    marginLeft: -(TAB_BAR.indicatorWidth / 2),
-    width: TAB_BAR.indicatorWidth,
-    height: TAB_BAR.indicatorHeight,
-    borderRadius: TAB_BAR.indicatorHeight / 2,
+    marginLeft: -(metrics.tabBar.indicatorWidth / 2),
+    width: metrics.tabBar.indicatorWidth,
+    height: metrics.tabBar.indicatorHeight,
+    borderRadius: metrics.tabBar.indicatorHeight / 2,
   },
   iconContainer: {
     alignItems: "center",
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   iconBackground: {
-    width: TAB_BAR.createButton.iconBackgroundSize,
-    height: TAB_BAR.createButton.iconBackgroundSize,
-    borderRadius: TAB_BAR.createButton.iconBackgroundRadius,
+    width: metrics.tabBar.createButton.iconBackgroundSize,
+    height: metrics.tabBar.createButton.iconBackgroundSize,
+    borderRadius: metrics.tabBar.createButton.iconBackgroundRadius,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "transparent",
