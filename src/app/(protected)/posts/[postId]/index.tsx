@@ -1,5 +1,6 @@
 import { PostDetails } from '@/src/features/post/components';
 import { useGetPostById } from '@/src/features/post/hooks';
+import { AppHeader } from '@/src/shared/components';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
@@ -36,9 +37,10 @@ const PostDetailScreen = () => {
   );
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-gray-50 mb-20">
       {/* Header  */}
       <View>
+        <AppHeader title="Post Details" showBackButton />
       </View>
 
       {/* Post Details */}

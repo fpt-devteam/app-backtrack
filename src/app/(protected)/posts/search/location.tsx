@@ -1,4 +1,8 @@
-import SuggestRow from "@/src/shared/components/ui/SuggestRow";
+import {
+  LocationActionButtons,
+  LocationScreenHeader,
+  LocationSearchPanel,
+} from "@/src/features/location/components";
 import {
   ANIMATE_TO_DURATION,
   DEFAULT_REGION,
@@ -12,21 +16,11 @@ import {
 import { colors } from "@/src/shared/theme";
 import type { LocationFilterValue } from "@/src/shared/types";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  ArrowLeft,
-  Check,
-  Clock,
-  Crosshair,
-  MapPin,
-  Target,
-  XCircle,
-} from "phosphor-react-native";
+import { MapPin, XCircle } from "phosphor-react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Animated,
   Easing,
-  FlatList,
   Keyboard,
   Pressable,
   Text,
@@ -71,7 +65,7 @@ export default function SearchLocationScreen() {
 
   const [radius, setRadius] = useState(initialRadius);
 
-  // Search state (following SearchPostScreen pattern)
+  // Search state
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [displayType, setDisplayType] = useState<DisplayType>("recent");
@@ -88,7 +82,7 @@ export default function SearchLocationScreen() {
     isLoading: loadingSuggestions,
   } = useLocationSearch(query, isFocused);
 
-  // Animation refs (following SearchPostScreen pattern)
+  // Animation refs
   const fade = useRef(new Animated.Value(1)).current;
   const slide = useRef(new Animated.Value(0)).current;
 
@@ -297,7 +291,7 @@ export default function SearchLocationScreen() {
     }
   }, [recent, displayType]);
 
-  // Handle suggestion data (following SearchPostScreen pattern)
+  // Handle suggestion data
   useEffect(() => {
     const q = query.trim();
 
@@ -335,7 +329,6 @@ export default function SearchLocationScreen() {
     }
   }, [params.lat, params.lng, handleGetCurrentPosition]);
 
-  const title = displayType === "suggest" ? "Suggestions" : "Recent";
   const showPanel = isFocused && (displayData.length > 0 || loadingSuggestions);
 
   return (
@@ -382,32 +375,10 @@ export default function SearchLocationScreen() {
       </View>
 
       {/* Header */}
-      <SafeAreaView
-        style={{ position: "absolute", top: 0, left: 0, right: 0 }}
-        pointerEvents="box-none"
-      >
-        <View className="flex-row items-center p-4" pointerEvents="box-none">
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={10}
-            className="mr-2 h-12 w-12 items-center justify-center rounded-2xl bg-white"
-            style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 }}
-          >
-            <ArrowLeft size={20} color={colors.slate[700]} />
-          </Pressable>
-
-          <View className="flex-1" />
-
-          <Pressable
-            onPress={handleConfirm}
-            hitSlop={10}
-            className="h-12 w-12 items-center justify-center rounded-2xl bg-blue-600"
-            style={{ shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 }}
-          >
-            <Check size={20} color="#fff" weight="bold" />
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <LocationScreenHeader
+        onBack={() => router.back()}
+        onConfirm={handleConfirm}
+      />
 
       {/* Search Panel */}
       <TouchableWithoutFeedback accessible={false} onPress={handlePressOutside}>
@@ -456,223 +427,30 @@ export default function SearchLocationScreen() {
             </View>
 
             {/* Suggestion Panel */}
-            {showPanel ? (
-              <TouchableWithoutFeedback>
-                <View
-                  className="mt-2 bg-white rounded-2xl p-3"
-                  style={{
-                    maxHeight: 300,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 3,
-                  }}
-                >
-                  <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-base font-semibold">{title}</Text>
-
-                    {displayType === "recent" && recent.length > 0 ? (
-                      <Pressable onPress={handleClearRecent} hitSlop={10}>
-                        <Text className="text-blue-600 font-semibold">Clear</Text>
-                      </Pressable>
-                    ) : null}
-                  </View>
-
-                  <Animated.View
-                    style={{ opacity: fade, transform: [{ translateY: slide }] }}
-                  >
-                    {loadingSuggestions && displayType === "suggest" ? (
-                      <View className="p-3 items-center">
-                        <ActivityIndicator size="small" color={colors.blue[600]} />
-                      </View>
-                    ) : (
-                      <FlatList
-                        data={displayData}
-                        keyExtractor={(item) => item.placeId}
-                        keyboardShouldPersistTaps="handled"
-                        renderItem={({ item }) => {
-                          if (displayType === "suggest") {
-                            return (
-                              <SuggestRow
-                                IconComponent={MapPin}
-                                text={item.label}
-                                onPress={() => handleSelectSuggestion(item)}
-                              />
-                            );
-                          }
-
-                          return (
-                            <SuggestRow
-                              IconComponent={Clock}
-                              text={item.label}
-                              onPress={() => handleSelectRecent(item)}
-                              onRemove={() => handleRemoveRecent(item.placeId)}
-                            />
-                          );
-                        }}
-                      />
-                    )}
-                  </Animated.View>
-                </View>
-              </TouchableWithoutFeedback>
-            ) : null}
+            <LocationSearchPanel
+              showPanel={showPanel}
+              displayType={displayType}
+              displayData={displayData}
+              loadingSuggestions={loadingSuggestions}
+              recent={recent}
+              fade={fade}
+              slide={slide}
+              onSelectSuggestion={handleSelectSuggestion}
+              onSelectRecent={handleSelectRecent}
+              onRemoveRecent={handleRemoveRecent}
+              onClearRecent={handleClearRecent}
+            />
           </View>
         </SafeAreaView>
       </TouchableWithoutFeedback>
 
       {/* Floating Action Buttons */}
-      <SafeAreaView
-        style={{ position: "absolute", bottom: 20, right: 20 }}
-        pointerEvents="box-none"
-      >
-        <View className="gap-3">
-          {/* My Location */}
-          <Pressable
-            onPress={handleGetCurrentPosition}
-            disabled={loadingLocation}
-            className="h-14 w-14 bg-white rounded-2xl items-center justify-center"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-            }}
-          >
-            {loadingLocation ? (
-              <ActivityIndicator size="small" color={colors.blue[600]} />
-            ) : (
-              <Crosshair size={24} color={colors.slate[700]} weight="bold" />
-            )}
-          </Pressable>
-
-          {/* Radius Control */}
-          <RadiusControl radius={radius} onChange={handleRadiusChange} />
-        </View>
-      </SafeAreaView>
+      <LocationActionButtons
+        radius={radius}
+        loadingLocation={loadingLocation}
+        onGetCurrentPosition={handleGetCurrentPosition}
+        onRadiusChange={handleRadiusChange}
+      />
     </View>
-  );
-}
-
-type RadiusControlProps = {
-  readonly radius: number;
-  readonly onChange: (radius: number) => void;
-};
-
-function RadiusControl({ radius, onChange }: RadiusControlProps) {
-  const [open, setOpen] = useState(false);
-  const [localRadius, setLocalRadius] = useState(radius);
-
-  useEffect(() => {
-    setLocalRadius(radius);
-  }, [radius]);
-
-  const handleApply = () => {
-    setOpen(false);
-    onChange(localRadius);
-  };
-
-  return (
-    <>
-      <Pressable
-        onPress={() => setOpen(true)}
-        className="h-14 w-14 bg-white rounded-2xl items-center justify-center"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3,
-        }}
-      >
-        <Target size={24} color={colors.slate[700]} weight="bold" />
-      </Pressable>
-
-      {open ? (
-        <TouchableWithoutFeedback onPress={() => setOpen(false)}>
-          <View
-            style={{
-              position: "absolute",
-              bottom: 70,
-              right: 0,
-              backgroundColor: "white",
-              borderRadius: 16,
-              padding: 16,
-              minWidth: 250,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-            }}
-          >
-            <TouchableWithoutFeedback>
-              <View>
-                <View className="flex-row items-center justify-between mb-3">
-                  <Text className="text-base font-semibold text-gray-900">
-                    Search radius
-                  </Text>
-
-                  <View className="px-3 py-1 rounded-full bg-gray-100">
-                    <Text className="text-sm font-semibold text-gray-900">
-                      {localRadius} km
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Quick picks */}
-                <View className="flex-row gap-2 mb-3">
-                  {[1, 3, 5, 10].map((v) => {
-                    const active = localRadius === v;
-                    return (
-                      <Pressable
-                        key={v}
-                        onPress={() => setLocalRadius(v)}
-                        className={[
-                          "px-3 py-2 rounded-xl flex-1 items-center",
-                          active ? "bg-gray-900" : "bg-white border border-gray-200",
-                        ].join(" ")}
-                      >
-                        <Text
-                          className={
-                            active
-                              ? "text-white text-xs font-semibold"
-                              : "text-gray-900 text-xs font-semibold"
-                          }
-                        >
-                          {v} km
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* Actions */}
-                <View className="flex-row gap-2">
-                  <Pressable
-                    onPress={() => setOpen(false)}
-                    className="flex-1 px-4 py-3 rounded-xl bg-gray-100"
-                  >
-                    <Text className="text-gray-900 font-semibold text-center">
-                      Cancel
-                    </Text>
-                  </Pressable>
-
-                  <Pressable
-                    onPress={handleApply}
-                    className="flex-1 px-4 py-3 rounded-xl bg-blue-600"
-                  >
-                    <Text className="text-white font-semibold text-center">
-                      Apply
-                    </Text>
-                  </Pressable>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      ) : null}
-    </>
   );
 }

@@ -27,10 +27,6 @@ const TAB_ICONS: Record<string, TabIcon> = {
     Icon: QrCodeIcon,
     label: "QRs",
   },
-  "create-post": {
-    Icon: HouseIcon, // Placeholder, not used (rendered via CreatePostButton)
-    label: "",
-  },
   chat: {
     Icon: ChatCircleIcon,
     label: "Chat",
@@ -51,13 +47,6 @@ type Props = BottomTabBarProps & {
 
 export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
   const insets = useSafeAreaInsets();
-
-  // Reduce safe area padding - adjust this value to your preference
-  // Options:
-  // - insets.bottom * 0.5 (half padding - closer)
-  // - insets.bottom * 0.3 (very close)
-  // - 8 (fixed small padding)
-  // - 0 (flush to bottom - not recommended)
   const bottomPadding = insets.bottom * 0.5;
 
   return (
@@ -71,9 +60,6 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
         },
       ]}
     >
-      {/* Subtle top border */}
-      {/* <View className="absolute top-0 left-0 right-0 border-t border-tab-bar-border" /> */}
-
       {/* Tab buttons */}
       <View style={styles.tabsContainer}>
         {state.routes.map((route, index) => {
@@ -83,14 +69,22 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
           // Skip hidden tabs
           if (!tabConfig || route.name === "(profile)") return null;
 
-          // Create post button (center)
-          if (route.name === "create-post") {
+          // Insert create button in the middle (between QR and Chat)
+          if (route.name === "chat") {
             return (
-              <CreatePostButton
-                key={route.key}
-                onPress={onCreatePress}
-                isFocused={isFocused}
-              />
+              <React.Fragment key={route.key}>
+                <CreatePostButton
+                  onPress={onCreatePress}
+                  isFocused={false}
+                />
+                <TabBarButton
+                  route={route}
+                  isFocused={isFocused}
+                  Icon={tabConfig.Icon}
+                  label={tabConfig.label}
+                  onPress={() => navigation.navigate(route.name)}
+                />
+              </React.Fragment>
             );
           }
 
