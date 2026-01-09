@@ -1,6 +1,6 @@
 import { ensureMediaPermission } from '@/src/shared/services';
-import { Ionicons } from '@expo/vector-icons';
 import { ImagePickerAsset, launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
+import { Camera, Plus, X } from 'phosphor-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 
@@ -57,7 +57,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
           className="border-2 border-dashed border-blue-300 rounded-xl p-8 items-center justify-center bg-blue-50/30"
         >
           <View className="w-16 h-16 bg-blue-100 rounded-2xl items-center justify-center mb-3">
-            <Ionicons name="camera" size={32} color="#3B82F6" />
+            <Camera size={32} color="#3B82F6" />
           </View>
 
           <Text className="text-slate-900 font-semibold text-base mb-1">
@@ -98,7 +98,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
             className="w-32 h-32 border-2 border-dashed border-blue-300 rounded-xl items-center justify-center bg-blue-50/30"
           >
             <View className="w-12 h-12 bg-blue-100 rounded-xl items-center justify-center mb-2">
-              <Ionicons name="add" size={24} color="#3B82F6" />
+              <Plus size={24} color="#3B82F6" />
             </View>
             <Text className="text-blue-600 font-medium text-xs">Add More</Text>
           </Pressable>
@@ -120,7 +120,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
               onPress={() => handleRemoveImage(index)}
               className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full items-center justify-center shadow-lg z-10"
             >
-              <Ionicons name="close" size={16} color="#FFFFFF" />
+              <X size={16} color="#FFFFFF" />
             </Pressable>
 
             {/* Image Number Badge */}

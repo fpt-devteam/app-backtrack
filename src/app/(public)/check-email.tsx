@@ -1,5 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
+import { ArrowLeft, EnvelopeSimple } from "phosphor-react-native";
 import React from "react";
 import {
   KeyboardAvoidingView,
@@ -27,7 +27,7 @@ export default function CheckEmailScreen() {
             {/* Icon */}
             <View className="items-center mb-8">
               <View className="w-20 h-20 bg-primary/10 rounded-full items-center justify-center mb-4">
-                <Ionicons name="mail-outline" size={40} color="#137fec" />
+                <EnvelopeSimple size={40} color="#137fec" />
               </View>
             </View>
 
@@ -55,7 +55,7 @@ export default function CheckEmailScreen() {
                 href="/login"
                 className="flex-row items-center justify-center rounded-lg bg-primary px-6 py-3.5"
               >
-                <Ionicons name="arrow-back" size={18} color="#ffffff" />
+                <ArrowLeft size={18} color="#ffffff" />
                 <Text className="ml-2 font-medium text-base text-white">Back to login</Text>
               </Link>
             </View>
