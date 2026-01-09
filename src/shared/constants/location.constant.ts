@@ -1,4 +1,4 @@
-import { Region } from "react-native-maps";
+import type { Region } from "react-native-maps";
 
 const DEFAULT_REGION: Region = {
   latitude: 10.762622,
