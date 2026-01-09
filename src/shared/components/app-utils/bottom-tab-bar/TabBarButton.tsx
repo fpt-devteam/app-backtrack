@@ -8,7 +8,6 @@
  * - Press feedback
  */
 
-import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, Text, StyleSheet, View, Platform } from "react-native";
@@ -19,16 +18,14 @@ import Animated, {
   withSequence,
 } from "react-native-reanimated";
 import { TAB_BAR, MOTION } from "@/src/shared/theme";
+import { IconProps } from "phosphor-react-native";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-type IconName = keyof typeof Ionicons.glyphMap;
 
 type Props = {
   route: any;
   isFocused: boolean;
-  activeIcon: IconName;
-  inactiveIcon: IconName;
+  Icon: React.ElementType<IconProps>;
   label: string;
   onPress: () => void;
 };
@@ -36,8 +33,7 @@ type Props = {
 export const TabBarButton = ({
   route,
   isFocused,
-  activeIcon,
-  inactiveIcon,
+  Icon,
   label,
   onPress,
 }: Props) => {
@@ -81,8 +77,8 @@ export const TabBarButton = ({
 
       {/* Icon */}
       <View style={styles.iconContainer}>
-        <Ionicons
-          name={isFocused ? activeIcon : inactiveIcon}
+        <Icon
+          weight={isFocused ? "fill" : "regular"}
           size={TAB_BAR.iconSize}
           color={isFocused ? "#137fec" : "#65676B"} // Will be replaced by theme hook
         />

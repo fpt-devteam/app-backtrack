@@ -1,8 +1,8 @@
 import { PostFilters, PostType } from '@/src/features/post/types';
 import { LocationField } from '@/src/shared/components';
 import { GoogleMapDetailLocation } from '@/src/shared/types';
-import { Ionicons } from '@expo/vector-icons';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { MagnifyingGlass, SlidersHorizontal } from 'phosphor-react-native';
 import React, { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -63,7 +63,7 @@ const PostFiltersComponent = ({ filters, onFiltersChange }: PostFiltersProps) =>
     <View className="flex-row items-center px-4 py-3">
       {/* Search Input */}
       <View className="flex-1 flex-row items-center rounded-full bg-white px-3 py-2 mr-3">
-        <Ionicons name="search" size={16} color="#64748B" />
+        <MagnifyingGlass size={16} color="#64748B" />
         <Controller
           control={control}
           name="searchTerm"
@@ -92,7 +92,7 @@ const PostFiltersComponent = ({ filters, onFiltersChange }: PostFiltersProps) =>
           elevation: 3,
         }}
       >
-        <Ionicons name="options-outline" size={18} color="#fff" />
+        <SlidersHorizontal size={18} color="#fff" />
       </TouchableOpacity>
 
       {/* ===== FILTER MODAL ===== */}

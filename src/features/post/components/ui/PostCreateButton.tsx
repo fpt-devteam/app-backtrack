@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Plus } from "phosphor-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
 
@@ -36,7 +36,7 @@ const PostCreateButton = ({ onPress, accessibilityState }: Props) => {
             shadowOffset: { width: 0, height: 6 },
           }}
         >
-          <Ionicons name="add" size={28} color="white" />
+          <Plus size={28} color="white" />
         </View>
       </Pressable>
     </View>

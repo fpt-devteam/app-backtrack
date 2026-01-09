@@ -1,5 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Check, Eye, QrCode, ShieldCheck } from 'phosphor-react-native';
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
@@ -40,7 +40,7 @@ const ActivatedItemScreen = () => {
           justifyContent: 'center',
           marginBottom: 32,
         }}>
-          <Ionicons name="checkmark" size={60} color="#0ea5e9" />
+          <Check size={60} color="#0ea5e9" />
         </View>
 
         {/* Title */}
@@ -89,7 +89,7 @@ const ActivatedItemScreen = () => {
           elevation: 2,
         }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-            <Ionicons name="shield-checkmark" size={20} color="#0ea5e9" style={{ marginRight: 8 }} />
+            <ShieldCheck size={20} color="#0ea5e9" style={{ marginRight: 8 }} />
             <View>
               <Text style={{ fontSize: 10, color: '#9ca3af', fontWeight: '600', marginBottom: 2 }}>
                 STATUS
@@ -102,7 +102,7 @@ const ActivatedItemScreen = () => {
 
           {/* Identifier Section */}
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="qr-code-outline" size={20} color="#0ea5e9" style={{ marginRight: 8 }} />
+            <QrCode size={20} color="#0ea5e9" style={{ marginRight: 8 }} />
             <View>
               <Text style={{ fontSize: 10, color: '#9ca3af', fontWeight: '600', marginBottom: 2 }}>
                 IDENTIFIER
@@ -133,7 +133,7 @@ const ActivatedItemScreen = () => {
           }}
           onPress={handleViewProtectedItems}
         >
-          <Ionicons name="eye-outline" size={20} color="#ffffff" style={{ marginRight: 8 }} />
+          <Eye size={20} color="#ffffff" style={{ marginRight: 8 }} />
           <Text style={{
             color: '#ffffff',
             fontSize: 16,

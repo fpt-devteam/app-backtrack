@@ -1,7 +1,7 @@
 import { AppBrand, AppUserAvatarIcon } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
-import { Ionicons } from "@expo/vector-icons";
 import { ExternalPathString, RelativePathString, router } from "expo-router";
+import { MagnifyingGlass } from "phosphor-react-native";
 import { Pressable, View } from "react-native";
 
 const PostHomeScreenHeader = () => {
@@ -19,7 +19,7 @@ const PostHomeScreenHeader = () => {
             console.log("Search pressed");
             router.push(POST_ROUTE.search as ExternalPathString | RelativePathString);
           }}>
-            <Ionicons name="search-outline" size={24} color="black" />
+            <MagnifyingGlass size={24} color="black" />
           </Pressable>
         </View>
 
