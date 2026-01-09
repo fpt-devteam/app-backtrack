@@ -1,8 +1,6 @@
 import { getMediaLibraryPermissionsAsync, PermissionStatus, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
-import { Platform } from "expo-modules-core";
 import { getDownloadURL, ref, StorageReference, uploadBytes } from "firebase/storage";
-import { Alert } from "react-native/Libraries/Alert/Alert";
-import { Linking } from "react-native/Libraries/Linking/Linking";
+import { Alert, Linking, Platform } from "react-native";
 import { firebaseStorage } from "../lib/firebase";
 import { ImageUploadRequest, ImageUploadResponse } from "../types";
 
