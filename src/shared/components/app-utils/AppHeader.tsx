@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import { ArrowLeftIcon } from "phosphor-react-native";
+import React from "react";
 import { Pressable, Text, View } from "react-native";
 import colors from "../../theme/colors";
 
@@ -7,12 +8,14 @@ type AppHeaderProps = {
   title: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
+  rightActionButton?: React.ReactNode;
 };
 
 const AppHeader = ({
   title,
   showBackButton = true,
-  onBackPress
+  onBackPress,
+  rightActionButton
 }: AppHeaderProps) => {
   const handleBackPress = () => {
     if (onBackPress) {
@@ -45,6 +48,12 @@ const AppHeader = ({
         <Text className="text-xl font-bold text-black">
           {title}
         </Text>
+
+        {rightActionButton && (
+          <View className="absolute right-4">
+            {rightActionButton}
+          </View>
+        )}
       </View>
     </View>
   );

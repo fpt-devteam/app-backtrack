@@ -1,6 +1,7 @@
 import { formatDateTime } from "@/src/shared/utils";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import { CalendarBlank } from "phosphor-react-native";
+import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { CalendarBlankIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
 import {
   Modal,
@@ -94,7 +95,7 @@ const DateTimePickerField = ({
         disabled={disabled}
         className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-white px-3.5 flex-row items-center gap-3"
       >
-        <CalendarBlank size={18} color="#94A3B8" />
+        <CalendarBlankIcon size={18} color="#94A3B8" />
         <Text
           className={`text-[15px] ${value ? 'text-slate-900' : 'text-slate-400'}`}
           numberOfLines={1}

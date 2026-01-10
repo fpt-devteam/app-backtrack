@@ -1,3 +1,2 @@
-export { default as PostFoundForm } from './PostFoundForm';
-export { default as PostLostForm } from './PostLostForm';
+export { default as PostCreateForm } from './PostCreateForm';
 
