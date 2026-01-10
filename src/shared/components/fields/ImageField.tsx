@@ -1,9 +1,9 @@
 import { ensureMediaPermission } from '@/src/shared/services';
+import colors from '@/src/shared/theme/colors';
 import { launchImageLibraryAsync, type ImagePickerAsset, type ImagePickerOptions, } from 'expo-image-picker';
 import { CameraIcon, PlusIcon, XIcon } from 'phosphor-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import colors from '../../theme/colors';
 
 const MAX_IMAGES = 5;
 
@@ -45,7 +45,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
   if (value.length === 0) {
     return (
       <View>
-        <Text className="text-slate-700 font-medium text-sm mb-2">
+        <Text className="text-slate-700 font-bold text-sm mb-2">
           Photos of the Item
         </Text>
         <Text className="text-slate-500 text-xs mb-3">

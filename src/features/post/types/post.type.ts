@@ -1,6 +1,6 @@
-import { LatLng } from "react-native-maps";
-import { GoogleMapDetailLocation } from "../../../shared/types/location.type";
-import { PostType } from "./post.enum";
+import type { UserLocation } from "@/src/features/location/types";
+import type { PostType } from "@/src/features/post/types";
+import type { LatLng } from "react-native-maps";
 
 export type PostFilters = {
   postType?: PostType;
@@ -20,7 +20,7 @@ export type Post = {
   eventTime: Date;
   createdAt: Date;
   authorId: string;
-} & GoogleMapDetailLocation;
+} & UserLocation;
 
 export type SimilarPost = Post & {
   similarityScore: number;

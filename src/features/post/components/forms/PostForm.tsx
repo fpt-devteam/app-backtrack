@@ -164,17 +164,15 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
             )}
           </View>
 
-          <Text className="text-xl font-bold text-slate-800 mb-4">Item Details</Text>
-
           {/* Item Name */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-slate-800 mb-2">Item Name</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">Item Name</Text>
             <Controller
               control={control}
               name="itemName"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? 'border-red-500' : 'border-slate-300'}`}
                   placeholder="e.g. Blue Backpack, iPhone 14"
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -190,13 +188,13 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
           {/* Description */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-slate-800 mb-2">Description</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">Description</Text>
             <Controller
               control={control}
               name="description"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? 'border-red-500' : 'border-slate-300'}`}
                   placeholder="Describe the item in detail."
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -215,13 +213,13 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
           {/* Distinctive Marks */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-slate-800 mb-2">Distinctive Marks</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">Distinctive Marks</Text>
             <Controller
               control={control}
               name="distinctiveMarks"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.distinctiveMarks ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.distinctiveMarks ? 'border-red-500' : 'border-slate-300'}`}
                   placeholder="Any unique marks, scratches, or identifying features (optional)"
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -238,9 +236,25 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
             )}
           </View>
 
+          {/* Location Picker */}
+          <View className="mb-4">
+            <Text className="text-slate-700 font-bold text-sm mb-2">Location</Text>
+
+            <Controller
+              control={control}
+              name="detailLocation"
+              render={({ field: { onChange, value } }) => (
+                <LocationField value={value} onChange={onChange} />
+              )}
+            />
+            {errors.detailLocation && (
+              <Text className="text-red-500 text-xs mt-1">{errors.detailLocation.message}</Text>
+            )}
+          </View>
+
           {/* Event Time */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-slate-800 mb-2">Event Time</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">Event Time</Text>
             <Controller
               control={control}
               name="eventTime"
@@ -258,25 +272,12 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
             )}
           </View>
 
-          {/* Location Picker */}
-          <View className="mb-4">
-            <Controller
-              control={control}
-              name="detailLocation"
-              render={({ field: { onChange, value } }) => (
-                <LocationField value={value} onChange={onChange} />
-              )}
-            />
-            {errors.detailLocation && (
-              <Text className="text-red-500 text-xs mt-1">{errors.detailLocation.message}</Text>
-            )}
-          </View>
         </View>
       </ScrollView>
 
       <View className="p-4 pb-0">
         <TouchableOpacity
-          className={`h-11 items-center justify-center rounded-lg ${loading ? 'bg-slate-400' : 'bg-primary'}`}
+          className={`h-11 items-center justify-center rounded-sm ${loading ? 'bg-slate-400' : 'bg-primary'}`}
           onPress={handleSubmit(onSubmit)}
           disabled={loading}
         >
