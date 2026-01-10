@@ -1,7 +1,7 @@
 import { auth } from '@/src/shared/lib';
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useSync } from '../hooks';
-import { AppUser } from '../types';
+import type { AppUser } from '../types';
 import { useAuth } from './auth.provider';
 
 type AppUserContextType = {

@@ -1,7 +1,7 @@
+import type { AuthState } from '@/src/features/auth/types'
 import { auth } from '@/src/shared/lib'
 import { onAuthStateChanged } from 'firebase/auth'
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { AuthState } from '../types'
 
 type AuthContextType = AuthState
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

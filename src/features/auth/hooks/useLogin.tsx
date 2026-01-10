@@ -4,8 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
 
-import { LOGIN_QUERY_KEY } from "../constants";
-import type { LoginRequest, LoginResponse } from "../types";
+import { LOGIN_QUERY_KEY } from "@/src/features/auth/constants";
+import type { LoginRequest, LoginResponse } from "@/src/features/auth/types";
 
 export function useLogin() {
   const mutation = useMutation<LoginResponse, Error, LoginRequest>({
@@ -23,7 +23,7 @@ export function useLogin() {
         }
 
         return { idToken } as LoginResponse;
-      } catch (error: any) {
+      } catch (error) {
         const friendlyMessage = getErrorMessage(error);
         throw new Error(friendlyMessage);
       }
