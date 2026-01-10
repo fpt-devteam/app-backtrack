@@ -1,5 +1,5 @@
-import { ApiResponse } from "@/src/api/common/api.types";
-import { AppUser } from "./auth.type";
+import type { ApiResponse } from "@/src/api/common/api.types";
+import type { AppUser } from "@/src/features/auth/types";
 
 export type SyncRequest = {
   idToken: string;

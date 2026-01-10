@@ -1,8 +1,8 @@
+import { syncUserApi } from "@/src/features/auth/api";
+import { SYNC_QUERY_KEY } from "@/src/features/auth/constants";
+import type { SyncRequest, SyncResponse } from "@/src/features/auth/types";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { syncUserApi } from "../api/auth.api";
-import { SYNC_QUERY_KEY } from "../constants";
-import { SyncRequest, SyncResponse } from "../types";
 
 export function useSync() {
 

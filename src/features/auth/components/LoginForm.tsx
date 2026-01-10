@@ -2,9 +2,10 @@ import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { AppInlineError, EmailField, PasswordField } from "@/src/shared/components";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "expo-router";
-import { ArrowRight, GoogleLogo } from "phosphor-react-native";
+import { ArrowRightIcon, GoogleLogoIcon } from "phosphor-react-native";
 import React from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -14,7 +15,7 @@ import {
   View
 } from "react-native";
 import * as yup from "yup";
-import { LoginRequest } from "../types";
+import type { LoginRequest } from "../types";
 
 const loginFormSchema = yup
   .object({
@@ -127,7 +128,7 @@ export default function LoginForm() {
                 ) : (
                   <>
                     <Text className="mr-2 font-medium text-base text-white">Sign In</Text>
-                    <ArrowRight size={18} color="#ffffff" />
+                    <ArrowRightIcon size={18} color="#ffffff" />
                   </>
                 )}
               </TouchableOpacity>
@@ -147,7 +148,7 @@ export default function LoginForm() {
                 disabled={loading}
                 activeOpacity={0.8}
               >
-                <GoogleLogo size={18} color="#e5453b" />
+                <GoogleLogoIcon size={18} color="#e5453b" />
                 <Text className="ml-2 text-slate-700 font-medium">Google</Text>
               </TouchableOpacity>
             </View>

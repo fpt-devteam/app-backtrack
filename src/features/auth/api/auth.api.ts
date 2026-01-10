@@ -1,6 +1,6 @@
 import { privateClient, publicClient } from "@/src/api/common";
-import { ApiResponse } from "@/src/shared/types";
-import { MeResponse, SyncRequest, SyncResponse } from "../types";
+import type { MeResponse, SyncRequest, SyncResponse } from "@/src/features/auth/types";
+import type { ApiResponse } from "@/src/shared/types";
 
 const AUTH = {
   me: "/core/users",

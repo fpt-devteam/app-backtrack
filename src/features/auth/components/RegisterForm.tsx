@@ -1,9 +1,10 @@
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
 import { AppInlineError, ConfirmPasswordField, EmailField, PasswordField } from "@/src/shared/components";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ArrowRight, GoogleLogo } from "phosphor-react-native";
+import { ArrowRightIcon, GoogleLogoIcon } from "phosphor-react-native";
 import React from "react";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -14,7 +15,7 @@ import {
   View
 } from "react-native";
 import * as yup from "yup";
-import { RegisterRequest } from "../types";
+import type { RegisterRequest } from "../types";
 
 const registerFormSchema = yup
   .object({
@@ -136,7 +137,7 @@ export default function RegisterForm() {
                   ) : (
                     <>
                       <Text className="mr-2 font-medium text-base text-white">Create Account</Text>
-                      <ArrowRight size={18} color="#ffffff" />
+                      <ArrowRightIcon size={18} color="#ffffff" />
                     </>
                   )}
                 </TouchableOpacity>
@@ -156,7 +157,7 @@ export default function RegisterForm() {
                   disabled={loading}
                   activeOpacity={0.8}
                 >
-                  <GoogleLogo size={18} color="#e5453b" />
+                  <GoogleLogoIcon size={18} color="#e5453b" />
                   <Text className="ml-2 text-slate-700 font-medium">Google</Text>
                 </TouchableOpacity>
               </View>

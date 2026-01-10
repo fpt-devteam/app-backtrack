@@ -1,4 +1,4 @@
-import { Nullable } from "@/src/shared/types";
+import type { Nullable } from "@/src/shared/types";
 
 export type AppUser = {
   id: string;

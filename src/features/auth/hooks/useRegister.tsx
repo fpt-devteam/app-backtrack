@@ -4,9 +4,9 @@ import { useMutation } from "@tanstack/react-query";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
 
-import { REGISTER_QUERY_KEY } from "../constants";
-import type { RegisterRequest, RegisterResponse } from "../types";
-import { useSync } from "./useSync";
+import { REGISTER_QUERY_KEY } from "@/src/features/auth/constants";
+import { useSync } from "@/src/features/auth/hooks";
+import type { RegisterRequest, RegisterResponse } from "@/src/features/auth/types";
 
 export function useRegister() {
   const { syncUser } = useSync();
@@ -24,7 +24,7 @@ export function useRegister() {
         if (!idToken) throw new Error("Failed to get ID token.");
 
         return { idToken } as RegisterResponse;
-      } catch (error: any) {
+      } catch (error) {
         const friendlyMessage = getErrorMessage(error);
         throw new Error(friendlyMessage);
       }
