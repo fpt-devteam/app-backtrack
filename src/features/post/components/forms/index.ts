@@ -1,2 +1,2 @@
-export { default as PostCreateForm } from './PostCreateForm';
+export { default as PostForm } from './PostForm';
 
