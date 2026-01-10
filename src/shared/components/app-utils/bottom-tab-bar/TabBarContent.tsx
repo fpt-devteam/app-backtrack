@@ -1,5 +1,6 @@
 import { metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { StackActions } from "@react-navigation/native";
 import type { IconProps } from "phosphor-react-native";
 import { BellIcon, ChatCircleIcon, HouseIcon, QrCodeIcon } from "phosphor-react-native";
 import React from "react";
@@ -8,16 +9,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CreatePostButton } from "./CreatePostButton";
 import { TabBarButton } from "./TabBarButton";
 
-// ============================================================================
-// TAB CONFIGURATION - Map your route names to icons
-// ============================================================================
-
 type TabIcon = {
   Icon: React.ElementType<IconProps>;
   label: string;
 };
 
-// Route name → icon mapping (customize for your app)
 const TAB_ICONS: Record<string, TabIcon> = {
   posts: {
     Icon: HouseIcon,
@@ -36,10 +32,6 @@ const TAB_ICONS: Record<string, TabIcon> = {
     label: "Inbox",
   },
 };
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
 
 type Props = BottomTabBarProps & {
   onCreatePress: () => void;
@@ -60,16 +52,42 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
         },
       ]}
     >
+
       {/* Tab buttons */}
       <View style={styles.tabsContainer}>
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
           const tabConfig = TAB_ICONS[route.name];
 
-          // Skip hidden tabs
           if (!tabConfig || route.name === "(profile)") return null;
 
-          // Insert create button in the middle (between QR and Chat)
+          const handlePress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
+
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+              return;
+            }
+
+            if (isFocused && !event.defaultPrevented) {
+              const nestedState = route.state;
+              const nestedIndex = typeof nestedState?.index === "number" ? nestedState.index : 0;
+              const nestedKey = typeof nestedState?.key === "string" ? nestedState.key : undefined;
+
+              if (nestedIndex > 0 && nestedKey) {
+                console.log("Popping to top for nested navigator:", route.name);
+                navigation.dispatch({
+                  ...StackActions.popToTop(),
+                  target: nestedKey,
+                });
+              }
+            }
+          };
+
           if (route.name === "chat") {
             return (
               <React.Fragment key={route.key}>
@@ -82,13 +100,12 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
                   isFocused={isFocused}
                   Icon={tabConfig.Icon}
                   label={tabConfig.label}
-                  onPress={() => navigation.navigate(route.name)}
+                  onPress={handlePress}
                 />
               </React.Fragment>
             );
           }
 
-          // Regular tab button
           return (
             <TabBarButton
               key={route.key}
@@ -96,7 +113,7 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
               isFocused={isFocused}
               Icon={tabConfig.Icon}
               label={tabConfig.label}
-              onPress={() => navigation.navigate(route.name)}
+              onPress={handlePress}
             />
           );
         })}
@@ -105,13 +122,8 @@ export const TabBarContent = ({ state, navigation, onCreatePress }: Props) => {
   );
 };
 
-// ============================================================================
-// STYLES
-// ============================================================================
-
 const styles = StyleSheet.create({
   container: {
-    // Colors via className, only shadow/elevation here
     ...(Platform.OS === 'ios' ? metrics.shadows.tabBar.ios : metrics.shadows.tabBar.android),
   },
   tabsContainer: {
