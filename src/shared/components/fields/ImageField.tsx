@@ -1,8 +1,9 @@
 import { ensureMediaPermission } from '@/src/shared/services';
-import { ImagePickerAsset, launchImageLibraryAsync, type ImagePickerOptions } from 'expo-image-picker';
-import { Camera, Plus, X } from 'phosphor-react-native';
+import { launchImageLibraryAsync, type ImagePickerAsset, type ImagePickerOptions, } from 'expo-image-picker';
+import { CameraIcon, PlusIcon, XIcon } from 'phosphor-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import colors from '../../theme/colors';
 
 const MAX_IMAGES = 5;
 
@@ -57,7 +58,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
           className="border-2 border-dashed border-blue-300 rounded-xl p-8 items-center justify-center bg-blue-50/30"
         >
           <View className="w-16 h-16 bg-blue-100 rounded-2xl items-center justify-center mb-3">
-            <Camera size={32} color="#3B82F6" />
+            <CameraIcon size={32} color={colors.primary} />
           </View>
 
           <Text className="text-slate-900 font-semibold text-base mb-1">
@@ -67,7 +68,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
             Select images or take a new photo.
           </Text>
 
-          <View className="bg-blue-500 px-6 py-2.5 rounded-lg">
+          <View className="bg-primary px-6 py-2.5 rounded-lg">
             <Text className="text-white font-medium text-sm">Upload</Text>
           </View>
         </Pressable>
@@ -98,9 +99,9 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
             className="w-32 h-32 border-2 border-dashed border-blue-300 rounded-xl items-center justify-center bg-blue-50/30"
           >
             <View className="w-12 h-12 bg-blue-100 rounded-xl items-center justify-center mb-2">
-              <Plus size={24} color="#3B82F6" />
+              <PlusIcon size={24} color={colors.primary} />
             </View>
-            <Text className="text-blue-600 font-medium text-xs">Add More</Text>
+            <Text className="text-primary font-medium text-xs">Add More</Text>
           </Pressable>
         )}
 
@@ -120,7 +121,7 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
               onPress={() => handleRemoveImage(index)}
               className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 rounded-full items-center justify-center shadow-lg z-10"
             >
-              <X size={16} color="#FFFFFF" />
+              <XIcon size={16} color="white" />
             </Pressable>
 
             {/* Image Number Badge */}

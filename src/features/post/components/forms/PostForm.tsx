@@ -5,6 +5,7 @@ import { DateTimePickerField, ImageField, LocationField } from "@/src/shared/com
 import { AppHeader } from "@/src/shared/components/app-utils";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
+import colors from "@/src/shared/theme/colors";
 import type { GoogleMapDetailLocation, Nullable } from "@/src/shared/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import type { ImagePickerAsset } from "expo-image-picker";
@@ -57,15 +58,15 @@ const postSchema = yup
   })
   .required();
 
-type PostCreateFormSchema = yup.InferType<typeof postSchema>;
+type PostFormSchema = yup.InferType<typeof postSchema>;
 
-type PostCreateFormProps = {
+type PostFormProps = {
   postType: PostType;
   mode: "create" | "edit";
   initialData: Nullable<Post>;
 };
 
-const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) => {
+const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   const [postData, setPostData] = useState<Nullable<Post>>(initialData);
   const { uploadImages, isUploadingImages } = useUploadImage();
   const { createPost, isCreatingPost } = useCreatePost();
@@ -73,7 +74,7 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
 
   const loading = isUploadingImages || isCreatingPost;
 
-  const { control, handleSubmit, formState: { errors } } = useForm<PostCreateFormSchema>({
+  const { control, handleSubmit, formState: { errors } } = useForm<PostFormSchema>({
     defaultValues: {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
@@ -98,7 +99,7 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
     return imageUrls;
   };
 
-  const onSubmit: SubmitHandler<PostCreateFormSchema> = async (data: PostCreateFormSchema) => {
+  const onSubmit: SubmitHandler<PostFormSchema> = async (data: PostFormSchema) => {
     try {
       const imageUrls = await handleUploadImages(data.images);
       if (imageUrls.length === 0) {
@@ -140,31 +141,12 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
   const headerTitle = postType === PostType.Found ? "Add Found Item" : "Add Lost Item";
 
   return (
-    <View className="flex-1 bg-white " style={{ paddingBottom: insets.bottom }}>
-      <AppHeader title={headerTitle}
-        rightActionButton={
-          loading ? <ActivityIndicator /> :
-            <TouchableOpacity
-              className="h-11 items-center justify-center "
-              onPress={handleSubmit(onSubmit)}
-              disabled={loading}
-            >
-              <Text className="text-base font-semibold text-primary">{mode === 'edit' ? 'Save' : 'Create'}</Text>
-            </TouchableOpacity>
-        }
-      />
+    <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
+      <AppHeader title={headerTitle} />
 
       <ScrollView className="flex-1 p-4">
         {/* Form Fields */}
-        <View className="bg-white rounded-3xl p-4 my-3 shadow-lg border border-slate-300"
-          style={{
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 3,
-          }}
-        >
+        <View className="bg-white rounded-3xl p-4 my-3 shadow-md border border-slate-300">
 
           {/* Image Picker */}
           <View className="mb-4">
@@ -192,7 +174,7 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
                 <TextInput
                   className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? 'border-red-500' : 'border-slate-300'}`}
                   placeholder="e.g. Blue Backpack, iPhone 14"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor={colors.slate[300]}
                   value={value}
                   onChangeText={onChange}
                   editable={!loading}
@@ -214,7 +196,7 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
                 <TextInput
                   className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? 'border-red-500' : 'border-slate-300'}`}
                   placeholder="Describe the item in detail."
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor={colors.slate[300]}
                   value={value}
                   onChangeText={onChange}
                   multiline
@@ -239,7 +221,7 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
                 <TextInput
                   className={`border rounded-lg px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.distinctiveMarks ? 'border-red-500' : 'border-slate-300'}`}
                   placeholder="Any unique marks, scratches, or identifying features (optional)"
-                  placeholderTextColor="#64748b"
+                  placeholderTextColor={colors.slate[300]}
                   value={value}
                   onChangeText={onChange}
                   multiline
@@ -289,8 +271,18 @@ const PostCreateForm = ({ postType, mode, initialData }: PostCreateFormProps) =>
           </View>
         </View>
       </ScrollView>
+
+      <View className="p-4 pb-0">
+        <TouchableOpacity
+          className={`h-11 items-center justify-center rounded-lg ${loading ? 'bg-slate-400' : 'bg-primary'}`}
+          onPress={handleSubmit(onSubmit)}
+          disabled={loading}
+        >
+          {loading ? <ActivityIndicator color="white" /> : <Text className="text-base font-semibold text-white">{mode === 'edit' ? 'Save' : 'Upload'}</Text>}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-export default PostCreateForm;
+export default PostForm;

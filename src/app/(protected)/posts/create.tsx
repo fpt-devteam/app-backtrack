@@ -1,4 +1,4 @@
-import PostCreateForm from "@/src/features/post/components/forms/PostCreateForm";
+import PostForm from "@/src/features/post/components/forms/PostForm";
 import { PostType, type Post } from "@/src/features/post/types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";
@@ -25,7 +25,7 @@ const CreatePostScreen = () => {
   }, [initialData]);
 
   return (
-    <PostCreateForm postType={safePostType} mode={safeMode} initialData={parsedData} />
+    <PostForm postType={safePostType} mode={safeMode} initialData={parsedData} />
   );
 };
 
