@@ -1,6 +1,7 @@
 import { AppBrand, AppUserAvatarIcon } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
-import { ExternalPathString, RelativePathString, router } from "expo-router";
+import type { ExternalPathString, RelativePathString } from "expo-router";
+import { router } from "expo-router";
 import { MagnifyingGlassIcon } from "phosphor-react-native";
 import { Pressable, View } from "react-native";
 

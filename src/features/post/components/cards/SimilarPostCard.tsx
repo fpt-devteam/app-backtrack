@@ -1,11 +1,12 @@
-import { SimilarPost } from '@/src/features/post/types'
-import { POST_ROUTE } from '@/src/shared/constants'
-import { colors } from '@/src/shared/theme'
-import { formatIsoDate } from '@/src/shared/utils'
-import { ExternalPathString, RelativePathString, router } from 'expo-router'
-import { Clock, MapPin } from 'phosphor-react-native'
-import React from 'react'
-import { Image, Pressable, Text, View } from 'react-native'
+import type { SimilarPost } from '@/src/features/post/types';
+import { POST_ROUTE } from '@/src/shared/constants';
+import { colors } from '@/src/shared/theme';
+import { formatIsoDate } from '@/src/shared/utils';
+import type { ExternalPathString, RelativePathString } from 'expo-router';
+import { router } from 'expo-router';
+import { ClockIcon, MapPinIcon } from 'phosphor-react-native';
+import React from 'react';
+import { Image, Pressable, Text, View } from 'react-native';
 
 type SimilarPostCardProps = {
   postId: string
@@ -46,7 +47,7 @@ const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
 
         <View className="flex-col justify-between gap-1">
           <View className="flex-row items-center gap-2">
-            <MapPin size={16} color={colors.slate[500]} />
+            <MapPinIcon size={16} color={colors.slate[500]} />
             <Text
               className="flex-1 min-w-0 text-[12px] text-slate-600"
               numberOfLines={1}
@@ -56,7 +57,7 @@ const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
           </View>
 
           <View className="flex-row items-center gap-2">
-            <Clock size={16} color={colors.slate[500]} />
+            <ClockIcon size={16} color={colors.slate[500]} />
             <Text
               className="flex-1 min-w-0 text-[12px] text-slate-600"
               numberOfLines={1}

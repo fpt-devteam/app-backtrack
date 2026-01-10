@@ -3,9 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { createPost } from '../api';
 import { POST_CREATE_KEY, POSTS_QUERY_KEY } from '../constants';
-import { PostCreateRequest } from '../types';
+import type { PostCreateRequest } from '../types';
 
-export const useCreatePost = () => {
+const useCreatePost = () => {
   const qc = useQueryClient();
 
   const mutation = useMutation({
@@ -33,3 +33,5 @@ export const useCreatePost = () => {
     error,
   }
 }
+
+export default useCreatePost;

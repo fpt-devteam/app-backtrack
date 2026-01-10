@@ -9,7 +9,7 @@ import { CHAT_ROUTE, POST_ROUTE } from '@/src/shared/constants'
 import { formatIsoDate } from '@/src/shared/utils'
 import type { ExternalPathString, RelativePathString } from 'expo-router'
 import { router } from 'expo-router'
-import { Calendar, MapPin, MapTrifold, Tag } from 'phosphor-react-native'
+import { CalendarIcon, MapPinIcon, MapTrifoldIcon, TagIcon } from 'phosphor-react-native'
 import React, { useEffect, useMemo, useRef } from 'react'
 import { Animated, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import type { Region } from 'react-native-maps'
@@ -33,7 +33,7 @@ const PostDetailsSkeleton = () => {
     return () => anim.stop()
   }, [opacity])
 
-  const Skel = ({ className }: { className: string }) => (
+  const Skeleton = ({ className }: { className: string }) => (
     <Animated.View style={{ opacity }} className={`bg-slate-200 ${className}`} />
   )
 
@@ -44,16 +44,16 @@ const PostDetailsSkeleton = () => {
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">
             <View className="flex-1 gap-2">
-              <Skel className="h-6 rounded-xl w-[85%]" />
-              <Skel className="h-6 rounded-xl w-[55%]" />
+              <Skeleton className="h-6 rounded-xl w-[85%]" />
+              <Skeleton className="h-6 rounded-xl w-[55%]" />
             </View>
-            <Skel className="h-7 w-20 rounded-full" />
+            <Skeleton className="h-7 w-20 rounded-full" />
           </View>
 
           <View className="mt-3 gap-2">
-            <Skel className="h-3 rounded-lg w-[95%]" />
-            <Skel className="h-3 rounded-lg w-[88%]" />
-            <Skel className="h-3 rounded-lg w-[70%]" />
+            <Skeleton className="h-3 rounded-lg w-[95%]" />
+            <Skeleton className="h-3 rounded-lg w-[88%]" />
+            <Skeleton className="h-3 rounded-lg w-[70%]" />
           </View>
         </View>
 
@@ -63,10 +63,10 @@ const PostDetailsSkeleton = () => {
         <View className="p-4 gap-4">
           {[0, 1, 2].map((i) => (
             <View key={i} className="flex-row gap-3 items-center">
-              <Skel className="h-10 w-10 rounded-2xl" />
+              <Skeleton className="h-10 w-10 rounded-2xl" />
               <View className="flex-1 gap-2">
-                <Skel className="h-3 w-32 rounded-lg" />
-                <Skel className="h-4 w-[80%] rounded-lg" />
+                <Skeleton className="h-3 w-32 rounded-lg" />
+                <Skeleton className="h-4 w-[80%] rounded-lg" />
               </View>
             </View>
           ))}
@@ -75,9 +75,9 @@ const PostDetailsSkeleton = () => {
         {/* Map Section */}
         <View className="px-5 pb-5">
           <View className="rounded-2xl overflow-hidden border border-slate-200">
-            <Skel className="h-40 w-full rounded-none" />
+            <Skeleton className="h-40 w-full rounded-none" />
             <View className="absolute right-3 bottom-3">
-              <Skel className="h-11 w-11 rounded-2xl" />
+              <Skeleton className="h-11 w-11 rounded-2xl" />
             </View>
           </View>
         </View>
@@ -180,7 +180,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           {/* Last seen location */}
           <View className="flex-row gap-3 items-start">
             <View className="w-8 h-8 items-center justify-center">
-              <MapPin size={28} color="#2563EB" weight="fill" />
+              <MapPinIcon size={28} color="#2563EB" weight="fill" />
             </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Last seen location</Text>
@@ -193,7 +193,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           {/* Distinctive marks */}
           <View className="flex-row gap-3 items-start">
             <View className="w-8 h-8 items-center justify-center">
-              <Tag size={28} color="#2563EB" weight="fill" />
+              <TagIcon size={28} color="#2563EB" weight="fill" />
             </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Distinctive marks</Text>
@@ -206,7 +206,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           {/* Event time */}
           <View className="flex-row gap-3 items-start">
             <View className="w-8 h-8 items-center justify-center">
-              <Calendar size={28} color="#2563EB" weight="fill" />
+              <CalendarIcon size={28} color="#2563EB" weight="fill" />
             </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Event time</Text>
@@ -239,7 +239,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
               onPress={openInMaps}
               className="absolute right-3 bottom-3 bg-white/95 rounded-2xl p-3 border border-slate-900/10"
             >
-              <MapTrifold size={20} color="#2563EB" weight="bold" />
+              <MapTrifoldIcon size={20} color="#2563EB" weight="bold" />
             </TouchableOpacity>
           </View>
         </View>
