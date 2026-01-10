@@ -1,6 +1,6 @@
-import { Nullable } from "@/src/shared/types";
+import type { Nullable } from "@/src/shared/types";
 import { useMutation } from "@tanstack/react-query";
-import { ImagePickerAsset } from "expo-image-picker";
+import type { ImagePickerAsset } from "expo-image-picker";
 import { useState } from "react";
 import {
   MAX_IMAGE_UPLOAD,

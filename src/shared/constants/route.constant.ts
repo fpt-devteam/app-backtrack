@@ -15,5 +15,5 @@ export const POST_ROUTE = {
 
 export const CHAT_ROUTE = {
   conversations: `/(protected)/chat/conversations`,
-  message: (conversationId: string) =>`/(protected)/chat/conversations/${conversationId}`,
+  message: (conversationId: string) => `/(protected)/chat/conversations/${conversationId}`,
 } as const;

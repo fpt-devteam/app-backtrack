@@ -1,4 +1,4 @@
-import { ImagePickerAsset } from "expo-image-picker";
+import type { ImagePickerAsset } from "expo-image-picker";
 
 export type ImageAsset = ImagePickerAsset & {
   type: 'image';

@@ -1,6 +1,7 @@
-import { MessageItem } from "@/src/features/chat/types";
+import type { MessageItem } from "@/src/features/chat/types";
 import { SOCKET_CONFIG } from "@/src/shared/constants";
-import { io, Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 
 export class SocketService {
   private socket: Socket | null = null;
@@ -68,7 +69,7 @@ export class SocketService {
   onReceiveMessage(callback: (message: MessageItem) => void): () => void {
     if (!this.socket) {
       console.warn("Socket not initialized");
-      return () => {};
+      return () => { };
     }
 
     this.socket.on("receive_message", callback);

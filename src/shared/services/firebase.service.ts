@@ -1,8 +1,9 @@
+import { firebaseStorage } from "@/src/shared/lib";
+import type { ImageUploadRequest, ImageUploadResponse } from "@/src/shared/types";
 import { getMediaLibraryPermissionsAsync, PermissionStatus, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
-import { getDownloadURL, ref, StorageReference, uploadBytes } from "firebase/storage";
+import type { StorageReference } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Alert, Linking, Platform } from "react-native";
-import { firebaseStorage } from "../lib/firebase";
-import { ImageUploadRequest, ImageUploadResponse } from "../types";
 
 export async function uploadImageToStorage(req: ImageUploadRequest): Promise<ImageUploadResponse> {
   const { path, blob } = req;

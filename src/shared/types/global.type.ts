@@ -19,7 +19,6 @@ export type ApiError = {
   code: string;
   message: string;
   statusCode: number;
-  details?: any;
 }
 
 export type ApiResponse<T> = {
