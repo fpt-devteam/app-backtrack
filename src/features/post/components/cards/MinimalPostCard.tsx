@@ -1,11 +1,12 @@
-import { PostStatusBadge } from '@/src/features/post/components'
-import { Post } from '@/src/features/post/types'
-import { POST_ROUTE } from '@/src/shared/constants'
-import { formatIsoDate } from '@/src/shared/utils'
-import { ExternalPathString, RelativePathString, router } from 'expo-router'
-import { Clock, MapPin } from 'phosphor-react-native'
-import React from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import { PostStatusBadge } from '@/src/features/post/components';
+import type { Post } from '@/src/features/post/types';
+import { POST_ROUTE } from '@/src/shared/constants';
+import { formatIsoDate } from '@/src/shared/utils';
+import type { ExternalPathString, RelativePathString } from 'expo-router';
+import { router } from 'expo-router';
+import { ClockIcon, MapPinIcon } from 'phosphor-react-native';
+import React from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 type MinimalPostCardProps = {
   post: Post
@@ -33,7 +34,7 @@ const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
 
         <View className="flex-col justify-between gap-1">
           <View className="flex-row items-center gap-2">
-            <MapPin size={16} color="#64748B" />
+            <MapPinIcon size={16} color="#64748B" />
             <Text
               className="flex-1 min-w-0 text-[12px] text-slate-600"
               numberOfLines={1}
@@ -43,7 +44,7 @@ const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
           </View>
 
           <View className="flex-row items-center gap-2">
-            <Clock size={16} color="#64748B" />
+            <ClockIcon size={16} color="#64748B" />
             <Text
               className="flex-1 min-w-0 text-[12px] text-slate-600"
               numberOfLines={1}

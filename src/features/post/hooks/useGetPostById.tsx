@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { getPostByIdApi } from '../api';
 import { POST_DETAIL_QUERY_KEY } from '../constants';
-import { PostGetByIdRequest } from '../types';
+import type { PostGetByIdRequest } from '../types';
 
 const useGetPostById = (request: PostGetByIdRequest) => {
   const query = useQuery({

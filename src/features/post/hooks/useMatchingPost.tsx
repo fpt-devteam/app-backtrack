@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { matchingPostsApi } from '../api';
 import { POST_MATCHING_QUERY_KEY } from '../constants';
-import { MatchingPostsRequest, MatchingPostsResponse, PostMatchingStatus } from '../types';
+import type { MatchingPostsRequest, MatchingPostsResponse } from '../types';
+import { PostMatchingStatus } from '../types';
 
 const TIME_INTERVAL_MS = 2000;
 

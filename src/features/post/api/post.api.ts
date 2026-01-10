@@ -1,7 +1,13 @@
 import { privateClient } from "@/src/api/common/client";
 import type { MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
-import { ApiResponse } from "@/src/shared/types";
-import { POST_API } from "../constants";
+import type { ApiResponse } from "@/src/shared/types";
+
+export const POST_API = {
+  create: "/core/posts",
+  filter: "/core/posts",
+  detail: (postId: string) => `/core/posts/${postId}`,
+  matching: (postId: string) => `/core/posts/${postId}/similar`,
+} as const;
 
 export async function filterPostsApi(params: PostsRequest = {}) {
   const response = await privateClient.get<PostsResponse>(POST_API.filter, {

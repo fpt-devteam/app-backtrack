@@ -1,12 +1,14 @@
+import { LocationField } from "@/src/features/location/components";
+import type { UserLocation } from "@/src/features/location/types";
 import { useCreatePost } from "@/src/features/post/hooks";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
-import { DateTimePickerField, ImageField, LocationField } from "@/src/shared/components";
+import { DateTimePickerField, ImageField } from "@/src/shared/components";
 import { AppHeader } from "@/src/shared/components/app-utils";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
 import colors from "@/src/shared/theme/colors";
-import type { GoogleMapDetailLocation, Nullable } from "@/src/shared/types";
+import type { Nullable } from "@/src/shared/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import type { ImagePickerAsset } from "expo-image-picker";
 import type { ExternalPathString, RelativePathString } from "expo-router";
@@ -54,7 +56,7 @@ const postSchema = yup
       .min(1, "Please select at least 1 image.")
       .max(5, "You can select up to 5 images.")
       .required("Images are required."),
-    detailLocation: yup.mixed<GoogleMapDetailLocation>().required("Location is required"),
+    detailLocation: yup.mixed<UserLocation>().required("Location is required"),
   })
   .required();
 

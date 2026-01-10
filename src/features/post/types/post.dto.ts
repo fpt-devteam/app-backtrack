@@ -1,8 +1,7 @@
-import { ApiResponse, PagedResponse } from "@/src/api/common/api.types";
-import { GoogleMapDetailLocation } from "@/src/shared/types/location.type";
-import { LatLng } from "react-native-maps";
-import { PostMatchingStatus, PostType } from "./post.enum";
-import { Post, SimilarPost } from "./post.type";
+import type { ApiResponse, PagedResponse } from "@/src/api/common/api.types";
+import type { UserLocation } from "@/src/features/location/types";
+import type { Post, PostMatchingStatus, PostType, SimilarPost } from "@/src/features/post/types";
+import type { LatLng } from "react-native-maps";
 
 export type PostsRequest = {
   page?: number;
@@ -23,7 +22,7 @@ export type PostCreateRequest = {
   imageUrls: string[];
   distinctiveMarks: string | null;
   eventTime: Date;
-} & GoogleMapDetailLocation;
+} & UserLocation;
 
 export type PostCreateResponse = ApiResponse<Post>;
 
