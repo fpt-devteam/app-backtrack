@@ -244,7 +244,9 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               control={control}
               name="detailLocation"
               render={({ field: { onChange, value } }) => (
-                <LocationField value={value} onChange={onChange} />
+                <LocationField
+                  value={value}
+                  onChange={onChange} />
               )}
             />
             {errors.detailLocation && (
