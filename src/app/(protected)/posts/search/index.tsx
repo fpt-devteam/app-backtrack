@@ -313,7 +313,7 @@ export default function SearchScreen() {
         {/* Top row: Back + Search bar */}
         <View className="flex-row items-center">
           <Pressable
-            onPress={() => router.replace(POST_ROUTE.index)}
+            onPress={() => router.back()}
             hitSlop={10}
             className="mr-2 h-12 w-12 items-center justify-center rounded-2xl border-2"
             style={{ borderColor: colors.slate[200] }}

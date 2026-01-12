@@ -4,8 +4,10 @@ import colors from '@/src/shared/theme/colors'
 import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
 import { CaretRightIcon, MapPinIcon } from 'phosphor-react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, TouchableOpacity } from 'react-native'
+import { usePlaceDetailsFromLatLngMutation } from '../hooks/usePlaceDetails'
+import { useLocationSelectionStore } from '../store'
 
 type LocationFieldProps = {
   placeholder?: string;
@@ -16,9 +18,36 @@ type LocationFieldProps = {
 const LocationField = ({
   value,
   onChange,
-  placeholder = 'Search location...'
+  placeholder = 'Search location...',
 }: LocationFieldProps) => {
   const [pressed, setPressed] = useState(false)
+  const { selection, initSelection, clearSelection } = useLocationSelectionStore();
+  const placeMut = usePlaceDetailsFromLatLngMutation();
+
+  useEffect(() => {
+    initSelection();
+    return () => clearSelection();
+  }, [initSelection, clearSelection]);
+
+  useEffect(() => {
+    console.log("Here to normalize data after selection");
+    console.log('Location selection changed at here:', selection);
+
+    const normData = async () => {
+      if (selection) {
+        const details = await placeMut.mutateAsync({ loc: selection.location });
+        if (details) {
+          console.log('Fetched place details:', details);
+          onChange({
+            displayAddress: details.formattedAddress || '',
+            location: details.location,
+            externalPlaceId: details.placeId,
+          });
+        }
+      }
+    }
+    normData()
+  }, [selection]);
 
   const handlePress = () => {
     console.log('Navigate to location search screen');

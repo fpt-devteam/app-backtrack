@@ -56,7 +56,7 @@ const LocationSearchScreen = () => {
   const mapRef = useRef<MapView>(null)
 
   const { getUserLocation, loadingUserLocation, error } = useUserLocation();
-  const { selection, setSelection, takeSelection } = useLocationSelectionStore();
+  const { takeSelection, selection, setSelection } = useLocationSelectionStore();
 
   const [mapLayout, setMapLayout] = useState<MapLayout>({ width: 0, height: 0 })
 
@@ -65,24 +65,24 @@ const LocationSearchScreen = () => {
   const [openRadiusSheet, setOpenRadiusSheet] = useState(false)
   const [localRadiusKm, setLocalRadiusKm] = useState(initialRadius)
 
-  const initialLocation: LatLng = selection?.location ?? DEFAULT_LOCATION
+  const initialLocation: LatLng = DEFAULT_LOCATION
   const [localLocation, setLocalLocation] = useState<LatLng>(initialLocation)
 
   const animatedRadius = useRef(new Animated.Value(initialRadius * 1000)).current
   const prevRadiusRef = useRef(localRadiusKm)
 
-  const handleOpenSearch = () => router.push(POST_ROUTE.searchLocationInput)
-
   useEffect(() => {
+    console.log("Selection changed:", selection);
     if (selection) {
       setLocalLocation(selection.location);
-      setLocalRadiusKm(selection.radiusKm ?? TARGET_RADIUS_DEFAULT_KM);
+      if (selection.radiusKm) {
+        setLocalRadiusKm(selection.radiusKm);
+      }
     }
-  }, [selection]);
+  }, [selection])
 
   const handleSelectLocation = () => {
     console.log("takeSelection", takeSelection());
-
     router.back();
   }
 
@@ -122,23 +122,38 @@ const LocationSearchScreen = () => {
     const userLocation = await getUserLocation();
     if (!userLocation) return;
 
-    setLocalLocation(userLocation);
+    setSelection({ location: userLocation });
   }
 
   const openSheet = () => setOpenRadiusSheet(true)
 
   const closeSheet = () => setOpenRadiusSheet(false)
 
-  const onApplyRadius = (newRadius: number) => {
-    console.log('Radius selected:', newRadius);
+  const onRadiusChange = (newRadius: number) => {
+    const next = {
+      location: selection?.location || localLocation,
+      radiusKm: newRadius
+    }
+
+    setSelection(next)
+
     setLocalRadiusKm(newRadius);
     closeSheet();
+
+    console.log('Radius change:', newRadius);
   }
 
   const onLocationChange = (coord: LatLng) => {
+    const next = { ...selection, location: coord }
+    setSelection(next)
+
     setLocalLocation(coord)
-    console.log('New coordinates:', coord)
+    console.log('Location change: ', coord)
   }
+
+  const handleOpenSearch = () => router.push(POST_ROUTE.searchLocationInput)
+
+  const isMapUtilDisable = loadingUserLocation || openRadiusSheet
 
   return (
     <View className="flex-1" style={{ paddingBottom: insets.bottom }}>
@@ -183,6 +198,7 @@ const LocationSearchScreen = () => {
             <TouchableOpacity
               onPress={openSheet}
               className="h-full w-full items-center justify-center"
+              disabled={isMapUtilDisable}
             >
               <TargetIcon size={24} color={colors.black} />
             </TouchableOpacity>
@@ -192,7 +208,7 @@ const LocationSearchScreen = () => {
           <View className="h-12 w-12 bg-white rounded-lg">
             <TouchableOpacity
               onPress={onGetCurrentPosition}
-              disabled={loadingUserLocation}
+              disabled={isMapUtilDisable}
               className="h-full w-full items-center justify-center"
             >
               <CrosshairIcon size={24} color={colors.black} />
@@ -205,7 +221,7 @@ const LocationSearchScreen = () => {
           isVisible={openRadiusSheet}
           onClose={closeSheet}
           radius={localRadiusKm}
-          onRadiusChange={onApplyRadius}
+          onRadiusChange={onRadiusChange}
         />
       </View>
 
