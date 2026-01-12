@@ -1,3 +1,4 @@
+import { useUIStore } from "@/src/shared/store/ui.store";
 import { Tabs, usePathname } from "expo-router";
 import React, { useState } from "react";
 import AppCreateActionsSheet from "../AppCreateActionsSheet";
@@ -6,11 +7,11 @@ import { TabBarContent } from "./TabBarContent";
 const BottomTabBar = () => {
   const [openSheet, setOpenSheet] = useState(false);
   const pathname = usePathname();
+  const bottomTabBarState = useUIStore((state) => state.bottomTabBarState);
 
   const closeSheet = () => setOpenSheet(false);
   const hiddenRoutes = ["/posts/create", "/posts/search", "/posts/search/result", "/posts/search/location"];
-  const shouldHideTabBar = hiddenRoutes.some(route => pathname.startsWith(route));
-
+  const shouldHideTabBar = hiddenRoutes.some(route => pathname.startsWith(route)) || bottomTabBarState === 'closed';
   return (
     <>
       <Tabs

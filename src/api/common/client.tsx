@@ -2,14 +2,14 @@ import { auth } from '@/src/shared/lib/firebase';
 import axios from 'axios';
 
 export const publicClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_BASE_URL,
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 export const privateClient = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_BASE_URL,
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
