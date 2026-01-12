@@ -3,10 +3,10 @@ import type { MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateReque
 import type { ApiResponse } from "@/src/shared/types";
 
 export const POST_API = {
-  create: "/core/posts",
-  filter: "/core/posts",
-  detail: (postId: string) => `/core/posts/${postId}`,
-  matching: (postId: string) => `/core/posts/${postId}/similar`,
+  create: "/api/core/posts",
+  filter: "/api/core/posts",
+  detail: (postId: string) => `/api/core/posts/${postId}`,
+  matching: (postId: string) => `/api/core/posts/${postId}/similar`,
 } as const;
 
 export async function filterPostsApi(params: PostsRequest = {}) {
