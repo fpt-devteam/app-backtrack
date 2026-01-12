@@ -1,24 +1,16 @@
 import { HOOK_QUERY_KEY } from '@/src/features/location/constants';
 import { useMutation } from '@tanstack/react-query';
-import { Accuracy, getCurrentPositionAsync } from 'expo-location';
 import { useMemo } from 'react';
-import type { LatLng } from 'react-native-maps';
+import type { PlaceDetails } from '../services/googlePlaces.service';
+import { GooglePlacesService } from '../services/googlePlaces.service';
 
-const useUserLocation = () => {
-  const mutation = useMutation<LatLng | null>({
+const useUserPlace = () => {
+  const mutation = useMutation<PlaceDetails | null>({
     mutationKey: HOOK_QUERY_KEY.getUserLocation,
     mutationFn: async () => {
       try {
-        const response = await getCurrentPositionAsync({
-          accuracy: Accuracy.Balanced,
-        });
-
-        const location: LatLng = {
-          latitude: response.coords.latitude,
-          longitude: response.coords.longitude,
-        };
-
-        return location;
+        const response = await GooglePlacesService.getCurrentPlace();
+        return response;
       } catch (error) {
         console.error('Failed to get current position:', error);
         return null;
@@ -42,5 +34,4 @@ const useUserLocation = () => {
   };
 }
 
-export default useUserLocation;
-
+export default useUserPlace;

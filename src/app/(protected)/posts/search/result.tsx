@@ -1,12 +1,15 @@
+import { LocationField } from "@/src/features/location/components";
+import { useLocationSelectionStore } from "@/src/features/location/store";
+import type { UserLocation } from "@/src/features/location/types";
 import { MinimalPostCard } from "@/src/features/post/components";
-import { LocationSearchBar } from "@/src/features/post/components/ui";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 import { AppEndOfFeed, AppLoader } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
+import { DEFAULT_LOCATION, POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import type { LocationFilterValue } from "@/src/shared/types";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeftIcon,
@@ -14,7 +17,18 @@ import {
   MagnifyingGlassIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import type { LatLng } from "react-native-maps";
+
+import * as yup from "yup";
+const filterSchema = yup
+  .object({
+    detailLocation: yup.mixed<UserLocation>().defined(),
+  })
+  .required();
+
+type FilterSchema = yup.InferType<typeof filterSchema>;
 
 const isLocationFilterValue = (value: unknown): value is LocationFilterValue => {
   if (!value || typeof value !== "object") return false;
@@ -43,6 +57,18 @@ export default function PostSearchResultScreen() {
     termSearch?: string;
     locationFilter?: string;
   }>();
+  const { takeSelection, selection, setSelection } = useLocationSelectionStore();
+
+  const { control, handleSubmit, formState: { errors } } = useForm<FilterSchema>({
+    defaultValues: {
+      detailLocation: undefined,
+    },
+    resolver: yupResolver(filterSchema),
+    mode: "onSubmit",
+  });
+
+  const initialLocation: LatLng = DEFAULT_LOCATION
+  const [localLocation, setLocalLocation] = useState<LatLng>(initialLocation)
 
   const searchTermData = (termSearch ?? "").toString();
   const parsedLocationFilter = useMemo(
@@ -129,12 +155,6 @@ export default function PostSearchResultScreen() {
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
 
-  const locationLabel = useMemo(() => {
-    if (!parsedLocationFilter) return undefined;
-    const baseLabel = parsedLocationFilter.label ?? "Selected location";
-    return `${baseLabel} - ${parsedLocationFilter.radius} km`;
-  }, [parsedLocationFilter]);
-
   return (
     <View className="bg-white flex-1">
       <View className="p-4 pb-2">
@@ -164,10 +184,17 @@ export default function PostSearchResultScreen() {
           </Pressable>
         </View>
 
-        <LocationSearchBar
-          valueLabel={locationLabel}
-          locationFilter={parsedLocationFilter}
-        />
+        <View>
+          <Controller
+            control={control}
+            name="detailLocation"
+            render={({ field: { onChange, value } }) => (
+              <LocationField
+                value={value}
+                onChange={onChange} />
+            )}
+          />
+        </View>
 
         <ScrollView
           horizontal
