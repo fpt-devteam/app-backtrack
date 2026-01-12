@@ -1,6 +1,6 @@
 export const SOCKET_CONFIG = {
-  DEV_URL: process.env.EXPO_PUBLIC_RAILWAY_STATIC_URL,
-  PROD_URL: process.env.EXPO_PUBLIC_RAILWAY_STATIC_URL,
+  DEV_URL: process.env.EXPO_PUBLIC_API_URL,
+  PROD_URL: process.env.EXPO_PUBLIC_API_URL,
   PATH: "/api/chat/hub",
   TRANSPORTS: ["websocket", "polling"] as const,
   TIMEOUT: 5000,

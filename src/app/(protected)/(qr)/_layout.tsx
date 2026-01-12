@@ -5,7 +5,7 @@ const QrLayout = () => {
   return (
     <Stack
       screenOptions={{
-        // headerShown: false,
+        headerShown: false,
       }}
     />
   )
