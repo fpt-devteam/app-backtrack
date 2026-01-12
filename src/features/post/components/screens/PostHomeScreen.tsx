@@ -4,7 +4,7 @@ import { usePosts } from '@/src/features/post/hooks';
 import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl } from 'react-native';
 
 const PostHomeScreen = () => {
   const queryClient = useQueryClient();
@@ -36,17 +36,11 @@ const PostHomeScreen = () => {
 
   const renderFooter = useCallback(() => {
     if (isLoadingNextPage) return (
-      <View>
-        <AppLoader />
-      </View>
+      <AppLoader />
     );
 
     if (!hasMore) return (
-      <View>
-        <View>
-          <AppEndOfFeed />
-        </View>
-      </View>
+      <AppEndOfFeed />
     );
 
     return null;
