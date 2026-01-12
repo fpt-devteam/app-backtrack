@@ -22,6 +22,7 @@ export const LocationSelectionProvider = ({ children }: { children: React.ReactN
   const { getUserLocation } = useUserLocation();
 
   const initSelection = useCallback(async () => {
+
     const location = await getUserLocation();
     if (!location) return;
 
@@ -43,7 +44,7 @@ export const LocationSelectionProvider = ({ children }: { children: React.ReactN
     let value: LocationSelection | null = null;
     setSelectionState((prev) => {
       value = prev;
-      return null; // clear
+      return null;
     });
     return value;
   }, []);

@@ -18,7 +18,7 @@ type LocationFieldProps = {
 const LocationField = ({
   value,
   onChange,
-  placeholder = 'Search location...'
+  placeholder = 'Search location...',
 }: LocationFieldProps) => {
   const [pressed, setPressed] = useState(false)
   const { selection, initSelection, clearSelection } = useLocationSelectionStore();
@@ -26,8 +26,8 @@ const LocationField = ({
 
   useEffect(() => {
     initSelection();
-    // return () => clearSelection();
-  }, [initSelection]);
+    return () => clearSelection();
+  }, [initSelection, clearSelection]);
 
   useEffect(() => {
     console.log("Here to normalize data after selection");
