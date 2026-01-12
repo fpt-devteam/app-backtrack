@@ -1,10 +1,11 @@
+import type {
+  BottomSheetBackdropProps
+} from '@gorhom/bottom-sheet';
 import BottomSheetPrimitive, {
   BottomSheetBackdrop,
-  BottomSheetBackdropProps,
   BottomSheetView,
-} from '@gorhom/bottom-sheet'
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
-import { View } from 'react-native'
+} from '@gorhom/bottom-sheet';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 type Props = {
   isVisible: boolean

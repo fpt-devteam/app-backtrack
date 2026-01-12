@@ -1,0 +1,28 @@
+import type { LatLng, Region } from "react-native-maps";
+
+const DEFAULT_REGION: Region = {
+  latitude: 10.762622,
+  longitude: 106.660172,
+  latitudeDelta: 0.03,
+  longitudeDelta: 0.03,
+};
+
+const DEFAULT_LOCATION: LatLng = {
+  latitude: 10.762622,
+  longitude: 106.660172,
+};
+
+const ANIMATE_TO_DURATION = 600;
+
+const QUERY_CONFIG = {
+  key: process.env.EXPO_PUBLIC_GOOGLE_API_KEY as string,
+  language: "vi",
+  components: "country:vn",
+} as const;
+
+export { ANIMATE_TO_DURATION, DEFAULT_LOCATION, DEFAULT_REGION, QUERY_CONFIG };
+
+export const HOOK_QUERY_KEY = {
+  location_autocomplete: "location-autocomplete",
+  getUserLocation: ["getUserLocation"],
+} as const;

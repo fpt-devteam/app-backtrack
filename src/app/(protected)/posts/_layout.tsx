@@ -7,6 +7,19 @@ export default function PostsStackLayout() {
     }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="create" />
+
+      <Stack.Screen name="location" />
+
+      <Stack.Screen
+        name="search/location-search"
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+          contentStyle: {
+            backgroundColor: "transparent"
+          },
+        }}
+      />
     </Stack>
   );
 }

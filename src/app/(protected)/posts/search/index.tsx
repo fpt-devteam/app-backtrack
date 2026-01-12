@@ -1,4 +1,3 @@
-import { LocationSearchBar } from "@/src/features/post/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -354,7 +353,8 @@ export default function SearchScreen() {
           </View>
           {/* Location Search Bar */}
         </View>
-        <LocationSearchBar />
+
+        {/* <LocationSearchBar /> */}
 
         {/* Divider */}
         <View className="h-[1px] mt-4" style={{ backgroundColor: colors.gray[100] }} />
