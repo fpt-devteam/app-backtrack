@@ -71,8 +71,6 @@ const LocationSearchScreen = () => {
   const animatedRadius = useRef(new Animated.Value(initialRadius * 1000)).current
   const prevRadiusRef = useRef(localRadiusKm)
 
-  const handleOpenSearch = () => router.push(POST_ROUTE.searchLocationInput)
-
   useEffect(() => {
     console.log("Selection changed:", selection);
     if (selection) {
@@ -131,16 +129,31 @@ const LocationSearchScreen = () => {
 
   const closeSheet = () => setOpenRadiusSheet(false)
 
-  const onApplyRadius = (newRadius: number) => {
-    console.log('Radius selected:', newRadius);
+  const onRadiusChange = (newRadius: number) => {
+    const next = {
+      location: selection?.location || localLocation,
+      radiusKm: newRadius
+    }
+
+    setSelection(next)
+
     setLocalRadiusKm(newRadius);
     closeSheet();
+
+    console.log('Radius change:', newRadius);
   }
 
   const onLocationChange = (coord: LatLng) => {
-    setSelection({ location: coord })
-    console.log('New coordinates:', coord)
+    const next = { ...selection, location: coord }
+    setSelection(next)
+
+    setLocalLocation(coord)
+    console.log('Location change: ', coord)
   }
+
+  const handleOpenSearch = () => router.push(POST_ROUTE.searchLocationInput)
+
+  const isMapUtilDisable = loadingUserLocation || openRadiusSheet
 
   return (
     <View className="flex-1" style={{ paddingBottom: insets.bottom }}>
@@ -185,6 +198,7 @@ const LocationSearchScreen = () => {
             <TouchableOpacity
               onPress={openSheet}
               className="h-full w-full items-center justify-center"
+              disabled={isMapUtilDisable}
             >
               <TargetIcon size={24} color={colors.black} />
             </TouchableOpacity>
@@ -194,7 +208,7 @@ const LocationSearchScreen = () => {
           <View className="h-12 w-12 bg-white rounded-lg">
             <TouchableOpacity
               onPress={onGetCurrentPosition}
-              disabled={loadingUserLocation}
+              disabled={isMapUtilDisable}
               className="h-full w-full items-center justify-center"
             >
               <CrosshairIcon size={24} color={colors.black} />
@@ -207,7 +221,7 @@ const LocationSearchScreen = () => {
           isVisible={openRadiusSheet}
           onClose={closeSheet}
           radius={localRadiusKm}
-          onRadiusChange={onApplyRadius}
+          onRadiusChange={onRadiusChange}
         />
       </View>
 

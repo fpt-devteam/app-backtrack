@@ -82,8 +82,6 @@ const LocationMarker = ({ mapRef, location, onLocationChange }: Props) => {
     if (!isDraggingRef.current) return
     const coord = event.nativeEvent.coordinate
     cameraTargetCenterRef.current = coord
-
-    // ✅ optional: marker follows finger smoothly (helps UX)
     setDragCoord(coord)
   }
 
