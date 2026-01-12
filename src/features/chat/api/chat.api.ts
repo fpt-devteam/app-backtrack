@@ -3,10 +3,10 @@ import { ConversationsGetResponse, MessagesGetResponse } from "../types";
 import { ConversationCreateRequest, ConversationCreateResponse, CursorPaginationParams, MessageSendRequest, MessageSendResponse } from "../types/chat.dto";
 
 const CHAT_API = {
-  getConversations: '/chat/conversations',
-  createConversation: '/chat/conversations',
-  getMessages: (conversationId: string) => `/chat/messages/${conversationId}`,
-  sendMessage: (partnerId: string) => `/chat/messages/${partnerId}`,
+  getConversations: '/api/chat/conversations',
+  createConversation: '/api/chat/conversations',
+  getMessages: (conversationId: string) => `/api/chat/messages/${conversationId}`,
+  sendMessage: (partnerId: string) => `/api/chat/messages/${partnerId}`,
 } as const;
 
 export const getConversationsApi = async (params: CursorPaginationParams) => {
