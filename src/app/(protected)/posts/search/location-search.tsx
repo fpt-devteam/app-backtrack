@@ -4,7 +4,7 @@ import type {
 } from "@/src/features/location/services/googlePlaces.service";
 import { useLocationSelectionStore } from "@/src/features/location/store";
 import { router } from "expo-router";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Keyboard,
   TouchableWithoutFeedback
@@ -12,11 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LocationSearchScreen() {
-  const { selection, setSelection } = useLocationSelectionStore();
-
-  useEffect(() => {
-    console.log('Current selection:', selection);
-  }, [selection]);
+  const { setSelection } = useLocationSelectionStore();
 
   const getInitialQuery = () => {
     return '';

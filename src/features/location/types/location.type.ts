@@ -2,6 +2,7 @@ import type { LatLng } from "react-native-maps";
 
 export type UserLocation = {
   location: LatLng;
-  displayAddress?: string | null;
-  externalPlaceId?: string | null;
+  displayAddress?: string;
+  externalPlaceId?: string;
+  radiusKm?: number;
 };

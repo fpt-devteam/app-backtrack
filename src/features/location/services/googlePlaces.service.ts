@@ -42,6 +42,24 @@ type PlaceDetailsResponse = {
   readonly status: string;
 };
 
+type GeocodeResponse = {
+  readonly results: readonly {
+    readonly place_id: string;
+    readonly formatted_address: string;
+    readonly address_components?: readonly {
+      readonly long_name: string;
+      readonly short_name: string;
+      readonly types: readonly string[];
+    }[];
+  }[];
+  readonly status: string;
+};
+
+function guessNameFromFormattedAddress(addr: string): string {
+  const first = addr.split(",")[0]?.trim();
+  return first || "Vị trí hiện tại";
+}
+
 let requestSequence = 0;
 
 export const GooglePlacesService = {
@@ -78,7 +96,7 @@ export const GooglePlacesService = {
 
       const data: AutocompleteResponse = await response.json();
 
-      // Ignore if this is not the latest request
+
       if (currentRequest !== requestSequence) {
         return [];
       }
@@ -153,6 +171,59 @@ export const GooglePlacesService = {
     }
   },
 
+  async getCurrentPlace(signal?: AbortSignal): Promise<PlaceDetails | null> {
+    const apiKey = getGoogleApiKey();
+    if (!apiKey) {
+      console.warn("Missing EXPO_PUBLIC_GOOGLE_API_KEY");
+      return null;
+    }
+
+    try {
+      const pos = await getCurrentPositionAsync({ accuracy: Accuracy.Balanced });
+
+      const coord: LatLng = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+      };
+
+      const params = new URLSearchParams({
+        latlng: `${coord.latitude},${coord.longitude}`,
+        key: apiKey,
+        language: "vi",
+        region: "vn",
+      });
+
+      const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?${params}`, { signal });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data: GeocodeResponse = await res.json();
+
+      if (data.status !== "OK" || data.results.length === 0) {
+        console.warn("Google Geocode error:", data.status);
+        return null;
+      }
+
+      const top = data.results[0];
+      const placeId = top.place_id;
+
+      const details = await this.getPlaceDetails(placeId, signal);
+      if (details) return details;
+
+      const formattedAddress = top.formatted_address;
+      return {
+        placeId,
+        name: guessNameFromFormattedAddress(formattedAddress),
+        formattedAddress,
+        location: coord,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") return null;
+      console.error("getCurrentPlace error:", error);
+      return null;
+    }
+  },
+
   async getUserLocation() {
     try {
       const response = await getCurrentPositionAsync({
@@ -167,6 +238,59 @@ export const GooglePlacesService = {
       return location;
     } catch (error) {
       console.error('Failed to get current position:', error);
+      return null;
+    }
+  },
+
+  async getPlaceFromLatLng(
+    location: LatLng,
+    signal?: AbortSignal
+  ): Promise<PlaceDetails | null> {
+    const apiKey = getGoogleApiKey();
+    if (!apiKey) {
+      console.warn("Missing EXPO_PUBLIC_GOOGLE_API_KEY");
+      return null;
+    }
+
+    try {
+      const params = new URLSearchParams({
+        latlng: `${location.latitude},${location.longitude}`,
+        key: apiKey,
+        language: "vi",
+        region: "vn",
+      });
+
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?${params}`,
+        { signal }
+      );
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data: GeocodeResponse = await res.json();
+
+      if (data.status !== "OK" || data.results.length === 0) {
+        console.warn("Google Geocode error:", data.status);
+        return null;
+      }
+
+      const top = data.results[0];
+      const placeId = top.place_id;
+
+      // Prefer Places Details if possible
+      const details = await this.getPlaceDetails(placeId, signal);
+      if (details) return details;
+
+      // Fallback
+      return {
+        placeId,
+        name: guessNameFromFormattedAddress(top.formatted_address),
+        formattedAddress: top.formatted_address,
+        location,
+      };
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return null;
+      console.error("getPlaceFromLatLng error:", e);
       return null;
     }
   },

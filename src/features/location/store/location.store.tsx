@@ -1,14 +1,14 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { LatLng } from "react-native-maps";
-import type { PlaceDetails } from "../services/googlePlaces.service";
+import { useUserLocation } from "../hooks";
 
 export type LocationSelection = {
   location: LatLng;
-  place?: PlaceDetails;
-  radiusKm?: number | null;
+  radiusKm?: number;
 };
 
 type LocationSelectionContextValue = {
+  initSelection: () => void;
   selection: LocationSelection | null;
   setSelection: (next: LocationSelection) => void;
   clearSelection: () => void;
@@ -19,14 +19,20 @@ const LocationSelectionContext = createContext<LocationSelectionContextValue | n
 
 export const LocationSelectionProvider = ({ children }: { children: React.ReactNode }) => {
   const [selection, setSelectionState] = useState<LocationSelection | null>(null);
+  const { getUserLocation } = useUserLocation();
+
+  const initSelection = useCallback(async () => {
+
+    const location = await getUserLocation();
+    if (!location) return;
+
+    setSelectionState({ location });
+  }, [getUserLocation]);
 
   const setSelection = useCallback((next: LocationSelection) => {
     setSelectionState({
-      location: {
-        latitude: next.location.latitude,
-        longitude: next.location.longitude
-      },
-      radiusKm: next.radiusKm ?? null,
+      location: { latitude: next.location.latitude, longitude: next.location.longitude },
+      ...(next.radiusKm ? { radiusKm: next.radiusKm } : {})
     });
   }, []);
 
@@ -44,8 +50,8 @@ export const LocationSelectionProvider = ({ children }: { children: React.ReactN
   }, []);
 
   const ctxValue = useMemo(
-    () => ({ selection, setSelection, clearSelection, takeSelection }),
-    [selection, setSelection, clearSelection, takeSelection]
+    () => ({ selection, setSelection, clearSelection, takeSelection, initSelection }),
+    [selection, setSelection, clearSelection, takeSelection, initSelection]
   );
 
   return (
