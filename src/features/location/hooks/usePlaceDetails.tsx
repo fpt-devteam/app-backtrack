@@ -1,7 +1,7 @@
-import type { PlaceDetails } from "@/src/features/location/services/googlePlaces.service";
 import { GooglePlacesService } from "@/src/features/location/services/googlePlaces.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { LatLng } from "react-native-maps";
+import type { PlaceDetails } from "../types";
 
 export const placeDetailsKey = (placeId: string) => ["googlePlaces", "placeDetails", placeId] as const;
 

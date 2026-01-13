@@ -155,7 +155,7 @@ export default function PostSearchResultScreen() {
         latitude: value.location.latitude,
         longitude: value.location.longitude,
       },
-      radiusInKm: selection?.radiusKm ?? 5,
+      radiusInKm: value?.radiusKm ?? 5,
     }));
     console.log("Filter: ", filters)
   }
@@ -200,7 +200,10 @@ export default function PostSearchResultScreen() {
             render={({ field: { onChange, value } }) => (
               <LocationField
                 value={value}
-                onChange={handleOnLocationChange}
+                onChange={(data: UserLocation) => {
+                  onChange(data);
+                  handleOnLocationChange(data);
+                }}
               />
             )}
           />

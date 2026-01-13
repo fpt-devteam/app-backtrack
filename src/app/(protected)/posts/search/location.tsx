@@ -2,15 +2,15 @@ import { LocationMarker, LocationRadiusBottomSheet } from '@/src/features/locati
 import { useUserLocation } from '@/src/features/location/hooks'
 import { useLocationSelectionStore } from '@/src/features/location/store'
 import { AppHeader } from '@/src/shared/components'
-import { ANIMATE_TO_DURATION, DEFAULT_LOCATION, POST_ROUTE } from '@/src/shared/constants'
+import { POST_ROUTE } from '@/src/shared/constants'
 import { colors } from '@/src/shared/theme'
 import { ensureLocationPermission } from '@/src/shared/utils'
 import { router } from 'expo-router'
 import { CrosshairIcon, MagnifyingGlassIcon, TargetIcon } from 'phosphor-react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import { Animated, Easing, Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import type { LatLng, Region } from 'react-native-maps'
-import MapView, { Circle } from 'react-native-maps'
+import MapView from 'react-native-maps'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const TARGET_RADIUS_DEFAULT_KM = 5
@@ -49,80 +49,54 @@ const getRegionForRadius = (
   }
 }
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle)
-
 const LocationSearchScreen = () => {
   const insets = useSafeAreaInsets()
   const mapRef = useRef<MapView>(null)
 
-  const { getUserLocation, loadingUserLocation, error } = useUserLocation();
-  const { takeSelection, selection, setSelection } = useLocationSelectionStore();
-
-  const [mapLayout, setMapLayout] = useState<MapLayout>({ width: 0, height: 0 })
-
-  const initialRadius = TARGET_RADIUS_DEFAULT_KM
-
+  const { getUserLocation, loadingUserLocation } = useUserLocation()
+  const { selection, onConfirmSelection, onChangeSelection } = useLocationSelectionStore()
   const [openRadiusSheet, setOpenRadiusSheet] = useState(false)
-  const [localRadiusKm, setLocalRadiusKm] = useState(initialRadius)
-
-  const initialLocation: LatLng = DEFAULT_LOCATION
-  const [localLocation, setLocalLocation] = useState<LatLng>(initialLocation)
-
-  const animatedRadius = useRef(new Animated.Value(initialRadius * 1000)).current
-  const prevRadiusRef = useRef(localRadiusKm)
 
   useEffect(() => {
-    console.log("Selection changed:", selection);
     if (selection) {
-      setLocalLocation(selection.location);
-      if (selection.radiusKm) {
-        setLocalRadiusKm(selection.radiusKm);
-      }
+      const region = getRegionForRadius(
+        selection.location.latitude,
+        selection.location.longitude,
+        selection.radiusKm || TARGET_RADIUS_DEFAULT_KM
+      )
+      const duration = RADIUS_ANIMATION_MS
+      mapRef.current?.animateToRegion(region, duration)
+      return
     }
+
+    const fetchUserLocation = async () => {
+      const userLocation = await getUserLocation()
+      if (!userLocation) return
+
+      const data = {
+        ...userLocation,
+        radiusKm: TARGET_RADIUS_DEFAULT_KM
+      }
+
+      console.log("data at screen:", data)
+      onChangeSelection(data)
+    }
+    fetchUserLocation()
   }, [selection])
 
-  const handleSelectLocation = () => {
-    console.log("takeSelection", takeSelection());
-    router.back();
+  const handleConfirmLocation = () => {
+    if (!selection) return
+    onConfirmSelection(selection)
+    router.back()
   }
 
-  useEffect(() => {
-    const radiusChanged = prevRadiusRef.current !== localRadiusKm
-    prevRadiusRef.current = localRadiusKm
-
-    const duration = radiusChanged ? RADIUS_ANIMATION_MS : ANIMATE_TO_DURATION
-    const delay = radiusChanged ? 0 : 200
-
-    const t = setTimeout(() => {
-      const region = getRegionForRadius(
-        localLocation.latitude,
-        localLocation.longitude,
-        localRadiusKm,
-        mapLayout
-      )
-      mapRef.current?.animateToRegion(region, duration)
-    }, delay)
-
-    return () => clearTimeout(t)
-  }, [localLocation, localRadiusKm, mapLayout])
-
-  useEffect(() => {
-    Animated.timing(animatedRadius, {
-      toValue: localRadiusKm * 1000,
-      duration: RADIUS_ANIMATION_MS,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start()
-  }, [animatedRadius, localRadiusKm])
-
   const onGetCurrentPosition = async () => {
-    const hasPermission = await ensureLocationPermission();
-    if (!hasPermission) return;
+    const hasPermission = await ensureLocationPermission()
+    if (!hasPermission) return
 
-    const userLocation = await getUserLocation();
-    if (!userLocation) return;
-
-    setSelection({ location: userLocation });
+    const res = await getUserLocation()
+    if (!res) return
+    onChangeSelection(res)
   }
 
   const openSheet = () => setOpenRadiusSheet(true)
@@ -130,25 +104,24 @@ const LocationSearchScreen = () => {
   const closeSheet = () => setOpenRadiusSheet(false)
 
   const onRadiusChange = (newRadius: number) => {
+    if (!selection?.location) return
+
     const next = {
-      location: selection?.location || localLocation,
+      ...selection,
       radiusKm: newRadius
     }
 
-    setSelection(next)
-
-    setLocalRadiusKm(newRadius);
-    closeSheet();
-
-    console.log('Radius change:', newRadius);
+    onChangeSelection(next)
+    closeSheet()
+    console.log('Radius change:', newRadius)
   }
 
   const onLocationChange = (coord: LatLng) => {
-    const next = { ...selection, location: coord }
-    setSelection(next)
-
-    setLocalLocation(coord)
-    console.log('Location change: ', coord)
+    const next = {
+      ...selection!,
+      location: coord
+    }
+    onChangeSelection(next)
   }
 
   const handleOpenSearch = () => router.push(POST_ROUTE.searchLocationInput)
@@ -176,13 +149,12 @@ const LocationSearchScreen = () => {
         <MapView
           ref={mapRef}
           style={{ flex: 1 }}
-          onLayout={(event) => setMapLayout(event.nativeEvent.layout)}
           provider='google'
         >
-          {localLocation && (
+          {selection && (
             <LocationMarker
               mapRef={mapRef}
-              location={localLocation}
+              location={selection.location}
               onLocationChange={onLocationChange}
             />
           )}
@@ -193,17 +165,6 @@ const LocationSearchScreen = () => {
       <View className="absolute inset-0 z-10" pointerEvents="box-none">
         {/* Util buttons */}
         <View className="absolute right-4 flex-col items-center gap-4 bottom-28" pointerEvents="box-none">
-          {/* Change radius */}
-          <View className="h-12 w-12 bg-white rounded-lg">
-            <TouchableOpacity
-              onPress={openSheet}
-              className="h-full w-full items-center justify-center"
-              disabled={isMapUtilDisable}
-            >
-              <TargetIcon size={24} color={colors.black} />
-            </TouchableOpacity>
-          </View>
-
           {/* Get current position */}
           <View className="h-12 w-12 bg-white rounded-lg">
             <TouchableOpacity
@@ -214,22 +175,37 @@ const LocationSearchScreen = () => {
               <CrosshairIcon size={24} color={colors.black} />
             </TouchableOpacity>
           </View>
+
+          {/* Change radius */}
+          {selection && (
+            <View className="h-12 w-12 bg-white rounded-lg">
+              <TouchableOpacity
+                onPress={openSheet}
+                className="h-full w-full items-center justify-center"
+                disabled={isMapUtilDisable}
+              >
+                <TargetIcon size={24} color={colors.black} />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         {/* Radius Slider Bottom sheet */}
-        <LocationRadiusBottomSheet
-          isVisible={openRadiusSheet}
-          onClose={closeSheet}
-          radius={localRadiusKm}
-          onRadiusChange={onRadiusChange}
-        />
+        {selection?.radiusKm &&
+          <LocationRadiusBottomSheet
+            isVisible={openRadiusSheet}
+            onClose={closeSheet}
+            radius={selection.radiusKm}
+            onRadiusChange={onRadiusChange}
+          />
+        }
       </View>
 
       {/* Footer */}
       <View className="p-4 pb-0">
         <TouchableOpacity
           className="h-11 items-center justify-center rounded-sm bg-primary"
-          onPress={handleSelectLocation}
+          onPress={handleConfirmLocation}
         >
           <Text className="text-base font-semibold text-white">Select location</Text>
         </TouchableOpacity>

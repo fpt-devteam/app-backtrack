@@ -1,8 +1,8 @@
+import { GooglePlacesService } from "@/src/features/location/services/googlePlaces.service";
 import type {
   PlaceDetails,
   PlaceSuggestion
-} from "@/src/features/location/services/googlePlaces.service";
-import { GooglePlacesService } from "@/src/features/location/services/googlePlaces.service";
+} from "@/src/features/location/types";
 import SuggestRow from "@/src/shared/components/ui/SuggestRow";
 import { useRecentSearch } from "@/src/shared/hooks";
 import { colors } from "@/src/shared/theme";
