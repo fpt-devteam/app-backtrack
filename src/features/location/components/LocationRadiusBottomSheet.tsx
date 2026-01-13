@@ -1,7 +1,7 @@
 import { BottomSheet } from '@/src/shared/components'
 import colors from '@/src/shared/theme/colors'
 import Slider from '@react-native-community/slider'
-import React, { useState } from 'react'
+import React from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
 
 type Props = {
@@ -17,12 +17,6 @@ const LocationRadiusBottomSheet = ({
   radius,
   onRadiusChange
 }: Props) => {
-  const [localRadius, setLocalRadius] = useState(radius)
-
-  const onApplyRadius = () => {
-    onRadiusChange(localRadius)
-    onClose()
-  }
 
   return (
     <BottomSheet isVisible={isVisible} onClose={onClose}>
@@ -32,7 +26,7 @@ const LocationRadiusBottomSheet = ({
           <Text className="text-base font-semibold text-gray-900">Search radius</Text>
 
           <View className="px-3 py-1 rounded-full bg-gray-100">
-            <Text className="text-sm font-semibold text-gray-900">{localRadius} km</Text>
+            <Text className="text-sm font-semibold text-gray-900">{radius} km</Text>
           </View>
         </View>
 
@@ -44,8 +38,8 @@ const LocationRadiusBottomSheet = ({
           </View>
 
           <Slider
-            value={localRadius}
-            onValueChange={(v) => setLocalRadius(Math.round(v))}
+            value={radius}
+            onValueChange={(v) => onRadiusChange(Math.round(v))}
             step={1}
             minimumValue={1}
             maximumValue={10}
@@ -57,11 +51,11 @@ const LocationRadiusBottomSheet = ({
           {/* Quick picks */}
           <View className="flex-row gap-2 mt-3">
             {[1, 5, 10].map((v) => {
-              const active = localRadius === v
+              const active = radius === v
               return (
                 <TouchableOpacity
                   key={v}
-                  onPress={() => setLocalRadius(v)}
+                  onPress={() => onRadiusChange(v)}
                   className={[
                     'px-3 py-2 rounded-xl',
                     active ? 'bg-gray-900' : 'bg-white border border-gray-200',
@@ -72,17 +66,6 @@ const LocationRadiusBottomSheet = ({
               )
             })}
           </View>
-        </View>
-
-        {/* Actions */}
-        <View className="flex-row justify-end gap-2 mt-4">
-          <TouchableOpacity onPress={onApplyRadius} className="px-4 py-3 rounded-xl bg-primary">
-            <Text className="text-white font-semibold">Apply</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={onClose} className="px-4 py-3 rounded-xl bg-gray-100">
-            <Text className="text-gray-900 font-semibold">Cancel</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </BottomSheet>
