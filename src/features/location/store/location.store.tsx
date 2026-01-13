@@ -1,68 +1,46 @@
+import type { UserLocation } from "@/src/features/location/types";
+import type { Nullable } from "@/src/shared/types";
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
-import type { LatLng } from "react-native-maps";
-import { useUserLocation } from "../hooks";
 
-export type LocationSelection = {
-  location: LatLng;
-  radiusKm?: number;
+type UserLocationContextValue = {
+  reset: () => void;
+  selection: Nullable<UserLocation>;
+  onChangeSelection: (data: UserLocation) => void;
+  confirmedSelection: Nullable<UserLocation>;
+  onConfirmSelection: (data: UserLocation) => void;
 };
 
-type LocationSelectionContextValue = {
-  initSelection: () => void;
-  selection: LocationSelection | null;
-  setSelection: (next: LocationSelection) => void;
-  clearSelection: () => void;
-  takeSelection: () => LocationSelection | null;
-};
-
-const LocationSelectionContext = createContext<LocationSelectionContextValue | null>(null);
+const LocationSelectionContext = createContext<UserLocationContextValue | null>(null);
 
 export const LocationSelectionProvider = ({ children }: { children: React.ReactNode }) => {
-  const [selection, setSelectionState] = useState<LocationSelection | null>(null);
-  const { getUserLocation } = useUserLocation();
+  const [selection, setSelection] = useState<Nullable<UserLocation>>(null);
+  const [confirmedSelection, setConfirmedSelection] = useState<Nullable<UserLocation>>(null);
 
-  const initSelection = useCallback(async () => {
-
-    const location = await getUserLocation();
-    if (!location) return;
-
-    setSelectionState({ location });
-  }, [getUserLocation]);
-
-  const setSelection = useCallback((next: LocationSelection) => {
-    setSelectionState({
-      location: { latitude: next.location.latitude, longitude: next.location.longitude },
-      ...(next.radiusKm ? { radiusKm: next.radiusKm } : {})
-    });
+  const reset = useCallback(() => {
+    setSelection(null);
+    setConfirmedSelection(null);
   }, []);
 
-  const clearSelection = useCallback(() => {
-    setSelectionState(null);
+  const onChangeSelection = useCallback((data: UserLocation) => {
+    setSelection(data);
   }, []);
 
-  const takeSelection = useCallback(() => {
-    let value: LocationSelection | null = null;
-    setSelectionState((prev) => {
-      value = prev;
-      return null;
-    });
-    return value;
+  const onConfirmSelection = useCallback((data: UserLocation) => {
+    setConfirmedSelection(data);
   }, []);
 
-  const ctxValue = useMemo(
-    () => ({ selection, setSelection, clearSelection, takeSelection, initSelection }),
-    [selection, setSelection, clearSelection, takeSelection, initSelection]
-  );
+  const contextValue = useMemo(() => ({ selection, onChangeSelection, confirmedSelection, onConfirmSelection, reset }),
+    [selection, onChangeSelection, confirmedSelection, onConfirmSelection, reset]);
 
   return (
-    <LocationSelectionContext.Provider value={ctxValue}>
+    <LocationSelectionContext.Provider value={contextValue}>
       {children}
     </LocationSelectionContext.Provider>
   );
 };
 
 export const useLocationSelectionStore = () => {
-  const ctx = useContext(LocationSelectionContext);
-  if (!ctx) throw new Error("useLocationSelectionStore must be used within LocationSelectionProvider");
-  return ctx;
+  const context = useContext(LocationSelectionContext);
+  if (!context) throw new Error("useLocationSelectionStore must be used within LocationSelectionProvider");
+  return context;
 };
