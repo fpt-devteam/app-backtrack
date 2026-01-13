@@ -1,8 +1,9 @@
 import { LocationSearchBar } from "@/src/features/location/components";
-import type {
-  PlaceDetails
-} from "@/src/features/location/services/googlePlaces.service";
 import { useLocationSelectionStore } from "@/src/features/location/store";
+import type {
+  PlaceDetails,
+  UserLocation
+} from "@/src/features/location/types";
 import { router } from "expo-router";
 import React from "react";
 import {
@@ -12,15 +13,17 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LocationSearchScreen() {
-  const { setSelection } = useLocationSelectionStore();
-
-  const getInitialQuery = () => {
-    return '';
-  }
+  const { selection, onChangeSelection } = useLocationSelectionStore();
 
   const handleSelectPlace = (details: PlaceDetails, label: string) => {
-    setSelection({ location: details.location });
-    console.log('Selected place details:', details);
+    const data: UserLocation = {
+      ...selection,
+      location: details.location,
+      displayAddress: label,
+      externalPlaceId: details.placeId,
+    }
+
+    onChangeSelection(data);
     router.back();
   };
 
@@ -35,7 +38,7 @@ export default function LocationSearchScreen() {
       <SafeAreaView className="bg-white flex-1 p-4 ">
         <LocationSearchBar
           showBackButton
-          initialQuery={getInitialQuery()}
+          initialQuery={selection?.displayAddress || ""}
           onBackPress={handleBackPress}
           onSelectPlace={handleSelectPlace}
         />

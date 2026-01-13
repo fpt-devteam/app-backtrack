@@ -6,11 +6,10 @@ import { router } from 'expo-router'
 import { CaretRightIcon, MapPinIcon } from 'phosphor-react-native'
 import React, { useEffect, useState } from 'react'
 import { Text, TouchableOpacity } from 'react-native'
-import { usePlaceDetailsFromLatLngMutation } from '../hooks/usePlaceDetails'
 import { useLocationSelectionStore } from '../store'
 
 type LocationFieldProps = {
-  placeholder?: string;
+  placeholder?: string
   value: UserLocation
   onChange: (value: UserLocation) => void
 }
@@ -21,45 +20,29 @@ const LocationField = ({
   placeholder = 'Search location...',
 }: LocationFieldProps) => {
   const [pressed, setPressed] = useState(false)
-  const { selection, initSelection, clearSelection } = useLocationSelectionStore();
-  const placeMut = usePlaceDetailsFromLatLngMutation();
+  const { reset, onConfirmSelection, confirmedSelection } = useLocationSelectionStore()
 
   useEffect(() => {
-    initSelection();
-    return () => clearSelection();
-  }, [initSelection, clearSelection]);
+    if (!value) return
+    reset()
+    onConfirmSelection(value)
+    return () => reset()
+  }, [])
 
   useEffect(() => {
-    console.log("Here to normalize data after selection");
-    console.log('Location selection changed at here:', selection);
+    if (!confirmedSelection) return
+    onChange(confirmedSelection)
+    console.log("Data at field: ", confirmedSelection)
+  }, [confirmedSelection])
 
-    const normData = async () => {
-      if (selection) {
-        const details = await placeMut.mutateAsync({ loc: selection.location });
-        if (details) {
-          console.log('Fetched place details:', details);
-          onChange({
-            displayAddress: details.formattedAddress || '',
-            location: details.location,
-            externalPlaceId: details.placeId,
-          });
-        }
-      }
-    }
-    normData()
-  }, [selection]);
+  const handlePress = () => router.push(POST_ROUTE.searchLocation)
 
-  const handlePress = () => {
-    console.log('Navigate to location search screen');
-    router.push(POST_ROUTE.searchLocation);
-  };
-
-  const displayText = value ? value.displayAddress : placeholder;
+  const displayText = value ? value.displayAddress : placeholder
 
   const handlePressIn = () => {
     setPressed(true)
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined)
-  };
+  }
 
   return (
     <TouchableOpacity

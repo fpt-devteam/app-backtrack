@@ -1,59 +1,12 @@
 import { Accuracy, getCurrentPositionAsync } from "expo-location";
 import type { LatLng } from "react-native-maps";
+import type { AutocompleteResponse, GeocodeResponse, PlaceDetails, PlaceDetailsResponse, PlaceSuggestion } from "../types";
 
 function getGoogleApiKey(): string | null {
   const key = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
   if (typeof key !== "string" || key.trim().length === 0) return null;
   return key.trim();
 }
-
-export type PlaceSuggestion = {
-  readonly placeId: string;
-  readonly description: string;
-};
-
-export type PlaceDetails = {
-  readonly placeId: string;
-  readonly name: string;
-  readonly formattedAddress: string;
-  readonly location: LatLng;
-};
-
-type AutocompleteResponse = {
-  readonly predictions: readonly {
-    readonly place_id: string;
-    readonly description: string;
-  }[];
-  readonly status: string;
-};
-
-type PlaceDetailsResponse = {
-  readonly result: {
-    readonly place_id: string;
-    readonly name: string;
-    readonly formatted_address: string;
-    readonly geometry: {
-      readonly location: {
-        readonly lat: number;
-        readonly lng: number;
-      };
-    };
-  };
-  readonly status: string;
-};
-
-type GeocodeResponse = {
-  readonly results: readonly {
-    readonly place_id: string;
-    readonly formatted_address: string;
-    readonly address_components?: readonly {
-      readonly long_name: string;
-      readonly short_name: string;
-      readonly types: readonly string[];
-    }[];
-  }[];
-  readonly status: string;
-};
 
 function guessNameFromFormattedAddress(addr: string): string {
   const first = addr.split(",")[0]?.trim();
@@ -277,11 +230,9 @@ export const GooglePlacesService = {
       const top = data.results[0];
       const placeId = top.place_id;
 
-      // Prefer Places Details if possible
       const details = await this.getPlaceDetails(placeId, signal);
       if (details) return details;
 
-      // Fallback
       return {
         placeId,
         name: guessNameFromFormattedAddress(top.formatted_address),
