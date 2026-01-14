@@ -8,7 +8,7 @@ type UseQRCodesOptions = {
   enabled?: boolean;
 };
 
-const useQRCodes = ({ pageSize = 20, enabled = true }: UseQRCodesOptions = {}) => {
+const useQRCodes = ({ pageSize = 2, enabled = true }: UseQRCodesOptions = {}) => {
   const query = useInfiniteQuery<GetQrCodesResponse>({
     queryKey: [...QR_CODES_QUERY_KEY, { pageSize }],
     enabled,

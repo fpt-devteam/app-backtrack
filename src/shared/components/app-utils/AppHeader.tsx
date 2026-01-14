@@ -1,8 +1,9 @@
 import { router } from "expo-router";
 import { ArrowLeftIcon } from "phosphor-react-native";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import colors from "../../theme/colors";
+import { cn } from "../../utils/cn";
 
 type AppHeaderProps = {
   title: string;
@@ -51,3 +52,20 @@ const AppHeader = ({
 };
 
 export default AppHeader;
+
+export const DefaultTopRightActionButton = ({ lable, onPress, disabled, isSubmitting }: { lable: string; onPress: () => void; disabled?: boolean; isSubmitting?: boolean }) => (
+  <Pressable
+    onPress={onPress}
+    disabled={disabled}
+    style={({ pressed }) => ({
+      opacity: pressed ? 0.5 : 1,
+      top: 12
+    })}
+  >
+    {isSubmitting ? (
+      <ActivityIndicator />
+    ) : (
+      <Text className={cn("text-base font-semibold", disabled ? "text-gray-400" : "text-default")}> {lable}</Text>
+    )}
+  </Pressable>
+);

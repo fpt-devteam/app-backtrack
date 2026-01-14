@@ -1,12 +1,15 @@
+import { useAppUser } from '@/src/features/auth/providers/user.provider';
 import { QRCodeProfileForm, QRCodeProfileFormSchema } from '@/src/features/qr/components';
 import { useCreateQRCode } from '@/src/features/qr/hooks';
 import { CreateQrCodeRequest } from '@/src/features/qr/types';
 import { toast } from '@/src/shared/components/ui/toast';
 import { QR_ROUTE } from '@/src/shared/constants';
 import { router } from "expo-router";
-import React from 'react';
+import React, { useMemo } from 'react';
 
 const GenerateQRScreen = () => {
+  const { user } = useAppUser();
+
   const { createQRCode, isLoading } = useCreateQRCode({
     onSuccess: (response) => {
       if (response.success && response.data) {
@@ -32,12 +35,33 @@ const GenerateQRScreen = () => {
     } as CreateQrCodeRequest);
   }
 
+  const buildInitialDescription = (): string => {
+    if (!user) return '';
+
+    const ownerName = user.displayName || 'Owner';
+    const ownerContact = user.email || 'No contact provided';
+
+    return `Thank you for finding this item! This belongs to ${ownerName}.
+
+Owner Contact: ${ownerContact}
+
+If you found this item, please contact the owner. Your kindness and help in returning this item would be greatly appreciated!`;
+  }
+
+  const initializeFormData = useMemo((): QRCodeProfileFormSchema => {
+    return {
+      name: '',
+      description: buildInitialDescription(),
+      images: [],
+    };
+  }, [user])
+
   return (
     <QRCodeProfileForm
       mode="create"
       onSubmit={handleFormSubmit}
       isSubmitting={isLoading}
-      submitButtonText="Create"
+      initialValues={initializeFormData}
     />
   );
 };

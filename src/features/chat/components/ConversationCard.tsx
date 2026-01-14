@@ -3,6 +3,7 @@ import { ExternalPathString, RelativePathString, router } from 'expo-router'
 import React, { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { Conversation } from '../types'
+import { ConversationAvatar } from './ConversationAvatar'
 
 type Props = {
   conversation: Conversation
@@ -18,24 +19,9 @@ const formatTime = (iso?: string) => {
   return `${hh}:${mm}`
 }
 
-const getInitials = (name?: string) => {
-  if (!name) return '?'
-  const parts = name.trim().split(/\s+/).slice(0, 2)
-  return parts.map(p => p[0]?.toUpperCase()).join('') || '?'
-}
-
 const ConversationCard = ({ conversation }: Props) => {
-  const partnerName =
-    // adjust if your AppUser has different fields
-    // @ts-ignore
-    conversation.partner?.fullName ||
-    // @ts-ignore
-    conversation.partner?.displayName ||
-    // @ts-ignore
-    conversation.partner?.name ||
-    'Unknown'
-
-  const lastText = conversation.lastMessage?.lastContent ?? 'Say hi 👋'
+  const partnerName = conversation.partner?.displayName ?? 'Unknown User'
+  const lastText = conversation.lastMessage?.lastContent ?? 'Say hi'
   const timeText = useMemo(() => {
     return (
       formatTime(conversation.lastMessage?.timestamp) ||
@@ -61,11 +47,7 @@ const ConversationCard = ({ conversation }: Props) => {
     >
       <View className="flex-row items-center">
         {/* Avatar */}
-        <View className="h-12 w-12 rounded-full bg-slate-100 items-center justify-center">
-          <Text className="text-sm font-bold text-slate-700">
-            {getInitials(partnerName)}
-          </Text>
-        </View>
+        <ConversationAvatar name={partnerName} />
 
         {/* Main content */}
         <View className="flex-1 ml-3">

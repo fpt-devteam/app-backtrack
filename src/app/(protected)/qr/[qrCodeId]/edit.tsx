@@ -10,8 +10,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
 
 const EditQRScreen = () => {
-  const { itemId } = useLocalSearchParams<{ itemId: string }>();
-  const { qrCode, isLoading: isLoadingQR } = useGetQRCodeById(itemId || '');
+  const { qrCodeId } = useLocalSearchParams<{ qrCodeId: string }>();
+  const { qrCode, isLoading: isLoadingQR } = useGetQRCodeById(qrCodeId || '');
   const { uploadImages, isUploadingImages } = useUploadImage();
 
   const { updateQRCode, isLoading: isUpdating } = useUpdateQRCode({
@@ -49,16 +49,14 @@ const EditQRScreen = () => {
   }, [qrCode]);
 
   const handleFormSubmit = async (data: QRCodeProfileFormSchema) => {
-    if (!itemId) return;
+    if (!qrCodeId) return;
 
     try {
-      // Check if images were changed (new uploads)
       const hasNewImages = data.images.some((img) => !img.uri.startsWith('http'));
 
       let imageUrls: string[];
 
       if (hasNewImages) {
-        // Upload new images
         const uploadRes = await uploadImages(data.images);
         if (!uploadRes || uploadRes.length === 0) {
           toast.error('Upload failed', 'Failed to upload images.');
@@ -66,12 +64,11 @@ const EditQRScreen = () => {
         }
         imageUrls = uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
       } else {
-        // Keep existing image URLs
         imageUrls = data.images.map((img) => img.uri);
       }
 
       await updateQRCode({
-        id: itemId,
+        id: qrCodeId,
         data: {
           name: data.name,
           description: data.description,
@@ -97,7 +94,6 @@ const EditQRScreen = () => {
       initialValues={initialValues}
       onSubmit={handleFormSubmit}
       isSubmitting={isUpdating || isUploadingImages}
-      submitButtonText="Save Changes"
     />
   );
 };

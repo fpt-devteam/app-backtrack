@@ -145,7 +145,7 @@ const DetailCard = memo(function DetailCard({
     >
       {/* Description */}
       <Text className="text-xl font-semibold text-gray-900 mb-2">
-        Description
+        Note
       </Text>
       <Text
         className="text-base text-gray-600 leading-6 max-h-[100px] mb-6"
