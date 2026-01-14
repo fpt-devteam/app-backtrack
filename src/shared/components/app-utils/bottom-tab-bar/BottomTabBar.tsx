@@ -26,7 +26,8 @@ const BottomTabBar = () => {
         }
       >
         <Tabs.Screen name="posts" options={{ title: "Home" }} />
-        <Tabs.Screen name="qr" options={{ title: "QRs" }} />
+        <Tabs.Screen name="map" options={{ title: "Map" }} />
+        <Tabs.Screen name="(qr)" options={{ title: "QRs" }} />
         <Tabs.Screen name="chat" options={{ title: "Chat" }} />
         <Tabs.Screen name="notification" options={{ title: "Inbox" }} />
       </Tabs>
