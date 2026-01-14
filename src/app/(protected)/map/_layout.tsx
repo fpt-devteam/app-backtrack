@@ -5,6 +5,7 @@ const MapLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="search" />
     </Stack>
   )
 }

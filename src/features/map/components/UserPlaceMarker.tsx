@@ -1,20 +1,23 @@
 import * as Haptics from 'expo-haptics'
 import React from 'react'
-import { View } from 'react-native'
 import type { LatLng } from 'react-native-maps'
 import { Circle, Marker } from 'react-native-maps'
 
 type UserPlaceMarkerProps = {
   coordinate: LatLng
   disabled: boolean
-  radiusKm: number
+  radiusKm?: number
+  showRadius?: boolean
   onPress?: () => void
 }
+
+const DEFAULT_RADIUS_KM = 5
 
 export default function UserPlaceMarker({
   coordinate,
   disabled,
-  radiusKm,
+  radiusKm = DEFAULT_RADIUS_KM,
+  showRadius = true,
   onPress,
 }: Readonly<UserPlaceMarkerProps>) {
 
@@ -25,15 +28,17 @@ export default function UserPlaceMarker({
   }
 
   return (
-    <View>
-      <Circle
-        center={coordinate}
-        radius={radiusKm * 1000}
-        zIndex={1}
-        strokeWidth={2}
-        strokeColor="rgba(0,122,255,0.8)"
-        fillColor="rgba(0,122,255,0.12)"
-      />
+    <>
+      {showRadius &&
+        <Circle
+          center={coordinate}
+          radius={radiusKm * 1000}
+          zIndex={1}
+          strokeWidth={2}
+          strokeColor="rgba(0,122,255,0.8)"
+          fillColor="rgba(0,122,255,0.12)"
+        />
+      }
 
       <Marker
         coordinate={coordinate}
@@ -41,6 +46,6 @@ export default function UserPlaceMarker({
         onPress={handlePress}
         zIndex={2}
       />
-    </View>
+    </>
   )
 }
