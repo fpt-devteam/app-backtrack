@@ -1,6 +1,7 @@
 import { HOOK_QUERY_KEY } from '@/src/features/location/constants'
 import type { GeocodeResponse, UserLocation } from '@/src/features/location/types'
 import type { Nullable } from '@/src/shared/types'
+import { ensureLocationPermission } from '@/src/shared/utils/location.utils'
 import { useMutation } from '@tanstack/react-query'
 import { Accuracy, getCurrentPositionAsync } from 'expo-location'
 import { useMemo } from 'react'
@@ -10,6 +11,12 @@ const useUserLocation = () => {
   const mutation = useMutation<Nullable<UserLocation>>({
     mutationKey: HOOK_QUERY_KEY.getUserLocation,
     mutationFn: async () => {
+      const hasPermission = await ensureLocationPermission()
+      if (!hasPermission) {
+        console.log("Location permission denied")
+        return null
+      }
+
       const apiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
       if (!apiKey) {
         console.warn("Missing EXPO_PUBLIC_GOOGLE_API_KEY");

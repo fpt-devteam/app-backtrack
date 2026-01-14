@@ -1,22 +1,24 @@
-import { useLocationSelectionStore } from '@/src/features/location/store'
-import ItemPlaceMarker from '@/src/features/map/components/ItemPlaceMarker'
-import UserPlaceButton from '@/src/features/map/components/UserPlaceButton'
-import UserPlaceMarker from '@/src/features/map/components/UserPlaceMarker'
-import { PostDetails, PostHomeScreen } from '@/src/features/post/components'
-import { usePosts } from '@/src/features/post/hooks'
-import type { PostFilters } from '@/src/features/post/types'
-import { BottomSheet } from '@/src/shared/components'
-import { MAP_ROUTE } from '@/src/shared/constants'
-import { useUIStore } from '@/src/shared/store/ui.store'
-import colors from '@/src/shared/theme/colors'
-import { router } from 'expo-router'
-import { MagnifyingGlassIcon } from 'phosphor-react-native'
-import type { ReactNode } from 'react'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
-import type { LatLng, Region } from 'react-native-maps'
-import MapView from 'react-native-maps'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useUserLocation } from '@/src/features/location/hooks';
+import { useLocationSelectionStore } from '@/src/features/location/store';
+import ItemPlaceMarker from '@/src/features/map/components/ItemPlaceMarker';
+import UserPlaceButton from '@/src/features/map/components/UserPlaceButton';
+import UserPlaceMarker from '@/src/features/map/components/UserPlaceMarker';
+import { PostDetails, PostHomeScreen } from '@/src/features/post/components';
+import { usePosts } from '@/src/features/post/hooks';
+import type { PostsFiltersOptions } from '@/src/features/post/hooks/usePosts';
+import type { PostFilters } from '@/src/features/post/types';
+import { BottomSheet } from '@/src/shared/components';
+import { MAP_ROUTE } from '@/src/shared/constants';
+import { useUIStore } from '@/src/shared/store/ui.store';
+import colors from '@/src/shared/theme/colors';
+import { router } from 'expo-router';
+import { MagnifyingGlassIcon } from 'phosphor-react-native';
+import type { ReactNode } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import type { LatLng, Region } from 'react-native-maps';
+import MapView from 'react-native-maps';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 /**
  * minimalist: only show map and search bar + user location button
@@ -34,12 +36,13 @@ const MapScreen = ({
   searchBarPlaceholder = "Search location...",
 }: MapOptions) => {
   const mapRef = useRef<MapView>(null)
-  const bottomSheetElement = useRef<ReactNode>(null)
-
-  const insets = useSafeAreaInsets()
-  const { selection, onChangeSelection } = useLocationSelectionStore()
   const setBottomTabBarState = useUIStore((state) => state.setBottomTabBarState)
   const [sheetVisible, setSheetVisible] = useState(false)
+  const insets = useSafeAreaInsets();
+  const { getUserLocation } = useUserLocation();
+
+  const bottomSheetElement = useRef<ReactNode>(null);
+  const { selection, onChangeSelection } = useLocationSelectionStore();
 
   const searchDisplayText = useMemo(() => {
     if (!selection) return searchBarPlaceholder
@@ -47,14 +50,37 @@ const MapScreen = ({
     return displayText
   }, [selection, searchBarPlaceholder])
 
+  useEffect(() => {
+    (async () => {
+      const data = await getUserLocation();
+      if (!data?.location) return;
+
+      const initSelection = {
+        ...data,
+        radiusKm: 10,
+      }
+
+      onChangeSelection(initSelection)
+    })();
+  }, [])
+
   const postParams = useMemo(() => {
+    if (!selection?.location || !selection?.radiusKm)
+      return { enabled: false } as PostsFiltersOptions
+
     const nextFilter: PostFilters = {
       ...selection,
       location: selection?.location,
       radiusInKm: selection?.radiusKm,
     }
-    return { filters: nextFilter }
+
+    return {
+      filters: nextFilter,
+      enabled: true
+    } as PostsFiltersOptions
   }, [selection])
+
+  const { items, } = usePosts(postParams)
 
   const handleOpenSheet = () => {
     setSheetVisible(false)
@@ -74,7 +100,6 @@ const MapScreen = ({
     }
   }, [sheetVisible])
 
-  const { items } = usePosts(postParams)
 
   useEffect(() => {
     const coords = selection?.location
@@ -83,6 +108,7 @@ const MapScreen = ({
   }, [selection])
 
   const onCoordinateChange = (coord: LatLng) => {
+    if (!selection) return;
     const nextSelection = {
       ...selection,
       location: coord,
@@ -100,7 +126,6 @@ const MapScreen = ({
       longitudeDelta: 0.01,
     }
 
-    console.log("")
     mapRef.current.animateToRegion(newRegion, duration)
   }
 
@@ -118,12 +143,12 @@ const MapScreen = ({
           ref={mapRef}
           style={{ flex: 1 }}
         >
-          {selection && (
+          {selection?.location && (
             <>
               <UserPlaceMarker
                 coordinate={selection.location}
                 disabled={false}
-                radiusKm={selection.radiusKm}
+                radiusKm={selection.radiusKm ?? 5}
                 showRadius={mode === 'full'}
                 onPress={() => {
                   handleOpenSheet()

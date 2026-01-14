@@ -1,12 +1,12 @@
 import { AppHeader } from '@/src/shared/components';
 import { DefaultTopRightActionButton } from '@/src/shared/components/app-utils/AppHeader';
 import { ImageField } from '@/src/shared/components/fields';
+import { toast } from '@/src/shared/components/ui/toast';
 import colors from '@/src/shared/theme/colors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { ImagePickerAsset } from 'expo-image-picker';
 import { BookmarkIcon, SparkleIcon } from 'phosphor-react-native';
 import React, { useEffect } from 'react';
-import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import { Text, TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -35,13 +35,13 @@ const qrCodeProfileSchema = yup
           .test('has-uri', 'Invalid image (missing uri).', (asset) => {
             return !!asset && typeof asset === 'object' && !!asset.uri;
           })
-          .test('mime', 'Only JPG/PNG/WebP images are allowed.', (asset) => {
+          .test('mime', 'Only JPG/PNG/WebP/Heic images are allowed.', (asset) => {
             if (!asset) return true;
 
             const mime = asset.mimeType;
             if (!mime) return true;
 
-            const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+            const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
             return allowedMimes.includes(mime);
           })
           .test('size', 'Image is too large (max 5 MB).', (asset) => {
@@ -71,7 +71,7 @@ const headerTitleMap: Record<FormMode, string> = {
 type QRCodeProfileFormProps = {
   mode: FormMode;
   initialValues?: Partial<QRCodeProfileFormSchema>;
-  onSubmit?: (data: QRCodeProfileFormSchema) => void | Promise<void>;
+  onSubmit: (data: QRCodeProfileFormSchema) => void | Promise<void>;
   isSubmitting?: boolean;
   submitButtonText?: string;
 };
@@ -102,10 +102,6 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
     });
   }, [initialValues, reset]);
 
-  const handleFormSubmit: SubmitHandler<QRCodeProfileFormSchema> = async (data: QRCodeProfileFormSchema) => {
-    await onSubmit?.(data);
-  };
-
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
       <AppHeader
@@ -113,8 +109,14 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
         rightActionButton={
           <DefaultTopRightActionButton
             lable={submitButtonText}
-            onPress={handleSubmit(handleFormSubmit)}
-            disabled={!isValid || isSubmitting}
+            onPress={handleSubmit(
+              onSubmit,
+              (errs) => {
+                console.log(errs);
+                toast.error("Form invalid", errs.description?.message || errs.name?.message || "please check required fields");
+              }
+            )}
+            disabled={isSubmitting}
             isSubmitting={isSubmitting}
           />
         } />
@@ -137,12 +139,33 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
               <ImageField value={value} onChange={onChange} />
             )}
           />
-          {errors.images && (
+
+          {!!errors.images && (
             <Text className="text-red-500 text-xs mt-1 ml-1">
-              {errors.images.message}
+              {(() => {
+                const err = errors.images as any;
+
+                // lỗi cấp mảng: min/max/required
+                if (typeof err?.message === "string") return err.message;
+
+                // lỗi từng item: errors.images[index].message
+                if (Array.isArray(err)) {
+                  const firstMsg = err.find((e) => typeof e?.message === "string")?.message;
+                  return firstMsg ?? "Invalid image.";
+                }
+
+                return "Invalid image.";
+              })()}
             </Text>
           )}
         </View>
+
+
+        {errors.images && (
+          <Text className="text-red-500 text-xs mt-1 ml-1">
+            {errors.images.message}
+          </Text>
+        )}
 
         {/* Item Name Field */}
         <View className="mb-6">

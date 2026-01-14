@@ -27,6 +27,8 @@ export default function UserPlaceMarker({
     onPress?.()
   }
 
+  console.log("Rendering UserPlaceMarker at", coordinate, "with radiusKm =", radiusKm, "showRadius =", showRadius)
+
   return (
     <>
       {showRadius &&
@@ -41,6 +43,7 @@ export default function UserPlaceMarker({
       }
 
       <Marker
+        key={`${coordinate.latitude},${coordinate.longitude}`}
         coordinate={coordinate}
         focusable={!disabled}
         onPress={handlePress}
