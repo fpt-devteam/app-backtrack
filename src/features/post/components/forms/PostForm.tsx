@@ -1,9 +1,9 @@
 import { LocationField } from "@/src/features/location/components";
 import type { UserLocation } from "@/src/features/location/types";
 import { useAnalyzeImage, useCreatePost } from "@/src/features/post/hooks";
-import { prepareImageForAnalysis } from "@/src/features/post/utils/image.utils";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
+import { prepareImageForAnalysis } from "@/src/features/post/utils/image.utils";
 import { DateTimePickerField, ImageField } from "@/src/shared/components";
 import { AppHeader, AppLoader } from "@/src/shared/components/app-utils";
 import { DefaultTopRightActionButton } from "@/src/shared/components/app-utils/AppHeader";
@@ -20,7 +20,7 @@ import { SparkleIcon } from "phosphor-react-native";
 import React, { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
 
@@ -37,13 +37,13 @@ const postSchema = yup
           .test("has-uri", "Invalid image (missing uri).", (asset) => {
             return !!asset && typeof asset === "object" && !!asset.uri;
           })
-          .test("mime", "Only JPG/PNG/WebP images are allowed.", (asset) => {
+          .test("mime", "Only JPG/PNG/WebP/Heic images are allowed.", (asset) => {
             if (!asset) return true;
 
             const mime = asset.mimeType;
             if (!mime) return true;
 
-            const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
+            const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/heic"];
             return allowedMimes.includes(mime);
           })
           .test("size", "Image is too large (max 5 MB).", (asset) => {
@@ -125,6 +125,7 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   };
 
   const handleUploadImages = async (images: ImagePickerAsset[]) => {
+    console.log("asdf");
     const uploadRes = await uploadImages(images);
     if (!uploadRes) return [];
 
@@ -180,7 +181,13 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         rightActionButton={
           <DefaultTopRightActionButton
             lable={mode === 'edit' ? 'Save' : 'Upload'}
-            onPress={handleSubmit(onSubmit)}
+            onPress={handleSubmit(
+              onSubmit,
+              (errs) => {
+                console.log("FORM INVALID:", errs);
+                toast.error("Form invalid", "please check required fields");
+              }
+            )}
             disabled={isCreatingPost || isUploadingImages}
             isSubmitting={isCreatingPost || isUploadingImages}
           />
