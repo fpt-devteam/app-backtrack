@@ -14,7 +14,7 @@ export type QrItemEntity = {
 export type QrOwnerEntity = {
   id: string;
   email: string;
-  displayName: string;
+  displayName?: string | null;
 };
 
 export type QrCodeData = {

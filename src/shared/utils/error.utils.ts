@@ -328,3 +328,13 @@ export const addErrorMapping = (code: ErrorCode, message: string): void => {
 export const addErrorMappings = (mappings: ErrorMapping): void => {
   Object.assign(ERROR_MESSAGES, mappings);
 };
+
+
+export function getErrorMessage2(error: unknown, fallback = 'An unknown error occurred'): string {
+  return (
+    (error as any)?.response?.data?.error?.message ||
+    (error as any)?.error?.message ||
+    (error as any)?.message ||
+    fallback
+  )
+}

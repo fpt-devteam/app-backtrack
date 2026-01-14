@@ -1,3 +1,4 @@
+
 export const PROFILE_ROUTE = {
   index: "/(protected)/profile",
 } as const;
@@ -18,3 +19,14 @@ export const CHAT_ROUTE = {
   conversations: `/(protected)/chat/conversations`,
   message: (conversationId: string) => `/(protected)/chat/conversations/${conversationId}`,
 } as const;
+
+export const QR_ROUTE = {
+  index: "/qr",
+  generate: "/qr/generate",
+  edit: (qrCodeId: string) => `/qr/${qrCodeId}/edit`,
+  scan: "/qr/scan",
+  purchase: "/qr/purchase",
+  detail: (qrCodeId: string) => `/qr/${qrCodeId}`,
+  qrView: (qrCodeId: string, publicCode: string) => `/qr/${qrCodeId}/qr-view/${publicCode}`,
+} as const;
+

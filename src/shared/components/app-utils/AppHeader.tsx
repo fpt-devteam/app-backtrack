@@ -26,35 +26,26 @@ const AppHeader = ({
   };
 
   return (
-    <View
-      className="bg-white border-b border-gray-200"
-    >
-      <View className="flex-row items-center justify-center px-4 py-3 relative">
-        {/* Back Button */}
-        {showBackButton && (
-          <Pressable
-            onPress={handleBackPress}
-            className="absolute left-4"
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.5 : 1,
-              top: 12
-            })}
-          >
-            <ArrowLeftIcon size={24} color={colors.black} weight="bold" />
-          </Pressable>
-        )}
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+      {/* Back Button */}
+      {showBackButton && (
+        <Pressable
+          onPress={handleBackPress}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.5 : 1,
+            top: 12
+          })}
+        >
+          <ArrowLeftIcon size={24} color={colors.black} weight="bold" />
+        </Pressable>
+      )}
 
-        {/* Centered Title */}
-        <Text className="text-xl font-bold text-black">
-          {title}
-        </Text>
+      {/* Centered Title */}
+      <Text className="text-xl font-bold text-black">
+        {title}
+      </Text>
 
-        {rightActionButton && (
-          <View className="absolute right-4">
-            {rightActionButton}
-          </View>
-        )}
-      </View>
+      {rightActionButton || <View style={{ width: 24 }} />}
     </View>
   );
 };
