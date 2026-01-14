@@ -1,3 +1,4 @@
+import { useUserLocation } from '@/src/features/location/hooks';
 import { useLocationSelectionStore } from '@/src/features/location/store';
 import ItemPlaceMarker from '@/src/features/map/components/ItemPlaceMarker';
 import UserPlaceButton from '@/src/features/map/components/UserPlaceButton';
@@ -22,13 +23,14 @@ const MapScreen = () => {
   const mapRef = useRef<MapView>(null)
   const [sheetVisible, setSheetVisible] = useState(false)
   const insets = useSafeAreaInsets();
+  const { getUserLocation } = useUserLocation();
 
   const [coordinate, setCoordinate] = useState<LatLng | null>(null)
   const [radiusKm, setRadiusKm] = useState<number>(10)
   const [filters, setFilters] = useState<PostFilters>({})
 
   const bottomSheetElement = useRef<ReactNode>(null);
-  const { selection } = useLocationSelectionStore();
+  const { selection, onChangeSelection } = useLocationSelectionStore();
 
   const searchDisplayText = useMemo(() => {
     const displayText = selection ? selection.displayAddress : "Search location...";
@@ -43,6 +45,14 @@ const MapScreen = () => {
       setBottomTabBarState('open');
     return () => { setBottomTabBarState('open'); }
   }, [sheetVisible]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await getUserLocation();
+      if (!data) return;
+      onChangeSelection(data)
+    })();
+  }, [])
 
   const postParams = useMemo(() => {
     const nextFilter: PostFilters = {
