@@ -37,13 +37,13 @@ const postSchema = yup
           .test("has-uri", "Invalid image (missing uri).", (asset) => {
             return !!asset && typeof asset === "object" && !!asset.uri;
           })
-          .test("mime", "Only JPG/PNG/WebP images are allowed.", (asset) => {
+          .test("mime", "Only JPG/PNG/WebP/Heic images are allowed.", (asset) => {
             if (!asset) return true;
 
             const mime = asset.mimeType;
             if (!mime) return true;
 
-            const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
+            const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/heic"];
             return allowedMimes.includes(mime);
           })
           .test("size", "Image is too large (max 5 MB).", (asset) => {
@@ -141,8 +141,6 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         return;
       }
 
-      console.log("o day");
-
       const postCreateRequest: PostCreateRequest = {
         postType,
         itemName: data.itemName,
@@ -175,7 +173,6 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   };
 
   const headerTitle = postType === PostType.Found ? "Add Found Item" : "Add Lost Item";
-  console.log("disabled", isCreatingPost || isUploadingImages);
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
@@ -184,10 +181,13 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         rightActionButton={
           <DefaultTopRightActionButton
             lable={mode === 'edit' ? 'Save' : 'Upload'}
-            onPress={() => {
-              console.log("Click here");
-              handleSubmit(onSubmit)();
-            }}
+            onPress={handleSubmit(
+              onSubmit,
+              (errs) => {
+                console.log("FORM INVALID:", errs);
+                toast.error("Form invalid", "please check required fields");
+              }
+            )}
             disabled={isCreatingPost || isUploadingImages}
             isSubmitting={isCreatingPost || isUploadingImages}
           />

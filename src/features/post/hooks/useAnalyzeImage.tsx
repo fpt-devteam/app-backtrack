@@ -13,6 +13,7 @@ const useAnalyzeImage = (options?: UseAnalyzeImageOptions) => {
   const mutation = useMutation({
     mutationKey: POST_ANALYZE_IMAGE_KEY,
     mutationFn: async (request: AnalyzeImageRequest) => {
+      console.log("analyze request", request);
       const response = await analyzeImageApi(request)
       if (!response.success) throw new Error('Failed to analyze image')
       return response.data
