@@ -1,5 +1,5 @@
 import { privateClient } from "@/src/api/common/client";
-import type { MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
 import type { ApiResponse } from "@/src/shared/types";
 
 export const POST_API = {
@@ -7,6 +7,7 @@ export const POST_API = {
   filter: "/api/core/posts",
   detail: (postId: string) => `/api/core/posts/${postId}`,
   matching: (postId: string) => `/api/core/posts/${postId}/similar`,
+  analyzeImage: "/api/core/image-analysis/analyze",
 } as const;
 
 export async function filterPostsApi(params: PostsRequest = {}) {
@@ -41,5 +42,14 @@ export async function getPostByIdApi(postId: string) {
 
 export async function matchingPostsApi(req: MatchingPostsRequest) {
   const response = await privateClient.get<MatchingPostsResponse>(POST_API.matching(req.postId));
+  return response.data;
+}
+
+export async function analyzeImageApi(req: AnalyzeImageRequest) {
+  const response = await privateClient.post<AnalyzeImageResponse>(POST_API.analyzeImage, req, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 }

@@ -13,7 +13,7 @@ import type { LatLng, Region } from 'react-native-maps'
 import MapView from 'react-native-maps'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const TARGET_RADIUS_DEFAULT_KM = 5
+const TARGET_RADIUS_DEFAULT_KM = 50
 const RADIUS_ANIMATION_MS = 300
 const RADIUS_SCREEN_PADDING = 1.3
 const METERS_PER_LATITUDE_DEGREE = 111_320
