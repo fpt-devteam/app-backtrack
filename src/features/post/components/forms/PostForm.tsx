@@ -5,7 +5,7 @@ import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 import { DateTimePickerField, ImageField } from "@/src/shared/components";
 import { AppHeader } from "@/src/shared/components/app-utils";
-import { FormSubmitButton } from "@/src/shared/components/ui";
+import { DefaultTopRightActionButton } from "@/src/shared/components/app-utils/AppHeader";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
 import colors from "@/src/shared/theme/colors";
@@ -77,7 +77,7 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
   const loading = isUploadingImages || isCreatingPost;
 
-  const { control, handleSubmit, formState: { errors } } = useForm<PostFormSchema>({
+  const { control, handleSubmit, formState: { errors, isValid } } = useForm<PostFormSchema>({
     defaultValues: {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
@@ -145,7 +145,16 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader title={headerTitle} />
+      <AppHeader
+        title={headerTitle}
+        rightActionButton={
+          <DefaultTopRightActionButton
+            lable={mode === 'edit' ? 'Save' : 'Upload'}
+            onPress={handleSubmit(onSubmit)}
+            disabled={isCreatingPost || isUploadingImages}
+          />
+        }
+      />
 
       <ScrollView className="flex-1 p-4">
         {/* Form Fields */}
@@ -277,12 +286,6 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
         </View>
       </ScrollView>
-
-      <FormSubmitButton
-        onPress={handleSubmit(onSubmit)}
-        isLoading={false}
-        text={mode === 'edit' ? 'Save' : 'Upload'}
-      />
     </View>
   );
 };

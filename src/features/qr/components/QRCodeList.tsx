@@ -17,26 +17,13 @@ const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
     pageSize,
   });
 
-  const handleEndReached = useCallback(() => {
-    if (!hasMore || isLoadingNextPage) return;
-    loadMore();
-  }, [hasMore, isLoadingNextPage, loadMore]);
-
   const renderFooter = useCallback(() => {
     if (!isRefetching && (isLoading || isLoadingNextPage)) {
-      return (
-        <View className="py-4">
-          <AppLoader />
-        </View>
-      );
+      return <AppLoader />;
     }
 
     if (!hasMore && items.length > 0) {
-      return (
-        <View className="py-4">
-          <AppEndOfFeed />
-        </View>
-      );
+      return <AppEndOfFeed />;
     }
 
     return null;
@@ -82,19 +69,19 @@ const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
         </View>
       )}
       numColumns={1}
-      onEndReached={handleEndReached}
+      onEndReached={loadMore}
       onEndReachedThreshold={0.5}
       ListFooterComponent={renderFooter}
       ListEmptyComponent={renderEmpty}
       showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl
-          refreshing={false}
+          refreshing={isRefetching}
           onRefresh={refresh}
           tintColor={colors.primary}
         />
       }
-      className='mb-20 p-4'
+      className='mb-24 p-4'
     />
   );
 };

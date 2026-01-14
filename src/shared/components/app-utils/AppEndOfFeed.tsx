@@ -1,5 +1,5 @@
 
-import { CheckCircle } from "phosphor-react-native";
+import { CheckCircleIcon } from "phosphor-react-native";
 import React from "react";
 import { Text, View } from "react-native";
 
@@ -15,7 +15,7 @@ const AppEndOfFeed = ({
   return (
     <View className="h-16 items-center px-4 justify-center">
       <View className="flex-row items-center gap-2">
-        <CheckCircle size={18} color="#64748B" />
+        <CheckCircleIcon size={18} color="#64748B" />
         <Text className="text-sm font-semibold text-slate-700">{title}</Text>
       </View>
 

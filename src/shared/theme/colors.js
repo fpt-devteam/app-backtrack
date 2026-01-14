@@ -5,7 +5,7 @@ const palette = {
 
   slate: {
     50: "#f8fafc", 100: "#f1f5f9", 200: "#e2e8f0", 300: "#cbd5e1",
-    400: "#94a3b8", 500: "#64748b", 600: "#475569", 700: "#334155",
+    400: "#94a3b8", 500: "#64748b", 600: "#787E87", 700: "#334155",
     800: "#1e293b", 900: "#0f172a",
   },
   gray: {
@@ -35,7 +35,7 @@ const semantic = {
   },
   text: {
     DEFAULT: palette.slate[900], // label, input
-    muted: palette.slate[500],   // placeholder
+    muted: palette.gray[600],   // placeholder
     normal: palette.slate[700],
   },
   border: palette.slate[200],
@@ -51,7 +51,7 @@ const components = {
     border: "rgba(0, 0, 0, 0.1)",
   },
   card: {
-    DEFAULT: palette.white,
+    default: palette.white,
     foreground: semantic.text.DEFAULT,
   },
   popover: {
