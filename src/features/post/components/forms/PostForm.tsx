@@ -1,11 +1,13 @@
 import { LocationField } from "@/src/features/location/components";
 import type { UserLocation } from "@/src/features/location/types";
-import { useCreatePost } from "@/src/features/post/hooks";
+import { useAnalyzeImage, useCreatePost } from "@/src/features/post/hooks";
+import { prepareImageForAnalysis } from "@/src/features/post/utils/image.utils";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 import { DateTimePickerField, ImageField } from "@/src/shared/components";
-import { AppHeader } from "@/src/shared/components/app-utils";
+import { AppHeader, AppLoader } from "@/src/shared/components/app-utils";
 import { DefaultTopRightActionButton } from "@/src/shared/components/app-utils/AppHeader";
+import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
 import colors from "@/src/shared/theme/colors";
@@ -14,10 +16,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import type { ImagePickerAsset } from "expo-image-picker";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
+import { SparkleIcon } from "phosphor-react-native";
 import React, { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
 
@@ -26,7 +29,6 @@ const postSchema = yup
     itemName: yup.string().required("Item name is required"),
     description: yup.string().required("Description is required"),
     eventTime: yup.date().required("Event time is required"),
-    distinctiveMarks: yup.string().required("Distinctive marks is required"),
     images: yup
       .array()
       .of(
@@ -73,15 +75,25 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   const [postData, setPostData] = useState<Nullable<Post>>(initialData);
   const { uploadImages, isUploadingImages } = useUploadImage();
   const { createPost, isCreatingPost } = useCreatePost();
+  const { analyzeImage, isAnalyzing } = useAnalyzeImage({
+    onSuccess: (data) => {
+      setValue('itemName', data.itemName);
+      setValue('description', data.description);
+      toast.success('Image analyzed successfully!');
+    },
+    onError: (error) => {
+      toast.error('Failed to analyze image. Please try again.');
+      console.error('Analyze error:', error);
+    }
+  });
   const insets = useSafeAreaInsets();
 
   const loading = isUploadingImages || isCreatingPost;
 
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<PostFormSchema>({
+  const { control, handleSubmit, formState: { errors, isValid }, setValue, watch } = useForm<PostFormSchema>({
     defaultValues: {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
-      distinctiveMarks: postData?.distinctiveMarks ?? "",
       eventTime: postData?.eventTime ? new Date(postData.eventTime) : undefined,
       detailLocation: postData?.location ? {
         location: postData?.location,
@@ -93,6 +105,24 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
     resolver: yupResolver(postSchema),
     mode: "onSubmit",
   });
+
+  const images = watch('images');
+
+  const handleAnalyzeImage = async () => {
+    if (!images || images.length === 0) {
+      toast.error('Please select an image first');
+      return;
+    }
+
+    try {
+      const firstImage = images[0];
+      const { imageBase64, mimeType } = await prepareImageForAnalysis(firstImage.uri);
+      await analyzeImage({ imageBase64, mimeType });
+    } catch (error) {
+      console.error('Error preparing image for analysis:', error);
+      toast.error('Failed to prepare image for analysis');
+    }
+  };
 
   const handleUploadImages = async (images: ImagePickerAsset[]) => {
     const uploadRes = await uploadImages(images);
@@ -118,7 +148,7 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         location: data.detailLocation?.location,
         externalPlaceId: data.detailLocation?.externalPlaceId,
         displayAddress: data.detailLocation?.displayAddress,
-        distinctiveMarks: data.distinctiveMarks,
+        distinctiveMarks: null,
         eventTime: data.eventTime,
       };
 
@@ -157,6 +187,25 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         }
       />
 
+      {/* Loading Modal */}
+      <Modal
+        visible={isAnalyzing}
+        transparent
+        animationType="fade"
+      >
+        <View className="flex-1 bg-black/50 items-center justify-center">
+          <View className="bg-white rounded-2xl p-6 mx-8 items-center">
+            <AppLoader size={40} />
+            <Text className="text-slate-700 font-semibold mt-4 text-center">
+              Analyzing image...
+            </Text>
+            <Text className="text-slate-500 text-sm mt-2 text-center">
+              AI is identifying the item
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView className="flex-1 p-4">
         {/* Form Fields */}
         <View className="bg-white rounded-3xl p-4 my-3 shadow-md border border-slate-300">
@@ -172,6 +221,21 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
             />
             {errors.images && (
               <Text className="text-red-500 text-xs mt-1">{errors.images.message}</Text>
+            )}
+
+            {/* Analyze Image Button */}
+            {images && images.length > 0 && (
+              <TouchableOpacity
+                onPress={handleAnalyzeImage}
+                disabled={isAnalyzing}
+                className="mt-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl py-3 px-4 flex-row items-center justify-center"
+                style={{ backgroundColor: colors.primary }}
+              >
+                <SparkleIcon size={20} color="white" weight="fill" />
+                <Text className="text-white font-semibold ml-2">
+                  Analyze with AI
+                </Text>
+              </TouchableOpacity>
             )}
           </View>
 
@@ -219,31 +283,6 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
             />
             {errors.description && (
               <Text className="text-red-500 text-xs mt-1">{errors.description.message}</Text>
-            )}
-          </View>
-
-          {/* Distinctive Marks */}
-          <View className="mb-4">
-            <Text className="text-slate-700 font-bold text-sm mb-2">Distinctive Marks</Text>
-            <Controller
-              control={control}
-              name="distinctiveMarks"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.distinctiveMarks ? 'border-red-500' : 'border-slate-300'}`}
-                  placeholder="Any unique marks, scratches, or identifying features (optional)"
-                  placeholderTextColor={colors.slate[300]}
-                  value={value}
-                  onChangeText={onChange}
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                  editable={!loading}
-                />
-              )}
-            />
-            {errors.distinctiveMarks && (
-              <Text className="text-red-500 text-xs mt-1">{errors.distinctiveMarks.message}</Text>
             )}
           </View>
 

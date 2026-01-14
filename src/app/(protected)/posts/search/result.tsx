@@ -155,7 +155,7 @@ export default function PostSearchResultScreen() {
         latitude: value.location.latitude,
         longitude: value.location.longitude,
       },
-      radiusInKm: value?.radiusKm ?? 5,
+      radiusInKm: value?.radiusKm ?? 50,
     }));
     console.log("Filter: ", filters)
   }

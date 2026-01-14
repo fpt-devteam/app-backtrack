@@ -43,3 +43,15 @@ export type MatchingPostsData = {
 };
 
 export type MatchingPostsResponse = ApiResponse<MatchingPostsData>;
+
+export type AnalyzeImageRequest = {
+  imageBase64: string;
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif';
+};
+
+export type AnalyzeImageData = {
+  itemName: string;
+  description: string;
+};
+
+export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
