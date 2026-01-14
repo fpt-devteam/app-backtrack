@@ -139,7 +139,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
   const eventTimeText = formatIsoDate(post.eventTime)
 
   return (
-    <View>
+    <>
       {/* Image Carousel */}
       <View className="bg-white">
         <ImageCarousel data={post.imageUrls} showLoadingIndicator={true} autoScrollInterval={4000} />
@@ -232,7 +232,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           </ScrollView>
         </View>
       )}
-    </View>
+    </>
   )
 };
 

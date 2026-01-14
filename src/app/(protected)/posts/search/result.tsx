@@ -1,4 +1,3 @@
-import { LocationField } from "@/src/features/location/components";
 import { useLocationSelectionStore } from "@/src/features/location/store";
 import type { UserLocation } from "@/src/features/location/types";
 import { MinimalPostCard } from "@/src/features/post/components";
@@ -17,7 +16,7 @@ import {
   MagnifyingGlassIcon
 } from "phosphor-react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { FlatList, Pressable, Text, View } from "react-native";
 
 import * as yup from "yup";
@@ -192,31 +191,16 @@ export default function PostSearchResultScreen() {
           </Pressable>
         </View>
 
-        {/* Location Filter */}
-        <View className="ml-14  my-2">
-          <Controller
-            control={control}
-            name="detailLocation"
-            render={({ field: { onChange, value } }) => (
-              <LocationField
-                value={value}
-                onChange={(data: UserLocation) => {
-                  onChange(data);
-                  handleOnLocationChange(data);
-                }}
-              />
-            )}
+        {/* Post Type Filter*/}
+        <View className="mt-4">
+          <ChipsRow
+            chips={[
+              { label: 'All', selected: selectedPostType === 'All', onPress: () => handlePostTypeChange('All') },
+              { label: 'Found', selected: selectedPostType === PostType.Found, onPress: () => handlePostTypeChange(PostType.Found) },
+              { label: 'Lost', selected: selectedPostType === PostType.Lost, onPress: () => handlePostTypeChange(PostType.Lost) },
+            ]}
           />
         </View>
-
-        {/* Post Type Filter*/}
-        <ChipsRow
-          chips={[
-            { label: 'All', selected: selectedPostType === 'All', onPress: () => handlePostTypeChange('All') },
-            { label: 'Found', selected: selectedPostType === PostType.Found, onPress: () => handlePostTypeChange(PostType.Found) },
-            { label: 'Lost', selected: selectedPostType === PostType.Lost, onPress: () => handlePostTypeChange(PostType.Lost) },
-          ]}
-        />
       </View>
 
       {/* Result Posts List */}

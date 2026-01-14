@@ -3,12 +3,7 @@ import type { DateTimePickerEvent } from "@react-native-community/datetimepicker
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { CalendarBlankIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
-import {
-  Modal,
-  Pressable,
-  Text,
-  View
-} from "react-native";
+import { Modal, Pressable, Text, View } from "react-native";
 
 type Props = Readonly<{
   label?: string;
@@ -18,9 +13,22 @@ type Props = Readonly<{
   disabled?: boolean;
 }>;
 
-const DATE_TIME_VALIDATE = {
-  minDate: new Date(2000, 0, 1),
-  maxDate: new Date(),
+const MIN_DATE = new Date(2000, 0, 1);
+
+const FUTURE_TOLERANCE_MS = 1000;
+
+const validateDateTime = (d: Date) => {
+  const now = new Date();
+
+  if (d.getTime() > now.getTime() + FUTURE_TOLERANCE_MS) {
+    return "Date and time cannot be in the future.";
+  }
+
+  if (d.getTime() < MIN_DATE.getTime()) {
+    return "Date and time cannot be before Jan 1, 2000.";
+  }
+
+  return null;
 };
 
 const DateTimePickerField = ({
@@ -40,24 +48,12 @@ const DateTimePickerField = ({
 
   const openModal = () => {
     if (disabled) return;
+
+    const now = new Date();
+    const initial = value ?? now;
+
+    setTemp(initial.getTime() > now.getTime() ? now : initial);
     setOpen(true);
-    setTemp(value ?? new Date());
-  };
-
-  const onPressDone = () => {
-    if (temp.getTime() > DATE_TIME_VALIDATE.maxDate.getTime()) {
-      setError("Date and time cannot be in the future.");
-      return;
-    }
-
-    if (temp.getTime() < DATE_TIME_VALIDATE.minDate.getTime()) {
-      setError("Date and time cannot be before Jan 1, 2000.");
-      return;
-    }
-
-    setError(null);
-    onChange(temp);
-    onPressClose();
   };
 
   const onPressClose = () => {
@@ -70,8 +66,21 @@ const DateTimePickerField = ({
     onPressClose();
   };
 
+  const onPressDone = () => {
+    const err = validateDateTime(temp);
+    if (err) {
+      setError(err);
+      return;
+    }
+
+    setError(null);
+    onChange(temp);
+    onPressClose();
+  };
+
   const onChangeDate = (event: DateTimePickerEvent, picked: Date | undefined) => {
     if (!picked) return;
+
     setTemp((prev) => {
       const next = new Date(prev);
       next.setFullYear(picked.getFullYear(), picked.getMonth(), picked.getDate());
@@ -81,6 +90,7 @@ const DateTimePickerField = ({
 
   const onChangeTime = (event: DateTimePickerEvent, picked: Date | undefined) => {
     if (!picked) return;
+
     setTemp((prev) => {
       const next = new Date(prev);
       next.setHours(picked.getHours(), picked.getMinutes(), 0, 0);
@@ -97,7 +107,7 @@ const DateTimePickerField = ({
       >
         <CalendarBlankIcon size={18} color="#94A3B8" />
         <Text
-          className={`text-[15px] ${value ? 'text-slate-900' : 'text-slate-400'}`}
+          className={`text-[15px] ${value ? "text-slate-900" : "text-slate-400"}`}
           numberOfLines={1}
         >
           {displayText}
@@ -152,9 +162,11 @@ const DateTimePickerField = ({
                 mode="date"
                 display="spinner"
                 onChange={onChangeDate}
-                style={{ width: '100%', backgroundColor: '#FFFFFF' }}
+                style={{ width: "100%", backgroundColor: "#FFFFFF" }}
                 themeVariant="light"
                 textColor="#334155"
+                minimumDate={MIN_DATE}
+                maximumDate={new Date()}
               />
             </View>
           </View>
@@ -169,7 +181,7 @@ const DateTimePickerField = ({
                 display="spinner"
                 is24Hour
                 onChange={onChangeTime}
-                style={{ width: '100%', backgroundColor: '#FFFFFF' }}
+                style={{ width: "100%", backgroundColor: "#FFFFFF" }}
                 themeVariant="light"
                 textColor="#334155"
               />
@@ -182,4 +194,3 @@ const DateTimePickerField = ({
 };
 
 export default DateTimePickerField;
-

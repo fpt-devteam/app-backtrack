@@ -3,7 +3,7 @@ import { filterPostsApi } from '../api';
 import { POSTS_QUERY_KEY } from '../constants';
 import type { PostFilters, PostsRequest, PostsResponse } from '../types';
 
-type usePostsOptions = {
+export type PostsFiltersOptions = {
   filters: PostFilters;
   enabled?: boolean;
 }
@@ -11,7 +11,7 @@ type usePostsOptions = {
 const usePosts = ({
   filters,
   enabled = true,
-}: usePostsOptions) => {
+}: PostsFiltersOptions) => {
   const query = useInfiniteQuery<PostsResponse>({
     queryKey: [...POSTS_QUERY_KEY, filters],
     enabled,
