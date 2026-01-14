@@ -14,7 +14,7 @@ interface PostCardProps {
   isFetching: boolean;
 }
 
-const IMAGE_HEIGHT = 400;
+const IMAGE_HEIGHT = 300;
 
 const PostCard = ({ item, isFetching }: PostCardProps) => {
   const eventTimeStr = useMemo(() => formatIsoDate(item.eventTime), [item.eventTime]);

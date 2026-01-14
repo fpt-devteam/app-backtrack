@@ -7,6 +7,11 @@ export type CreateQrCodeRequest = {
 
 export type CreateQrCodeResponse = ApiResponse<QrCodeData>;
 
+export type UpdateQrCodeRequest = QrItemEntity;
+
+
+export type UpdateQrCodeResponse = ApiResponse<QrCodeData>;
+
 export type GetQrCodeByIdResponse = ApiResponse<QrCodeData & { owner: QrOwnerEntity }>;
 
 export type GetQrCodesRequest = {
