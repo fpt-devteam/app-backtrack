@@ -152,6 +152,7 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
             lable={mode === 'edit' ? 'Save' : 'Upload'}
             onPress={handleSubmit(onSubmit)}
             disabled={isCreatingPost || isUploadingImages}
+            isSubmitting={isCreatingPost || isUploadingImages}
           />
         }
       />
