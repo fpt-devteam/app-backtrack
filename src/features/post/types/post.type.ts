@@ -19,7 +19,11 @@ export type Post = {
   distinctiveMarks: string | null;
   eventTime: Date;
   createdAt: Date;
-  authorId: string;
+  author: {
+    id: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  };
 } & UserLocation;
 
 export type SimilarPost = Post & {

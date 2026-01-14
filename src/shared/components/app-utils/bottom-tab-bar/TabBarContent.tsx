@@ -2,7 +2,7 @@ import { metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
 import type { IconProps } from "phosphor-react-native";
-import { BellIcon, ChatCircleIcon, HouseIcon, QrCodeIcon } from "phosphor-react-native";
+import { BellIcon, ChatCircleIcon, HouseIcon, MapTrifoldIcon, QrCodeIcon } from "phosphor-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,6 +22,10 @@ const TAB_ICONS: Record<string, TabIcon> = {
   qr: {
     Icon: QrCodeIcon,
     label: "QRs",
+  },
+  map: {
+    Icon: MapTrifoldIcon,
+    label: "Map",
   },
   chat: {
     Icon: ChatCircleIcon,

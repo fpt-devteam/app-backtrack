@@ -30,3 +30,9 @@ export const QR_ROUTE = {
   qrView: (qrCodeId: string, publicCode: string) => `/qr/${qrCodeId}/qr-view/${publicCode}`,
 } as const;
 
+
+export const MAP_ROUTE = {
+  index: "/(protected)/map",
+  search: "/(protected)/map/search",
+} as const;
+
