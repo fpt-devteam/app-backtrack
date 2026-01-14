@@ -3,7 +3,7 @@ import type {
 } from '@gorhom/bottom-sheet';
 import BottomSheetPrimitive, {
   BottomSheetBackdrop,
-  BottomSheetView,
+  BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
@@ -67,9 +67,9 @@ const BottomSheet = ({
       handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 40, height: 6 }}
       maxDynamicContentSize={maxDynamicContentSize}
     >
-      <BottomSheetView style={{ paddingBottom: 12 }}>
+      <BottomSheetScrollView style={{ paddingBottom: 12 }}>
         {children}
-      </BottomSheetView>
+      </BottomSheetScrollView>
     </BottomSheetPrimitive>
   )
 }
