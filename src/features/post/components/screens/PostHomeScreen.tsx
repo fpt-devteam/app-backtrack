@@ -1,14 +1,23 @@
 import { PostCard } from '@/src/features/post/components';
 import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
 import { usePosts } from '@/src/features/post/hooks';
-import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
+import { AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
+import type { PostFilters } from '../../types';
 
-const PostHomeScreen = () => {
+type PostHomeScreenProps = {
+  direction?: 'vertical' | 'horizontal';
+  filters: PostFilters
+}
+
+const PostHomeScreen = ({ direction = 'vertical', filters }: PostHomeScreenProps) => {
   const queryClient = useQueryClient();
-  const { items, hasMore, loadMore, isLoading, isLoadingNextPage } = usePosts({ filters: {} });
+
+  console.log("Filter herer", filters)
+
+  const { items, hasMore, loadMore, isLoading, isLoadingNextPage } = usePosts({ filters });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const isEndOfFeedRef = useRef(false);
@@ -39,30 +48,50 @@ const PostHomeScreen = () => {
       <AppLoader />
     );
 
-    if (!hasMore) return (
-      <AppEndOfFeed />
-    );
-
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
 
-  return (
-    <FlatList
-      data={items}
-      keyExtractor={item => item.id}
-      renderItem={({ item }) => <PostCard item={item} isFetching={isLoading} />}
-      onEndReachedThreshold={0.01}
-      onEndReached={handleEndReached}
-      ListFooterComponent={renderFooter}
-      scrollEventThrottle={16}
-      bounces={true}
-      refreshControl={<RefreshControl
-        refreshing={isRefreshing}
-        onRefresh={onRefresh}
-      />}
-    />
+  if (direction === 'vertical') {
+    return (
+      <FlatList
+        data={items}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => <PostCard item={item} isFetching={isLoading} type={direction} />}
+        onEndReachedThreshold={0.01}
+        onEndReached={handleEndReached}
+        ListFooterComponent={renderFooter}
+        scrollEventThrottle={16}
+        bounces={true}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+        contentContainerStyle={{ padding: 16 }}
+        refreshControl={<RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+        />}
+      />
+    );
+  }
+  else {
+    return (
+      <FlatList
+        horizontal
+        directionalLockEnabled
+        alwaysBounceVertical={false}
+        bounces={true}
+        showsVerticalScrollIndicator={false}
+        showsHorizontalScrollIndicator={false}
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <PostCard item={item} isFetching={isLoading} type={direction} />}
+        ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+        onEndReachedThreshold={0.01}
+        onEndReached={handleEndReached}
+        ListFooterComponent={renderFooter}
+        scrollEventThrottle={16}
+      />
 
-  );
+    );
+  }
 };
 
 export default PostHomeScreen;

@@ -13,6 +13,7 @@ type Props = {
   children: React.ReactNode
   snapPoints?: string[]
   enableDynamicSizing?: boolean
+  maxDynamicContentSize?: number
 }
 
 const BottomSheet = ({
@@ -21,12 +22,13 @@ const BottomSheet = ({
   children,
   snapPoints: customSnapPoints,
   enableDynamicSizing = true,
+  maxDynamicContentSize,
 }: Props) => {
   const bottomSheetRef = useRef<BottomSheetPrimitive>(null)
 
   // Default snap points if not using dynamic sizing
   const snapPoints = useMemo(
-    () => customSnapPoints || ['50%', '75%'],
+    () => customSnapPoints || ['25%', '50%', '75%'],
     [customSnapPoints]
   )
 
@@ -63,6 +65,7 @@ const BottomSheet = ({
       backdropComponent={renderBackdrop}
       backgroundStyle={{ backgroundColor: 'white' }}
       handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 40, height: 6 }}
+      maxDynamicContentSize={maxDynamicContentSize}
     >
       <BottomSheetView style={{ paddingBottom: 12 }}>
         {children}
