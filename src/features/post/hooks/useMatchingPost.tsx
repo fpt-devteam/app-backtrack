@@ -33,6 +33,7 @@ const useMatchingPost = (postId: string) => {
     error,
     isMatching: query?.data?.data?.embeddingStatus !== PostMatchingStatus.Ready,
     similarPosts: query?.data?.data?.similarPosts || [],
+    retry: query.refetch,
   };
 };
 

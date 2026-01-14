@@ -43,7 +43,10 @@ export function timeSincePast(
   return `${years}y`;
 }
 
-export const formatDateTime = (d: Date) => {
+export const formatDateTime = (input: Date | string) => {
+  const d = toDate(input);
+  if (!d) return "Invalid date";
+
   const pad2 = (n: number) => String(n).padStart(2, "0");
   const mm = pad2(d.getMonth() + 1);
   const dd = pad2(d.getDate());
@@ -54,9 +57,11 @@ export const formatDateTime = (d: Date) => {
 };
 
 export function formatTime<T extends Intl.DateTimeFormatOptions>(
-  d: Date,
+  input: Date | string,
   options: T
 ): string {
+  const d = toDate(input);
+  if (!d) return "Invalid time";
   return d.toLocaleTimeString([], options);
 }
 
