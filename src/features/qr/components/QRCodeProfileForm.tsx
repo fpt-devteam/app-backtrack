@@ -1,6 +1,6 @@
 import { AppHeader } from '@/src/shared/components';
+import { DefaultTopRightActionButton } from '@/src/shared/components/app-utils/AppHeader';
 import { ImageField } from '@/src/shared/components/fields';
-import { FormSubmitButton } from '@/src/shared/components/ui';
 import colors from '@/src/shared/theme/colors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { ImagePickerAsset } from 'expo-image-picker';
@@ -8,9 +8,11 @@ import { BookmarkIcon, SparkleIcon } from 'phosphor-react-native';
 import React, { useEffect } from 'react';
 import type { SubmitHandler } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
-import { ScrollView, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as yup from 'yup';
+
 
 const qrCodeProfileSchema = yup
   .object({
@@ -74,7 +76,7 @@ type QRCodeProfileFormProps = {
   submitButtonText?: string;
 };
 
-const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false, submitButtonText = 'Create' }: QRCodeProfileFormProps) => {
+const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false, submitButtonText = 'Save' }: QRCodeProfileFormProps) => {
   const { control, handleSubmit, formState: { errors, isValid }, watch, reset, } = useForm<QRCodeProfileFormSchema>({
     defaultValues: {
       name: "",
@@ -106,13 +108,25 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader title={headerTitleMap[mode]} />
+      <AppHeader
+        title={headerTitleMap[mode]}
+        rightActionButton={
+          <DefaultTopRightActionButton
+            lable={submitButtonText}
+            onPress={handleSubmit(handleFormSubmit)}
+            disabled={!isValid || isSubmitting}
+            isSubmitting={isSubmitting}
+          />
+        } />
 
-      <ScrollView
-        className="flex-1 bg-white"
-        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+      <KeyboardAwareScrollView
+        className='p-4'
         showsVerticalScrollIndicator={false}
+        enableAutomaticScroll
         keyboardShouldPersistTaps="handled"
+        extraScrollHeight={10}
+        extraHeight={150}
+        keyboardOpeningTime={0}
       >
         {/* Image Upload Section */}
         <View className="mb-6">
@@ -175,7 +189,7 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
           <View className="flex-row items-center mb-2">
             <SparkleIcon size={20} color={colors.primary} weight="fill" />
             <Text className="ml-2 text-base font-semibold text-gray-900">
-              Description
+              Note
             </Text>
           </View>
           <Controller
@@ -188,7 +202,7 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
                 placeholder="Scratches on the back, sticker on lid..."
                 placeholderTextColor={colors.slate[400]}
                 multiline
-                numberOfLines={5}
+                numberOfLines={15}
                 textAlignVertical="top"
                 className="bg-gray-50 rounded-2xl px-4 py-3 text-base text-gray-900"
                 style={{
@@ -196,7 +210,7 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
                   borderColor: errors.description ? colors.red[500] : colors.slate[200],
                   minHeight: 120,
                 }}
-                maxLength={500}
+                maxLength={700}
                 editable={!isSubmitting}
               />
             )}
@@ -208,22 +222,17 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
           ) : (
             descriptionValue && descriptionValue.length > 0 && (
               <Text className="text-xs text-gray-400 mt-1 ml-1">
-                {descriptionValue.length}/500 characters
+                {descriptionValue.length}/700 characters
               </Text>
             )
           )}
         </View>
 
-      </ScrollView>
-
-      <FormSubmitButton
-        onPress={handleSubmit(handleFormSubmit)}
-        isLoading={isSubmitting}
-        text={submitButtonText}
-      />
+      </KeyboardAwareScrollView>
     </View>
   );
 };
 
 export default QRCodeProfileForm;
 export type { QRCodeProfileFormSchema };
+

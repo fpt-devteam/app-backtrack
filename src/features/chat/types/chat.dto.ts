@@ -25,3 +25,5 @@ export type ConversationsGetResponse = ApiResponse<CursorScrollResponse<Conversa
 export type MessagesGetResponse = ApiResponse<CursorScrollResponse<Message>>;
 
 export type MessageSendResponse = ApiResponse<Message>;
+
+export type ConversationDetailResponse = ApiResponse<Conversation>;
