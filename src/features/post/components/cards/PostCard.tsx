@@ -7,16 +7,38 @@ import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import { ClockIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { DimensionValue } from "react-native";
 import { Animated, Easing, Image, Pressable, Text, View } from "react-native";
 
-interface PostCardProps {
+type CardType = "vertical" | "horizontal";
+
+const CardConfigs: Record<CardType, {
+  card: {
+    width: DimensionValue;
+    height: DimensionValue
+  }
+}> = {
+  vertical: {
+    card: {
+      width: "100%",
+      height: 500,
+    },
+  },
+  horizontal: {
+    card: {
+      width: 300,
+      height: 400,
+    },
+  },
+};
+
+type PostCardProps = {
   item: Post;
   isFetching: boolean;
-}
+  type?: CardType;
+};
 
-const IMAGE_HEIGHT = 300;
-
-const PostCard = ({ item, isFetching }: PostCardProps) => {
+const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps) => {
   const eventTimeStr = useMemo(() => formatIsoDate(item.eventTime), [item.eventTime]);
   const imageUrl = useMemo(() => item.imageUrls?.[0], [item.imageUrls]);
   const [imgLoading, setImgLoading] = useState(true);
@@ -40,82 +62,89 @@ const PostCard = ({ item, isFetching }: PostCardProps) => {
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
     }).start();
-  }, [isFetching, imgLoading, skeletonOpacity, contentOpacity,]);
+  }, [isFetching, imgLoading, skeletonOpacity, contentOpacity]);
 
   const handleOpenDetail = useCallback(() => {
     router.push(POST_ROUTE.details(item.id) as ExternalPathString | RelativePathString);
   }, [item.id]);
 
   return (
-
-    <View className="m-4" style={{ position: "relative" }}>
-      <Animated.View style={{ opacity: contentOpacity }}>
+    <View
+      style={{
+        position: "relative",
+        width: CardConfigs[type].card.width,
+        height: CardConfigs[type].card.height,
+      }}
+    >
+      <Animated.View
+        style={{
+          opacity: contentOpacity,
+          width: "100%",
+          height: "100%",
+        }}
+      >
         <Pressable
           onPress={handleOpenDetail}
           className="bg-white rounded-[18px] overflow-hidden border border-slate-300"
           style={{
-            shadowColor: "#000",
-            shadowOpacity: 0.08,
-            shadowRadius: 12,
-            shadowOffset: { width: 0, height: 6 },
-            elevation: 3,
+            width: "100%",
+            height: "100%"
           }}
         >
-          {/* Image header */}
-          <View className="relative" style={{ height: IMAGE_HEIGHT }}>
-            <Image
-              source={{ uri: imageUrl }}
-              className="w-full"
-              style={{ height: IMAGE_HEIGHT }}
-              resizeMode="cover"
-              onLoadStart={() => setImgLoading(true)}
-              onLoadEnd={() => setImgLoading(false)}
-              onError={() => setImgLoading(false)}
-            />
-          </View>
+          <Image
+            source={{ uri: imageUrl }}
+            style={{
+              flex: 1,
+              width: "100%",
+            }}
+            resizeMode="cover"
+            onLoadStart={() => setImgLoading(true)}
+            onLoadEnd={() => setImgLoading(false)}
+            onError={() => setImgLoading(false)}
+          />
 
-          {/* Content */}
           <View className="p-4 gap-2">
-            <View className="flex-row items-center justify-between gap-2.5">
+            <View className="flex-row items-center justify-between gap-2">
               <Text className="text-base font-extrabold text-slate-900 flex-1" numberOfLines={1}>
                 {item.itemName}
               </Text>
               <PostStatusBadge status={item.postType} />
             </View>
 
-            {/* Event Time */}
             <View className="flex-row items-center gap-2">
               <ClockIcon size={16} color={colors.slate[500]} />
-              <Text className="flex-1 text-sm text-slate-600">{eventTimeStr}</Text>
+              <Text className="flex-1 text-sm text-slate-600" numberOfLines={1}>
+                {eventTimeStr}
+              </Text>
             </View>
 
-            {/* Location */}
             <View className="flex-row items-center gap-2">
               <MapPinIcon size={16} color={colors.slate[500]} />
-              <Text className="flex-1 text-sm text-slate-600" numberOfLines={1}>{item.displayAddress ?? "Near here"}</Text>
+              <Text className="flex-1 text-sm text-slate-600" numberOfLines={1}>
+                {item.displayAddress ?? "Near here"}
+              </Text>
             </View>
           </View>
         </Pressable>
       </Animated.View>
 
-      {/* Skeleton overlay */}
       <Animated.View
         pointerEvents="none"
         style={{
           position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
+          inset: 0,
           opacity: skeletonOpacity,
         }}
       >
-        <PostCardSkeleton />
+        <PostCardSkeleton type={type} />
       </Animated.View>
-    </View >
+    </View>
   );
 };
 
-const PostCardSkeleton = () => {
+type SkeletonProps = { type: CardType };
+
+const PostCardSkeleton = ({ type }: SkeletonProps) => {
   const opacity = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
@@ -144,26 +173,25 @@ const PostCardSkeleton = () => {
     <Animated.View
       pointerEvents="none"
       className="bg-white rounded-[18px] overflow-hidden border border-slate-200"
-      style={{ opacity }}
+      style={{
+        opacity,
+        width: CardConfigs[type].card.width,
+        height: CardConfigs[type].card.height,
+      }}
     >
-      {/* Image skeleton  */}
-      <View className="w-full bg-slate-200" style={{ height: IMAGE_HEIGHT }} />
+      <View style={{ flex: 1, width: "100%" }} className="bg-slate-200" />
 
-      {/* Content skeleton  */}
       <View className="p-4">
-        {/* Title + badge */}
         <View className="flex-row items-center justify-between gap-2">
           <View className="h-8 bg-slate-200 rounded-md flex-1 mr-3" />
           <View className="h-8 w-16 bg-slate-200 rounded-full" />
         </View>
 
-        {/* Event time skeleton */}
         <View className="flex-row items-center gap-2 mt-2">
           <View className="h-4 w-4 bg-slate-200 rounded" />
           <View className="h-4 bg-slate-200 rounded-md w-[55%]" />
         </View>
 
-        {/* Location  */}
         <View className="flex-row items-center gap-2 mt-3">
           <View className="h-4 w-4 bg-slate-200 rounded" />
           <View className="h-4 bg-slate-200 rounded-md flex-1" />

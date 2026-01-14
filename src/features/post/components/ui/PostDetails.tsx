@@ -6,14 +6,15 @@ import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks'
 import { PostType } from '@/src/features/post/types'
 import { ImageCarousel } from '@/src/shared/components'
 import { CHAT_ROUTE, POST_ROUTE } from '@/src/shared/constants'
+import colors from '@/src/shared/theme/colors'
 import { formatIsoDate } from '@/src/shared/utils'
 import type { ExternalPathString, RelativePathString } from 'expo-router'
 import { router } from 'expo-router'
-import { CalendarIcon, MapPinIcon, MapTrifoldIcon, TagIcon } from 'phosphor-react-native'
+import { CalendarIcon, MapPinIcon, TagIcon } from 'phosphor-react-native'
 import React, { useEffect, useMemo, useRef } from 'react'
-import { Animated, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import { Animated, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import type MapView from 'react-native-maps'
 import type { Region } from 'react-native-maps'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 
 type PostDetailsProps = {
   postId: string
@@ -93,13 +94,13 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
   const { createConversation, isCreatingConversation } = useCreateConversation();
   const { user } = useAppUser();
 
-  const isOwner = useMemo(() => post?.authorId === user?.id, [post, user]);
+  const isOwner = useMemo(() => post?.author.id === user?.id, [post, user]);
 
   const handleCreateConversation = async () => {
     if (!post) return;
 
     const req = {
-      partnerId: post.authorId,
+      partnerId: post.author.id,
       creatorKeyName: post.postType === PostType.Found ? PostType.Lost : PostType.Found,
       partnerKeyName: post.postType,
     } as ConversationCreateRequest;
@@ -137,18 +138,6 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
 
   const eventTimeText = formatIsoDate(post.eventTime)
 
-  const openInMaps = async () => {
-    if (!post.location) return
-    const { latitude, longitude } = post.location
-    const label = encodeURIComponent(post.itemName || 'Location')
-    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}&query_place_id=${post.externalPlaceId ?? ''}&q=${label}`
-    try {
-      await Linking.openURL(url)
-    } catch {
-      // ignore
-    }
-  }
-
   return (
     <View>
       {/* Image Carousel */}
@@ -180,7 +169,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           {/* Last seen location */}
           <View className="flex-row gap-3 items-start">
             <View className="w-8 h-8 items-center justify-center">
-              <MapPinIcon size={28} color="#2563EB" weight="fill" />
+              <MapPinIcon size={28} color={colors.primary} weight="fill" />
             </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Last seen location</Text>
@@ -193,7 +182,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           {/* Distinctive marks */}
           <View className="flex-row gap-3 items-start">
             <View className="w-8 h-8 items-center justify-center">
-              <TagIcon size={28} color="#2563EB" weight="fill" />
+              <TagIcon size={28} color={colors.primary} weight="fill" />
             </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Distinctive marks</Text>
@@ -206,7 +195,7 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
           {/* Event time */}
           <View className="flex-row gap-3 items-start">
             <View className="w-8 h-8 items-center justify-center">
-              <CalendarIcon size={28} color="#2563EB" weight="fill" />
+              <CalendarIcon size={28} color={colors.primary} weight="fill" />
             </View>
             <View className="flex-1 justify-center">
               <Text className="text-sm text-slate-500 font-display">Event time</Text>
@@ -214,33 +203,6 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
                 <Text className="text-base mt-0.5">{eventTimeText}</Text>
               </ScrollView>
             </View>
-          </View>
-        </View>
-
-        {/* Map Section */}
-        <View className="px-5 pb-5">
-          <View className="rounded-2xl overflow-hidden border border-blue-600/15 bg-blue-50">
-            <MapView
-              ref={mapRef}
-              provider={PROVIDER_GOOGLE}
-              style={{ height: 160 }}
-              initialRegion={region}
-              showsUserLocation
-              showsMyLocationButton={false}
-              pitchEnabled={false}
-              rotateEnabled={false}
-              scrollEnabled={false}
-              zoomEnabled={false}
-            >
-              {post.location && <Marker coordinate={post.location} />}
-            </MapView>
-
-            <TouchableOpacity
-              onPress={openInMaps}
-              className="absolute right-3 bottom-3 bg-white/95 rounded-2xl p-3 border border-slate-900/10"
-            >
-              <MapTrifoldIcon size={20} color="#2563EB" weight="bold" />
-            </TouchableOpacity>
           </View>
         </View>
       </View>
