@@ -5,6 +5,7 @@ import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 import { DateTimePickerField, ImageField } from "@/src/shared/components";
 import { AppHeader } from "@/src/shared/components/app-utils";
+import { FormSubmitButton } from "@/src/shared/components/ui";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
 import colors from "@/src/shared/theme/colors";
@@ -16,7 +17,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
 
@@ -277,15 +278,11 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         </View>
       </ScrollView>
 
-      <View className="p-4 pb-0">
-        <TouchableOpacity
-          className={`h-11 items-center justify-center rounded-sm ${loading ? 'bg-slate-400' : 'bg-primary'}`}
-          onPress={handleSubmit(onSubmit)}
-          disabled={loading}
-        >
-          {loading ? <ActivityIndicator color="white" /> : <Text className="text-base font-semibold text-white">{mode === 'edit' ? 'Save' : 'Upload'}</Text>}
-        </TouchableOpacity>
-      </View>
+      <FormSubmitButton
+        onPress={handleSubmit(onSubmit)}
+        isLoading={false}
+        text={mode === 'edit' ? 'Save' : 'Upload'}
+      />
     </View>
   );
 };

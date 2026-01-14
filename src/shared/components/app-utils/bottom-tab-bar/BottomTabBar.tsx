@@ -10,7 +10,7 @@ const BottomTabBar = () => {
   const bottomTabBarState = useUIStore((state) => state.bottomTabBarState);
 
   const closeSheet = () => setOpenSheet(false);
-  const hiddenRoutes = ["/posts/create", "/posts/search", "/posts/search/result", "/posts/search/location"];
+  const hiddenRoutes = ["/posts/create", "/posts/search", "/posts/search/result", "/posts/search/location", "/qr/generate"];
   const shouldHideTabBar = hiddenRoutes.some(route => pathname.startsWith(route)) || bottomTabBarState === 'closed';
   return (
     <>
@@ -26,7 +26,7 @@ const BottomTabBar = () => {
         }
       >
         <Tabs.Screen name="posts" options={{ title: "Home" }} />
-        <Tabs.Screen name="(qr)" options={{ title: "QRs" }} />
+        <Tabs.Screen name="qr" options={{ title: "QRs" }} />
         <Tabs.Screen name="chat" options={{ title: "Chat" }} />
         <Tabs.Screen name="notification" options={{ title: "Inbox" }} />
         <Tabs.Screen name="(profile)" options={{ href: null }} />

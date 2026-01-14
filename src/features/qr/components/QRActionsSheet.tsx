@@ -39,7 +39,6 @@ const QRActionsSheet = ({
       icon: QrCodeIcon,
       label: 'Generate Digital QR',
       onPress: () => {
-        console.log('Generate digital QR');
         if (onGenerateDigitalQR) {
           handleActionPress(onGenerateDigitalQR);
         }

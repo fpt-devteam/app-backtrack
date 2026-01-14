@@ -19,7 +19,7 @@ const TAB_ICONS: Record<string, TabIcon> = {
     Icon: HouseIcon,
     label: "Home",
   },
-  "(qr)": {
+  qr: {
     Icon: QrCodeIcon,
     label: "QRs",
   },

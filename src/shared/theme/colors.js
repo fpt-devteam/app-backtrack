@@ -22,7 +22,7 @@ const palette = {
 
 const semantic = {
   primary: palette.sky[500],
-  secondary: palette.gray[500],
+  secondary: palette.slate[200],
   success: palette.emerald[600],
   error: palette.red[600],
   warning: palette.amber[500],
