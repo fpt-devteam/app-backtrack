@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getMessagesApi } from '../api';
-import { CHAT_QUERY_KEY } from '../constants';
+import { getMessagesApi } from '@/src/features/chat/api';
+import { CHAT_QUERY_KEY } from '@/src/features/chat/constants';
 
-const useMessages = (conversationId: string) => {
+export const useMessages = (conversationId: string) => {
   const query = useInfiniteQuery({
     queryKey: CHAT_QUERY_KEY.messages(conversationId),
     queryFn: async ({ pageParam }) => {
@@ -36,4 +36,4 @@ const useMessages = (conversationId: string) => {
   };
 };
 
-export default useMessages;
+

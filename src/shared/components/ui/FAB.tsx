@@ -23,7 +23,7 @@ type FABProps = {
   readonly style?: ViewStyle;
 };
 
-export default function FAB({
+export const FAB = ({
   icon: Icon,
   label,
   onPress,
@@ -31,7 +31,7 @@ export default function FAB({
   size = "md",
   disabled = false,
   style,
-}: FABProps) {
+}: FABProps) => {
   const s = useMemo(() => sizeMap[size], [size]);
   const c = useMemo(() => toneMap[tone], [tone]);
   const isPill = !!label;

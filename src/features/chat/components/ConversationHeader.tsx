@@ -9,7 +9,7 @@ interface ConversationHeaderProps {
   isLoading?: boolean
 }
 
-const ConversationHeader = ({ partnerName, isLoading }: ConversationHeaderProps) => {
+export const ConversationHeader = ({ partnerName, isLoading }: ConversationHeaderProps) => {
   const router = useRouter()
 
   return (
@@ -30,4 +30,4 @@ const ConversationHeader = ({ partnerName, isLoading }: ConversationHeaderProps)
   )
 }
 
-export default ConversationHeader
+

@@ -1,19 +1,16 @@
+import { Post } from '@/src/features/post/types'
 import { colors } from '@/src/shared/theme'
-import { formatDateTime } from '@/src/shared/utils'
+import {
+  calculateHaversineDistance,
+  calculateTimeDifference, formatDateTime,
+  formatDistance,
+  formatTimeDifference,
+  getLocationMatchStatus,
+  getTimeMatchStatus,
+} from '@/src/shared/utils'
 import { CheckSquareIcon, ClockIcon, MapPinIcon, PaletteIcon } from 'phosphor-react-native'
 import React from 'react'
 import { Text, View } from 'react-native'
-import { Post } from '../../types'
-import {
-  calculateHaversineDistance,
-  formatDistance,
-  getLocationMatchStatus,
-} from '../../utils/distance.utils'
-import {
-  calculateTimeDifference,
-  formatTimeDifference,
-  getTimeMatchStatus
-} from '../../utils/time.utils'
 
 interface MatchedAttributesSectionProps {
   post1: Post
@@ -77,7 +74,7 @@ const AttributeItem = ({ icon, title, matchLevel, description, details }: Attrib
   )
 }
 
-const MatchedAttributesSection = ({ post1, post2 }: MatchedAttributesSectionProps) => {
+export const MatchedAttributesSection = ({ post1, post2 }: MatchedAttributesSectionProps) => {
   // Calculate distance
   const distanceInMeters = calculateHaversineDistance(
     post1.location.latitude,
@@ -154,5 +151,3 @@ const MatchedAttributesSection = ({ post1, post2 }: MatchedAttributesSectionProp
     </View>
   )
 }
-
-export default MatchedAttributesSection

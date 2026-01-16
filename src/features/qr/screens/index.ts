@@ -1,0 +1,1 @@
+export { QRScreen } from '@/src/features/qr/screens/QRScreen';

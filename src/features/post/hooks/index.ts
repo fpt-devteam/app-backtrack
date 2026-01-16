@@ -1,6 +1,6 @@
-export { default as useAnalyzeImage } from './useAnalyzeImage'
-export { default as useCreatePost } from './useCreatePost'
-export { default as useGetPostById } from './useGetPostById'
-export { default as useMatchingPost } from './useMatchingPost'
-export { default as usePosts } from './usePosts'
+export { useAnalyzeImage } from './useAnalyzeImage'
+export { useCreatePost } from './useCreatePost'
+export { useGetPostById } from './useGetPostById'
+export { useMatchingPost } from './useMatchingPost'
+export { usePosts } from './usePosts'
 

@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
 
 import { REGISTER_QUERY_KEY } from "@/src/features/auth/constants";
-import { useSync } from "@/src/features/auth/hooks";
+import { useSync } from "@/src/features/auth/hooks/useSync";
 import type { RegisterRequest, RegisterResponse } from "@/src/features/auth/types";
 
 export function useRegister() {

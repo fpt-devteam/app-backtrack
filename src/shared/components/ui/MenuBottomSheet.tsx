@@ -1,8 +1,8 @@
-import { BottomSheet } from '@/src/shared/components/ui';
+import { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
+import colors from '@/src/shared/theme/colors';
 import { DotsThreeIcon, type PhosphorLogoIcon } from 'phosphor-react-native';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import colors from '../../theme/colors';
 
 export type MenuOption = {
   id: string;
@@ -18,7 +18,7 @@ type MenuBottomSheetProps = {
   options: MenuOption[];
 };
 
-const MenuBottomSheet = ({ isVisible, options, onClose }: MenuBottomSheetProps) => {
+export const MenuBottomSheet = ({ isVisible, options, onClose }: MenuBottomSheetProps) => {
   return (
     <BottomSheet
       isVisible={isVisible}
@@ -36,7 +36,7 @@ const MenuBottomSheet = ({ isVisible, options, onClose }: MenuBottomSheetProps) 
               onPress={option.onPress}
               className="flex-row items-center bg-gray-50 rounded-2xl p-4"
               style={({ pressed }) => ({
-                opacity: pressed ? 0.7 : 1,
+                opacity: pressed ? 0.6 : 1,
               })}
             >
               <View
@@ -66,7 +66,7 @@ const MenuBottomSheet = ({ isVisible, options, onClose }: MenuBottomSheetProps) 
 
 MenuBottomSheet.displayName = 'MenuBottomSheet';
 
-export default MenuBottomSheet;
+
 
 
 export const MenuButton = ({ onPress }: { onPress: () => void }) => {

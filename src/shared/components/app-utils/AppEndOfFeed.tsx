@@ -8,12 +8,12 @@ interface EndOfFeedFooterProps {
   readonly hint?: string;
 }
 
-const AppEndOfFeed = ({
+export const AppEndOfFeed = ({
   title = "You’re all caught up",
   hint = "Try changing filters or searching nearby to see more.",
 }: EndOfFeedFooterProps) => {
   return (
-    <View className="h-16 items-center px-4 justify-center">
+    <View className="h-32 items-center px-4 justify-center">
       <View className="flex-row items-center gap-2">
         <CheckCircleIcon size={18} color="#64748B" />
         <Text className="text-sm font-semibold text-slate-700">{title}</Text>
@@ -29,4 +29,4 @@ const AppEndOfFeed = ({
   );
 }
 
-export default AppEndOfFeed;
+

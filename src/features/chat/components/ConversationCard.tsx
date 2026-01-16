@@ -1,9 +1,9 @@
+import { ConversationAvatar } from '@/src/features/chat/components/ConversationAvatar'
+import { Conversation } from '@/src/features/chat/types'
 import { CHAT_ROUTE } from '@/src/shared/constants/route.constant'
 import { ExternalPathString, RelativePathString, router } from 'expo-router'
 import React, { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { Conversation } from '../types'
-import { ConversationAvatar } from './ConversationAvatar'
 
 type Props = {
   conversation: Conversation
@@ -19,8 +19,8 @@ const formatTime = (iso?: string) => {
   return `${hh}:${mm}`
 }
 
-const ConversationCard = ({ conversation }: Props) => {
-  const partnerName = conversation.partner?.displayName ?? 'Unknown User'
+export const ConversationCard = ({ conversation }: Props) => {
+  const partnerName = conversation.partner?.displayName || 'Unknown User'
   const lastText = conversation.lastMessage?.lastContent ?? 'Say hi'
   const timeText = useMemo(() => {
     return (
@@ -39,7 +39,7 @@ const ConversationCard = ({ conversation }: Props) => {
           CHAT_ROUTE.message(conversation.conversationId) as ExternalPathString | RelativePathString
         )
       }}
-      className="w-full px-4 py-3 bg-white"
+      className="w-full p-4 mb-4"
       style={({ pressed }) => ({
         opacity: pressed ? 0.92 : 1,
         transform: [{ scale: pressed ? 0.99 : 1 }],
@@ -75,10 +75,8 @@ const ConversationCard = ({ conversation }: Props) => {
         </View>
       </View>
 
-      {/* Divider */}
-      <View className="h-[1px] bg-slate-100 mt-3" />
     </Pressable>
   )
 }
 
-export default ConversationCard
+

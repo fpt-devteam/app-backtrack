@@ -7,7 +7,7 @@ type FormSubmitButtonProps = {
   text: string;
 };
 
-const FormSubmitButton = ({
+export const FormSubmitButton = ({
   onPress,
   isLoading = false,
   text
@@ -31,4 +31,4 @@ const FormSubmitButton = ({
   );
 };
 
-export default FormSubmitButton;
+

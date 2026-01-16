@@ -1,5 +1,5 @@
-import { publicClient } from '@/src/api/common'
 import type { PlaceAutocompleteResponse, PlaceSuggestion } from '@/src/features/map/types'
+import { publicClient } from '@/src/shared/api'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 

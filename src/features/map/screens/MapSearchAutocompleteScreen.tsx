@@ -1,5 +1,9 @@
+import { GooglePlacesService } from '@/src/features/location/services/googlePlaces.service'
+import { useLocationSelectionStore } from '@/src/features/location/store'
+import type { PlaceDetails, UserLocation } from '@/src/features/location/types'
 import { usePlaceAutocomplete } from '@/src/features/map/hooks'
-import SuggestRow from '@/src/shared/components/ui/SuggestRow'
+import type { PlaceSuggestion } from '@/src/features/map/types'
+import { SuggestRow } from '@/src/shared/components'
 import { MAP_ROUTE } from '@/src/shared/constants'
 import { useRecentSearch } from '@/src/shared/hooks'
 import { colors } from '@/src/shared/theme'
@@ -7,10 +11,6 @@ import { router } from 'expo-router'
 import { ArrowLeftIcon, ClockIcon, MagnifyingGlassIcon, MapPinIcon, XCircleIcon } from 'phosphor-react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ActivityIndicator, Animated, Easing, FlatList, Keyboard, Pressable, Text, TextInput, View } from 'react-native'
-import { GooglePlacesService } from '../../location/services/googlePlaces.service'
-import { useLocationSelectionStore } from '../../location/store'
-import type { PlaceDetails, UserLocation } from '../../location/types'
-import type { PlaceSuggestion } from '../types'
 
 type DisplayMode = 'recent' | 'suggestions'
 
@@ -23,7 +23,7 @@ const MapSearchOptions = {
   },
 }
 
-const MapSearchAutocompleteScreen = () => {
+export const MapSearchAutocompleteScreen = () => {
   const inputRef = useRef<TextInput>(null)
   const fade = useRef(new Animated.Value(1)).current
   const slide = useRef(new Animated.Value(0)).current
@@ -265,4 +265,3 @@ const MapSearchAutocompleteScreen = () => {
   )
 }
 
-export default MapSearchAutocompleteScreen

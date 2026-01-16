@@ -1,3 +1,2 @@
-export { default as LoginForm } from './LoginForm';
-export { default as RegisterForm } from './RegisterForm';
-
+export { LoginForm } from '@/src/features/auth/components/LoginForm';
+export { RegisterForm } from '@/src/features/auth/components/RegisterForm';

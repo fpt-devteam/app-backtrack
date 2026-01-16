@@ -13,7 +13,7 @@ type SimilarPostCardProps = {
   matchPost: SimilarPost;
 };
 
-const SimilarPostCardSkeleton = () => {
+export const SimilarPostCardSkeleton = () => {
   return (
     <View className="flex-row bg-white rounded-lg shadow-md p-4">
       <Text>Loading...</Text>
@@ -21,7 +21,7 @@ const SimilarPostCardSkeleton = () => {
   );
 };
 
-const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
+export const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
   if (!matchPost) return <SimilarPostCardSkeleton />;
 
   const imgUrl = matchPost.imageUrls?.[0];
@@ -71,5 +71,3 @@ const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => {
     </Pressable>
   );
 };
-
-export default SimilarPostCard;

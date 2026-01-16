@@ -1,1 +1,1 @@
-export * from './auth.api';
+export * from "@/src/features/auth/api/auth.api";

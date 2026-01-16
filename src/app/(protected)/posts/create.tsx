@@ -1,4 +1,4 @@
-import PostForm from "@/src/features/post/components/forms/PostForm";
+import { PostForm } from "@/src/features/post/components";
 import { PostType, type Post } from "@/src/features/post/types";
 import { useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";

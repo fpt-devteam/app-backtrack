@@ -118,4 +118,4 @@ export function AppLoader({
     </View >
   );
 }
-export default AppLoader;
+

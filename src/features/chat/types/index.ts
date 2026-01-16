@@ -1,3 +1,2 @@
-export * from './chat.dto';
-export * from './chat.type';
-
+export * from "@/src/features/chat/types/chat.dto";
+export * from "@/src/features/chat/types/chat.type";

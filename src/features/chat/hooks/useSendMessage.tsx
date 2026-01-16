@@ -1,15 +1,15 @@
+import { sendMessageApi } from '@/src/features/chat/api';
+import { CHAT_QUERY_KEY } from '@/src/features/chat/constants';
+import type { MessageSendRequest, MessageSendResponse } from '@/src/features/chat/types/chat.dto';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { sendMessageApi } from '../api';
-import { CHAT_QUERY_KEY } from '../constants';
-import { MessageSendRequest, MessageSendResponse } from '../types/chat.dto';
 
 type SendMessageParams = {
   conversationId: string;
   request: MessageSendRequest;
 };
 
-const useSendMessage = () => {
+export const useSendMessage = () => {
   const qc = useQueryClient();
   const mutation = useMutation<MessageSendResponse, Error, SendMessageParams>({
     mutationKey: CHAT_QUERY_KEY.messageSend,
@@ -37,4 +37,4 @@ const useSendMessage = () => {
   };
 };
 
-export default useSendMessage;
+

@@ -15,7 +15,7 @@ import {
   View
 } from "react-native";
 import * as yup from "yup";
-import type { RegisterRequest } from "../types";
+import type { RegisterRequest } from "@/src/features/auth/types";
 
 const registerFormSchema = yup
   .object({
@@ -27,7 +27,7 @@ const registerFormSchema = yup
 
 type RegisterFormSchema = yup.InferType<typeof registerFormSchema>;
 
-export default function RegisterForm() {
+export const RegisterForm = () => {
   const { register, loading, error } = useRegister();
 
   const {

@@ -46,9 +46,9 @@ const components = {
   "tab-bar": {
     background: palette.white,
     active: semantic.primary,
-    inactive: palette.black,
+    inactive: palette.gray[400],
     indicator: semantic.primary,
-    border: "rgba(0, 0, 0, 0.1)",
+    border: "rgba(0, 0, 0, 0.2)",
   },
   card: {
     default: palette.white,
