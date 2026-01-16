@@ -7,8 +7,8 @@ const getInitials = (name?: string) => {
 }
 export const ConversationAvatar = ({ name }: { name: string }) => {
   return (
-    <View className="h-12 w-12 rounded-full bg-slate-100 items-center justify-center">
-      <Text className="text-sm font-bold text-slate-700">
+    <View className="h-16 w-16 rounded-full bg-slate-200 items-center justify-center">
+      <Text className="text-lg font-bold text-slate-700">
         {getInitials(name)}
       </Text>
     </View>

@@ -1,41 +1,33 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { RelativePathString, router } from "expo-router";
 import React, { useMemo } from "react";
-import { Image, ImageSourcePropType, Pressable, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
 
-const FALLBACK_AVATAR = require("@/assets/images/fallback_avatar.png");
+const FALLBACK_SOURCE = { uri: "https://i.pravatar.cc/150?u=a04258a2462d826712d" };
 
 export const AppUserAvatarIcon = () => {
   const { user } = useAppUser();
 
-  const source: ImageSourcePropType = useMemo(() => {
+  const source = useMemo(() => {
     const url = user?.avatar?.trim();
-    return url ? { uri: url } : FALLBACK_AVATAR;
+    return url ? { uri: url } : FALLBACK_SOURCE;
   }, [user?.avatar]);
 
-  return (
-    <Pressable
-      onPress={() => {
-        router.push("/profile" as RelativePathString);
-        console.log("Move to profile screen");
-      }}
-    >
-      <View className="relative">
-        <View className="rounded-full">
-          <Image
-            source={source}
-            resizeMode="cover"
-            className="rounded-full"
-            style={{ width: 36, height: 36 }}
-          />
-        </View>
+  const handlePress = () => {
+    router.push("/profile" as RelativePathString);
+  };
 
-        <View className="absolute -left-0.5 -bottom-0.5">
-          <View className="h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
-        </View>
+  return (
+    <Pressable onPress={handlePress}>
+      <View className="relative">
+        <Image
+          source={source}
+          resizeMode="cover"
+          className="w-10 h-10 rounded-full bg-gray-200"
+        />
+
+        {/* <View className="absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-white" /> */}
       </View>
     </Pressable>
   );
 };
-
-

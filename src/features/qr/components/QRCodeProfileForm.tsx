@@ -103,7 +103,7 @@ export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting 
   }, [initialValues, reset]);
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
+    <View className="flex-1" style={{ paddingBottom: insets.bottom }}>
       <AppHeader
         title={headerTitleMap[mode]}
         rightActionButton={

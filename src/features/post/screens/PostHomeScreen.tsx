@@ -2,17 +2,17 @@ import { PostCard } from '@/src/features/post/components';
 import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
 import { usePosts } from '@/src/features/post/hooks';
 import type { PostFilters } from '@/src/features/post/types';
-import { AppLoader } from '@/src/shared/components';
+import { AppEndOfFeed, AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 
 type PostHomeScreenProps = {
   direction?: 'vertical' | 'horizontal';
-  filters: PostFilters
+  filters?: PostFilters;
 }
 
-export const PostHomeScreen = ({ direction = 'vertical', filters }: PostHomeScreenProps) => {
+export const PostHomeScreen = ({ direction = 'vertical', filters = {} }: PostHomeScreenProps) => {
   const queryClient = useQueryClient();
 
   console.log("Filter herer", filters)
@@ -47,6 +47,10 @@ export const PostHomeScreen = ({ direction = 'vertical', filters }: PostHomeScre
     if (isLoadingNextPage) return (
       <AppLoader />
     );
+
+    if (!hasMore) {
+      return <AppEndOfFeed hint='No more posts' />;
+    }
 
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);

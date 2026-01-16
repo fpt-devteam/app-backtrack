@@ -28,12 +28,10 @@ export const TabBarButton = ({
   const pressOpacity = useSharedValue(1);
 
   const handlePress = () => {
-    // Haptic feedback on press
     if (Platform.OS === "ios") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
-    // Quick press animation
     pressOpacity.value = withSequence(
       withTiming(0.6, { duration: metrics.motion.press.in }),
       withTiming(1, { duration: metrics.motion.press.out })
@@ -55,15 +53,6 @@ export const TabBarButton = ({
       accessibilityLabel={`${label} tab`}
       accessibilityState={{ selected: isFocused }}
     >
-      {/* Active indicator line at top */}
-      {isFocused && (
-        <View
-          className="bg-tab-bar-indicator"
-          style={styles.indicator}
-        />
-      )}
-
-      {/* Icon */}
       <View style={styles.iconContainer}>
         <Icon
           weight="fill"
@@ -72,7 +61,6 @@ export const TabBarButton = ({
         />
       </View>
 
-      {/* Label */}
       <Text
         className={isFocused ? "text-tab-bar-active" : "text-tab-bar-inactive"}
         style={[
@@ -98,15 +86,6 @@ const styles = StyleSheet.create({
     paddingTop: metrics.tabBar.padding.top,
     paddingBottom: metrics.tabBar.padding.bottom,
     position: "relative",
-  },
-  indicator: {
-    position: "absolute",
-    top: -8,
-    left: "50%",
-    marginLeft: -(metrics.tabBar.indicatorWidth / 2), // Center the indicator
-    width: metrics.tabBar.indicatorWidth,
-    height: metrics.tabBar.indicatorHeight,
-    borderRadius: metrics.tabBar.indicatorHeight / 2,
   },
   iconContainer: {
     alignItems: "center",

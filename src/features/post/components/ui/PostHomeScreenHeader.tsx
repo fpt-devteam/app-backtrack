@@ -1,4 +1,5 @@
-import { AppBrand, AppUserAvatarIcon } from "@/src/shared/components";
+import { AppUserAvatarIcon } from "@/src/shared/components";
+import { AppLogo } from "@/src/shared/components/app-utils";
 import { POST_ROUTE } from "@/src/shared/constants";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
@@ -7,25 +8,22 @@ import { Pressable, View } from "react-native";
 
 export const PostHomeScreenHeader = () => {
   return (
-    <View className="h-[48] px-4 py-2 flex-row bg-white border-b border-gray-200">
-      <View className="flex-1">
-        <AppBrand />
+    <View className="h-[48] px-4 py-2 flex-row justify-start">
+      <View className="flex-1 justify-center">
+        <AppLogo width={180} height={40} />
       </View>
 
       {/* Search and Avatar */}
       <View className="flex-row gap-3 items-center">
-        {/* Search Icon */}
-        <View className="h-full justify-center">
+        <View className="justify-center">
           <Pressable onPress={() => {
-            console.log("Search pressed");
             router.push(POST_ROUTE.search as ExternalPathString | RelativePathString);
           }}>
             <MagnifyingGlassIcon size={24} color="black" />
           </Pressable>
         </View>
 
-        {/* User Avatar */}
-        <View className="h-full justify-center">
+        <View className="justify-center">
           <AppUserAvatarIcon />
         </View>
       </View>

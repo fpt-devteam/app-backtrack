@@ -1,10 +1,13 @@
+import { TabBarContent } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarContent";
 import { Tabs } from "expo-router";
 import React from "react";
-import { TabBarContent } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarContent";
 
-export const TabsLayout = () => {
+export const BottomTabBar = () => {
   return (
-    <Tabs screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }}
+    <Tabs
+      screenOptions={{
+        headerShown: false, tabBarHideOnKeyboard: true,
+      }}
       tabBar={(props) => <TabBarContent {...props} />}
     >
       <Tabs.Screen name="posts" options={{ title: "Home" }} />
