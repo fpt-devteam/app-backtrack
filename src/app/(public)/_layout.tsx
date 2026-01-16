@@ -1,6 +1,6 @@
 import { useAuth } from '@/src/features/auth/providers';
 import { POST_ROUTE } from '@/src/shared/constants';
-import { Redirect, Slot } from 'expo-router';
+import { Redirect, RelativePathString, Slot } from 'expo-router';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ function PublicLayout() {
 
   // If already logged in, redirect to posts
   if (isLoggedIn) {
-    return <Redirect href={POST_ROUTE.index} />;
+    return <Redirect href={POST_ROUTE.index as RelativePathString} />;
   }
 
   return (

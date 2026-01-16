@@ -1,11 +1,11 @@
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import { router } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import { MagnifyingGlass, Question } from "phosphor-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export const MatchingNoResultScreen = () => {
-  const handleGoToHomepage = () => router.replace(POST_ROUTE.index);
+  const handleGoToHomepage = () => router.replace(POST_ROUTE.index as RelativePathString);
 
   return (
     <View className="flex-1 items-center justify-center px-6">
