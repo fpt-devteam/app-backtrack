@@ -1,7 +1,7 @@
 import { useLogin } from "@/src/features/auth/hooks/useLogin";
 import { AppInlineError, EmailField, PasswordField } from "@/src/shared/components";
+import { POST_ROUTE } from "@/src/shared/constants/route.constant";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "expo-router";
 import { ArrowRightIcon, GoogleLogoIcon } from "phosphor-react-native";
 import React from "react";
 import type { SubmitHandler } from "react-hook-form";
@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import * as yup from "yup";
 import type { LoginRequest } from "../types";
+import { Link, router } from "expo-router";
 
 const loginFormSchema = yup
   .object({
@@ -53,6 +54,7 @@ export default function LoginForm() {
     try {
       const req: LoginRequest = { email: data.email, password: data.password };
       await login(req);
+      router.replace(POST_ROUTE.index);
     } catch {
     }
   };

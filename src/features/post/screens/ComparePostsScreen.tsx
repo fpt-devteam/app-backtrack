@@ -1,10 +1,9 @@
 import { AppHeader, AppInlineError, AppLoader } from '@/src/shared/components'
-import { useUIStore } from '@/src/shared/store/ui.store'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { ScrollView, View } from 'react-native'
-import { useGetPostById } from '../../hooks'
-import { PostComparisonCard } from '../cards'
-import { MatchedAttributesSection } from '../ui'
+import { PostComparisonCard } from '../components/cards'
+import { MatchedAttributesSection } from '../components/ui'
+import { useGetPostById } from '../hooks'
 
 interface ComparePostsScreenProps {
   postId: string
@@ -12,14 +11,6 @@ interface ComparePostsScreenProps {
 }
 
 const ComparePostsScreen = ({ postId, otherPostId }: ComparePostsScreenProps) => {
-  const setBottomTabBarState = useUIStore((state) => state.setBottomTabBarState);
-
-  useEffect(() => {
-    setBottomTabBarState('closed');
-    return () => {
-      setBottomTabBarState('open');
-    };
-  }, [setBottomTabBarState]);
   const {
     data: post1,
     isLoading: isLoadingPost1,

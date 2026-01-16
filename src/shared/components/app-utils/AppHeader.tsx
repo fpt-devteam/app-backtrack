@@ -42,7 +42,7 @@ const AppHeader = ({
       )}
 
       {/* Centered Title */}
-      <Text className="text-xl font-bold text-black">
+      <Text className="text-3xl font-bold text-black">
         {title}
       </Text>
 

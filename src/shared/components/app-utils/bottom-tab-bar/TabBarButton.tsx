@@ -79,7 +79,7 @@ export const TabBarButton = ({
       {/* Icon */}
       <View style={styles.iconContainer}>
         <Icon
-          weight={isFocused ? "fill" : "bold"}
+          weight="fill"
           size={metrics.tabBar.iconSize}
           color={isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive}
         />

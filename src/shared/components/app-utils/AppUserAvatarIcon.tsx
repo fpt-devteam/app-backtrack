@@ -1,5 +1,5 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { router } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import React, { useMemo } from "react";
 import { Image, ImageSourcePropType, Pressable, View } from "react-native";
 
@@ -16,7 +16,7 @@ const AppUserAvatarIcon = () => {
   return (
     <Pressable
       onPress={() => {
-        router.push("/(profile)");
+        router.push("/profile" as RelativePathString);
         console.log("Move to profile screen");
       }}
     >

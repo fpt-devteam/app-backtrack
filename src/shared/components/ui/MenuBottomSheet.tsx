@@ -36,7 +36,7 @@ const MenuBottomSheet = ({ isVisible, options, onClose }: MenuBottomSheetProps) 
               onPress={option.onPress}
               className="flex-row items-center bg-gray-50 rounded-2xl p-4"
               style={({ pressed }) => ({
-                opacity: pressed ? 0.7 : 1,
+                opacity: pressed ? 0.6 : 1,
               })}
             >
               <View

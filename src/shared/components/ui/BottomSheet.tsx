@@ -1,20 +1,18 @@
-import type {
-  BottomSheetBackdropProps
-} from '@gorhom/bottom-sheet';
+import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 import BottomSheetPrimitive, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
-} from '@gorhom/bottom-sheet';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+} from "@gorhom/bottom-sheet";
+import React, { useCallback, useMemo, useRef } from "react";
 
 type Props = {
-  isVisible: boolean
-  onClose: () => void
-  children: React.ReactNode
-  snapPoints?: string[]
-  enableDynamicSizing?: boolean
-  maxDynamicContentSize?: number
-}
+  isVisible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  snapPoints?: string[];
+  enableDynamicSizing?: boolean;
+  maxDynamicContentSize?: number;
+};
 
 const BottomSheet = ({
   isVisible,
@@ -24,24 +22,13 @@ const BottomSheet = ({
   enableDynamicSizing = true,
   maxDynamicContentSize,
 }: Props) => {
-  const bottomSheetRef = useRef<BottomSheetPrimitive>(null)
+  const bottomSheetRef = useRef<BottomSheetPrimitive>(null);
 
-  // Default snap points if not using dynamic sizing
   const snapPoints = useMemo(
-    () => customSnapPoints || ['25%', '50%', '75%'],
+    () => customSnapPoints || ["25%", "50%", "75%"],
     [customSnapPoints]
-  )
+  );
 
-  // Handle visibility changes
-  useEffect(() => {
-    if (isVisible) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.close()
-    }
-  }, [isVisible])
-
-  // Render backdrop
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
@@ -49,29 +36,31 @@ const BottomSheet = ({
         disappearsOnIndex={-1}
         appearsOnIndex={0}
         opacity={0.2}
+        pressBehavior="close"
       />
     ),
     []
-  )
+  );
 
   return (
     <BottomSheetPrimitive
       ref={bottomSheetRef}
-      index={-1}
+      index={isVisible ? 0 : -1}
       snapPoints={enableDynamicSizing ? undefined : snapPoints}
       enableDynamicSizing={enableDynamicSizing}
       enablePanDownToClose
       onClose={onClose}
       backdropComponent={renderBackdrop}
-      backgroundStyle={{ backgroundColor: 'white' }}
-      handleIndicatorStyle={{ backgroundColor: '#D1D5DB', width: 40, height: 6 }}
+      backgroundStyle={{ backgroundColor: "white" }}
+      handleIndicatorStyle={{ backgroundColor: "#D1D5DB", width: 40, height: 6 }}
       maxDynamicContentSize={maxDynamicContentSize}
+      animationConfigs={{ duration: 90 }}
     >
       <BottomSheetScrollView style={{ paddingBottom: 12 }}>
         {children}
       </BottomSheetScrollView>
     </BottomSheetPrimitive>
-  )
-}
+  );
+};
 
-export default BottomSheet
+export default BottomSheet;

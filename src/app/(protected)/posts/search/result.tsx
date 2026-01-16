@@ -1,6 +1,6 @@
 import { useLocationSelectionStore } from "@/src/features/location/store";
 import type { UserLocation } from "@/src/features/location/types";
-import { MinimalPostCard } from "@/src/features/post/components";
+import { MinimalPostCard } from "@/src/features/post/components/cards";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
