@@ -8,8 +8,8 @@ import {
   Text,
   View,
 } from 'react-native'
-import { MessageItem } from '../types'
-import MessageItemCard from './MessageItemCard'
+import { MessageItem } from '@/src/features/chat/types'
+import { MessageItemCard } from '@/src/features/chat/components/MessageItemCard'
 
 interface MessageListProps {
   messages: MessageItem[]
@@ -29,7 +29,7 @@ const LoadingFooter = ({ isFetchingNextPage }: { isFetchingNextPage: boolean }) 
   )
 }
 
-const MessageList = ({
+export const MessageList = ({
   messages,
   hasNextPage,
   isFetchingNextPage,
@@ -73,4 +73,4 @@ const MessageList = ({
   )
 }
 
-export default MessageList
+

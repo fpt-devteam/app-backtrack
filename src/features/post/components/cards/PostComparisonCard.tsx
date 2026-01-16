@@ -1,12 +1,12 @@
 import React from 'react'
 import { Image, Text, View } from 'react-native'
-import { Post, PostType } from '../../types'
+import { Post, PostType } from '@/src/features/post/types'
 
 interface PostComparisonCardProps {
   post: Post
 }
 
-const PostComparisonCard = ({ post }: PostComparisonCardProps) => {
+export const PostComparisonCard = ({ post }: PostComparisonCardProps) => {
   const isLost = post.postType === PostType.Lost
   const badgeColor = isLost ? 'bg-orange-100' : 'bg-green-100'
   const badgeTextColor = isLost ? 'text-orange-600' : 'text-green-600'
@@ -38,5 +38,3 @@ const PostComparisonCard = ({ post }: PostComparisonCardProps) => {
     </View>
   )
 }
-
-export default PostComparisonCard

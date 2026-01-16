@@ -1,6 +1,2 @@
-import { MapSearchAutocompleteScreen } from "@/src/features/map/screens"
-import React from "react"
+export { MapSearchAutocompleteScreen as default } from "@/src/features/map/screens";
 
-export default function Search() {
-  return (<MapSearchAutocompleteScreen />)
-}

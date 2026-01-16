@@ -1,16 +1,16 @@
+import { BottomSheet } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
+import colors from "@/src/shared/theme/colors";
 import { router } from "expo-router";
 import { BinocularsIcon, PackageIcon } from "phosphor-react-native";
 import { Pressable, Text, View } from "react-native";
-import colors from "../../theme/colors";
-import { BottomSheet } from "../ui";
 
 type AppCreateActionsSheetProps = {
   isVisible: boolean;
   onClose: () => void;
 };
 
-const AppCreateActionsSheet = ({ isVisible, onClose }: AppCreateActionsSheetProps) => {
+export const AppCreateActionsSheet = ({ isVisible, onClose }: AppCreateActionsSheetProps) => {
   const handlePress = (postType: "Lost" | "Found") => {
     onClose();
     router.push({
@@ -62,4 +62,4 @@ const AppCreateActionsSheet = ({ isVisible, onClose }: AppCreateActionsSheetProp
   )
 };
 
-export default AppCreateActionsSheet;
+

@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { matchingPostsApi } from '../api';
-import { POST_MATCHING_QUERY_KEY } from '../constants';
-import type { MatchingPostsRequest, MatchingPostsResponse } from '../types';
-import { PostMatchingStatus } from '../types';
+import { matchingPostsApi } from '@/src/features/post/api';
+import { POST_MATCHING_QUERY_KEY } from '@/src/features/post/constants';
+import type { MatchingPostsRequest, MatchingPostsResponse } from '@/src/features/post/types';
+import { PostMatchingStatus } from '@/src/features/post/types';
 
 const TIME_INTERVAL_MS = 2000;
 
-const useMatchingPost = (postId: string) => {
+export const useMatchingPost = (postId: string) => {
   const query = useQuery<MatchingPostsResponse>({
     queryKey: [...POST_MATCHING_QUERY_KEY, postId],
     queryFn: async () => {
@@ -36,5 +36,3 @@ const useMatchingPost = (postId: string) => {
     retry: query.refetch,
   };
 };
-
-export default useMatchingPost;

@@ -1,15 +1,4 @@
-/**
- * Tab Bar Button
- *
- * Individual tab item with:
- * - Icon on top
- * - Label below
- * - Active indicator line at the top
- * - Press feedback
- */
-
 import { colors, metrics } from "@/src/shared/theme";
-import type { NavigationRoute, ParamListBase } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import type { IconProps } from "phosphor-react-native";
 import React from "react";
@@ -24,7 +13,6 @@ import Animated, {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type Props = {
-  route: NavigationRoute<ParamListBase, string>;
   isFocused: boolean;
   Icon: React.ElementType<IconProps>;
   label: string;
@@ -32,7 +20,6 @@ type Props = {
 };
 
 export const TabBarButton = ({
-  route,
   isFocused,
   Icon,
   label,
@@ -41,12 +28,10 @@ export const TabBarButton = ({
   const pressOpacity = useSharedValue(1);
 
   const handlePress = () => {
-    // Haptic feedback on press
     if (Platform.OS === "ios") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
-    // Quick press animation
     pressOpacity.value = withSequence(
       withTiming(0.6, { duration: metrics.motion.press.in }),
       withTiming(1, { duration: metrics.motion.press.out })
@@ -68,24 +53,14 @@ export const TabBarButton = ({
       accessibilityLabel={`${label} tab`}
       accessibilityState={{ selected: isFocused }}
     >
-      {/* Active indicator line at top */}
-      {isFocused && (
-        <View
-          className="bg-tab-bar-indicator"
-          style={styles.indicator}
-        />
-      )}
-
-      {/* Icon */}
       <View style={styles.iconContainer}>
         <Icon
-          weight={isFocused ? "fill" : "bold"}
+          weight="fill"
           size={metrics.tabBar.iconSize}
           color={isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive}
         />
       </View>
 
-      {/* Label */}
       <Text
         className={isFocused ? "text-tab-bar-active" : "text-tab-bar-inactive"}
         style={[
@@ -111,15 +86,6 @@ const styles = StyleSheet.create({
     paddingTop: metrics.tabBar.padding.top,
     paddingBottom: metrics.tabBar.padding.bottom,
     position: "relative",
-  },
-  indicator: {
-    position: "absolute",
-    top: -8,
-    left: "50%",
-    marginLeft: -(metrics.tabBar.indicatorWidth / 2), // Center the indicator
-    width: metrics.tabBar.indicatorWidth,
-    height: metrics.tabBar.indicatorHeight,
-    borderRadius: metrics.tabBar.indicatorHeight / 2,
   },
   iconContainer: {
     alignItems: "center",

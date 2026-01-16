@@ -1,8 +1,2 @@
-import { MapSearchScreen } from '@/src/features/map/screens'
-import React from 'react'
+export { MapSearchScreen as default } from "@/src/features/map/screens";
 
-const Index = () => {
-  return (<MapSearchScreen />)
-}
-
-export default Index

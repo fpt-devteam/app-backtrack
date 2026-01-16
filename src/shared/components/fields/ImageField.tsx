@@ -13,7 +13,7 @@ type ImageFieldProps = {
   disabled?: boolean;
 }
 
-const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
+export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
   const handlePickImages = async () => {
     const hasPermission = await ensureMediaPermission();
     if (!hasPermission) return;
@@ -135,5 +135,5 @@ const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
   );
 };
 
-export default ImageField;
+
 

@@ -1,5 +1,5 @@
-import { ApiResponse, PagedResponse } from "@/src/api/common/api.types";
-import { QrCodeData, QrItemEntity, QrOwnerEntity } from "./qr.type";
+import type { ApiResponse, PagedResponse } from "@/src/shared/api";
+import type { QrCodeData, QrItemEntity, QrOwnerEntity } from "./qr.type";
 
 export type CreateQrCodeRequest = {
   item: QrItemEntity;

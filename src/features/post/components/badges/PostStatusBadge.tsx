@@ -1,7 +1,7 @@
 import { PostType } from "@/src/features/post/types";
 import { Text, View } from "react-native";
 
-const PostStatusBadge = ({ status }: { status: PostType }) => {
+export const PostStatusBadge = ({ status }: { status: PostType }) => {
   if (status === PostType.Lost) {
     return (
       <View className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-orange-100">
@@ -25,5 +25,3 @@ const PostStatusBadge = ({ status }: { status: PostType }) => {
     );
   }
 };
-
-export default PostStatusBadge;

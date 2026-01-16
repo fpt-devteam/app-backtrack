@@ -1,3 +1,5 @@
+import type { LatLng } from "react-native-maps";
+
 /**
  * Status codes returned by the Google Places Autocomplete API.
  * 
@@ -15,19 +17,47 @@
  *   - Invalid key parameter
  * - `UNKNOWN_ERROR` - An unknown error occurred
  */
-export type PlacesAutocompleteStatus = 'OK' | 'ZERO_RESULTS' | 'OVER_QUERY_LIMIT' | 'REQUEST_DENIED' | 'INVALID_REQUEST' | 'UNKNOWN_ERROR';
+export type GoogleMapResponseStatus = 'OK' | 'ZERO_RESULTS' | 'OVER_QUERY_LIMIT' | 'REQUEST_DENIED' | 'INVALID_REQUEST' | 'UNKNOWN_ERROR'
+
+export type UserPlace = {
+  location: LatLng;
+  displayAddress?: string | null;
+  externalPlaceId?: string | null;
+};
 
 export type PlaceAutocompleteResponse = {
-  predictions: PlacePrediction[];
-  status: PlacesAutocompleteStatus;
+  predictions: PlacePrediction[]
+  status: GoogleMapResponseStatus
 }
 
 export type PlaceSuggestion = {
-  placeId: string;
-  description: string;
-};
+  placeId: string
+  description: string
+}
 
 export type PlacePrediction = {
-  description: string;
-  place_id: string;
+  description: string
+  place_id: string
+}
+
+export type Place = {
+  placeId: string
+  displayName: string
+  formatted_address: string
+  location: LatLng
+}
+
+export type GeocodeResponse = {
+  results: GeocodeResult[];
+  status: GoogleMapResponseStatus;
 };
+
+export type GeocodeResult = {
+  placeId: string
+  formatted_address: string
+  location: LatLng
+}
+
+export type GeocodeLocationResponse = {
+  results: GeocodeResult[],
+}

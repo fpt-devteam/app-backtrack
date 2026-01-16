@@ -7,13 +7,13 @@ import {
   MIN_IMAGE_UPLOAD,
   UPLOAD_IMAGE_API,
   UPLOAD_IMAGE_QUERY_KEY,
-} from "../constants";
-import { auth } from "../lib";
-import { uploadImageToStorage } from "../services";
+} from "@/src/shared/constants";
+import { auth } from "@/src/shared/lib";
+import { uploadImageToStorage } from "@/src/shared/services";
 import type {
   ImageUploadRequest,
   ImageUploadResponse
-} from "../types/firebase.type";
+} from "@/src/shared/types/firebase.type";
 
 export function useUploadImage() {
   const [progress, setProgress] = useState(0);

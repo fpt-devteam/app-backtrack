@@ -8,7 +8,7 @@ interface MessageInputProps {
   isSending?: boolean
 }
 
-const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
+export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
   const [messageText, setMessageText] = useState('')
 
   const handleSend = async () => {
@@ -57,4 +57,4 @@ const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
   )
 }
 
-export default MessageInput
+

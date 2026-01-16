@@ -8,7 +8,7 @@ type ConfirmPasswordFieldProps = {
   error?: string;
 }
 
-const ConfirmPasswordField = ({
+export const ConfirmPasswordField = ({
   value,
   onChange,
   error
@@ -57,4 +57,4 @@ const ConfirmPasswordField = ({
   )
 }
 
-export default ConfirmPasswordField
+

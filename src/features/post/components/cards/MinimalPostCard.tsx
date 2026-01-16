@@ -12,7 +12,7 @@ type MinimalPostCardProps = {
   post: Post
 }
 
-const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
+export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
   const imgUrl = post.imageUrls?.[0];
 
   return (
@@ -57,5 +57,3 @@ const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
     </TouchableOpacity>
   )
 }
-
-export default MinimalPostCard

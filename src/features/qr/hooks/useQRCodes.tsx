@@ -1,14 +1,14 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { getQrCodes } from '../api';
-import { QR_CODES_QUERY_KEY } from '../constants';
-import type { GetQrCodesRequest, GetQrCodesResponse } from '../types';
+import { getQrCodes } from '@/src/features/qr/api';
+import { QR_CODES_QUERY_KEY } from '@/src/features/qr/constants';
+import type { GetQrCodesRequest, GetQrCodesResponse } from '@/src/features/qr/types';
 
 type UseQRCodesOptions = {
   pageSize?: number;
   enabled?: boolean;
 };
 
-const useQRCodes = ({ pageSize = 2, enabled = true }: UseQRCodesOptions = {}) => {
+export const useQRCodes = ({ pageSize = 2, enabled = true }: UseQRCodesOptions = {}) => {
   const query = useInfiniteQuery<GetQrCodesResponse>({
     queryKey: [...QR_CODES_QUERY_KEY, { pageSize }],
     enabled,
@@ -53,4 +53,4 @@ const useQRCodes = ({ pageSize = 2, enabled = true }: UseQRCodesOptions = {}) =>
   };
 };
 
-export default useQRCodes;
+

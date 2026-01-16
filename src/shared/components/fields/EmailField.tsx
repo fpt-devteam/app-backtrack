@@ -8,7 +8,7 @@ type EmailFieldProps = {
   error?: string
 }
 
-const EmailField = ({ value, onChange, error }: EmailFieldProps) => {
+export const EmailField = ({ value, onChange, error }: EmailFieldProps) => {
   return (
     <View>
       <Text className="mb-2 text-base font-medium text-label">Email</Text>
@@ -39,4 +39,4 @@ const EmailField = ({ value, onChange, error }: EmailFieldProps) => {
   )
 }
 
-export default EmailField
+

@@ -12,12 +12,12 @@ type SuggestRowProps = {
   readonly onRemove?: () => void;
 };
 
-function SuggestRow({
+export const SuggestRow = ({
   IconComponent = Clock,
   text,
   onPress,
   onRemove,
-}: SuggestRowProps) {
+}: SuggestRowProps) => {
   const handleRemove = (e: GestureResponderEvent) => {
     e.stopPropagation();
     onRemove?.();
@@ -42,4 +42,4 @@ function SuggestRow({
   );
 }
 
-export default SuggestRow;
+

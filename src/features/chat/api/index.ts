@@ -1,2 +1,1 @@
-export * from './chat.api';
-
+export * from "@/src/features/chat/api/chat.api";

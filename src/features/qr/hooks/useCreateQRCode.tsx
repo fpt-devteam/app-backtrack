@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createQrCode } from '../api';
-import { QR_CODES_QUERY_KEY } from '../constants';
-import type { CreateQrCodeRequest, CreateQrCodeResponse } from '../types';
+import { createQrCode } from '@/src/features/qr/api';
+import { QR_CODES_QUERY_KEY } from '@/src/features/qr/constants';
+import type { CreateQrCodeRequest, CreateQrCodeResponse } from '@/src/features/qr/types';
 
 type UseCreateQRCodeOptions = {
   onSuccess?: (data: CreateQrCodeResponse) => void;
   onError?: (error: Error) => void;
 };
 
-const useCreateQRCode = ({ onSuccess, onError }: UseCreateQRCodeOptions = {}) => {
+export const useCreateQRCode = ({ onSuccess, onError }: UseCreateQRCodeOptions = {}) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<CreateQrCodeResponse, Error, CreateQrCodeRequest>({
@@ -35,4 +35,4 @@ const useCreateQRCode = ({ onSuccess, onError }: UseCreateQRCodeOptions = {}) =>
   };
 };
 
-export default useCreateQRCode;
+

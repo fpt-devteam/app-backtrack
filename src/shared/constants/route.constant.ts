@@ -4,7 +4,7 @@ export const PROFILE_ROUTE = {
 } as const;
 
 export const POST_ROUTE = {
-  index: "/(protected)/posts",
+  index: "/(protected)/(tabs)/posts",
   create: "/(protected)/posts/create",
   details: (postId: string) => `/(protected)/posts/${postId}`,
   matching: (postId: string) => `/(protected)/posts/${postId}/matching`,

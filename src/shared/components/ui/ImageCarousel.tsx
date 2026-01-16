@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Dimensions, Image, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -10,7 +10,7 @@ type ImageCarouselProps = {
   showLoadingIndicator?: boolean;
 };
 
-const ImageCarousel = ({
+export const ImageCarousel = ({
   data,
   imageHeight = 250,
   autoScrollInterval = 3000,
@@ -63,7 +63,7 @@ const ImageCarousel = ({
     };
   }, [currentIndex, data.length, autoScrollInterval]);
 
-  const handleScroll = (event: any) => {
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const contentOffset = event.nativeEvent.contentOffset;
     const viewSize = event.nativeEvent.layoutMeasurement;
     const pageNum = Math.floor(contentOffset.x / viewSize.width);
@@ -156,4 +156,4 @@ const ImageCarousel = ({
   );
 };
 
-export default ImageCarousel;
+

@@ -1,2 +1,2 @@
-export * from "./post.api";
+export * from "@/src/features/post/api/post.api";
 

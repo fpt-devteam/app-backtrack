@@ -1,9 +1,9 @@
+import colors from "@/src/shared/theme/colors";
+import { cn } from "@/src/shared/utils/cn";
 import { router } from "expo-router";
 import { ArrowLeftIcon } from "phosphor-react-native";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import colors from "../../theme/colors";
-import { cn } from "../../utils/cn";
 
 type AppHeaderProps = {
   title: string;
@@ -12,7 +12,7 @@ type AppHeaderProps = {
   rightActionButton?: React.ReactNode;
 };
 
-const AppHeader = ({
+export const AppHeader = ({
   title,
   showBackButton = true,
   onBackPress,
@@ -27,7 +27,7 @@ const AppHeader = ({
   };
 
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+    <View className="flex-row items-center justify-between px-4 py-4">
       {/* Back Button */}
       {showBackButton && (
         <Pressable
@@ -42,7 +42,7 @@ const AppHeader = ({
       )}
 
       {/* Centered Title */}
-      <Text className="text-xl font-bold text-black">
+      <Text className="text-3xl font-bold text-black">
         {title}
       </Text>
 
@@ -51,7 +51,7 @@ const AppHeader = ({
   );
 };
 
-export default AppHeader;
+
 
 export const DefaultTopRightActionButton = ({ lable, onPress, disabled, isSubmitting }: { lable: string; onPress: () => void; disabled?: boolean; isSubmitting?: boolean }) => (
   <Pressable

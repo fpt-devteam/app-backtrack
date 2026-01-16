@@ -1,5 +1,7 @@
 import { AppHeader } from '@/src/shared/components';
-import MenuBottomSheet, { MenuButton, MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
+import { DotThreeButton } from '@/src/shared/components/ui/DotThreeButton';
+import { MenuBottomSheet, type MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
+
 import { QR_ROUTE } from '@/src/shared/constants';
 import colors from '@/src/shared/theme/colors';
 import { formatDateTime } from '@/src/shared/utils';
@@ -27,7 +29,7 @@ type QRCodeDetailProps = {
   onDelete?: () => void;
 };
 
-const QRCodeDetail = ({
+export const QRCodeDetail = ({
   id,
   name,
   description,
@@ -75,7 +77,7 @@ const QRCodeDetail = ({
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader title="QR Code Details" rightActionButton={<MenuButton onPress={() => setIsMenuOpen(true)} />} />
+      <AppHeader title="QR Code Details" rightActionButton={<DotThreeButton onPress={() => setIsMenuOpen(true)} />} />
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <ItemImage imageUrl={imageUrl} />
@@ -211,4 +213,4 @@ const DetailCard = memo(function DetailCard({
   );
 });
 
-export default QRCodeDetail;
+

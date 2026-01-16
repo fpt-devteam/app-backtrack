@@ -1,5 +1,5 @@
-import { privateClient } from "@/src/api/common/client";
-import { CreateQrCodeRequest, CreateQrCodeResponse, GetQrCodeByIdResponse, GetQrCodesRequest, GetQrCodesResponse, UpdateQrCodeRequest, UpdateQrCodeResponse } from "@/src/features/qr/types";
+import type { CreateQrCodeRequest, CreateQrCodeResponse, GetQrCodeByIdResponse, GetQrCodesRequest, GetQrCodesResponse, UpdateQrCodeRequest, UpdateQrCodeResponse } from "@/src/features/qr/types";
+import { privateClient } from "@/src/shared/api/client";
 
 export const QR_API = {
   base: "/api/qr/qr-codes",

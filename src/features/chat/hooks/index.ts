@@ -1,6 +1,6 @@
-export { default as useConversationDetail } from './useConversationDetail'
-export { default as useConversations } from './useConversations'
-export { default as useCreateConversation } from './useCreateConversation'
-export { default as useMessages } from './useMessages'
-export { default as useSendMessage } from './useSendMessage'
+export * from '@/src/features/chat/hooks/useConversationDetail';
+export * from '@/src/features/chat/hooks/useConversations';
+export * from '@/src/features/chat/hooks/useCreateConversation';
+export * from '@/src/features/chat/hooks/useMessages';
+export * from '@/src/features/chat/hooks/useSendMessage';
 
