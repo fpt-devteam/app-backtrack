@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateQrCode } from '../api';
-import { QR_CODES_QUERY_KEY, QR_CODE_DETAIL_QUERY_KEY } from '../constants';
-import type { UpdateQrCodeRequest, UpdateQrCodeResponse } from '../types';
+import { updateQrCode } from '@/src/features/qr/api';
+import { QR_CODES_QUERY_KEY, QR_CODE_DETAIL_QUERY_KEY } from '@/src/features/qr/constants';
+import type { UpdateQrCodeRequest, UpdateQrCodeResponse } from '@/src/features/qr/types';
 
 type UpdateQrCodeVariables = {
   id: string;
@@ -13,7 +13,7 @@ type UseUpdateQRCodeOptions = {
   onError?: (error: Error) => void;
 };
 
-const useUpdateQRCode = ({ onSuccess, onError }: UseUpdateQRCodeOptions = {}) => {
+export const useUpdateQRCode = ({ onSuccess, onError }: UseUpdateQRCodeOptions = {}) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<UpdateQrCodeResponse, Error, UpdateQrCodeVariables>({
@@ -39,4 +39,4 @@ const useUpdateQRCode = ({ onSuccess, onError }: UseUpdateQRCodeOptions = {}) =>
   };
 };
 
-export default useUpdateQRCode;
+

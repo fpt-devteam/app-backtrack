@@ -1,6 +1,5 @@
-import { privateClient } from "@/src/api/common";
-import { ConversationDetailResponse, ConversationsGetResponse, MessagesGetResponse } from "../types";
-import { ConversationCreateRequest, ConversationCreateResponse, CursorPaginationParams, MessageSendRequest, MessageSendResponse } from "../types/chat.dto";
+import { ConversationCreateRequest, ConversationCreateResponse, ConversationDetailResponse, ConversationsGetResponse, CursorPaginationParams, MessageSendRequest, MessageSendResponse, MessagesGetResponse } from "@/src/features/chat/types";
+import { privateClient } from "@/src/shared/api";
 
 const CHAT_API = {
   getConversations: '/api/chat/conversations',

@@ -1,16 +1,15 @@
+import { MatchedAttributesSection, PostComparisonCard } from '@/src/features/post/components'
+import { useGetPostById } from '@/src/features/post/hooks'
 import { AppHeader, AppInlineError, AppLoader } from '@/src/shared/components'
 import React from 'react'
 import { ScrollView, View } from 'react-native'
-import { PostComparisonCard } from '../components/cards'
-import { MatchedAttributesSection } from '../components/ui'
-import { useGetPostById } from '../hooks'
 
 interface ComparePostsScreenProps {
   postId: string
   otherPostId: string
 }
 
-const ComparePostsScreen = ({ postId, otherPostId }: ComparePostsScreenProps) => {
+export const ComparePostsScreen = ({ postId, otherPostId }: ComparePostsScreenProps) => {
   const {
     data: post1,
     isLoading: isLoadingPost1,
@@ -62,5 +61,3 @@ const ComparePostsScreen = ({ postId, otherPostId }: ComparePostsScreenProps) =>
     </View>
   )
 }
-
-export default ComparePostsScreen

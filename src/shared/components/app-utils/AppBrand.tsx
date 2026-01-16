@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-const AppBrand = () => {
+export const AppBrand = () => {
 
   return (
     <View>
@@ -10,5 +10,5 @@ const AppBrand = () => {
   );
 };
 
-export default AppBrand;
+
 

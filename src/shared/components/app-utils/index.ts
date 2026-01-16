@@ -1,9 +1,8 @@
-export { default as AppBrand } from "./AppBrand";
-export { default as AppBrandHeader } from "./AppBrandHeader";
-export { default as AppEndOfFeed } from "./AppEndOfFeed";
-export { default as AppHeader } from "./AppHeader";
-export { default as AppInlineError } from "./AppInlineError";
-export { default as AppLoader } from './AppLoader';
-export { default as AppUserAvatarIcon } from "./AppUserAvatarIcon";
-export { default as BottomTabBar } from "./bottom-tab-bar/BottomTabBar";
-
+export { AppBrand } from "@/src/shared/components/app-utils/AppBrand";
+export { AppBrandHeader } from "@/src/shared/components/app-utils/AppBrandHeader";
+export { AppEndOfFeed } from "@/src/shared/components/app-utils/AppEndOfFeed";
+export { AppHeader } from "@/src/shared/components/app-utils/AppHeader";
+export { AppInlineError } from "@/src/shared/components/app-utils/AppInlineError";
+export { AppLoader } from '@/src/shared/components/app-utils/AppLoader';
+export { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
+export { TabsLayout as BottomTabBar } from "@/src/shared/components/app-utils/bottom-tab-bar/BottomTabBar";

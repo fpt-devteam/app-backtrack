@@ -1,8 +1,7 @@
 import { useAppUser } from '@/src/features/auth/providers'
 import { useCreateConversation } from '@/src/features/chat/hooks'
 import type { ConversationCreateRequest } from '@/src/features/chat/types'
-import { PostStatusBadge } from '@/src/features/post/components/badges'
-import { SimilarPostCard } from '@/src/features/post/components/cards'
+import { PostStatusBadge, SimilarPostCard } from '@/src/features/post/components'
 import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks'
 import { PostType } from '@/src/features/post/types'
 import { ImageCarousel } from '@/src/shared/components'
@@ -21,7 +20,7 @@ type PostDetailsProps = {
   postId: string
 }
 
-const PostDetailsSkeleton = () => {
+export const PostDetailsSkeleton = () => {
   const opacity = useRef(new Animated.Value(0.45)).current
 
   useEffect(() => {
@@ -88,7 +87,7 @@ const PostDetailsSkeleton = () => {
   )
 }
 
-const PostDetails = ({ postId }: PostDetailsProps) => {
+export const PostDetails = ({ postId }: PostDetailsProps) => {
   const { isLoading, data: post } = useGetPostById({ postId })
   const { isMatching, similarPosts } = useMatchingPost(postId)
 
@@ -229,12 +228,10 @@ const PostDetails = ({ postId }: PostDetailsProps) => {
         <View className="mx-4 mb-6">
           <Text className="text-lg font-bold text-slate-900 mb-3">Similar Posts</Text>
           <ScrollView contentContainerStyle={{ gap: 12 }}>
-            {similarPosts.map((item) => (<SimilarPostCard key={item.id} postId={post.id} matchPost={item} />))}
+            {similarPosts.map((item: typeof similarPosts[number]) => (<SimilarPostCard key={item.id} postId={post.id} matchPost={item} />))}
           </ScrollView>
         </View>
       )}
     </>
   )
 };
-
-export default PostDetails;

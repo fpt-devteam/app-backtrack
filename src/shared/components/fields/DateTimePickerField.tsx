@@ -31,7 +31,7 @@ const validateDateTime = (d: Date) => {
   return null;
 };
 
-const DateTimePickerField = ({
+export const DateTimePickerField = ({
   value,
   onChange,
   placeholder = "mm/dd/yyyy, --:--",
@@ -193,4 +193,4 @@ const DateTimePickerField = ({
   );
 };
 
-export default DateTimePickerField;
+

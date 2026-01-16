@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
-import { getConversationDetailApi } from '../api'
-import { CHAT_QUERY_KEY } from '../constants'
+import { getConversationDetailApi } from '@/src/features/chat/api'
+import { CHAT_QUERY_KEY } from '@/src/features/chat/constants'
 
-const useConversationDetail = (conversationId: string) => {
+export const useConversationDetail = (conversationId: string) => {
   const query = useQuery({
     queryKey: CHAT_QUERY_KEY.conversationDetail(conversationId),
     queryFn: async () => {
@@ -22,4 +22,4 @@ const useConversationDetail = (conversationId: string) => {
   }
 }
 
-export default useConversationDetail
+

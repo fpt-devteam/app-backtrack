@@ -15,7 +15,7 @@ import {
   View
 } from "react-native";
 import * as yup from "yup";
-import type { LoginRequest } from "../types";
+import type { LoginRequest } from "@/src/features/auth/types";
 import { Link, router } from "expo-router";
 
 const loginFormSchema = yup
@@ -27,7 +27,7 @@ const loginFormSchema = yup
 
 type LoginFormSchema = yup.InferType<typeof loginFormSchema>;
 
-export default function LoginForm() {
+export const LoginForm = () => {
   const { login, loading, error, reset } = useLogin();
 
   const {

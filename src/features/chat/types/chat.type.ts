@@ -1,5 +1,5 @@
-import { Nullable } from "@/src/shared/types";
-import { AppUser } from "../../auth/types";
+import type { AppUser } from "@/src/features/auth/types";
+import type { Nullable } from "@/src/shared/types";
 
 export type Conversation = {
   conversationId: string;

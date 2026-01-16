@@ -1,9 +1,9 @@
-import { SimilarPostCard } from '@/src/features/post/components/cards';
+import { SimilarPostCard } from '@/src/features/post/components';
 import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks';
 import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen } from '@/src/features/post/screens';
 import { AppHeader } from '@/src/shared/components';
 import { POST_ROUTE } from '@/src/shared/constants';
-import { getErrorMessage2 } from '@/src/shared/utils';
+import { getErrorMessage } from '@/src/shared/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
@@ -27,7 +27,7 @@ const MatchingScreen = () => {
 
   if (applyingInterval || isMatching || !yourItem) return <MatchingWaitingScreen />;
 
-  if (error) return <MatchingErrorScreen errorMessage={getErrorMessage2(error)} />;
+  if (error) return <MatchingErrorScreen errorMessage={getErrorMessage(error)} />;
 
   if (similarPosts.length === 0) return <MatchingNoResultScreen />;
 

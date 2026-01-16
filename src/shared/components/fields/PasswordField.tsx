@@ -8,7 +8,7 @@ type PasswordFieldProps = {
   error?: string;
 }
 
-const PasswordField = ({
+export const PasswordField = ({
   value,
   onChange,
   error
@@ -57,4 +57,4 @@ const PasswordField = ({
   )
 }
 
-export default PasswordField
+

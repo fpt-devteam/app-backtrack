@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { MagnifyingGlass, Question } from "phosphor-react-native";
 import { Text, TouchableOpacity, View } from "react-native";
 
-const MatchingNoResultScreen = () => {
+export const MatchingNoResultScreen = () => {
   const handleGoToHomepage = () => router.replace(POST_ROUTE.index);
 
   return (
@@ -51,5 +51,3 @@ const MatchingNoResultScreen = () => {
     </View>
   );
 };
-
-export default MatchingNoResultScreen;

@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { getQrCodeById } from '../api';
-import { QR_CODE_DETAIL_QUERY_KEY } from '../constants';
-import type { GetQrCodeByIdResponse } from '../types';
+import { getQrCodeById } from '@/src/features/qr/api';
+import { QR_CODE_DETAIL_QUERY_KEY } from '@/src/features/qr/constants';
+import type { GetQrCodeByIdResponse } from '@/src/features/qr/types';
 
 type UseGetQRCodeByIdOptions = {
   enabled?: boolean;
 };
 
-const useGetQRCodeById = (id: string, { enabled = true }: UseGetQRCodeByIdOptions = {}) => {
+export const useGetQRCodeById = (id: string, { enabled = true }: UseGetQRCodeByIdOptions = {}) => {
   const query = useQuery<GetQrCodeByIdResponse>({
     queryKey: [...QR_CODE_DETAIL_QUERY_KEY, id],
     queryFn: () => getQrCodeById(id),
@@ -24,4 +24,4 @@ const useGetQRCodeById = (id: string, { enabled = true }: UseGetQRCodeByIdOption
   };
 };
 
-export default useGetQRCodeById;
+

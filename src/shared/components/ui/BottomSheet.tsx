@@ -14,7 +14,7 @@ type Props = {
   maxDynamicContentSize?: number;
 };
 
-const BottomSheet = ({
+export const BottomSheet = ({
   isVisible,
   onClose,
   children,
@@ -63,4 +63,4 @@ const BottomSheet = ({
   );
 };
 
-export default BottomSheet;
+

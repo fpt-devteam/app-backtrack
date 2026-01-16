@@ -5,7 +5,7 @@ import { Image, ImageSourcePropType, Pressable, View } from "react-native";
 
 const FALLBACK_AVATAR = require("@/assets/images/fallback_avatar.png");
 
-const AppUserAvatarIcon = () => {
+export const AppUserAvatarIcon = () => {
   const { user } = useAppUser();
 
   const source: ImageSourcePropType = useMemo(() => {
@@ -38,4 +38,4 @@ const AppUserAvatarIcon = () => {
   );
 };
 
-export default AppUserAvatarIcon;
+

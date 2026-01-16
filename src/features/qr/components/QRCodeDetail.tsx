@@ -1,6 +1,6 @@
 import { AppHeader } from '@/src/shared/components';
 import { DotThreeButton } from '@/src/shared/components/ui/DotThreeButton';
-import MenuBottomSheet, { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
+import { MenuBottomSheet, type MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 
 import { QR_ROUTE } from '@/src/shared/constants';
 import colors from '@/src/shared/theme/colors';
@@ -29,7 +29,7 @@ type QRCodeDetailProps = {
   onDelete?: () => void;
 };
 
-const QRCodeDetail = ({
+export const QRCodeDetail = ({
   id,
   name,
   description,
@@ -95,7 +95,7 @@ const QRCodeDetail = ({
       <MenuBottomSheet
         isVisible={isMenuOpen}
         options={menuOptions}
-        onDismiss={() => setIsMenuOpen(false)}
+        onClose={() => setIsMenuOpen(false)}
       />
     </View>
   );
@@ -213,4 +213,4 @@ const DetailCard = memo(function DetailCard({
   );
 });
 
-export default QRCodeDetail;
+

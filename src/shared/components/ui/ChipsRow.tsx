@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, Text } from 'react-native';
-import { colors } from '../../theme';
+import { colors } from '@/src/shared/theme';
 
 type ChipProps = {
   label: string;
@@ -8,7 +8,7 @@ type ChipProps = {
   onPress: () => void;
 }
 
-const ChipsRow = ({ chips }: { chips: ChipProps[] }) => {
+export const ChipsRow = ({ chips }: { chips: ChipProps[] }) => {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
       {chips.map((chip, index) => <Chip key={index} label={chip.label} selected={chip.selected} onPress={chip.onPress} />)}
@@ -32,5 +32,3 @@ const Chip = ({ label, selected, onPress }: ChipProps) => {
     </Pressable>
   )
 }
-
-export default ChipsRow

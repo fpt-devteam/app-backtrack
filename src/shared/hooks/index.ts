@@ -1,2 +1,2 @@
-export * from './useRecentSearch';
-export * from './useUploadImage';
+export * from '@/src/shared/hooks/useRecentSearch';
+export * from '@/src/shared/hooks/useUploadImage';

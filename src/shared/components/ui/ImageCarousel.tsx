@@ -10,7 +10,7 @@ type ImageCarouselProps = {
   showLoadingIndicator?: boolean;
 };
 
-const ImageCarousel = ({
+export const ImageCarousel = ({
   data,
   imageHeight = 250,
   autoScrollInterval = 3000,
@@ -156,4 +156,4 @@ const ImageCarousel = ({
   );
 };
 
-export default ImageCarousel;
+

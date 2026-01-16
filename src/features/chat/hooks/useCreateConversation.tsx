@@ -1,10 +1,10 @@
+import { createConversationApi } from '@/src/features/chat/api';
+import { CHAT_QUERY_KEY } from '@/src/features/chat/constants';
+import type { ConversationCreateRequest, ConversationCreateResponse } from '@/src/features/chat/types/chat.dto';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { createConversationApi } from '../api';
-import { CHAT_QUERY_KEY } from '../constants';
-import { ConversationCreateRequest, ConversationCreateResponse } from '../types/chat.dto';
 
-const useCreateConversation = () => {
+export const useCreateConversation = () => {
   const mutation = useMutation<ConversationCreateResponse, Error, ConversationCreateRequest>({
     mutationKey: CHAT_QUERY_KEY.conversationCreate,
     mutationFn: async (req) => {
@@ -27,4 +27,4 @@ const useCreateConversation = () => {
   });
 };
 
-export default useCreateConversation;
+

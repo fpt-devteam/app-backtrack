@@ -59,7 +59,7 @@ function Ripple({ delayMs, size }: RippleProps) {
   );
 }
 
-const MatchingWaitingScreen = ({
+export const MatchingWaitingScreen = ({
   title = "Matching in progress",
   subtitle = "We’re comparing Lost & Found posts near you",
   hint = "This usually takes a few seconds…",
@@ -208,4 +208,3 @@ const MatchingWaitingScreen = ({
     </View>
   );
 }
-export default MatchingWaitingScreen;
