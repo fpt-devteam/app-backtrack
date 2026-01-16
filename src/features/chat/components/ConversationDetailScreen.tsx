@@ -2,7 +2,6 @@ import { useAppUser } from '@/src/features/auth/providers/user.provider'
 import { AppInlineError, AppLoader } from '@/src/shared/components'
 import { toast } from '@/src/shared/components/ui/toast'
 import { socketService } from '@/src/shared/services'
-import { useUIStore } from '@/src/shared/store/ui.store'
 import React, { useCallback, useEffect, useMemo } from 'react'
 import {
   KeyboardAvoidingView,
@@ -21,15 +20,6 @@ interface ConversationDetailScreenProps {
 }
 
 const ConversationDetailScreen = ({ conversationId }: ConversationDetailScreenProps) => {
-  const setBottomTabBarState = useUIStore((state) => state.setBottomTabBarState);
-
-  useEffect(() => {
-    setBottomTabBarState('closed');
-    return () => {
-      setBottomTabBarState('open');
-    };
-  }, [setBottomTabBarState]);
-
   const insets = useSafeAreaInsets();
 
   const { user } = useAppUser()

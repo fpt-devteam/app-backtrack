@@ -1,11 +1,11 @@
-import { PostCard } from '@/src/features/post/components';
+import { PostCard } from '@/src/features/post/components/cards';
 import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
 import { usePosts } from '@/src/features/post/hooks';
 import { AppLoader } from '@/src/shared/components';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
-import type { PostFilters } from '../../types';
+import type { PostFilters } from '../types';
 
 type PostHomeScreenProps = {
   direction?: 'vertical' | 'horizontal';

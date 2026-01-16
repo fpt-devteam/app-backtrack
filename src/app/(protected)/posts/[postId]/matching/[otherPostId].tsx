@@ -1,4 +1,4 @@
-import { ComparePostsScreen } from '@/src/features/post/components'
+import { ComparePostsScreen } from '@/src/features/post/screens'
 import { AppInlineError } from '@/src/shared/components'
 import { useLocalSearchParams } from 'expo-router'
 import React from 'react'

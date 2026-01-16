@@ -1,5 +1,6 @@
-import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen, SimilarPostCard } from '@/src/features/post/components';
+import { SimilarPostCard } from '@/src/features/post/components/cards';
 import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks';
+import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen } from '@/src/features/post/screens';
 import { AppHeader } from '@/src/shared/components';
 import { POST_ROUTE } from '@/src/shared/constants';
 import { getErrorMessage2 } from '@/src/shared/utils';

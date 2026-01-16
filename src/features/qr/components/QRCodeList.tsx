@@ -81,7 +81,7 @@ const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
           tintColor={colors.primary}
         />
       }
-      className='mb-24 p-4'
+      className='p-4'
     />
   );
 };
