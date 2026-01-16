@@ -1,9 +1,9 @@
+import colors from "@/src/shared/theme/colors";
+import { cn } from "@/src/shared/utils/cn";
 import { router } from "expo-router";
 import { ArrowLeftIcon } from "phosphor-react-native";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import colors from "@/src/shared/theme/colors";
-import { cn } from "@/src/shared/utils/cn";
 
 type AppHeaderProps = {
   title: string;
@@ -27,7 +27,7 @@ export const AppHeader = ({
   };
 
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+    <View className="flex-row items-center justify-between px-4 py-4">
       {/* Back Button */}
       {showBackButton && (
         <Pressable

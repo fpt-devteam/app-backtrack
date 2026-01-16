@@ -1,10 +1,10 @@
+import { ConversationCard } from '@/src/features/chat/components/ConversationCard'
 import { useConversations } from '@/src/features/chat/hooks'
-import { AppEndOfFeed, AppInlineError, AppLoader } from '@/src/shared/components'
+import { AppInlineError, AppLoader } from '@/src/shared/components'
 import colors from '@/src/shared/theme/colors'
 import { EmptyIcon } from 'phosphor-react-native'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { FlatList, RefreshControl } from 'react-native'
-import { ConversationCard } from '@/src/features/chat/components/ConversationCard'
 
 interface FooterProps {
   isFetchingNextPage: boolean
@@ -15,11 +15,6 @@ const Footer = ({ isFetchingNextPage, hasNextPage }: FooterProps) => {
   if (isFetchingNextPage) {
     return <AppLoader />;
   }
-
-  if (!hasNextPage) {
-    return <AppEndOfFeed hint='No more conversations' />;
-  }
-
   return null;
 }
 
@@ -85,6 +80,7 @@ export const ConversationList = () => {
           tintColor={colors.primary}
         />
       }
+      className='px-2 flex-1'
     />
   )
 }

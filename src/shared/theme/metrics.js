@@ -76,8 +76,8 @@ module.exports = {
     indicatorHeight: 3,
     indicatorWidth: 60,
     padding: {
-      top: 6,
-      bottom: 2,
+      top: 0,
+      bottom: 16,
     },
     createButton: {
       iconBackgroundSize: 28,
