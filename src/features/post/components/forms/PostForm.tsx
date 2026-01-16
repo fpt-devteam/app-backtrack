@@ -3,7 +3,6 @@ import type { UserLocation } from "@/src/features/location/types";
 import { useAnalyzeImage, useCreatePost } from "@/src/features/post/hooks";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
-import { prepareImageForAnalysis } from "@/src/features/post/utils/image.utils";
 import { DateTimePickerField, ImageField } from "@/src/shared/components";
 import { AppHeader, AppLoader } from "@/src/shared/components/app-utils";
 import { DefaultTopRightActionButton } from "@/src/shared/components/app-utils/AppHeader";
@@ -12,6 +11,7 @@ import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
 import colors from "@/src/shared/theme/colors";
 import type { Nullable } from "@/src/shared/types";
+import { prepareImageForAnalysis } from "@/src/shared/utils/image.utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import type { ImagePickerAsset } from "expo-image-picker";
 import type { ExternalPathString, RelativePathString } from "expo-router";
@@ -71,7 +71,7 @@ type PostFormProps = {
   initialData: Nullable<Post>;
 };
 
-const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
+export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   const [postData, setPostData] = useState<Nullable<Post>>(initialData);
   const { uploadImages, isUploadingImages } = useUploadImage();
   const { createPost, isCreatingPost } = useCreatePost();
@@ -336,5 +336,3 @@ const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
     </View>
   );
 };
-
-export default PostForm;

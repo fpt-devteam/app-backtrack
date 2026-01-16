@@ -1,8 +1,8 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { TabBarContent } from "./TabBarContent";
+import { TabBarContent } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarContent";
 
-export default function TabsLayout() {
+export const TabsLayout = () => {
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }}
       tabBar={(props) => <TabBarContent {...props} />}

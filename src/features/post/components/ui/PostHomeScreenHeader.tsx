@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { MagnifyingGlassIcon } from "phosphor-react-native";
 import { Pressable, View } from "react-native";
 
-const PostHomeScreenHeader = () => {
+export const PostHomeScreenHeader = () => {
   return (
     <View className="h-[48] px-4 py-2 flex-row bg-white border-b border-gray-200">
       <View className="flex-1">
@@ -32,5 +32,3 @@ const PostHomeScreenHeader = () => {
     </View>
   );
 };
-
-export default PostHomeScreenHeader;

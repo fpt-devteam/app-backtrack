@@ -1,15 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
 import { useMemo } from 'react'
-import { analyzeImageApi } from '../api'
-import { POST_ANALYZE_IMAGE_KEY } from '../constants'
-import type { AnalyzeImageRequest } from '../types'
+import { analyzeImageApi } from '@/src/features/post/api'
+import { POST_ANALYZE_IMAGE_KEY } from '@/src/features/post/constants'
+import type { AnalyzeImageRequest } from '@/src/features/post/types'
 
 interface UseAnalyzeImageOptions {
   onSuccess?: (data: { itemName: string; description: string }) => void
   onError?: (error: Error) => void
 }
 
-const useAnalyzeImage = (options?: UseAnalyzeImageOptions) => {
+export const useAnalyzeImage = (options?: UseAnalyzeImageOptions) => {
   const mutation = useMutation({
     mutationKey: POST_ANALYZE_IMAGE_KEY,
     mutationFn: async (request: AnalyzeImageRequest) => {
@@ -20,7 +20,9 @@ const useAnalyzeImage = (options?: UseAnalyzeImageOptions) => {
     },
 
     onSuccess: (data) => {
-      options?.onSuccess?.(data)
+      if (data) {
+        options?.onSuccess?.(data)
+      }
     },
 
     onError: (error) => {
@@ -42,5 +44,3 @@ const useAnalyzeImage = (options?: UseAnalyzeImageOptions) => {
     data: mutation.data,
   }
 }
-
-export default useAnalyzeImage

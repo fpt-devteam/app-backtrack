@@ -1,8 +1,8 @@
 import { formatTime } from "@/src/shared/utils";
 import { Text, View } from "react-native";
-import { MessageItem } from "../types";
+import { MessageItem } from "@/src/features/chat/types";
 
-const MessageItemCard = ({ item }: { item: MessageItem }) => (
+export const MessageItemCard = ({ item }: { item: MessageItem }) => (
   <View className={`mb-3 flex-row ${item.isMine ? 'justify-end' : 'justify-start'}`}>
     <View className={`max-w-[75%] rounded-lg px-4 py-2 ${item.isMine ? 'bg-primary' : 'bg-slate-100'}`}>
       <Text className={`text-base ${item.isMine ? 'text-white' : 'text-slate-900'}`}> {item.content} </Text>
@@ -12,4 +12,4 @@ const MessageItemCard = ({ item }: { item: MessageItem }) => (
     </View>
   </View>
 );
-export default MessageItemCard;
+

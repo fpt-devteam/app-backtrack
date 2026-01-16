@@ -1,4 +1,4 @@
-import { PostStatusBadge } from "@/src/features/post/components/badges";
+import { PostStatusBadge } from "@/src/features/post/components";
 import type { Post } from "@/src/features/post/types";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
@@ -38,7 +38,7 @@ type PostCardProps = {
   type?: CardType;
 };
 
-const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps) => {
+export const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps) => {
   const eventTimeStr = useMemo(() => formatIsoDate(item.eventTime), [item.eventTime]);
   const imageUrl = useMemo(() => item.imageUrls?.[0], [item.imageUrls]);
   const [imgLoading, setImgLoading] = useState(true);
@@ -200,5 +200,3 @@ const PostCardSkeleton = ({ type }: SkeletonProps) => {
     </Animated.View>
   );
 };
-
-export default PostCard;

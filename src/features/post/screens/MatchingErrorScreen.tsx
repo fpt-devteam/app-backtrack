@@ -63,7 +63,7 @@ function Ripple({ delayMs, size }: RippleProps) {
   );
 }
 
-const MatchingErrorScreen = ({
+export const MatchingErrorScreen = ({
   title = "We couldn’t complete the match",
   subtitle = "Something went wrong while checking Lost & Found posts.",
   hint = "Please try again in a moment.",
@@ -194,5 +194,3 @@ const MatchingErrorScreen = ({
     </View>
   );
 };
-
-export default MatchingErrorScreen;

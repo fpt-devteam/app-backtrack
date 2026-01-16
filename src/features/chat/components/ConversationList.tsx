@@ -4,7 +4,7 @@ import colors from '@/src/shared/theme/colors'
 import { EmptyIcon } from 'phosphor-react-native'
 import React, { useCallback, useMemo, useRef } from 'react'
 import { FlatList, RefreshControl } from 'react-native'
-import ConversationCard from './ConversationCard'
+import { ConversationCard } from '@/src/features/chat/components/ConversationCard'
 
 interface FooterProps {
   isFetchingNextPage: boolean
@@ -23,7 +23,7 @@ const Footer = ({ isFetchingNextPage, hasNextPage }: FooterProps) => {
   return null;
 }
 
-const ConversationList = () => {
+export const ConversationList = () => {
   const {
     data,
     isLoading,
@@ -89,4 +89,4 @@ const ConversationList = () => {
   )
 }
 
-export default ConversationList
+

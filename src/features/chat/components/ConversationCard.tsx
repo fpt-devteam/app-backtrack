@@ -2,8 +2,8 @@ import { CHAT_ROUTE } from '@/src/shared/constants/route.constant'
 import { ExternalPathString, RelativePathString, router } from 'expo-router'
 import React, { useMemo } from 'react'
 import { Pressable, Text, View } from 'react-native'
-import { Conversation } from '../types'
-import { ConversationAvatar } from './ConversationAvatar'
+import { Conversation } from '@/src/features/chat/types'
+import { ConversationAvatar } from '@/src/features/chat/components/ConversationAvatar'
 
 type Props = {
   conversation: Conversation
@@ -19,7 +19,7 @@ const formatTime = (iso?: string) => {
   return `${hh}:${mm}`
 }
 
-const ConversationCard = ({ conversation }: Props) => {
+export const ConversationCard = ({ conversation }: Props) => {
   const partnerName = conversation.partner?.displayName ?? 'Unknown User'
   const lastText = conversation.lastMessage?.lastContent ?? 'Say hi'
   const timeText = useMemo(() => {
@@ -81,4 +81,4 @@ const ConversationCard = ({ conversation }: Props) => {
   )
 }
 
-export default ConversationCard
+

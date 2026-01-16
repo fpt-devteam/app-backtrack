@@ -7,7 +7,7 @@ import { RelativePathString, router } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 
-export default function QRScreen() {
+export const QRScreen = () => {
   const handleMenuOpen = () => {
     router.push("/(bottom-sheet)/qr-menu" as RelativePathString);
   };

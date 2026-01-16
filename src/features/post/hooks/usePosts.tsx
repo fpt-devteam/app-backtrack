@@ -1,14 +1,14 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { filterPostsApi } from '../api';
-import { POSTS_QUERY_KEY } from '../constants';
-import type { PostFilters, PostsRequest, PostsResponse } from '../types';
+import { filterPostsApi } from '@/src/features/post/api';
+import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
+import type { PostFilters, PostsRequest, PostsResponse } from '@/src/features/post/types';
 
 export type PostsFiltersOptions = {
   filters: PostFilters;
   enabled?: boolean;
 }
 
-const usePosts = ({
+export const usePosts = ({
   filters,
   enabled = true,
 }: PostsFiltersOptions) => {
@@ -52,5 +52,3 @@ const usePosts = ({
     refresh: () => query.refetch(),
   };
 }
-
-export default usePosts;

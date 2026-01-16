@@ -1,2 +1,1 @@
-export { default as QRScreen } from './QRScreen';
-
+export { QRScreen } from '@/src/features/qr/screens/QRScreen';

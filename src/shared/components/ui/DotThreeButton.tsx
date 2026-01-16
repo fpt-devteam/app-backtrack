@@ -1,6 +1,6 @@
 import { DotsThreeIcon } from "phosphor-react-native";
 import { Pressable } from "react-native";
-import colors from "../../theme/colors";
+import colors from "@/src/shared/theme/colors";
 
 export const DotThreeButton = ({ onPress }: { onPress: () => void }) => {
   return (

@@ -1,17 +1,7 @@
-/**
- * Error utility for mapping error codes to user-friendly messages
- * Supports Firebase, API, and custom error codes
- */
-
-export type ErrorCode = string;
-
 export interface ErrorMapping {
   [key: string]: string;
 }
 
-/**
- * Firebase Authentication error messages
- */
 const FIREBASE_AUTH_ERRORS: ErrorMapping = {
   // Authentication errors
   "auth/invalid-email":
@@ -89,9 +79,6 @@ const FIREBASE_AUTH_ERRORS: ErrorMapping = {
     "Email change requires verification. Please check your inbox.",
 };
 
-/**
- * API error messages
- */
 const API_ERRORS: ErrorMapping = {
   // HTTP status codes
   "400": "Bad request. Please check your input and try again.",
@@ -112,10 +99,6 @@ const API_ERRORS: ErrorMapping = {
   TIMEOUT_ERROR: "Request timeout. Please try again.",
   CONNECTION_ERROR: "Connection error. Please check your internet connection.",
 };
-
-/**
- * Application-specific error messages
- */
 const APP_ERRORS: ErrorMapping = {
   VALIDATION_ERROR: "Please check your input and try again.",
   PERMISSION_DENIED: "You don't have permission to perform this action.",
@@ -125,212 +108,15 @@ const APP_ERRORS: ErrorMapping = {
   OPERATION_FAILED: "Operation failed. Please try again.",
   UNKNOWN_ERROR: "An unexpected error occurred. Please try again.",
 };
-
-/**
- * Default error message
- */
 const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
 
-/**
- * Combined error mapping
- */
 const ERROR_MESSAGES: ErrorMapping = {
   ...FIREBASE_AUTH_ERRORS,
   ...API_ERRORS,
   ...APP_ERRORS,
 };
 
-/**
- * Extracts error code from various error object formats
- */
-const extractErrorCode = (error: any): string | null => {
-  if (!error) return null;
-
-  // Direct error code
-  if (error.code) return error.code;
-
-  // Nested error code
-  if (error.error?.code) return error.error.code;
-
-  // HTTP status code
-  if (error.status) return String(error.status);
-  if (error.statusCode) return String(error.statusCode);
-
-  // Response status
-  if (error.response?.status) return String(error.response.status);
-
-  return null;
-};
-
-/**
- * Extracts error message from various error object formats
- */
-const extractErrorMessage = (error: any): string | null => {
-  if (!error) return null;
-
-  // Direct message
-  if (typeof error === "string") return error;
-  if (error.message) return error.message;
-
-  // Nested message
-  if (error.error?.message) return error.error.message;
-
-  // Response message
-  if (error.response?.data?.message) return error.response.data.message;
-  if (error.response?.message) return error.response.message;
-
-  return null;
-};
-
-/**
- * Checks if a message contains specific keywords
- */
-const containsKeyword = (message: string, keywords: string[]): boolean => {
-  const lowerMessage = message.toLowerCase();
-  return keywords.some((keyword) =>
-    lowerMessage.includes(keyword.toLowerCase())
-  );
-};
-
-/**
- * Pattern-based error detection
- */
-const detectErrorByPattern = (message: string): string | null => {
-  if (containsKeyword(message, ["network", "connection", "offline"])) {
-    return ERROR_MESSAGES["NETWORK_ERROR"];
-  }
-
-  if (containsKeyword(message, ["timeout", "timed out"])) {
-    return ERROR_MESSAGES["TIMEOUT_ERROR"];
-  }
-
-  if (containsKeyword(message, ["password", "incorrect", "wrong"])) {
-    return ERROR_MESSAGES["auth/wrong-password"];
-  }
-
-  if (containsKeyword(message, ["email", "invalid email"])) {
-    return ERROR_MESSAGES["auth/invalid-email"];
-  }
-
-  if (containsKeyword(message, ["not found", "404"])) {
-    return ERROR_MESSAGES["404"];
-  }
-
-  if (containsKeyword(message, ["unauthorized", "401", "unauthenticated"])) {
-    return ERROR_MESSAGES["401"];
-  }
-
-  if (containsKeyword(message, ["forbidden", "403", "permission"])) {
-    return ERROR_MESSAGES["403"];
-  }
-
-  return null;
-};
-
-/**
- * Checks if a message is user-friendly
- */
-const isUserFriendly = (message: string): boolean => {
-  if (!message || message.length > 150) return false;
-
-  // Filter out technical messages
-  const technicalKeywords = [
-    "Firebase",
-    "firebase",
-    "Error:",
-    "Exception",
-    "Stack trace",
-    "at Object",
-    "undefined",
-    "null",
-    "NaN",
-  ];
-
-  return !containsKeyword(message, technicalKeywords);
-};
-
-/**
- * Main function to get user-friendly error message
- *
- * @param error - Error object, error code, or error message
- * @returns User-friendly error message
- *
- * @example
- * ```typescript
- * // With Firebase error
- * const message = getErrorMessage({ code: 'auth/wrong-password' });
- * // Returns: "Incorrect password. Please try again or reset your password."
- *
- * // With HTTP error
- * const message = getErrorMessage({ status: 404 });
- * // Returns: "Resource not found. Please check and try again."
- *
- * // With error code string
- * const message = getErrorMessage('auth/user-not-found');
- * // Returns: "No account found with this email. Please check your email or sign up."
- * ```
- */
-export const getErrorMessage = (error: any): string => {
-  if (!error) return DEFAULT_ERROR_MESSAGE;
-
-  // If error is a string, treat it as error code
-  if (typeof error === "string") {
-    return ERROR_MESSAGES[error] || DEFAULT_ERROR_MESSAGE;
-  }
-
-  // 1. Try to get message by error code
-  const errorCode = extractErrorCode(error);
-  if (errorCode && ERROR_MESSAGES[errorCode]) {
-    return ERROR_MESSAGES[errorCode];
-  }
-
-  // 2. Try to extract and analyze error message
-  const errorMessage = extractErrorMessage(error);
-  if (errorMessage) {
-    // Try pattern matching
-    const patternMatch = detectErrorByPattern(errorMessage);
-    if (patternMatch) return patternMatch;
-
-    // Return original message if it's user-friendly
-    if (isUserFriendly(errorMessage)) {
-      return errorMessage;
-    }
-  }
-
-  // 3. Return default message
-  return DEFAULT_ERROR_MESSAGE;
-};
-
-/**
- * Checks if an error code exists in the mapping
- */
-export const hasErrorMapping = (errorCode: ErrorCode): boolean => {
-  return errorCode in ERROR_MESSAGES;
-};
-
-/**
- * Gets error message by error code directly
- */
-export const getErrorMessageByCode = (errorCode: ErrorCode): string => {
-  return ERROR_MESSAGES[errorCode] || DEFAULT_ERROR_MESSAGE;
-};
-
-/**
- * Adds custom error mappings at runtime
- */
-export const addErrorMapping = (code: ErrorCode, message: string): void => {
-  ERROR_MESSAGES[code] = message;
-};
-
-/**
- * Adds multiple custom error mappings at runtime
- */
-export const addErrorMappings = (mappings: ErrorMapping): void => {
-  Object.assign(ERROR_MESSAGES, mappings);
-};
-
-
-export function getErrorMessage2(error: unknown, fallback = 'An unknown error occurred'): string {
+export function getErrorMessage(error: unknown, fallback = DEFAULT_ERROR_MESSAGE): string {
   return (
     (error as any)?.response?.data?.error?.message ||
     (error as any)?.error?.message ||

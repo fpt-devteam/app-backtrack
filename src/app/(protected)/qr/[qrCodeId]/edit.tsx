@@ -1,10 +1,10 @@
-import { QRCodeProfileForm, QRCodeProfileFormSchema } from '@/src/features/qr/components';
+import { QRCodeProfileForm, type QRCodeProfileFormSchema } from '@/src/features/qr/components';
 import { useGetQRCodeById, useUpdateQRCode } from '@/src/features/qr/hooks';
 import { UpdateQrCodeRequest } from '@/src/features/qr/types';
 import { AppInlineError, AppLoader } from '@/src/shared/components';
 import { toast } from '@/src/shared/components/ui/toast';
 import { useUploadImage } from '@/src/shared/hooks';
-import { getErrorMessage2 } from '@/src/shared/utils';
+import { getErrorMessage } from '@/src/shared/utils';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
@@ -24,7 +24,7 @@ const EditQRScreen = () => {
     onError: (error) => {
       toast.info(
         'Update failed',
-        getErrorMessage2(error)
+        getErrorMessage(error)
       );
     },
   });
@@ -32,7 +32,7 @@ const EditQRScreen = () => {
   const initialValues = useMemo(() => {
     if (!qrCode) return undefined;
 
-    const imageAssets: ImagePickerAsset[] = qrCode.item.imageUrls.map((url, index) => ({
+    const imageAssets: ImagePickerAsset[] = qrCode.item.imageUrls.map((url: string, index: number) => ({
       uri: url,
       width: 0,
       height: 0,
@@ -76,7 +76,7 @@ const EditQRScreen = () => {
         } as UpdateQrCodeRequest,
       });
     } catch (error) {
-      toast.error('Update failed', getErrorMessage2(error));
+      toast.error('Update failed', getErrorMessage(error));
     }
   };
 

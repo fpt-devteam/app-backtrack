@@ -1,2 +1,2 @@
-export * from './qr.dto';
-export * from './qr.type';
+export * from "@/src/features/qr/types/qr.dto";
+export * from "@/src/features/qr/types/qr.type";

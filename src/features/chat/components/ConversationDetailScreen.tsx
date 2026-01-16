@@ -9,17 +9,17 @@ import {
   View
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useConversationDetail, useMessages, useSendMessage } from '../hooks'
-import { MessageItem } from '../types'
-import ConversationHeader from './ConversationHeader'
-import MessageInput from './MessageInput'
-import MessageList from './MessageList'
+import { useConversationDetail, useMessages, useSendMessage } from '@/src/features/chat/hooks'
+import { MessageItem } from '@/src/features/chat/types'
+import { ConversationHeader } from '@/src/features/chat/components/ConversationHeader'
+import { MessageInput } from '@/src/features/chat/components/MessageInput'
+import { MessageList } from '@/src/features/chat/components/MessageList'
 
 interface ConversationDetailScreenProps {
   conversationId: string
 }
 
-const ConversationDetailScreen = ({ conversationId }: ConversationDetailScreenProps) => {
+export const ConversationDetailScreen = ({ conversationId }: ConversationDetailScreenProps) => {
   const insets = useSafeAreaInsets();
 
   const { user } = useAppUser()
@@ -147,4 +147,4 @@ const ConversationDetailScreen = ({ conversationId }: ConversationDetailScreenPr
   )
 }
 
-export default ConversationDetailScreen
+

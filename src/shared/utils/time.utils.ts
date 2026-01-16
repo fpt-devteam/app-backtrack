@@ -31,19 +31,6 @@ export const formatTimeDifference = (diffInMs: number): string => {
   }
   return 'Same time'
 }
-
-/**
- * Format time for display
- * @param date Date to format (Date object or ISO string)
- * @returns Formatted time string (e.g., "14:00")
- */
-export const formatTime = (date: Date | string): string => {
-  const d = typeof date === 'string' ? new Date(date) : date
-  const hours = d.getHours().toString().padStart(2, '0')
-  const minutes = d.getMinutes().toString().padStart(2, '0')
-  return `${hours}:${minutes}`
-}
-
 /**
  * Get time match status based on time difference
  * @param diffInMs Time difference in milliseconds

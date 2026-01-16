@@ -1,1 +1,1 @@
-export * from "./qr.api";
+export * from "@/src/features/qr/api/qr.api";

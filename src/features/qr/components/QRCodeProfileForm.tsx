@@ -60,7 +60,7 @@ const qrCodeProfileSchema = yup
   })
   .required();
 
-type QRCodeProfileFormSchema = yup.InferType<typeof qrCodeProfileSchema>;
+export type QRCodeProfileFormSchema = yup.InferType<typeof qrCodeProfileSchema>;
 type FormMode = "create" | "update";
 
 const headerTitleMap: Record<FormMode, string> = {
@@ -76,7 +76,7 @@ type QRCodeProfileFormProps = {
   submitButtonText?: string;
 };
 
-const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false, submitButtonText = 'Save' }: QRCodeProfileFormProps) => {
+export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false, submitButtonText = 'Save' }: QRCodeProfileFormProps) => {
   const { control, handleSubmit, formState: { errors, isValid }, watch, reset, } = useForm<QRCodeProfileFormSchema>({
     defaultValues: {
       name: "",
@@ -256,6 +256,5 @@ const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false
   );
 };
 
-export default QRCodeProfileForm;
-export type { QRCodeProfileFormSchema };
+
 

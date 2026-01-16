@@ -1,4 +1,4 @@
-import { PostStatusBadge } from '@/src/features/post/components/badges';
+import { PostStatusBadge } from '@/src/features/post/components';
 import type { Post } from '@/src/features/post/types';
 import { POST_ROUTE } from '@/src/shared/constants';
 import { formatIsoDate } from '@/src/shared/utils';
@@ -12,7 +12,7 @@ type MinimalPostCardProps = {
   post: Post
 }
 
-const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
+export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
   const imgUrl = post.imageUrls?.[0];
 
   return (
@@ -57,5 +57,3 @@ const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
     </TouchableOpacity>
   )
 }
-
-export default MinimalPostCard

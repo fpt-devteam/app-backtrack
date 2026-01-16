@@ -1,6 +1,5 @@
-export { default as ConfirmPasswordField } from "./ConfirmPasswordField";
-export { default as DateTimePickerField } from "./DateTimePickerField";
-export { default as EmailField } from "./EmailField";
-export { default as ImageField } from "./ImageField";
-export { default as PasswordField } from "./PasswordField";
-
+export { ConfirmPasswordField } from "@/src/shared/components/fields/ConfirmPasswordField";
+export { DateTimePickerField } from "@/src/shared/components/fields/DateTimePickerField";
+export { EmailField } from "@/src/shared/components/fields/EmailField";
+export { ImageField } from "@/src/shared/components/fields/ImageField";
+export { PasswordField } from "@/src/shared/components/fields/PasswordField";

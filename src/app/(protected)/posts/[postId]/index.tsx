@@ -1,4 +1,4 @@
-import { PostDetails } from '@/src/features/post/components/ui';
+import { PostDetails } from '@/src/features/post/components';
 import { useGetPostById } from '@/src/features/post/hooks';
 import { AppHeader } from '@/src/shared/components';
 import { useLocalSearchParams } from 'expo-router';

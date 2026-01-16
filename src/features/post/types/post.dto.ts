@@ -1,6 +1,6 @@
-import type { ApiResponse, PagedResponse } from "@/src/api/common/api.types";
 import type { UserLocation } from "@/src/features/location/types";
 import type { Post, PostMatchingStatus, PostType, SimilarPost } from "@/src/features/post/types";
+import type { ApiResponse, PagedResponse } from "@/src/shared/api";
 import type { LatLng } from "react-native-maps";
 
 export type PostsRequest = {

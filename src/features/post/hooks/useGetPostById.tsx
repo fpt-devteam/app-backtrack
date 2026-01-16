@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getPostByIdApi } from '../api';
-import { POST_DETAIL_QUERY_KEY } from '../constants';
-import type { PostGetByIdRequest } from '../types';
+import { getPostByIdApi } from '@/src/features/post/api';
+import { POST_DETAIL_QUERY_KEY } from '@/src/features/post/constants';
+import type { PostGetByIdRequest } from '@/src/features/post/types';
 
-const useGetPostById = (request: PostGetByIdRequest) => {
+export const useGetPostById = (request: PostGetByIdRequest) => {
   const query = useQuery({
     queryKey: [...POST_DETAIL_QUERY_KEY, request.postId],
     queryFn: async () => {
@@ -27,5 +27,3 @@ const useGetPostById = (request: PostGetByIdRequest) => {
     error,
   };
 };
-
-export default useGetPostById;

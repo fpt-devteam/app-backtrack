@@ -1,15 +1,4 @@
-/**
- * Tab Bar Button
- *
- * Individual tab item with:
- * - Icon on top
- * - Label below
- * - Active indicator line at the top
- * - Press feedback
- */
-
 import { colors, metrics } from "@/src/shared/theme";
-import type { NavigationRoute, ParamListBase } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import type { IconProps } from "phosphor-react-native";
 import React from "react";
@@ -24,7 +13,6 @@ import Animated, {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type Props = {
-  route: NavigationRoute<ParamListBase, string>;
   isFocused: boolean;
   Icon: React.ElementType<IconProps>;
   label: string;
@@ -32,7 +20,6 @@ type Props = {
 };
 
 export const TabBarButton = ({
-  route,
   isFocused,
   Icon,
   label,

@@ -5,7 +5,7 @@ type BrandHeaderProps = {
   message: string;
 };
 
-const AppBrandHeader = ({ message }: BrandHeaderProps) => {
+export const AppBrandHeader = ({ message }: BrandHeaderProps) => {
   return (
     <View className="w-full items-center">
       {/* Logo */}
@@ -30,4 +30,4 @@ const AppBrandHeader = ({ message }: BrandHeaderProps) => {
   )
 }
 
-export default AppBrandHeader
+

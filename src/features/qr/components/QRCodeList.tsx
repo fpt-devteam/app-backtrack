@@ -5,14 +5,14 @@ import colors from '@/src/shared/theme/colors';
 import { QrCodeIcon } from 'phosphor-react-native';
 import React, { useCallback } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
-import { QRCodeCard } from './QRCodeCard';
+import { QRCodeCard } from '@/src/features/qr/components/QRCodeCard';
 
 type QRCodeListProps = {
   onItemPress?: (item: QrCodeData) => void;
   pageSize?: number;
 };
 
-const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
+export const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
   const { items, isLoading, error, hasMore, loadMore, isLoadingNextPage, refresh, isRefetching } = useQRCodes({
     pageSize,
   });
@@ -86,4 +86,4 @@ const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
   );
 };
 
-export default QRCodeList;
+

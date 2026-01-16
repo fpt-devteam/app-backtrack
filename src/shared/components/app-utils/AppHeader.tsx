@@ -2,8 +2,8 @@ import { router } from "expo-router";
 import { ArrowLeftIcon } from "phosphor-react-native";
 import React from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
-import colors from "../../theme/colors";
-import { cn } from "../../utils/cn";
+import colors from "@/src/shared/theme/colors";
+import { cn } from "@/src/shared/utils/cn";
 
 type AppHeaderProps = {
   title: string;
@@ -12,7 +12,7 @@ type AppHeaderProps = {
   rightActionButton?: React.ReactNode;
 };
 
-const AppHeader = ({
+export const AppHeader = ({
   title,
   showBackButton = true,
   onBackPress,
@@ -51,7 +51,7 @@ const AppHeader = ({
   );
 };
 
-export default AppHeader;
+
 
 export const DefaultTopRightActionButton = ({ lable, onPress, disabled, isSubmitting }: { lable: string; onPress: () => void; disabled?: boolean; isSubmitting?: boolean }) => (
   <Pressable

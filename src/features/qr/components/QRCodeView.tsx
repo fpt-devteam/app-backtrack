@@ -11,10 +11,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type QRCodeViewProps = {
   publicCode: string;
   itemName?: string;
-  onBack?: () => void;
 };
 
-const QRCodeView = ({ publicCode, itemName, onBack }: QRCodeViewProps) => {
+export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
   const insets = useSafeAreaInsets();
   const [qrImageUri, setQrImageUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -154,4 +153,4 @@ const QRCodeView = ({ publicCode, itemName, onBack }: QRCodeViewProps) => {
   );
 };
 
-export default QRCodeView;
+

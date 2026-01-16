@@ -3,7 +3,7 @@ import { useLocationSelectionStore } from '@/src/features/location/store';
 import ItemPlaceMarker from '@/src/features/map/components/ItemPlaceMarker';
 import UserPlaceButton from '@/src/features/map/components/UserPlaceButton';
 import UserPlaceMarker from '@/src/features/map/components/UserPlaceMarker';
-import { PostDetails } from '@/src/features/post/components/ui';
+import { PostDetails } from '@/src/features/post/components';
 import { usePosts } from '@/src/features/post/hooks';
 import type { PostsFiltersOptions } from '@/src/features/post/hooks/usePosts';
 import { PostHomeScreen } from '@/src/features/post/screens';

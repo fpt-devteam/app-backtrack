@@ -1,5 +1,5 @@
-import { privateClient } from "@/src/api/common/client";
 import type { AnalyzeImageRequest, AnalyzeImageResponse, MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
+import { privateClient } from "@/src/shared/api/client";
 import type { ApiResponse } from "@/src/shared/types";
 
 export const POST_API = {

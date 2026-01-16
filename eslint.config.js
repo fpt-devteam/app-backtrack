@@ -25,7 +25,7 @@ module.exports = defineConfig([
     ],
   },
 
-  // 3) TypeScript / TSX rules (plugin must be defined here!)
+  // 3) TypeScript / TSX rules
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -39,7 +39,6 @@ module.exports = defineConfig([
       '@typescript-eslint': tsPlugin,
     },
     rules: {
-      // iOS-clean guardrails
       'no-restricted-imports': [
         'error',
         {
@@ -53,8 +52,15 @@ module.exports = defineConfig([
               message: 'Do not use react-native-paper (Material). Keep iOS-clean UI stack.',
             },
           ],
+          patterns: [
+            {
+              group: ['../*'],
+              message: 'DETECTED RELATIVE IMPORT: Please use path aliases (e.g. @/components, @/hooks) instead of imports pointing back to parent folders (../).',
+            },
+          ],
         },
       ],
+
 
       // TS rules
       'no-unused-vars': 'off',
@@ -67,17 +73,16 @@ module.exports = defineConfig([
         },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/consistent-type-imports': [
-        'warn',
-        {
-          prefer: 'type-imports',
-          fixStyle: 'separate-type-imports',
-        },
-      ],
+      // '@typescript-eslint/consistent-type-imports': [
+      //   'warn',
+      //   {
+      //     prefer: 'type-imports',
+      //     fixStyle: 'separate-type-imports',
+      //   },
+      // ],
     },
   },
 
-  // 4) JS/JSX (no TS plugin rules here)
   {
     files: ['**/*.{js,jsx}'],
     rules: {

@@ -1,3 +1,4 @@
+import { TabBarButton } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarButton";
 import { metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
@@ -13,7 +14,6 @@ import {
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { TabBarButton } from "./TabBarButton";
 
 type TabIcon = {
   Icon: React.ElementType<IconProps>;
@@ -89,7 +89,6 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
           return (
             <TabBarButton
               key={route.key}
-              route={route}
               isFocused={isFocused}
               Icon={tabConfig.Icon}
               label={tabConfig.label}
@@ -120,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TabBarContent;
+

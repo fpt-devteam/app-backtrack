@@ -1,3 +1,2 @@
-export * from './firebase.service';
-export * from './socket.service';
-
+export * from '@/src/shared/services/firebase.service';
+export * from '@/src/shared/services/socket.service';

@@ -3,7 +3,7 @@ import type {
   PlaceDetails,
   PlaceSuggestion
 } from "@/src/features/location/types";
-import SuggestRow from "@/src/shared/components/ui/SuggestRow";
+import { SuggestRow } from "@/src/shared/components";
 import { useRecentSearch } from "@/src/shared/hooks";
 import { colors } from "@/src/shared/theme";
 import {
