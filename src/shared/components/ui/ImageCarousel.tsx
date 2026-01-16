@@ -19,7 +19,7 @@ export const ImageCarousel = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const autoScrollTimerRef = useRef<number | null>(null);
+  const autoScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastScrollTimeRef = useRef<number>(Date.now());
 
   const infiniteData = data.length > 1 ? [data[data.length - 1], ...data, data[0]] : data;
