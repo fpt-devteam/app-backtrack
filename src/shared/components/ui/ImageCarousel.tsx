@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Dimensions, Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, ScrollView, Text, View } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -19,7 +19,7 @@ export const ImageCarousel = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const autoScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoScrollTimerRef = useRef<number | null>(null);
   const lastScrollTimeRef = useRef<number>(Date.now());
 
   const infiniteData = data.length > 1 ? [data[data.length - 1], ...data, data[0]] : data;
@@ -63,7 +63,7 @@ export const ImageCarousel = ({
     };
   }, [currentIndex, data.length, autoScrollInterval]);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = (event: any) => {
     const contentOffset = event.nativeEvent.contentOffset;
     const viewSize = event.nativeEvent.layoutMeasurement;
     const pageNum = Math.floor(contentOffset.x / viewSize.width);

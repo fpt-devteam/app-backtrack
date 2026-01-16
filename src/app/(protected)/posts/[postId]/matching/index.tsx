@@ -4,7 +4,7 @@ import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen } fr
 import { AppHeader } from '@/src/shared/components';
 import { POST_ROUTE } from '@/src/shared/constants';
 import { getErrorMessage } from '@/src/shared/utils';
-import { RelativePathString, router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
 
@@ -33,7 +33,7 @@ const MatchingScreen = () => {
 
   return (
     <View>
-      <AppHeader title="Matching result" onBackPress={() => router.replace(POST_ROUTE.index as RelativePathString)} />
+      <AppHeader title="Matching result" onBackPress={() => router.replace(POST_ROUTE.index)} />
 
       {/* Results */}
       <FlatList
