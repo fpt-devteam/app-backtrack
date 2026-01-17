@@ -1,5 +1,5 @@
 import { useAuth } from "@/src/features/auth/providers";
-import { LocationSelectionProvider } from "@/src/features/location/store";
+import { LocationSelectionProvider } from "@/src/features/map/store";
 import { Redirect, Stack } from "expo-router";
 import React from "react";
 

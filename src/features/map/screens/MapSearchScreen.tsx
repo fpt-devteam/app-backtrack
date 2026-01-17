@@ -1,8 +1,8 @@
-import { useLocationSelectionStore } from "@/src/features/location/store";
 import {
   usePlaceAutocomplete,
   usePlaceDetails,
 } from "@/src/features/map/hooks";
+import { useLocationSelectionStore } from "@/src/features/map/store";
 import type { PlacePrediction } from "@/src/features/map/types";
 import { SuggestRow } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";

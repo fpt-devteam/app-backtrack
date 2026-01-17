@@ -1,6 +1,6 @@
-import { useLocationSelectionStore } from "@/src/features/location/store";
-import type { UserLocation } from "@/src/features/location/types";
-import { MAP_ROUTE } from "@/src/shared/constants";
+import { useLocationSelectionStore } from "@/src/features/map/store";
+import type { UserLocation } from "@/src/features/map/types";
+import { POST_ROUTE } from "@/src/shared/constants";
 import colors from "@/src/shared/theme/colors";
 import * as Haptics from "expo-haptics";
 import { RelativePathString, router } from "expo-router";
@@ -14,7 +14,7 @@ type LocationFieldProps = {
   onChange: (value: UserLocation) => void;
 };
 
-const LocationField = ({
+export const LocationField = ({
   value,
   onChange,
   placeholder = "Search location...",
@@ -36,7 +36,8 @@ const LocationField = ({
     console.log("Data at field: ", confirmedSelection);
   }, [confirmedSelection]);
 
-  const handlePress = () => router.push(MAP_ROUTE.index as RelativePathString);
+  const handlePress = () =>
+    router.push(POST_ROUTE.searchLocation as RelativePathString);
 
   const displayText = value ? value.displayAddress : placeholder;
 
@@ -66,5 +67,3 @@ const LocationField = ({
     </TouchableOpacity>
   );
 };
-
-export default LocationField;

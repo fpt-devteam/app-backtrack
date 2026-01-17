@@ -34,7 +34,7 @@ function useDebouncedValue<T>(value: T, delayMs: number) {
   return debounced;
 }
 
-const usePlaceAutocomplete = ({
+export const usePlaceAutocomplete = ({
   searchQuery,
   enabled = true,
   debounceMs = DEBOUNCE_MS_DEFAULT,
@@ -89,5 +89,3 @@ const usePlaceAutocomplete = ({
     error: query.isError,
   };
 };
-
-export default usePlaceAutocomplete;

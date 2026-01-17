@@ -1,9 +1,11 @@
-import { useUserLocation } from "@/src/features/location/hooks";
-import { useLocationSelectionStore } from "@/src/features/location/store";
-import ItemPlaceMarker from "@/src/features/map/components/ItemPlaceMarker";
-import UserPlaceButton from "@/src/features/map/components/UserPlaceButton";
-import UserPlaceMarker from "@/src/features/map/components/UserPlaceMarker";
-import { useReverseGeocoding } from "@/src/features/map/hooks";
+import {
+  ItemPlaceMarker,
+  UserPlaceButton,
+  UserPlaceMarker,
+} from "@/src/features/map/components";
+import { DEFAULT_RADIUS_KM } from "@/src/features/map/constants";
+import { useReverseGeocoding, useUserLocation } from "@/src/features/map/hooks";
+import { useLocationSelectionStore } from "@/src/features/map/store";
 import { PostDetails } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostsFiltersOptions } from "@/src/features/post/hooks/usePosts";
@@ -22,21 +24,9 @@ import type { LatLng, Region } from "react-native-maps";
 import MapView from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-/*
- * minimalist: only show map and search bar + user location button
- * full: show map + search bar + user location button + bottom sheet with posts + post's markers
- */
-type MapMode = "minimalist" | "full";
+const placeholder = "Search for a location";
 
-type MapOptions = {
-  mode?: MapMode;
-  searchBarPlaceholder?: string;
-};
-
-export const MapScreen = ({
-  mode = "full",
-  searchBarPlaceholder = "Search location...",
-}: MapOptions) => {
+export const MapScreen = () => {
   const mapRef = useRef<MapView>(null);
   const setBottomTabBarState = useUIStore(
     (state) => state.setBottomTabBarState,
@@ -50,14 +40,11 @@ export const MapScreen = ({
   const { reverseGeocode } = useReverseGeocoding();
 
   const searchDisplayText = useMemo(() => {
-    if (!selection) return searchBarPlaceholder;
-    console.log("Display text:", selection.displayAddress);
+    if (!selection) return placeholder;
 
-    const displayText = selection
-      ? selection.displayAddress
-      : searchBarPlaceholder;
+    const displayText = selection ? selection.displayAddress : placeholder;
     return displayText;
-  }, [selection, searchBarPlaceholder]);
+  }, [selection]);
 
   useEffect(() => {
     (async () => {
@@ -66,7 +53,7 @@ export const MapScreen = ({
 
       const initSelection = {
         ...data,
-        radiusKm: 10,
+        radiusKm: DEFAULT_RADIUS_KM,
       };
 
       onChangeSelection(initSelection);
@@ -78,10 +65,11 @@ export const MapScreen = ({
       return { enabled: false } as PostsFiltersOptions;
 
     const nextFilter: PostFilters = {
-      ...selection,
       location: selection?.location,
       radiusInKm: selection?.radiusKm,
     };
+
+    console.log("filter", nextFilter);
 
     return {
       filters: nextFilter,
@@ -120,12 +108,9 @@ export const MapScreen = ({
     const nextSelection = {
       ...selection,
       location: geocodeResult.location,
-      displayAddress: geocodeResult?.formatted_address ?? searchBarPlaceholder,
+      displayAddress: geocodeResult?.formattedAddress ?? placeholder,
       externalPlaceId: geocodeResult?.placeId ?? selection?.externalPlaceId,
     };
-
-    console.log("Geocode Result: ", geocodeResult);
-    console.log("Next Selection: ", nextSelection);
 
     onChangeSelection(nextSelection);
   };
@@ -158,8 +143,7 @@ export const MapScreen = ({
               <UserPlaceMarker
                 coordinate={selection.location}
                 disabled={false}
-                radiusKm={selection.radiusKm ?? 5}
-                showRadius={mode === "full"}
+                radiusKm={selection.radiusKm}
                 onPress={() => {
                   handleOpenSheet();
                   bottomSheetElement.current = (

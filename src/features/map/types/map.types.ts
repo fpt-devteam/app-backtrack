@@ -26,10 +26,11 @@ export type GoogleMapResponseStatus =
   | "INVALID_REQUEST"
   | "UNKNOWN_ERROR";
 
-export type UserPlace = {
+export type UserLocation = {
   location: LatLng;
   displayAddress?: string | null;
   externalPlaceId?: string | null;
+  radiusKm?: number;
 };
 
 export type PlusCode = {
@@ -37,9 +38,13 @@ export type PlusCode = {
   globalCode: string;
 };
 
+export type GeocodeLocationRequest = {
+  location: LatLng;
+};
+
 export type GeocodeResult = {
   placeId: string;
-  formatted_address: string;
+  formattedAddress: string;
   location: LatLng;
 };
 
@@ -48,7 +53,6 @@ export type GeocodeLocationResponse = {
   plusCode: PlusCode;
 };
 
-//
 export type FormattableText = {
   text: string;
 };

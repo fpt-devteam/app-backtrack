@@ -1,5 +1,4 @@
-import { useLocationSelectionStore } from "@/src/features/location/store";
-import type { UserLocation } from "@/src/features/location/types";
+import type { UserLocation } from "@/src/features/map/types";
 import { MinimalPostCard } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
@@ -11,11 +10,14 @@ import type { LocationFilterValue } from "@/src/shared/types";
 import { yupResolver } from "@hookform/resolvers/yup";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router, useLocalSearchParams } from "expo-router";
-import {
-  ArrowLeftIcon,
-  MagnifyingGlassIcon
-} from "phosphor-react-native";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeftIcon, MagnifyingGlassIcon } from "phosphor-react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { FlatList, Pressable, Text, View } from "react-native";
 
@@ -28,7 +30,9 @@ const filterSchema = yup
 
 type FilterSchema = yup.InferType<typeof filterSchema>;
 
-const isLocationFilterValue = (value: unknown): value is LocationFilterValue => {
+const isLocationFilterValue = (
+  value: unknown,
+): value is LocationFilterValue => {
   if (!value || typeof value !== "object") return false;
   const record = value as Record<string, unknown>;
   return (
@@ -55,9 +59,10 @@ export default function PostSearchResultScreen() {
     termSearch?: string;
     locationFilter?: string;
   }>();
-  const { selection } = useLocationSelectionStore();
 
-  const { control, formState: { errors } } = useForm<FilterSchema>({
+  const {
+    formState: { errors },
+  } = useForm<FilterSchema>({
     defaultValues: {
       detailLocation: undefined,
     },
@@ -69,12 +74,14 @@ export default function PostSearchResultScreen() {
 
   const parsedLocationFilter = useMemo(
     () => parseLocationFilter(locationFilter),
-    [locationFilter]
+    [locationFilter],
   );
 
   const isEndOfFeedRef = useRef(false);
 
-  const [selectedPostType, setSelectedPostType] = useState<PostType | "All">("All");
+  const [selectedPostType, setSelectedPostType] = useState<PostType | "All">(
+    "All",
+  );
 
   const [filters, setFilters] = useState<PostFilters>({
     searchTerm: searchTermData || undefined,
@@ -87,7 +94,9 @@ export default function PostSearchResultScreen() {
     radiusInKm: parsedLocationFilter?.radius,
   });
 
-  const { items, isLoading, hasMore, loadMore, isLoadingNextPage } = usePosts({ filters });
+  const { items, isLoading, hasMore, loadMore, isLoadingNextPage } = usePosts({
+    filters,
+  });
 
   useEffect(() => {
     isEndOfFeedRef.current = !hasMore;
@@ -147,18 +156,6 @@ export default function PostSearchResultScreen() {
     return null;
   }, [isLoadingNextPage, hasMore, isLoading]);
 
-  const handleOnLocationChange = (value: UserLocation) => {
-    setFilters((prev) => ({
-      ...prev,
-      location: {
-        latitude: value.location.latitude,
-        longitude: value.location.longitude,
-      },
-      radiusInKm: value?.radiusKm ?? 50,
-    }));
-    console.log("Filter: ", filters)
-  }
-
   return (
     <View className="bg-white flex-1">
       <View className="p-4 pb-2">
@@ -195,9 +192,21 @@ export default function PostSearchResultScreen() {
         <View className="mt-4">
           <ChipsRow
             chips={[
-              { label: 'All', selected: selectedPostType === 'All', onPress: () => handlePostTypeChange('All') },
-              { label: 'Found', selected: selectedPostType === PostType.Found, onPress: () => handlePostTypeChange(PostType.Found) },
-              { label: 'Lost', selected: selectedPostType === PostType.Lost, onPress: () => handlePostTypeChange(PostType.Lost) },
+              {
+                label: "All",
+                selected: selectedPostType === "All",
+                onPress: () => handlePostTypeChange("All"),
+              },
+              {
+                label: "Found",
+                selected: selectedPostType === PostType.Found,
+                onPress: () => handlePostTypeChange(PostType.Found),
+              },
+              {
+                label: "Lost",
+                selected: selectedPostType === PostType.Lost,
+                onPress: () => handlePostTypeChange(PostType.Lost),
+              },
             ]}
           />
         </View>

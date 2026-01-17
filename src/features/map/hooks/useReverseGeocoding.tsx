@@ -1,22 +1,11 @@
-import type { PlusCode } from "@/src/features/map/types";
+import {
+  GeocodeLocationRequest,
+  GeocodeLocationResponse,
+  GeocodeResult,
+} from "@/src/features/map/types";
 import { publicClient } from "@/src/shared/api";
 import { useMutation } from "@tanstack/react-query";
 import type { LatLng } from "react-native-maps";
-
-export type GeocodeResult = {
-  placeId: string;
-  formatted_address: string;
-  location: LatLng;
-};
-
-export type GeocodeLocationRequest = {
-  location: LatLng;
-};
-
-export type GeocodeLocationResponse = {
-  results: GeocodeResult[];
-  plusCode: PlusCode;
-};
 
 const API_CONFIG = {
   reverseGeocodeLocation: {
@@ -58,7 +47,7 @@ export const useReverseGeocoding = () => {
 
       return {
         placeId: resData.results?.[0]?.placeId ?? "",
-        formatted_address: resData.results?.[0]?.formatted_address ?? "",
+        formattedAddress: resData.results?.[0]?.formattedAddress ?? "",
         location: request.location,
       } as GeocodeResult;
     },
@@ -74,4 +63,4 @@ export const useReverseGeocoding = () => {
     error: mutation.error,
     reset: mutation.reset,
   };
-}
+};
