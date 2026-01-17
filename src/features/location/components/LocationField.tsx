@@ -1,48 +1,51 @@
-import type { UserLocation } from '@/src/features/location/types'
-import { POST_ROUTE } from '@/src/shared/constants'
-import colors from '@/src/shared/theme/colors'
-import * as Haptics from 'expo-haptics'
-import { router } from 'expo-router'
-import { CaretRightIcon, MapPinIcon } from 'phosphor-react-native'
-import React, { useEffect, useState } from 'react'
-import { Text, TouchableOpacity } from 'react-native'
-import { useLocationSelectionStore } from '../store'
+import { useLocationSelectionStore } from "@/src/features/location/store";
+import type { UserLocation } from "@/src/features/location/types";
+import { MAP_ROUTE } from "@/src/shared/constants";
+import colors from "@/src/shared/theme/colors";
+import * as Haptics from "expo-haptics";
+import { RelativePathString, router } from "expo-router";
+import { CaretRightIcon, MapPinIcon } from "phosphor-react-native";
+import React, { useEffect, useState } from "react";
+import { Text, TouchableOpacity } from "react-native";
 
 type LocationFieldProps = {
-  placeholder?: string
-  value: UserLocation
-  onChange: (value: UserLocation) => void
-}
+  placeholder?: string;
+  value: UserLocation;
+  onChange: (value: UserLocation) => void;
+};
 
 const LocationField = ({
   value,
   onChange,
-  placeholder = 'Search location...',
+  placeholder = "Search location...",
 }: LocationFieldProps) => {
-  const [pressed, setPressed] = useState(false)
-  const { reset, onConfirmSelection, confirmedSelection } = useLocationSelectionStore()
+  const [pressed, setPressed] = useState(false);
+  const { reset, onConfirmSelection, confirmedSelection } =
+    useLocationSelectionStore();
 
   useEffect(() => {
-    if (!value) return
-    reset()
-    onConfirmSelection(value)
-    return () => reset()
-  }, [])
+    if (!value) return;
+    reset();
+    onConfirmSelection(value);
+    return () => reset();
+  }, []);
 
   useEffect(() => {
-    if (!confirmedSelection) return
-    onChange(confirmedSelection)
-    console.log("Data at field: ", confirmedSelection)
-  }, [confirmedSelection])
+    if (!confirmedSelection) return;
+    onChange(confirmedSelection);
+    console.log("Data at field: ", confirmedSelection);
+  }, [confirmedSelection]);
 
-  const handlePress = () => router.push(POST_ROUTE.searchLocation)
+  const handlePress = () => router.push(MAP_ROUTE.index as RelativePathString);
 
-  const displayText = value ? value.displayAddress : placeholder
+  const displayText = value ? value.displayAddress : placeholder;
 
   const handlePressIn = () => {
-    setPressed(true)
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined)
-  }
+    setPressed(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+      () => undefined,
+    );
+  };
 
   return (
     <TouchableOpacity
@@ -56,10 +59,12 @@ const LocationField = ({
       ].join(" ")}
     >
       <MapPinIcon size={18} color={colors.slate[400]} />
-      <Text className="flex-1 ml-4 text-sm text-slate-400" numberOfLines={2}>{displayText}</Text>
+      <Text className="flex-1 ml-4 text-sm text-slate-400" numberOfLines={2}>
+        {displayText}
+      </Text>
       <CaretRightIcon size={18} color={colors.slate[400]} />
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default LocationField
+export default LocationField;

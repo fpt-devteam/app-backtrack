@@ -1,5 +1,5 @@
 import type { CreateQrCodeRequest, CreateQrCodeResponse, GetQrCodeByIdResponse, GetQrCodesRequest, GetQrCodesResponse, UpdateQrCodeRequest, UpdateQrCodeResponse } from "@/src/features/qr/types";
-import { privateClient } from "@/src/shared/api/client";
+import { DEFAULT_PAGED_REQUEST, privateClient } from "@/src/shared/api";
 
 export const QR_API = {
   base: "/api/qr/qr-codes",
@@ -22,13 +22,8 @@ export const getQrCodeById = async (id: string) => {
   return response.data;
 };
 
-export const getQrCodes = async (params: GetQrCodesRequest = {}) => {
-  const response = await privateClient.get<GetQrCodesResponse>(QR_API.base, {
-    params: {
-      page: params.page ?? 1,
-      pageSize: params.pageSize ?? 20,
-    },
-  });
+export const getQrCodes = async (params: GetQrCodesRequest = DEFAULT_PAGED_REQUEST) => {
+  const response = await privateClient.get<GetQrCodesResponse>(QR_API.base, { params });
   return response.data;
 };
 

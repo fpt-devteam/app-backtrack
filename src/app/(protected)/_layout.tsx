@@ -2,7 +2,6 @@ import { useAuth } from "@/src/features/auth/providers";
 import { LocationSelectionProvider } from "@/src/features/location/store";
 import { Redirect, Stack } from "expo-router";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProtectedLayout() {
   const { isAppReady, isLoggedIn } = useAuth();
@@ -12,19 +11,25 @@ export default function ProtectedLayout() {
 
   return (
     <LocationSelectionProvider>
-      <SafeAreaView className="flex-1 bg-transparent" edges={['top']}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen
-            name="(bottom-sheet)/qr-menu"
-            options={{
-              presentation: "transparentModal",
-              animation: "fade",
-              contentStyle: { backgroundColor: "transparent" },
-            }}
-          />
-        </Stack>
-      </SafeAreaView>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="(bottom-sheet)/qr-menu"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            contentStyle: { backgroundColor: "transparent" },
+          }}
+        />
+        <Stack.Screen
+          name="(bottom-sheet)/post-menu"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            contentStyle: { backgroundColor: "transparent" },
+          }}
+        />
+      </Stack>
     </LocationSelectionProvider>
   );
 }

@@ -1,7 +1,8 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { filterPostsApi } from '@/src/features/post/api';
 import { POSTS_QUERY_KEY } from '@/src/features/post/constants';
 import type { PostFilters, PostsRequest, PostsResponse } from '@/src/features/post/types';
+import { DEFAULT_PAGED_REQUEST } from '@/src/shared/api';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 export type PostsFiltersOptions = {
   filters: PostFilters;
@@ -20,7 +21,7 @@ export const usePosts = ({
       const filtersRequest: PostsRequest = {
         ...filters,
         page: Number(pageParam),
-        pageSize: 10,
+        pageSize: DEFAULT_PAGED_REQUEST.pageSize,
       };
 
       const res: PostsResponse = await filterPostsApi(filtersRequest);

@@ -1,8 +1,9 @@
+import { ApiResponse } from "@/src/shared/api";
 import type { LatLng } from "react-native-maps";
 
 /**
  * Status codes returned by the Google Places Autocomplete API.
- * 
+ *
  * Possible values:
  * - `OK` - The API request was successful
  * - `ZERO_RESULTS` - The search was successful but returned no results (may occur if searching in a remote location)
@@ -17,7 +18,13 @@ import type { LatLng } from "react-native-maps";
  *   - Invalid key parameter
  * - `UNKNOWN_ERROR` - An unknown error occurred
  */
-export type GoogleMapResponseStatus = 'OK' | 'ZERO_RESULTS' | 'OVER_QUERY_LIMIT' | 'REQUEST_DENIED' | 'INVALID_REQUEST' | 'UNKNOWN_ERROR'
+export type GoogleMapResponseStatus =
+  | "OK"
+  | "ZERO_RESULTS"
+  | "OVER_QUERY_LIMIT"
+  | "REQUEST_DENIED"
+  | "INVALID_REQUEST"
+  | "UNKNOWN_ERROR";
 
 export type UserPlace = {
   location: LatLng;
@@ -25,39 +32,61 @@ export type UserPlace = {
   externalPlaceId?: string | null;
 };
 
-export type PlaceAutocompleteResponse = {
-  predictions: PlacePrediction[]
-  status: GoogleMapResponseStatus
-}
-
-export type PlaceSuggestion = {
-  placeId: string
-  description: string
-}
-
-export type PlacePrediction = {
-  description: string
-  place_id: string
-}
-
-export type Place = {
-  placeId: string
-  displayName: string
-  formatted_address: string
-  location: LatLng
-}
-
-export type GeocodeResponse = {
-  results: GeocodeResult[];
-  status: GoogleMapResponseStatus;
+export type PlusCode = {
+  compoundCode: string;
+  globalCode: string;
 };
 
 export type GeocodeResult = {
-  placeId: string
-  formatted_address: string
-  location: LatLng
-}
+  placeId: string;
+  formatted_address: string;
+  location: LatLng;
+};
 
 export type GeocodeLocationResponse = {
-  results: GeocodeResult[],
-}
+  results: GeocodeResult[];
+  plusCode: PlusCode;
+};
+
+//
+export type FormattableText = {
+  text: string;
+};
+
+export type PlaceAutocompleteRequest = {
+  input: string;
+  languageCode: string;
+  regionCode: string;
+};
+
+export type PlaceAutocompleteResponse = {
+  suggestions: Suggestion[];
+};
+
+export type Suggestion = {
+  placePrediction: PlacePredictionResponse;
+};
+
+export type PlacePrediction = {
+  placeId: string;
+  formattedAddress: string;
+};
+
+export type PlacePredictionResponse = {
+  placeId: string;
+  text: FormattableText;
+};
+
+export type PlaceDetailsRequest = {
+  placeId: string;
+};
+
+export type PlaceDetails = {
+  id: string;
+  name: string;
+  formattedAddress: string;
+  location: LatLng;
+  plusCode: PlusCode;
+};
+
+export type PlaceDetailsResponse = ApiResponse<PlaceDetails>;

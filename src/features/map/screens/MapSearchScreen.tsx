@@ -1,239 +1,274 @@
-import { useUserLocation } from '@/src/features/location/hooks';
-import { GooglePlacesService } from '@/src/features/location/services/googlePlaces.service';
-import { useLocationSelectionStore } from '@/src/features/location/store';
-import ItemPlaceMarker from '@/src/features/map/components/ItemPlaceMarker';
-import UserPlaceButton from '@/src/features/map/components/UserPlaceButton';
-import UserPlaceMarker from '@/src/features/map/components/UserPlaceMarker';
-import { PostDetails } from '@/src/features/post/components';
-import { usePosts } from '@/src/features/post/hooks';
-import type { PostsFiltersOptions } from '@/src/features/post/hooks/usePosts';
-import { PostHomeScreen } from '@/src/features/post/screens';
-import type { PostFilters } from '@/src/features/post/types';
-import { BottomSheet } from '@/src/shared/components';
-import { MAP_ROUTE } from '@/src/shared/constants';
-import { useUIStore } from '@/src/shared/store/ui.store';
-import colors from '@/src/shared/theme/colors';
-import { router } from 'expo-router';
-import { MagnifyingGlassIcon } from 'phosphor-react-native';
-import type { ReactNode } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import type { LatLng, Region } from 'react-native-maps';
-import MapView from 'react-native-maps';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLocationSelectionStore } from "@/src/features/location/store";
+import {
+  usePlaceAutocomplete,
+  usePlaceDetails,
+} from "@/src/features/map/hooks";
+import type { PlacePrediction } from "@/src/features/map/types";
+import { SuggestRow } from "@/src/shared/components";
+import { MAP_ROUTE } from "@/src/shared/constants";
+import { useRecentSearch } from "@/src/shared/hooks";
+import { colors } from "@/src/shared/theme";
+import { RelativePathString, router } from "expo-router";
+import {
+  ArrowLeftIcon,
+  ClockIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  XCircleIcon,
+} from "phosphor-react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Animated,
+  Easing,
+  FlatList,
+  Keyboard,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-/**
- * minimalist: only show map and search bar + user location button
- * full: show map + search bar + user location button + bottom sheet with posts + post's markers 
- */
-type MapMode = 'minimalist' | 'full'
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type MapOptions = {
-  mode?: MapMode
-  searchBarPlaceholder?: string
-}
+type DisplayMode = "recent" | "suggestions";
 
-export const MapSearchScreen = ({
-  mode = 'full',
-  searchBarPlaceholder = "Search location...",
-}: MapOptions) => {
-  const mapRef = useRef<MapView>(null)
-  const setBottomTabBarState = useUIStore((state) => state.setBottomTabBarState)
-  const [sheetVisible, setSheetVisible] = useState(false)
+const MapSearchOptions = {
+  searchBarPlaceholder: "Search location...",
+
+  searchRecentParams: {
+    namespace: "map-search",
+    maxItems: 10,
+  },
+};
+
+export const MapSearchScreen = () => {
+  const inputRef = useRef<TextInput>(null);
+  const fade = useRef(new Animated.Value(1)).current;
+  const slide = useRef(new Animated.Value(0)).current;
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+
   const insets = useSafeAreaInsets();
-  const { getUserLocation } = useUserLocation();
-
-  const bottomSheetElement = useRef<ReactNode>(null);
+  const {
+    items: recentItems,
+    add,
+    remove,
+    clear,
+  } = useRecentSearch(MapSearchOptions.searchRecentParams);
   const { selection, onChangeSelection } = useLocationSelectionStore();
+  const { getPlaceDetails } = usePlaceDetails();
 
-  const searchDisplayText = useMemo(() => {
-    if (!selection) return searchBarPlaceholder
-    const displayText = selection ? selection.displayAddress : searchBarPlaceholder
-    return displayText
-  }, [selection, searchBarPlaceholder])
+  const displayMode: DisplayMode = useMemo(
+    () =>
+      !isFocused || searchQuery.trim().length === 0 ? "recent" : "suggestions",
+    [isFocused, searchQuery],
+  );
+
+  const { predictions } = usePlaceAutocomplete({
+    searchQuery,
+    enabled: displayMode === "suggestions",
+  });
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(MAP_ROUTE.index as RelativePathString);
+      console.log("Can not go back, replacing to map index");
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      const data = await getUserLocation();
-      if (!data?.location) return;
+    fade.stopAnimation();
+    slide.stopAnimation();
 
-      const initSelection = {
-        ...data,
-        radiusKm: 10,
+    fade.setValue(0);
+    slide.setValue(8);
+
+    Animated.parallel([
+      Animated.timing(fade, {
+        toValue: 1,
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+
+      Animated.timing(slide, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [displayMode]);
+
+  const handleSelectPlace = async (prediction: PlacePrediction) => {
+    try {
+      const place = await getPlaceDetails({ placeId: prediction.placeId });
+
+      if (!place) {
+        console.log(
+          "[MapSearchScreen] No details found for placeId:",
+          prediction.placeId,
+        );
+        return;
       }
 
-      onChangeSelection(initSelection)
-    })();
-  }, [])
+      const description = prediction.formattedAddress;
+      const label = place.formattedAddress || description || searchQuery;
 
-  const postParams = useMemo(() => {
-    if (!selection?.location || !selection?.radiusKm)
-      return { enabled: false } as PostsFiltersOptions
+      await add(label);
+      setSearchQuery(label);
 
-    const nextFilter: PostFilters = {
-      ...selection,
-      location: selection?.location,
-      radiusInKm: selection?.radiusKm,
+      try {
+        const data = {
+          ...selection,
+          location: place.location,
+          displayAddress: label,
+          externalPlaceId: place.id,
+        };
+        onChangeSelection(data);
+      } catch (e) {
+        console.log("[MapSearchScreen] handleSelectPlace failed:", e);
+      }
+    } catch (e) {
+      console.log("[MapSearchScreen] handleSelectPlace failed:", e);
+    } finally {
+      setIsFocused(false);
+      inputRef.current?.blur();
+      Keyboard.dismiss();
+      handleBack();
     }
+  };
 
-    return {
-      filters: nextFilter,
-      enabled: true
-    } as PostsFiltersOptions
-  }, [selection])
+  const handleSelectRecent = (value: string) => {
+    setSearchQuery(value);
+    setIsFocused(true);
+    inputRef.current?.focus();
+  };
 
-  const { items, } = usePosts(postParams)
+  const handleSubmit = () => {
+    if (displayMode !== "suggestions") return;
 
-  const handleOpenSheet = () => {
-    setSheetVisible(false)
-    setSheetVisible(true)
-  }
+    const first = predictions[0];
+    if (!first) return;
 
-  useEffect(() => {
-    if (sheetVisible) {
-      setBottomTabBarState('closed')
-    }
-    else {
-      setBottomTabBarState('open')
-    }
+    handleSelectPlace(first);
+  };
 
-    return () => {
-      setBottomTabBarState('open')
-    }
-  }, [sheetVisible])
+  const renderSuggestionList = () => {
+    return (
+      <FlatList
+        data={predictions}
+        keyExtractor={(item) => item.placeId}
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item }) => (
+          <SuggestRow
+            IconComponent={MapPinIcon}
+            text={item.formattedAddress}
+            onPress={() => handleSelectPlace(item)}
+          />
+        )}
+      />
+    );
+  };
 
+  const renderRecentList = () => {
+    return (
+      <FlatList
+        data={recentItems}
+        keyExtractor={(item) => item.value}
+        keyboardShouldPersistTaps="handled"
+        renderItem={({ item }) => (
+          <SuggestRow
+            IconComponent={ClockIcon}
+            text={item.value}
+            onPress={() => handleSelectRecent(item.value)}
+            onRemove={() => void remove(item.value)}
+          />
+        )}
+      />
+    );
+  };
 
-  useEffect(() => {
-    const coords = selection?.location
-    if (!coords) return
-    handleMoveMarker(coords)
-  }, [selection])
-
-  const onCoordinateChange = async (coord: LatLng) => {
-    const details = await GooglePlacesService.getPlaceFromLatLng(coord)
-    if (!details) return
-
-    const nextSelection = {
-      ...selection,
-      location: coord,
-      displayAddress: details.formattedAddress ?? selection?.displayAddress ?? searchBarPlaceholder,
-      externalPlaceId: details.placeId ?? selection?.externalPlaceId,
-    }
-    onChangeSelection(nextSelection)
-  }
-
-  const handleMoveMarker = (coord: LatLng, duration: number = 2000) => {
-    if (!mapRef.current) return
-
-    const newRegion: Region = {
-      latitude: coord.latitude,
-      longitude: coord.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    }
-
-    mapRef.current.animateToRegion(newRegion, duration)
-  }
+  const displayTitle = useMemo(
+    () => (displayMode === "suggestions" ? "Suggestions" : "Recent"),
+    [displayMode],
+  );
 
   return (
     <View
-      className="flex-1"
-      style={{ paddingBottom: insets.bottom }}
+      className="flex-1 px-4"
+      style={{
+        paddingTop: insets.top,
+      }}
     >
-      {/* Map (base) */}
-      <View style={{
-        flex: 1,
-        zIndex: 0
-      }}>
-        <MapView
-          ref={mapRef}
-          style={{ flex: 1 }}
+      <View className="flex-row items-center">
+        <Pressable
+          onPress={handleBack}
+          hitSlop={10}
+          className="mr-2 h-12 w-12 items-center justify-center rounded-2xl"
+          style={{ borderColor: colors.slate[200] }}
         >
-          {selection?.location && (
-            <>
-              <UserPlaceMarker
-                coordinate={selection.location}
-                disabled={false}
-                radiusKm={selection.radiusKm ?? 5}
-                showRadius={mode === 'full'}
-                onPress={() => {
-                  handleOpenSheet()
-                  bottomSheetElement.current = (
-                    <View className="px-4" style={{ paddingBottom: insets.bottom }}>
-                      <Text className="text-lg font-bold mb-4">Posts</Text>
-                      <PostHomeScreen direction="horizontal" filters={postParams.filters} />
-                    </View>
-                  )
-                }}
-              />
+          <ArrowLeftIcon size={24} color={colors.slate[700]} />
+        </Pressable>
 
-              {items.map((item) => (
-                <ItemPlaceMarker
-                  key={item.id}
-                  item={item}
-                  coordinate={item.location}
-                  disabled={false}
-                  onPress={() => {
-                    handleOpenSheet()
-                    bottomSheetElement.current = <PostDetails postId={item.id} />
-                  }}
-                />
-              ))}
-            </>
-          )}
-        </MapView>
+        <View
+          className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
+          style={{
+            borderColor: isFocused ? colors.primary : colors.slate[200],
+          }}
+        >
+          <MagnifyingGlassIcon size={20} color={colors.slate[500]} />
+
+          <TextInput
+            ref={inputRef}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder={MapSearchOptions.searchBarPlaceholder}
+            returnKeyType="search"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            onSubmitEditing={handleSubmit}
+            className="flex-1 ml-2 p-0 text-base"
+            placeholderTextColor={colors.slate[400]}
+          />
+
+          {searchQuery.length > 0 ? (
+            <Pressable
+              onPress={() => {
+                setSearchQuery("");
+                inputRef.current?.focus();
+              }}
+              hitSlop={10}
+            >
+              <XCircleIcon size={20} color={colors.slate[400]} />
+            </Pressable>
+          ) : null}
+        </View>
       </View>
 
-      {/* SearchBar overlay */}
-      <View
-        style={{
-          position: 'absolute',
-          top: 12,
-          left: 16,
-          right: 16,
-          zIndex: 10,
-        }}
-        pointerEvents="box-none"
-      >
-        <TouchableOpacity
-          onPress={() => router.push(MAP_ROUTE.search)}
-          activeOpacity={0.9}
-          className="rounded-full p-4 flex-row items-center bg-white shadow-sm shadow-black/10"
-        >
-          <MagnifyingGlassIcon size={18} color={colors.slate[600]} />
-          <Text className="flex-1 ml-4 text-sm text-slate-600" numberOfLines={1}>{searchDisplayText}</Text>
-        </TouchableOpacity>
-      </View>
+      <View className="mt-4">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-base font-semibold">{displayTitle}</Text>
+          {displayMode === "recent" && recentItems.length > 0 ? (
+            <Pressable onPress={() => void clear()} hitSlop={10}>
+              <Text className="text-primary font-semibold">Clear</Text>
+            </Pressable>
+          ) : null}
+        </View>
 
-      {/* FAB overlay */}
-      <View
-        style={{
-          position: 'absolute',
-          right: 16,
-          bottom: 128,
-          zIndex: 20,
-        }}
-        pointerEvents="box-none"
-      >
-        <UserPlaceButton disabled={false} onPress={onCoordinateChange} />
-      </View>
-
-      {/* BottomSheet overlay (topmost) */}
-      <View
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 30,
-        }}
-        pointerEvents="box-none"
-      >
-        <BottomSheet
-          isVisible={sheetVisible}
-          onClose={() => setSheetVisible(false)}
+        <Animated.View
+          style={{ opacity: fade, transform: [{ translateY: slide }] }}
         >
-          {bottomSheetElement.current}
-        </BottomSheet>
+          <View className="mt-3 max-h-[300px]">
+            {displayMode === "recent"
+              ? renderRecentList()
+              : renderSuggestionList()}
+          </View>
+        </Animated.View>
       </View>
     </View>
-  )
-}
+  );
+};
