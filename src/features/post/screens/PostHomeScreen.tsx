@@ -14,9 +14,6 @@ type PostHomeScreenProps = {
 
 export const PostHomeScreen = ({ direction = 'vertical', filters = {} }: PostHomeScreenProps) => {
   const queryClient = useQueryClient();
-
-  console.log("Filter herer", filters)
-
   const { items, hasMore, loadMore, isLoading, isLoadingNextPage } = usePosts({ filters });
   const [isRefreshing, setIsRefreshing] = useState(false);
 

@@ -77,7 +77,7 @@ type QRCodeProfileFormProps = {
 };
 
 export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting = false, submitButtonText = 'Save' }: QRCodeProfileFormProps) => {
-  const { control, handleSubmit, formState: { errors, isValid }, watch, reset, } = useForm<QRCodeProfileFormSchema>({
+  const { control, handleSubmit, formState: { errors }, watch, reset, } = useForm<QRCodeProfileFormSchema>({
     defaultValues: {
       name: "",
       description: "",
@@ -108,13 +108,10 @@ export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting 
         title={headerTitleMap[mode]}
         rightActionButton={
           <DefaultTopRightActionButton
-            lable={submitButtonText}
+            label={submitButtonText}
             onPress={handleSubmit(
               onSubmit,
-              (errs) => {
-                console.log(errs);
-                toast.error("Form invalid", errs.description?.message || errs.name?.message || "please check required fields");
-              }
+              (errs) => { toast.error("Form invalid", errs.description?.message || errs.name?.message || "please check required fields"); }
             )}
             disabled={isSubmitting}
             isSubmitting={isSubmitting}
@@ -145,10 +142,10 @@ export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting 
               {(() => {
                 const err = errors.images as any;
 
-                // lỗi cấp mảng: min/max/required
+                // Array error if exists: min/max/required
                 if (typeof err?.message === "string") return err.message;
 
-                // lỗi từng item: errors.images[index].message
+                // Error for each item: errors.images[index].message
                 if (Array.isArray(err)) {
                   const firstMsg = err.find((e) => typeof e?.message === "string")?.message;
                   return firstMsg ?? "Invalid image.";
