@@ -1,4 +1,4 @@
-import { PostStatusBadge } from '@/src/features/post/components';
+import { PostStatusBadge } from '@/src/features/post/components/badges/PostStatusBadge';
 import type { Post } from '@/src/features/post/types';
 import { POST_ROUTE } from '@/src/shared/constants';
 import { formatIsoDate } from '@/src/shared/utils';

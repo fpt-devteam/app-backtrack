@@ -20,7 +20,7 @@ import { SparkleIcon } from "phosphor-react-native";
 import React, { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
 
@@ -90,7 +90,7 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
   const loading = isUploadingImages || isCreatingPost;
 
-  const { control, handleSubmit, formState: { errors, isValid }, setValue, watch } = useForm<PostFormSchema>({
+  const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<PostFormSchema>({
     defaultValues: {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
@@ -125,7 +125,6 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   };
 
   const handleUploadImages = async (images: ImagePickerAsset[]) => {
-    console.log("asdf");
     const uploadRes = await uploadImages(images);
     if (!uploadRes) return [];
 
@@ -137,7 +136,7 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
     try {
       const imageUrls = await handleUploadImages(data.images);
       if (imageUrls.length === 0) {
-        Alert.alert("Error", "Failed to upload images.");
+        toast.error("Failed to upload images. Please try again.");
         return;
       }
 
@@ -153,22 +152,17 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         eventTime: data.eventTime,
       };
 
-      console.log("Post data to submit:", postCreateRequest);
       const postDetails = await createPost(postCreateRequest);
       setPostData(postDetails);
-
-      console.log("Post created successfully:", postDetails);
-
       const postId = postDetails?.id;
       if (!postId) {
-        Alert.alert("Error", "Failed to create post. Please try again.");
+        toast.error("Failed to create post. Please try again.");
         return;
       }
-
       router.push(POST_ROUTE.matching(postId) as RelativePathString | ExternalPathString);
     } catch (error) {
       console.error("Submit error:", error);
-      Alert.alert("Error", "Failed to submit post. Please try again.");
+      toast.error("Failed to submit post. Please try again.");
     }
   };
 
@@ -180,7 +174,7 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         title={headerTitle}
         rightActionButton={
           <DefaultTopRightActionButton
-            lable={mode === 'edit' ? 'Save' : 'Upload'}
+            label={mode === 'edit' ? 'Save' : 'Upload'}
             onPress={handleSubmit(
               onSubmit,
               (errs) => {

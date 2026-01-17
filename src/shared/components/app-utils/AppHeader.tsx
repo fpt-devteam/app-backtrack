@@ -53,7 +53,7 @@ export const AppHeader = ({
 
 
 
-export const DefaultTopRightActionButton = ({ lable, onPress, disabled, isSubmitting }: { lable: string; onPress: () => void; disabled?: boolean; isSubmitting?: boolean }) => (
+export const DefaultTopRightActionButton = ({ label, onPress, disabled, isSubmitting }: { label: string; onPress: () => void; disabled?: boolean; isSubmitting?: boolean }) => (
   <Pressable
     onPress={onPress}
     disabled={disabled}
@@ -65,7 +65,7 @@ export const DefaultTopRightActionButton = ({ lable, onPress, disabled, isSubmit
     {isSubmitting ? (
       <ActivityIndicator />
     ) : (
-      <Text className={cn("text-base font-semibold", disabled ? "text-gray-400" : "text-default")}> {lable}</Text>
+      <Text className={cn("text-base font-semibold", disabled ? "text-gray-400" : "text-default")}> {label}</Text>
     )}
   </Pressable>
 );
