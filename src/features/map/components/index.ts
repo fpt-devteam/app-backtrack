@@ -1,4 +1,5 @@
-export { default as ItemPlaceMarker } from './ItemPlaceMarker';
-export { default as UserPlaceButton } from './UserPlaceButton';
-export { default as UserPlaceMarker } from './UserPlaceMarker';
+export { ItemPlaceMarker } from "./ItemPlaceMarker";
+export { UserPlaceButton } from "./UserPlaceButton";
+export { UserPlaceMarker } from "./UserPlaceMarker";
+export { LocationField } from "./LocationField";
 

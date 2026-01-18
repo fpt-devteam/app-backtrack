@@ -4,8 +4,8 @@ import { useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";
 
 type Params = {
-  mode?: string;        // "create" | "edit"
-  postType?: string;  // "Lost" | "Found"
+  mode?: string; // "create" | "edit"
+  postType?: string; // "Lost" | "Found"
   initialData?: string; // JSON string
 };
 
@@ -13,7 +13,8 @@ const CreatePostScreen = () => {
   const { mode, postType, initialData } = useLocalSearchParams<Params>();
 
   const safeMode: "create" | "edit" = mode === "edit" ? "edit" : "create";
-  const safePostType: PostType = postType === PostType.Found ? PostType.Found : PostType.Lost;
+  const safePostType: PostType =
+    postType === PostType.Found ? PostType.Found : PostType.Lost;
 
   const parsedData = useMemo<Post | null>(() => {
     if (!initialData) return null;
@@ -25,7 +26,11 @@ const CreatePostScreen = () => {
   }, [initialData]);
 
   return (
-    <PostForm postType={safePostType} mode={safeMode} initialData={parsedData} />
+    <PostForm
+      postType={safePostType}
+      mode={safeMode}
+      initialData={parsedData}
+    />
   );
 };
 

@@ -1,14 +1,14 @@
-import type { UserLocation } from "@/src/features/location/types";
+import type { UserLocation } from "@/src/features/map/types";
 import type { PostType } from "@/src/features/post/types";
 import type { LatLng } from "react-native-maps";
 
 export type PostFilters = {
   postType?: PostType;
-  location?: Partial<LatLng>;
+  location?: LatLng;
   searchTerm?: string;
   radiusInKm?: number;
   authorId?: string;
-}
+};
 
 export type Post = {
   id: string;
@@ -28,5 +28,4 @@ export type Post = {
 
 export type SimilarPost = Post & {
   similarityScore: number;
-}
-
+};

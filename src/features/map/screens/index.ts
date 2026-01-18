@@ -1,3 +1,4 @@
-export { MapSearchAutocompleteScreen } from './MapSearchAutocompleteScreen';
-export { MapSearchScreen } from './MapSearchScreen';
+export { MapOnlySearchScreen } from "./MapOnlySearchScreen";
+export { MapScreen } from "./MapScreen";
+export { MapSearchScreen } from "./MapSearchScreen";
 

@@ -1,4 +1,3 @@
-
 export const PROFILE_ROUTE = {
   index: "/(protected)/profile",
 } as const;
@@ -8,7 +7,8 @@ export const POST_ROUTE = {
   create: "/(protected)/posts/create",
   details: (postId: string) => `/(protected)/posts/${postId}`,
   matching: (postId: string) => `/(protected)/posts/${postId}/matching`,
-  detailMatch: (postId: string, otherPostId: string) => `/(protected)/posts/${postId}/matching/${otherPostId}`,
+  detailMatch: (postId: string, otherPostId: string) =>
+    `/(protected)/posts/${postId}/matching/${otherPostId}`,
   search: "/(protected)/posts/search",
   searchLocationInput: "/(protected)/posts/search/location-search",
   searchLocation: "/(protected)/posts/search/location",
@@ -17,7 +17,8 @@ export const POST_ROUTE = {
 
 export const CHAT_ROUTE = {
   conversations: `/(protected)/chat/conversations`,
-  message: (conversationId: string) => `/(protected)/chat/conversations/${conversationId}`,
+  message: (conversationId: string) =>
+    `/(protected)/chat/conversations/${conversationId}`,
 } as const;
 
 export const QR_ROUTE = {
@@ -27,12 +28,11 @@ export const QR_ROUTE = {
   scan: "/qr/scan",
   purchase: "/qr/purchase",
   detail: (qrCodeId: string) => `/qr/${qrCodeId}`,
-  qrView: (qrCodeId: string, publicCode: string) => `/qr/${qrCodeId}/qr-view/${publicCode}`,
+  qrView: (qrCodeId: string, publicCode: string) =>
+    `/qr/${qrCodeId}/qr-view/${publicCode}`,
 } as const;
-
 
 export const MAP_ROUTE = {
   index: "/(protected)/map",
   search: "/(protected)/map/search",
 } as const;
-
