@@ -1,22 +1,55 @@
 import { Stack } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PostsStackLayout() {
-  return (
-    <Stack screenOptions={{
-      headerShown: false,
-    }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="create" />
+  const insets = useSafeAreaInsets();
 
-      <Stack.Screen name="location" />
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="search/index"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          },
+        }}
+      />
 
       <Stack.Screen
-        name="search/location-search"
+        name="search/location"
         options={{
-          presentation: "transparentModal",
-          animation: "fade",
+          headerShown: false,
           contentStyle: {
-            backgroundColor: "transparent"
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          },
+        }}
+      />
+
+      <Stack.Screen
+        name="search/result"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          },
+        }}
+      />
+
+      <Stack.Screen
+        name="create"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
           },
         }}
       />

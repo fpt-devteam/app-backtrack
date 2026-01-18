@@ -1,4 +1,5 @@
 export * from "@/src/shared/utils/app.utils";
+export * from "@/src/shared/utils/bottom-sheet.utils";
 export * from "@/src/shared/utils/datetime.utils";
 export * from "@/src/shared/utils/distance.utils";
 export * from "@/src/shared/utils/error.utils";

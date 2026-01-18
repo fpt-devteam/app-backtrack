@@ -1,7 +1,7 @@
 import type { Conversation, Message } from "@/src/features/chat/types/chat.type";
 import type { PostType } from "@/src/features/post/types";
+import type { ApiResponse } from "@/src/shared/api";
 import { CursorScrollResponse } from "@/src/shared/api";
-import type { ApiResponse } from "@/src/shared/types";
 
 export type ConversationCreateRequest = {
   partnerId: string,
@@ -11,11 +11,6 @@ export type ConversationCreateRequest = {
 
 export type MessageSendRequest = {
   content: string,
-};
-
-export type CursorPaginationParams = {
-  cursor?: string,
-  limit?: number,
 };
 
 export type ConversationCreateResponse = ApiResponse<Pick<Conversation, 'conversationId'>>;

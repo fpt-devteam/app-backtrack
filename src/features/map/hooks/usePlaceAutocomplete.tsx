@@ -1,79 +1,91 @@
-import type { PlaceAutocompleteResponse, PlaceSuggestion } from '@/src/features/map/types'
-import { publicClient } from '@/src/shared/api'
-import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import type {
+  PlaceAutocompleteRequest,
+  PlaceAutocompleteResponse,
+  PlacePrediction,
+} from "@/src/features/map/types";
+import { publicClient } from "@/src/shared/api";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+
+const DEBOUNCE_MS_DEFAULT = 350;
+const MIN_QUERY_LENGTH = 1;
+
+const API_CONFIG = {
+  placeAutocomplete: {
+    url: "https://places.googleapis.com/v1/places:autocomplete",
+    fieldMask: "*",
+    queryKey: ["place-autocomplete"] as const,
+  },
+} as const;
 
 type PlaceAutocompleteOptions = {
-  searchQuery: string,
-  enabled?: boolean
-  debounceMs?: number
-  minQueryLength?: number
-}
+  searchQuery: string;
+  enabled?: boolean;
+  debounceMs?: number;
+  minQueryLength?: number;
+};
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
-  const [debounced, setDebounced] = useState(value)
+  const [debounced, setDebounced] = useState(value);
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delayMs)
-    return () => clearTimeout(t)
-  }, [value, delayMs])
-  return debounced
+    const t = setTimeout(() => setDebounced(value), delayMs);
+    return () => clearTimeout(t);
+  }, [value, delayMs]);
+  return debounced;
 }
 
-const GOOGLE_PLACES_API_URL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json'
-const DEBOUNCE_MS_DEFAULT = 350
-const MIN_QUERY_LENGTH = 1
-
-const usePlaceAutocomplete = ({
+export const usePlaceAutocomplete = ({
   searchQuery,
   enabled = true,
   debounceMs = DEBOUNCE_MS_DEFAULT,
-  minQueryLength = MIN_QUERY_LENGTH
+  minQueryLength = MIN_QUERY_LENGTH,
 }: PlaceAutocompleteOptions) => {
-  const debounced = useDebouncedValue(searchQuery, debounceMs)
+  const debounced = useDebouncedValue(searchQuery, debounceMs);
 
   const debouncedQuery = useMemo(() => {
-    return debounced.trim().replace(/\s+/g, ' ')
-  }, [debounced])
+    return debounced.trim().replace(/\s+/g, " ");
+  }, [debounced]);
 
-  const canFetch = enabled && debouncedQuery.length >= minQueryLength
+  const canFetch = enabled && debouncedQuery.length >= minQueryLength;
 
-  const query = useQuery<PlaceSuggestion[]>({
-    queryKey: ['place-autocomplete', { q: debouncedQuery }],
+  const query = useQuery<PlacePrediction[]>({
+    queryKey: [API_CONFIG.placeAutocomplete.queryKey, { q: debouncedQuery }],
     enabled: canFetch,
     queryFn: async () => {
-      const apiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY
+      const apiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
       if (!apiKey) {
-        console.warn("Missing EXPO_PUBLIC_GOOGLE_API_KEY")
-        return [] as PlaceSuggestion[]
+        console.warn("Missing EXPO_PUBLIC_GOOGLE_API_KEY");
+        return [] as PlacePrediction[];
       }
 
-      const params = new URLSearchParams({
-        input: searchQuery.trim(),
-        key: apiKey,
-        language: "vi",
-        components: "country:vn",
-      })
+      const url = API_CONFIG.placeAutocomplete.url;
+      const req: PlaceAutocompleteRequest = {
+        input: debouncedQuery,
+        languageCode: "vi",
+        regionCode: "vn",
+      };
 
-      const response = await publicClient<PlaceAutocompleteResponse>(`${GOOGLE_PLACES_API_URL}?${params}`)
-      if (!(response.data.status === 'OK' || response.data.status === 'ZERO_RESULTS')) {
-        console.warn("Google Places Autocomplete error:", response.data.status)
-        return [] as PlaceSuggestion[]
-      }
+      const res = await publicClient.post(url, req, {
+        headers: {
+          "X-Goog-Api-Key": apiKey,
+          "X-Goog-FieldMask": API_CONFIG.placeAutocomplete.fieldMask,
+          "Content-Type": "application/json",
+        },
+      });
 
-      const predictions: PlaceSuggestion[] = response.data.predictions.map(prediction => ({
-        placeId: prediction.place_id,
-        description: prediction.description,
-      }))
+      const resData: PlaceAutocompleteResponse = res.data;
+      const predictions: PlacePrediction[] = resData.suggestions.map((s) => ({
+        placeId: s.placePrediction.placeId,
+        formattedAddress: s.placePrediction.text.text,
+      }));
 
-      return predictions
-    }
-  })
+      return predictions;
+    },
+  });
 
   return {
     loading: query.isLoading,
-    suggestions: query.data || [],
+    predictions: query.data || [],
     error: query.isError,
-  }
-}
-
-export default usePlaceAutocomplete
+  };
+};

@@ -1,5 +1,5 @@
-import { LocationField } from "@/src/features/location/components";
-import type { UserLocation } from "@/src/features/location/types";
+import { LocationField } from "@/src/features/map/components";
+import type { UserLocation } from "@/src/features/map/types";
 import { useAnalyzeImage, useCreatePost } from "@/src/features/post/hooks";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
@@ -33,19 +33,29 @@ const postSchema = yup
       .array()
       .of(
         yup
-          .mixed<ImagePickerAsset>().defined()
+          .mixed<ImagePickerAsset>()
+          .defined()
           .test("has-uri", "Invalid image (missing uri).", (asset) => {
             return !!asset && typeof asset === "object" && !!asset.uri;
           })
-          .test("mime", "Only JPG/PNG/WebP/Heic images are allowed.", (asset) => {
-            if (!asset) return true;
+          .test(
+            "mime",
+            "Only JPG/PNG/WebP/Heic images are allowed.",
+            (asset) => {
+              if (!asset) return true;
 
-            const mime = asset.mimeType;
-            if (!mime) return true;
+              const mime = asset.mimeType;
+              if (!mime) return true;
 
-            const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/heic"];
-            return allowedMimes.includes(mime);
-          })
+              const allowedMimes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp",
+                "image/heic",
+              ];
+              return allowedMimes.includes(mime);
+            },
+          )
           .test("size", "Image is too large (max 5 MB).", (asset) => {
             if (!asset) return true;
 
@@ -54,7 +64,7 @@ const postSchema = yup
 
             const maxImageSize = 5 * 1024 * 1024; // 5 MB
             return size <= maxImageSize;
-          })
+          }),
       )
       .min(1, "Please select at least 1 image.")
       .max(5, "You can select up to 5 images.")
@@ -77,14 +87,14 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
   const { createPost, isCreatingPost } = useCreatePost();
   const { analyzeImage, isAnalyzing } = useAnalyzeImage({
     onSuccess: (data) => {
-      setValue('itemName', data.itemName);
-      setValue('description', data.description);
-      toast.success('Image analyzed successfully!');
+      setValue("itemName", data.itemName);
+      setValue("description", data.description);
+      toast.success("Image analyzed successfully!");
     },
     onError: (error) => {
-      toast.error('Failed to analyze image. Please try again.');
-      console.error('Analyze error:', error);
-    }
+      toast.error("Failed to analyze image. Please try again.");
+      console.error("Analyze error:", error);
+    },
   });
   const insets = useSafeAreaInsets();
 
@@ -95,32 +105,36 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
       eventTime: postData?.eventTime ? new Date(postData.eventTime) : undefined,
-      detailLocation: postData?.location ? {
-        location: postData?.location,
-        externalPlaceId: postData?.externalPlaceId ?? null,
-        displayAddress: postData?.displayAddress ?? null,
-      } : undefined,
+      detailLocation: postData?.location
+        ? {
+          location: postData?.location,
+          externalPlaceId: postData?.externalPlaceId ?? null,
+          displayAddress: postData?.displayAddress ?? null,
+        }
+        : undefined,
       images: [] as ImagePickerAsset[],
     },
     resolver: yupResolver(postSchema),
     mode: "onSubmit",
   });
 
-  const images = watch('images');
+  const images = watch("images");
 
   const handleAnalyzeImage = async () => {
     if (!images || images.length === 0) {
-      toast.error('Please select an image first');
+      toast.error("Please select an image first");
       return;
     }
 
     try {
       const firstImage = images[0];
-      const { imageBase64, mimeType } = await prepareImageForAnalysis(firstImage.uri);
+      const { imageBase64, mimeType } = await prepareImageForAnalysis(
+        firstImage.uri,
+      );
       await analyzeImage({ imageBase64, mimeType });
     } catch (error) {
-      console.error('Error preparing image for analysis:', error);
-      toast.error('Failed to prepare image for analysis');
+      console.error("Error preparing image for analysis:", error);
+      toast.error("Failed to prepare image for analysis");
     }
   };
 
@@ -128,11 +142,15 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
     const uploadRes = await uploadImages(images);
     if (!uploadRes) return [];
 
-    const imageUrls = uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
+    const imageUrls = uploadRes.map(
+      (res: { downloadURL: string }) => res.downloadURL,
+    );
     return imageUrls;
   };
 
-  const onSubmit: SubmitHandler<PostFormSchema> = async (data: PostFormSchema) => {
+  const onSubmit: SubmitHandler<PostFormSchema> = async (
+    data: PostFormSchema,
+  ) => {
     try {
       const imageUrls = await handleUploadImages(data.images);
       if (imageUrls.length === 0) {
@@ -166,7 +184,8 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
     }
   };
 
-  const headerTitle = postType === PostType.Found ? "Add Found Item" : "Add Lost Item";
+  const headerTitle =
+    postType === PostType.Found ? "Add Found Item" : "Add Lost Item";
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
@@ -189,11 +208,7 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
       />
 
       {/* Loading Modal */}
-      <Modal
-        visible={isAnalyzing}
-        transparent
-        animationType="fade"
-      >
+      <Modal visible={isAnalyzing} transparent animationType="fade">
         <View className="flex-1 bg-black/50 items-center justify-center">
           <View className="bg-white rounded-2xl p-6 mx-8 items-center">
             <AppLoader size={40} />
@@ -210,7 +225,6 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
       <ScrollView className="flex-1 p-4">
         {/* Form Fields */}
         <View className="bg-white rounded-3xl p-4 my-3 shadow-md border border-slate-300">
-
           {/* Image Picker */}
           <View className="mb-4">
             <Controller
@@ -221,7 +235,9 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               )}
             />
             {errors.images && (
-              <Text className="text-red-500 text-xs mt-1">{errors.images.message}</Text>
+              <Text className="text-red-500 text-xs mt-1">
+                {errors.images.message}
+              </Text>
             )}
 
             {/* Analyze Image Button */}
@@ -242,13 +258,15 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
           {/* Item Name */}
           <View className="mb-4">
-            <Text className="text-slate-700 font-bold text-sm mb-2">Item Name</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">
+              Item Name
+            </Text>
             <Controller
               control={control}
               name="itemName"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? "border-red-500" : "border-slate-300"}`}
                   placeholder="e.g. Blue Backpack, iPhone 14"
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -258,19 +276,23 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               )}
             />
             {errors.itemName && (
-              <Text className="text-red-500 text-xs mt-1">{errors.itemName.message}</Text>
+              <Text className="text-red-500 text-xs mt-1">
+                {errors.itemName.message}
+              </Text>
             )}
           </View>
 
           {/* Description */}
           <View className="mb-4">
-            <Text className="text-slate-700 font-bold text-sm mb-2">Description</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">
+              Description
+            </Text>
             <Controller
               control={control}
               name="description"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? 'border-red-500' : 'border-slate-300'}`}
+                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? "border-red-500" : "border-slate-300"}`}
                   placeholder="Describe the item in detail."
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -283,31 +305,37 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               )}
             />
             {errors.description && (
-              <Text className="text-red-500 text-xs mt-1">{errors.description.message}</Text>
+              <Text className="text-red-500 text-xs mt-1">
+                {errors.description.message}
+              </Text>
             )}
           </View>
 
           {/* Location Picker */}
           <View className="mb-4">
-            <Text className="text-slate-700 font-bold text-sm mb-2">Location</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">
+              Location
+            </Text>
 
             <Controller
               control={control}
               name="detailLocation"
               render={({ field: { onChange, value } }) => (
-                <LocationField
-                  value={value}
-                  onChange={onChange} />
+                <LocationField value={value} onChange={onChange} />
               )}
             />
             {errors.detailLocation && (
-              <Text className="text-red-500 text-xs mt-1">{errors.detailLocation.message}</Text>
+              <Text className="text-red-500 text-xs mt-1">
+                {errors.detailLocation.message}
+              </Text>
             )}
           </View>
 
           {/* Event Time */}
           <View className="mb-4">
-            <Text className="text-slate-700 font-bold text-sm mb-2">Event Time</Text>
+            <Text className="text-slate-700 font-bold text-sm mb-2">
+              Event Time
+            </Text>
             <Controller
               control={control}
               name="eventTime"
@@ -321,10 +349,11 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               )}
             />
             {errors.eventTime && (
-              <Text className="text-red-500 text-xs mt-1">{errors.eventTime.message}</Text>
+              <Text className="text-red-500 text-xs mt-1">
+                {errors.eventTime.message}
+              </Text>
             )}
           </View>
-
         </View>
       </ScrollView>
     </View>

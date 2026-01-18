@@ -2,7 +2,8 @@ import { colors } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
 import type { PhosphorLogoIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
-import { Platform, Pressable, StyleSheet, Text, ViewStyle } from "react-native";
+import type { ViewStyle } from "react-native";
+import { Platform, Pressable, StyleSheet, Text } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,7 +15,9 @@ type Tone = "primary" | "neutral" | "white";
 type Size = "sm" | "md";
 
 type FABProps = {
-  readonly icon: React.ElementType<React.ComponentProps<typeof PhosphorLogoIcon>>;
+  readonly icon: React.ElementType<
+    React.ComponentProps<typeof PhosphorLogoIcon>
+  >;
   readonly label?: string;
   readonly onPress: () => void;
   readonly tone?: Tone;
@@ -91,7 +94,7 @@ export const FAB = ({
       </Pressable>
     </Animated.View>
   );
-}
+};
 
 const sizeMap: Record<Size, { btn: number; icon: number }> = {
   sm: { btn: 44, icon: 20 },
@@ -133,5 +136,5 @@ const styles = StyleSheet.create({
     },
     android: { elevation: 8 },
     default: {},
-  }) as any,
+  }) as ViewStyle,
 });

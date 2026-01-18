@@ -1,9 +1,12 @@
-export type PaginateQuery<T> = {
-  results: T[];
-  count: number;
-  next: string | null;
-  previous: string | null;
-};
+export type PagedRequest = {
+  page: number;
+  pageSize: number;
+}
+
+export const DEFAULT_PAGED_REQUEST: PagedRequest = {
+  page: 1,
+  pageSize: 20,
+}
 
 export type PagedResponse<T> = {
   items: T[];
@@ -16,7 +19,7 @@ export type ApiError = {
   code: string;
   message: string;
   statusCode: number;
-  details?: any;
+  details?: unknown;
 }
 
 export type ApiResponse<T> = {
@@ -25,6 +28,11 @@ export type ApiResponse<T> = {
   error?: ApiError | null;
   correlationId?: string | null;
 }
+
+export type CursorPaginationParams = {
+  cursor?: string,
+  limit?: number,
+};
 
 export type CursorScrollResponse<T> = {
   items: T[];

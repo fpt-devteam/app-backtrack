@@ -1,3 +1,6 @@
-export { default as usePlaceAutocomplete } from './usePlaceAutocomplete';
-export { default as useUserCoordinates } from './useUserCoordinates';
+export { usePlaceAutocomplete } from "./usePlaceAutocomplete";
+export { usePlaceDetails } from "./usePlaceDetails";
+export { useReverseGeocoding } from "./useReverseGeocoding";
+export { useUserCoordinates } from "./useUserCoordinates";
+export { useUserLocation } from "./useUserLocation";
 

@@ -1,13 +1,13 @@
-import { PostHomeScreenHeader } from '@/src/features/post/components';
-import React from 'react';
-import { View } from 'react-native';
-import { PostHomeScreen } from './PostHomeScreen';
+import { PostHomeScreenHeader } from "@/src/features/post/components";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { PostHomeScreen } from "./PostHomeScreen";
 
 export const PostScreen = () => {
   return (
-    <View >
+    <SafeAreaView>
       <PostHomeScreenHeader />
       <PostHomeScreen />
-    </View>
+    </SafeAreaView>
   );
-}
+};
