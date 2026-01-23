@@ -37,11 +37,9 @@ export const PostHomeScreen = ({
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
-    console.log("Refreshing posts...");
     queryClient.invalidateQueries({ queryKey: POSTS_QUERY_KEY });
     setTimeout(() => {
       setIsRefreshing(false);
-      console.log("Finished refreshing posts.");
     }, 2000);
   }, [queryClient]);
 
