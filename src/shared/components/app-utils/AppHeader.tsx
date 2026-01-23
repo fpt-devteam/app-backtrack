@@ -42,7 +42,7 @@ export const AppHeader = ({
       )}
 
       {/* Centered Title */}
-      <Text className="text-3xl font-bold text-black">
+      <Text className="text-2xl font-bold text-black">
         {title}
       </Text>
 

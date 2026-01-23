@@ -1,2 +1,2 @@
-export { default as ProfileScreen } from '@/src/features/profile/screen/ProfileScreen';
+export { ProfileScreen } from '@/src/features/profile/screen/ProfileScreen';
 

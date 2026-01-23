@@ -1,3 +1,4 @@
+import { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarButton";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
@@ -8,8 +9,7 @@ import {
   BellIcon,
   ChatCircleIcon,
   HouseIcon,
-  MapTrifoldIcon,
-  QrCodeIcon,
+  QrCodeIcon
 } from "phosphor-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
@@ -19,21 +19,15 @@ type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 const TAB_ICONS: Record<string, TabIcon> = {
   posts: { Icon: HouseIcon, label: "Home" },
   qr: { Icon: QrCodeIcon, label: "QRs" },
-  map: { Icon: MapTrifoldIcon, label: "Map" },
   chat: { Icon: ChatCircleIcon, label: "Chat" },
   notification: { Icon: BellIcon, label: "Inbox" },
+  profile: { Icon: AppUserAvatarIcon, label: "Profile" },
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   return (
     <View
-      style={[
-        styles.wrapper,
-        {
-          height: metrics.tabBar.height + metrics.tabBar.padding.bottom,
-          paddingTop: metrics.tabBar.padding.top,
-        },
-      ]}
+      style={styles.wrapper}
     >
       <BlurView
         intensity={55}
@@ -45,7 +39,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
           const tabConfig = TAB_ICONS[route.name];
-          if (!tabConfig || route.name === "profile") return null;
+          if (!tabConfig) return null;
 
           const handlePress = () => {
             const event = navigation.emit({
@@ -97,6 +91,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     overflow: "hidden",
+    height: metrics.tabBar.height,
     ...(Platform.OS === "ios"
       ? metrics.shadows.tabBar.ios
       : metrics.shadows.tabBar.android),

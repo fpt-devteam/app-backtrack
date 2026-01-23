@@ -23,10 +23,8 @@ export const AppUserAvatarIcon = () => {
         <Image
           source={source}
           resizeMode="cover"
-          className="w-10 h-10 rounded-full bg-gray-200"
+          className="w-8 h-8 rounded-full bg-gray-200"
         />
-
-        {/* <View className="absolute -bottom-0.5 -left-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-white" /> */}
       </View>
     </Pressable>
   );
