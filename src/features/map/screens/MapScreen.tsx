@@ -68,9 +68,6 @@ export const MapScreen = () => {
       location: selection?.location,
       radiusInKm: selection?.radiusKm,
     };
-
-    console.log("filter", nextFilter);
-
     return {
       filters: nextFilter,
       enabled: true,
