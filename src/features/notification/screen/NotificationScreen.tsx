@@ -1,12 +1,12 @@
 import { AppEndOfFeed, AppHeader } from "@/src/shared/components";
-import { View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NotificationScreen() {
   return (
-    <View className="flex-1" >
+    <SafeAreaView className="flex-1" >
       <AppHeader title='Notifications' showBackButton={false} />
       <AppEndOfFeed />
-    </View>
+    </SafeAreaView>
   );
 };
 

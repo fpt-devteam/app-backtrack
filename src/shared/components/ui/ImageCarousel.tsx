@@ -1,159 +1,107 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Dimensions, Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import { Dimensions, FlatList, Image, NativeScrollEvent, NativeSyntheticEvent, Text, View } from "react-native";
 
-const { width: screenWidth } = Dimensions.get('window');
-
-type ImageCarouselProps = {
+type Props = {
   data: string[];
-  imageHeight?: number;
-  autoScrollInterval?: number;
-  showLoadingIndicator?: boolean;
+  height?: number;
+  initialIndex?: number;
 };
 
-export const ImageCarousel = ({
-  data,
-  imageHeight = 250,
-  autoScrollInterval = 3000,
-  showLoadingIndicator = true
-}: ImageCarouselProps) => {
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const autoScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const lastScrollTimeRef = useRef<number>(Date.now());
+export const ImageCarousel = ({ data, height = 480, initialIndex = 0 }: Props) => {
+  const width = Dimensions.get("window").width;
+  const listRef = useRef<FlatList<string>>(null);
 
-  const infiniteData = data.length > 1 ? [data[data.length - 1], ...data, data[0]] : data;
+  const images = useMemo(() => data?.filter(Boolean) ?? [], [data]);
+  const total = images.length;
 
-  useEffect(() => {
-    if (data.length > 1 && scrollViewRef.current) {
-      setTimeout(() => {
-        scrollViewRef.current?.scrollTo({ x: screenWidth, animated: false });
-      }, 100);
-    }
-  }, [data.length]);
+  const safeInitial = Math.min(Math.max(initialIndex, 0), Math.max(total - 1, 0));
+  const [index, setIndex] = useState(safeInitial);
 
+  const onScrollToIndexFailed = useCallback(() => {
+    setTimeout(() => {
+      listRef.current?.scrollToIndex({ index: safeInitial, animated: false });
+    }, 50);
+  }, [safeInitial]);
 
-  useEffect(() => {
-    if (data.length <= 1) return;
+  const onMomentumScrollEnd = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const x = e.nativeEvent.contentOffset.x;
+      setIndex(Math.round(x / width));
+    },
+    [width]
+  );
 
-    const startAutoScroll = () => {
-      autoScrollTimerRef.current = setInterval(() => {
-        const timeSinceLastScroll = Date.now() - lastScrollTimeRef.current;
-
-        if (timeSinceLastScroll >= autoScrollInterval && scrollViewRef.current) {
-          const nextIndex = currentIndex + 1;
-          const targetX = (nextIndex + 1) * screenWidth;
-
-          scrollViewRef.current.scrollTo({
-            x: targetX,
-            animated: true,
-          });
-
-          lastScrollTimeRef.current = Date.now();
-        }
-      }, 100);
-    };
-
-    startAutoScroll();
-
-    return () => {
-      if (autoScrollTimerRef.current) {
-        clearInterval(autoScrollTimerRef.current);
-      }
-    };
-  }, [currentIndex, data.length, autoScrollInterval]);
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const contentOffset = event.nativeEvent.contentOffset;
-    const viewSize = event.nativeEvent.layoutMeasurement;
-    const pageNum = Math.floor(contentOffset.x / viewSize.width);
-
-    if (data.length > 1) {
-      if (pageNum === 0) {
-
-        setTimeout(() => {
-          scrollViewRef.current?.scrollTo({
-            x: (data.length) * screenWidth,
-            animated: false,
-          });
-        }, 50);
-        setCurrentIndex(data.length - 1);
-      } else if (pageNum === infiniteData.length - 1) {
-
-        setTimeout(() => {
-          scrollViewRef.current?.scrollTo({
-            x: screenWidth,
-            animated: false,
-          });
-        }, 50);
-        setCurrentIndex(0);
-      } else {
-
-        setCurrentIndex(pageNum - 1);
-      }
-    } else {
-      setCurrentIndex(pageNum);
-    }
-  };
-
-  const handleScrollBegin = () => {
-
-    lastScrollTimeRef.current = Date.now();
-  };
-
-  const handleScrollEnd = () => {
-
-    lastScrollTimeRef.current = Date.now();
-  };
-
-  const handleImageLoad = (index: number) => {
-    setLoadedImages(prev => new Set(prev).add(index));
-  };
-
-  if (!data || data.length === 0) {
-    return (
-      <View className="bg-gray-100 justify-center items-center" style={{ height: imageHeight }}>
-        <Text className="text-gray-500">No images available</Text>
-      </View>
-    );
-  }
+  if (total === 0) return null;
 
   return (
-    <View className="relative">
-      <ScrollView
-        ref={scrollViewRef}
+    <View style={{ width: "100%", height }}>
+      <FlatList
+        ref={listRef}
+        data={images}
+        keyExtractor={(uri, i) => `${uri}-${i}`}
         horizontal
         pagingEnabled
+        scrollEnabled={true}                // ✅ cho swipe
+        onMomentumScrollEnd={onMomentumScrollEnd} // ✅ cập nhật index
         showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScroll}
-        onScrollBeginDrag={handleScrollBegin}
-        onScrollEndDrag={handleScrollEnd}
-        onMomentumScrollBegin={handleScrollBegin}
-        className="w-full"
-      >
-        {infiniteData.map((imageUrl, index) => (
-          <View key={index} style={{ width: screenWidth, height: imageHeight }}>
-            {/* Placeholder/Loading indicator */}
-            {!loadedImages.has(index) && showLoadingIndicator && (
-              <View className="absolute inset-0 bg-gray-200 justify-center items-center z-10">
-                <ActivityIndicator size="large" color="#0ea5e9" />
-              </View>
-            )}
-
+        initialScrollIndex={safeInitial}
+        onScrollToIndexFailed={onScrollToIndexFailed}
+        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })} // ✅ giảm lỗi scrollToIndex
+        renderItem={({ item }) => (
+          <View style={{ width, height, justifyContent: "center" }}>
             <Image
-              source={{ uri: imageUrl }}
-              className="w-full"
-              style={{ height: imageHeight }}
+              source={{ uri: item }}
+              style={{ width: "100%", height: "100%" }}
               resizeMode="cover"
-              onLoad={() => handleImageLoad(index)}
-              progressiveRenderingEnabled={true}
-              fadeDuration={300}
             />
           </View>
-        ))}
-      </ScrollView>
+        )}
+      />
+
+      {total > 1 && (
+        <>
+          <View
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              borderRadius: 999,
+              backgroundColor: "rgba(0,0,0,0.45)",
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 12, fontWeight: "700" }}>
+              {index + 1}/{total}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 12,
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 6,
+            }}
+          >
+            {images.map((_, i) => (
+              <View
+                key={i}
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: 999,
+                  backgroundColor:
+                    i === index ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
+                }}
+              />
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };
-
-

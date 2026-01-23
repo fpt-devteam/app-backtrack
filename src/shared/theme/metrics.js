@@ -70,8 +70,8 @@ module.exports = {
   // TAB BAR METRICS (React Native specific)
   // ============================================================================
   tabBar: {
-    height: 65,
-    iconSize: 24,
+    height: 75,
+    iconSize: 28,
     labelSize: 11,
     indicatorHeight: 3,
     indicatorWidth: 60,
