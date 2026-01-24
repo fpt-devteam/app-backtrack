@@ -12,8 +12,6 @@ const MatchingScreen = () => {
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { postId } = useLocalSearchParams<{ postId: string }>();
 
-  console.log("PostId for matching:", postId);
-
   const { isMatching, similarPosts, error } = useMatchingPost(postId);
   const { data: yourItem } = useGetPostById({ postId });
 
