@@ -1,4 +1,5 @@
 import { useAppUser } from "@/src/features/auth/providers";
+import { useExpoTokenDesync } from "@/src/features/notification/hooks";
 import { AppHeader } from "@/src/shared/components";
 import { auth } from "@/src/shared/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -8,8 +9,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export function ProfileScreen() {
   const { user } = useAppUser();
+  const { desync } = useExpoTokenDesync();
 
   const handleLogout = async () => {
+    await desync();
     await signOut(auth);
   };
 

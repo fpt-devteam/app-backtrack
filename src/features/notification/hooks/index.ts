@@ -1,3 +1,4 @@
+export * from "./useExpoTokenDesync";
 export * from "./useExpoTokenSync";
 export * from "./useInfiniteNotifications";
 export * from "./useSyncExpoPushToken";
