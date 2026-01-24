@@ -4,9 +4,7 @@ import {
   calculateHaversineDistance,
   calculateTimeDifference, formatDateTime,
   formatDistance,
-  formatTimeDifference,
-  getLocationMatchStatus,
-  getTimeMatchStatus,
+  formatTimeDifference
 } from '@/src/shared/utils'
 import { CheckSquareIcon, ClockIcon, MapPinIcon, PaletteIcon } from 'phosphor-react-native'
 import React from 'react'
@@ -82,13 +80,9 @@ export const MatchedAttributesSection = ({ post1, post2 }: MatchedAttributesSect
     post2.location.latitude,
     post2.location.longitude
   )
-  const locationMatchStatus = getLocationMatchStatus(distanceInMeters)
-  console.log(post1);
-  console.log(post2);
 
   // Calculate time difference
   const timeDiffInMs = calculateTimeDifference(post1.eventTime, post2.eventTime)
-  const timeMatchStatus = getTimeMatchStatus(timeDiffInMs)
 
   // Visual features matching (simplified - you can enhance this)
   const visualMatch = 'High Match'
