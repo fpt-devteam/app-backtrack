@@ -1,7 +1,8 @@
 import { useSync } from "@/src/features/auth/hooks";
 import { useAuth } from "@/src/features/auth/providers/auth.provider";
 import type { AppUser } from "@/src/features/auth/types";
-import { useExpoTokenSync } from "@/src/features/notification/hooks";
+
+import { useRegisterDeviceMutation } from "@/src/features/notification/hooks";
 import { auth } from "@/src/shared/lib";
 import React, {
   useCallback,
@@ -29,7 +30,7 @@ export const AppUserProvider: React.FC<{ children: React.ReactNode }> = ({
   const { isAppReady, isLoggedIn } = useAuth();
 
   const { syncUser, loading, error } = useSync();
-  const { sync: syncExpoToken } = useExpoTokenSync();
+  const { mutateAsync: syncExpoToken } = useRegisterDeviceMutation();
 
   const [user, setUser] = useState<AppUser | null>(null);
 

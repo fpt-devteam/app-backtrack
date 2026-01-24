@@ -7,6 +7,9 @@ import type {
 /*
  * ENUMS & TYPES
  */
+export const StorageKey = "bt:expoToken";
+export type ExpoTokenValue = { token: string; deviceId: string };
+
 export const NOTIFICATION_STATUS = {
   Unread: "Unread",
   Read: "Read",
@@ -22,14 +25,6 @@ export const NOTIFICATION_EVENT = {
 
 export type NotificationEvent =
   (typeof NOTIFICATION_EVENT)[keyof typeof NOTIFICATION_EVENT];
-
-export const DEVICE_PLATFORM = {
-  ios: "ios",
-  android: "android",
-} as const;
-
-export type DevicePlatform =
-  (typeof DEVICE_PLATFORM)[keyof typeof DEVICE_PLATFORM];
 
 export const PUSH_NOTIFICATION_PROVIDER = {
   expo: "expo",
@@ -67,9 +62,7 @@ export type UpdateNotificationStatusRequest = {
 };
 
 export type UpdatePushTokenRequest = {
-  provider: PushNotificationProvider;
   token: string;
-  platform: DevicePlatform;
   deviceId: string;
 };
 

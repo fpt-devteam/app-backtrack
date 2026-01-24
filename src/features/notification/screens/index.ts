@@ -1,2 +1,1 @@
-export { default as NotificationScreen } from '@/src/features/notification/screen/NotificationScreen';
-
+export { default as NotificationScreen } from "@/src/features/notification/screens/NotificationScreen";
