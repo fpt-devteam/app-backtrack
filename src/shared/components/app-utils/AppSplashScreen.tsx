@@ -1,3 +1,4 @@
+import colors from '@/src/shared/theme/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
@@ -14,7 +15,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import colors from '../../theme/colors';
 
 const { width, height } = Dimensions.get('window');
 

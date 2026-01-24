@@ -1,5 +1,5 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { AppHeader } from "@/src/shared/components";
+import { AppHeader, HeaderTitle } from "@/src/shared/components";
 import { auth } from "@/src/shared/lib/firebase";
 import { signOut } from "firebase/auth";
 import React from "react";
@@ -15,7 +15,7 @@ export function ProfileScreen() {
 
   return (
     <SafeAreaView>
-      <AppHeader title="Profile" showBackButton={false} />
+      <AppHeader left={<HeaderTitle title="Profile" />} />
       <Text>Welcome, {user?.displayName || user?.email || "User"}!</Text>
       <Button title="Logout" onPress={handleLogout} />
     </SafeAreaView>

@@ -15,8 +15,28 @@ type SimilarPostCardProps = {
 
 export const SimilarPostCardSkeleton = () => {
   return (
-    <View className="flex-row bg-white rounded-lg shadow-md p-4">
-      <Text>Loading...</Text>
+    <View className="flex-row gap-3 bg-white rounded-2xl border border-slate-200 p-3">
+      {/* Image skeleton */}
+      <View className="w-20 h-20 rounded-xl bg-slate-200 animate-pulse" />
+
+      <View className="flex-1 min-w-0">
+        {/* Top row: title + match skeleton */}
+        <View className="flex-row justify-between items-start">
+          <View className="h-5 bg-slate-200 rounded flex-1 animate-pulse" />
+          <View className="ml-2 h-7 w-24 rounded-full bg-slate-200 animate-pulse" />
+        </View>
+
+        {/* Middle: meta rows skeleton */}
+        <View className="mt-2 gap-1">
+          <View className="flex-row items-center gap-2">
+            <View className="w-4 h-4 bg-slate-200 rounded animate-pulse" />
+            <View className="h-3 bg-slate-200 rounded flex-1 animate-pulse" />
+          </View>
+
+          {/* Tag time skeleton */}
+          <View className="mt-2 h-6 w-32 rounded-md bg-slate-200 animate-pulse" />
+        </View>
+      </View>
     </View>
   );
 };

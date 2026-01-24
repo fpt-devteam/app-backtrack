@@ -1,14 +1,15 @@
 import { SimilarPostCard } from '@/src/features/post/components';
 import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks';
-import { MatchingErrorScreen, MatchingNoResultScreen, MatchingWaitingScreen } from '@/src/features/post/screens';
-import { AppHeader } from '@/src/shared/components';
-import { POST_ROUTE } from '@/src/shared/constants';
+import { MatchingErrorScreen } from '@/src/features/post/screens/MatchingErrorScreen';
+import { MatchingNoResultScreen } from '@/src/features/post/screens/MatchingNoResultScreen';
+import { MatchingWaitingScreen } from '@/src/features/post/screens/MatchingWaitingScreen';
+import { AppHeader, BackButton, HeaderTitle } from '@/src/shared/components/app-utils/AppHeader';
 import { getErrorMessage } from '@/src/shared/utils';
-import { RelativePathString, router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
 
-const MatchingScreen = () => {
+export const MatchingScreen = () => {
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { postId } = useLocalSearchParams<{ postId: string }>();
 
@@ -31,7 +32,7 @@ const MatchingScreen = () => {
 
   return (
     <View>
-      <AppHeader title="Matching result" onBackPress={() => router.replace(POST_ROUTE.index as RelativePathString)} />
+      <AppHeader left={<BackButton />} center={<HeaderTitle title="Matching result" />} />
 
       {/* Results */}
       <FlatList
@@ -44,5 +45,3 @@ const MatchingScreen = () => {
     </View>
   );
 }
-
-export default MatchingScreen;

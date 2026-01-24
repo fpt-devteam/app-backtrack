@@ -1,5 +1,5 @@
 import { getQrCodeImage } from '@/src/features/qr/api';
-import { AppHeader, AppInlineError, AppLoader } from '@/src/shared/components';
+import { AppHeader, AppInlineError, AppLoader, HeaderTitle } from '@/src/shared/components';
 import colors from '@/src/shared/theme/colors';
 import * as Clipboard from 'expo-clipboard';
 import { Image } from 'expo-image';
@@ -68,7 +68,8 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader title="QR Code" />
+      <AppHeader
+        left={<HeaderTitle title={"QR Code"} />} />
 
       <ScrollView
         className="flex-1"

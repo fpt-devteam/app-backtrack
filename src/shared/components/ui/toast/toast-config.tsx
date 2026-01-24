@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "600",
-    color: colors.text.DEFAULT,
+    color: colors.text.primary,
     letterSpacing: -0.4,
   },
   subtitle: {

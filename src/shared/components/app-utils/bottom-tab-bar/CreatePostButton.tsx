@@ -44,8 +44,6 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
     transform: [{ scale: scale.value }],
   }));
 
-  // Match TabBarButton pattern for icon color until theme hook is available
-  // Colors match global.css --tab-bar-active / --tab-bar-inactive
   const iconColor = isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive;
 
   return (

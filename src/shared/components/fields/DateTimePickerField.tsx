@@ -99,7 +99,7 @@ export const DateTimePickerField = ({
   };
 
   return (
-    <View className="border-blue-500">
+    <View className="border-primary">
       <Pressable
         onPress={openModal}
         disabled={disabled}

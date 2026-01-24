@@ -1,8 +1,9 @@
 import { MatchedAttributesSection, PostComparisonCard } from '@/src/features/post/components'
 import { useGetPostById } from '@/src/features/post/hooks'
-import { AppHeader, AppInlineError, AppLoader } from '@/src/shared/components'
+import { AppHeader, AppInlineError, AppSplashScreen, CloseButton, HeaderTitle } from '@/src/shared/components'
 import React from 'react'
 import { ScrollView, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 interface ComparePostsScreenProps {
   postId: string
@@ -26,26 +27,21 @@ export const ComparePostsScreen = ({ postId, otherPostId }: ComparePostsScreenPr
   const hasError = errorPost1 || errorPost2
 
   if (isLoading) {
-    return (
-      <View className="flex-1 bg-background-light">
-        <AppHeader title="Compare Items" />
-        <AppLoader />
-      </View>
-    )
+    return <AppSplashScreen />
   }
 
   if (hasError || !post1 || !post2) {
     return (
       <View className="flex-1 bg-background-light">
-        <AppHeader title="Compare Items" />
+        <AppHeader left={<CloseButton />} center={<HeaderTitle title="Compare Items" className="items-center" />} />
         <AppInlineError message="Failed to load posts for comparison." />
       </View>
     )
   }
 
   return (
-    <View className="flex-1 bg-background-light">
-      <AppHeader title="Compare Items" />
+    <SafeAreaView className="flex-1 bg-background-light">
+      <AppHeader left={<CloseButton />} center={<HeaderTitle title="Compare Items" className="items-center" />} />
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 py-4">
           {/* Comparison Cards */}
@@ -58,6 +54,6 @@ export const ComparePostsScreen = ({ postId, otherPostId }: ComparePostsScreenPr
           <MatchedAttributesSection post1={post1} post2={post2} />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }

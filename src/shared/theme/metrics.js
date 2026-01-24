@@ -28,7 +28,7 @@ module.exports = {
   borderRadius: {
     none: 0,
     sm: 4,
-    DEFAULT: 6,
+    primary: 6,
     md: 8,
     lg: 12,
     xl: 16,

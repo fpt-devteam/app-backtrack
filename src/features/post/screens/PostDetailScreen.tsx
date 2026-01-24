@@ -1,13 +1,38 @@
 import { PostDetails } from '@/src/features/post/components';
 import { useGetPostById } from '@/src/features/post/hooks';
-import { AppInlineError, AppSplashScreen } from '@/src/shared/components';
+import { AppHeader, AppInlineError, AppSplashScreen, BackButton } from '@/src/shared/components';
 import { getRandomAvatarUrl } from '@/src/shared/mocks/avatar.mock';
-import { timeSincePast } from '@/src/shared/utils/datetime.utils';
+import { timeSincePast } from '@/src/shared/utils';
 import { useLocalSearchParams } from "expo-router";
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const PostDetailHeader = ({ avatarUrl, authorName, createdAt }: { avatarUrl: string; authorName: string; createdAt: Date }) => {
+  return (
+    <AppHeader
+      left={
+        <View className="flex-row items-center gap-4">
+          <BackButton />
+          <View className="w-10 h-10 rounded-full overflow-hidden">
+            <Image
+              source={{ uri: avatarUrl }}
+              style={{ width: "100%", height: "100%" }}
+              resizeMode="cover"
+            />
+          </View>
+          <View className="flex-1 min-w-0">
+            <Text className="text-base font-extrabold text-main w-40" numberOfLines={1}>
+              {authorName}
+            </Text>
+            <Text className="text-xs text-sub" numberOfLines={1}>
+              {timeSincePast(createdAt)}
+            </Text>
+          </View>
+        </View>
+      } />
+  )
+};
 export const PostDetailScreen = () => {
   const params = useLocalSearchParams<{ postId: string }>();
   const postId = params.postId;
@@ -19,28 +44,13 @@ export const PostDetailScreen = () => {
   const authorName = post.author?.displayName?.trim() || "Anonymous";
   const avatarUrl = post.author?.avatarUrl || getRandomAvatarUrl();
 
-
   return (
     <SafeAreaView>
-      <View className="px-4 pt-4 pb-2 flex-row items-center">
-        {/* Avatar */}
-        <View className="w-10 h-10 rounded-full overflow-hidden bg-slate-200">
-          <Image
-            source={{ uri: avatarUrl }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-          />
-        </View>
-
-        <View className="flex-1 min-w-0 ml-3">
-          <Text className="text-base font-extrabold text-slate-900" numberOfLines={1}>
-            {authorName}
-          </Text>
-          <Text className="text-xs text-slate-500" numberOfLines={1}>
-            {timeSincePast(post.createdAt)}
-          </Text>
-        </View>
-      </View>
+      <PostDetailHeader
+        avatarUrl={avatarUrl}
+        authorName={authorName}
+        createdAt={post.createdAt}
+      />
       < PostDetails postId={post.id} />
     </SafeAreaView>
   )

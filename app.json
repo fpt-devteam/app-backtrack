@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "app-backtrack",
+    "name": "backtrack",
     "slug": "backtrack",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "appbacktrack",
+    "icon": "./assets/backtrack-logo.png",
+    "scheme": "backtrack",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
