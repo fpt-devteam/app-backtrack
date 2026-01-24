@@ -5,7 +5,7 @@ import { DotThreeButton } from '@/src/shared/components/ui/DotThreeButton';
 import { QR_ROUTE } from '@/src/shared/constants';
 import { RelativePathString, router } from 'expo-router';
 import React from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const QRScreen = () => {
   const handleMenuOpen = () => {
@@ -17,11 +17,11 @@ export const QRScreen = () => {
   };
 
   return (
-    <View className="flex-1" style={{ flex: 1 }}>
+    <SafeAreaView className="flex-1">
       <AppHeader title="My Protected Items" showBackButton={false} rightActionButton={<DotThreeButton onPress={handleMenuOpen} />} />
 
       <QRCodeList onItemPress={handleQRCodePress} />
 
-    </View>
+    </SafeAreaView>
   );
 };

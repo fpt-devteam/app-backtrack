@@ -3,9 +3,10 @@ import { AppHeader } from "@/src/shared/components";
 import { auth } from "@/src/shared/lib/firebase";
 import { signOut } from "firebase/auth";
 import React from "react";
-import { Button, Text, View } from "react-native";
+import { Button, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ProfileScreen() {
+export function ProfileScreen() {
   const { user } = useAppUser();
 
   const handleLogout = async () => {
@@ -13,10 +14,10 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View>
+    <SafeAreaView>
       <AppHeader title="Profile" showBackButton={false} />
-      <Text>Welcome, {user?.displayName || "User"}!</Text>
+      <Text>Welcome, {user?.displayName || user?.email || "User"}!</Text>
       <Button title="Logout" onPress={handleLogout} />
-    </View>
+    </SafeAreaView>
   );
 }

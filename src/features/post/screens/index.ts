@@ -1,8 +1,8 @@
-export { ComparePostsScreen } from "./ComparePostsScreen";
-export { MatchingErrorScreen } from "./MatchingErrorScreen";
-export { MatchingNoResultScreen } from "./MatchingNoResultScreen";
-export { MatchingWaitingScreen } from "./MatchingWaitingScreen";
-export { PostHomeScreen } from "./PostHomeScreen";
-export { PostScreen } from "./PostScreen";
-export { PostSearchScreen } from "./PostSearchScreen";
+export { ComparePostsScreen } from "@/src/features/post/screens/ComparePostsScreen";
+export { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
+export { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoResultScreen";
+export { MatchingWaitingScreen } from "@/src/features/post/screens/MatchingWaitingScreen";
+export { PostDetailScreen } from "@/src/features/post/screens/PostDetailScreen";
+export { PostScreen } from "@/src/features/post/screens/PostScreen";
+export { PostSearchScreen } from "@/src/features/post/screens/PostSearchScreen";
 

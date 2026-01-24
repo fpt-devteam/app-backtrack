@@ -47,7 +47,6 @@ export const useUserLocation = () => {
         externalPlaceId: geocodeResult?.placeId,
       };
 
-      console.log("User location fetched at hook:", userLocation);
       return userLocation;
     },
 

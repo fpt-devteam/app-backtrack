@@ -1,28 +1,48 @@
-import { useAppUser } from '@/src/features/auth/providers'
-import { useCreateConversation } from '@/src/features/chat/hooks'
-import type { ConversationCreateRequest } from '@/src/features/chat/types'
-import { PostStatusBadge } from '@/src/features/post/components/badges/PostStatusBadge'
-import { SimilarPostCard } from '@/src/features/post/components/cards/SimilarPostCard'
-import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks'
-import { PostType } from '@/src/features/post/types'
-import { ImageCarousel } from '@/src/shared/components'
-import { CHAT_ROUTE, POST_ROUTE } from '@/src/shared/constants'
-import colors from '@/src/shared/theme/colors'
-import { formatIsoDate } from '@/src/shared/utils'
-import type { ExternalPathString, RelativePathString } from 'expo-router'
-import { router } from 'expo-router'
-import { CalendarIcon, MapPinIcon, TagIcon } from 'phosphor-react-native'
-import React, { useEffect, useMemo, useRef } from 'react'
-import { Animated, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import type MapView from 'react-native-maps'
-import type { Region } from 'react-native-maps'
+import { useAppUser } from "@/src/features/auth/providers";
+import { useCreateConversation } from "@/src/features/chat/hooks";
+import type { ConversationCreateRequest } from "@/src/features/chat/types";
+import { PostStatusBadge } from "@/src/features/post/components/badges/PostStatusBadge";
+import { SimilarPostCard } from "@/src/features/post/components/cards/SimilarPostCard";
+import { InfoRow } from "@/src/features/post/components/ui/PostInfoRow";
+import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import { PostType } from "@/src/features/post/types";
+import { ImageCarousel } from "@/src/shared/components";
+import { Divider } from "@/src/shared/components/ui/Divider";
+import { toast } from "@/src/shared/components/ui/toast";
+import { CHAT_ROUTE } from "@/src/shared/constants";
+import colors from "@/src/shared/theme/colors";
+import { formatIsoDate } from "@/src/shared/utils";
+import type { ExternalPathString, RelativePathString } from "expo-router";
+import { router } from "expo-router";
+import { CalendarIcon, MapPinIcon } from "phosphor-react-native";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
+import type MapView from "react-native-maps";
+import type { Region } from "react-native-maps";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-type PostDetailsProps = {
-  postId: string
-}
+type PostDetailsProps = { postId: string };
+
+const PrimaryButton = ({
+  title,
+  disabled,
+  onPress,
+}: {
+  title: string;
+  disabled?: boolean;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity
+    className="w-full bg-primary rounded-2xl py-4 items-center justify-center active:opacity-90"
+    disabled={disabled}
+    onPress={onPress}
+  >
+    <Text className="text-white font-bold text-[15px]">{title}</Text>
+  </TouchableOpacity>
+);
 
 export const PostDetailsSkeleton = () => {
-  const opacity = useRef(new Animated.Value(0.45)).current
+  const opacity = useRef(new Animated.Value(0.45)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
@@ -30,209 +50,177 @@ export const PostDetailsSkeleton = () => {
         Animated.timing(opacity, { toValue: 0.9, duration: 700, useNativeDriver: true }),
         Animated.timing(opacity, { toValue: 0.45, duration: 700, useNativeDriver: true }),
       ])
-    )
-    anim.start()
-    return () => anim.stop()
-  }, [opacity])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [opacity]);
 
-  const Skeleton = ({ className }: { className: string }) => (
+  const S = ({ className }: { className: string }) => (
     <Animated.View style={{ opacity }} className={`bg-slate-200 ${className}`} />
-  )
+  );
 
   return (
-    <View>
-      <View className="m-4 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden">
-        {/* Header */}
-        <View className="px-5 pt-5 pb-4">
-          <View className="flex-row items-start justify-between gap-3">
+    <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
+      <View className="px-5 pt-5 pb-4">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="flex-1 gap-2">
+            <S className="h-7 rounded-xl w-[82%]" />
+            <S className="h-7 rounded-xl w-[52%]" />
+          </View>
+          <S className="h-7 w-20 rounded-full" />
+        </View>
+
+        <View className="mt-4 gap-2">
+          <S className="h-3 rounded-lg w-[95%]" />
+          <S className="h-3 rounded-lg w-[88%]" />
+          <S className="h-3 rounded-lg w-[70%]" />
+        </View>
+      </View>
+
+      <Divider />
+
+      <View className="p-5 gap-4">
+        {[0, 1, 2].map((i) => (
+          <View key={i} className="flex-row gap-3 items-center">
+            <S className="h-10 w-10 rounded-2xl" />
             <View className="flex-1 gap-2">
-              <Skeleton className="h-6 rounded-xl w-[85%]" />
-              <Skeleton className="h-6 rounded-xl w-[55%]" />
+              <S className="h-3 w-36 rounded-lg" />
+              <S className="h-4 w-[80%] rounded-lg" />
             </View>
-            <Skeleton className="h-7 w-20 rounded-full" />
           </View>
+        ))}
+      </View>
 
-          <View className="mt-3 gap-2">
-            <Skeleton className="h-3 rounded-lg w-[95%]" />
-            <Skeleton className="h-3 rounded-lg w-[88%]" />
-            <Skeleton className="h-3 rounded-lg w-[70%]" />
-          </View>
-        </View>
-
-        <View className="h-[1px] bg-slate-900/5 mx-4" />
-
-        {/* Info Section */}
-        <View className="p-4 gap-4">
-          {[0, 1, 2].map((i) => (
-            <View key={i} className="flex-row gap-3 items-center">
-              <Skeleton className="h-10 w-10 rounded-2xl" />
-              <View className="flex-1 gap-2">
-                <Skeleton className="h-3 w-32 rounded-lg" />
-                <Skeleton className="h-4 w-[80%] rounded-lg" />
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {/* Map Section */}
-        <View className="px-5 pb-5">
-          <View className="rounded-2xl overflow-hidden border border-slate-200">
-            <Skeleton className="h-40 w-full rounded-none" />
-            <View className="absolute right-3 bottom-3">
-              <Skeleton className="h-11 w-11 rounded-2xl" />
-            </View>
+      <View className="px-5 pb-5">
+        <View className="rounded-2xl overflow-hidden border border-slate-200">
+          <S className="h-44 w-full rounded-none" />
+          <View className="absolute right-3 bottom-3">
+            <S className="h-11 w-11 rounded-2xl" />
           </View>
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
 export const PostDetails = ({ postId }: PostDetailsProps) => {
-  const { isLoading, data: post } = useGetPostById({ postId })
-  const { isMatching, similarPosts } = useMatchingPost(postId)
-
-  const { createConversation, isCreatingConversation } = useCreateConversation();
+  const { bottom } = useSafeAreaInsets();
   const { user } = useAppUser();
+  const { isLoading, data: post } = useGetPostById({ postId });
+  const { isMatching, similarPosts } = useMatchingPost(postId);
+  const { createConversation, isCreatingConversation } = useCreateConversation();
 
-  const isOwner = useMemo(() => post?.author.id === user?.id, [post, user]);
+  const isOwner = !!post && post.author.id === user?.id;
 
-  const handleCreateConversation = async () => {
+  const handleCreateConversation = useCallback(async () => {
     if (!post) return;
 
-    const req = {
+    const req: ConversationCreateRequest = {
       partnerId: post.author.id,
       creatorKeyName: post.postType === PostType.Found ? PostType.Lost : PostType.Found,
       partnerKeyName: post.postType,
-    } as ConversationCreateRequest;
-
-    console.log(req);
+    };
 
     try {
       const response = await createConversation(req);
-      if (!response?.data) throw new Error("No conversation data returned");
-      console.log("Create conversation response:", response);
-      router.push(CHAT_ROUTE.message(response.data.conversationId) as ExternalPathString | RelativePathString);
-    } catch (e) {
-      console.log("Create conversation error:", e);
+      const id = response?.data?.conversationId;
+      if (!id) return;
+      router.push(CHAT_ROUTE.message(id) as ExternalPathString | RelativePathString);
+    } catch {
+      toast.error("Something went wrong. Please try again.");
     }
-  };
+  }, [post, createConversation]);
 
-  const mapRef = useRef<MapView>(null)
-
+  const mapRef = useRef<MapView>(null);
   const region: Region | undefined = useMemo(() => {
-    if (!post?.location) return undefined
+    if (!post?.location) return undefined;
     return {
       latitude: post.location.latitude,
       longitude: post.location.longitude,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
-    }
-  }, [post?.location])
+    };
+  }, [post?.location]);
 
   useEffect(() => {
-    if (!region) return
-    mapRef.current?.animateToRegion(region, 650)
-  }, [region])
+    if (!region) return;
+    mapRef.current?.animateToRegion(region, 650);
+  }, [region]);
 
-  if (isLoading || isMatching || !post) return <PostDetailsSkeleton />
+  const scrollY = useRef(new Animated.Value(0)).current;
+  if (isLoading || isMatching || !post) return <PostDetailsSkeleton />;
 
-  const eventTimeText = formatIsoDate(post.eventTime)
+  const chatLabel =
+    post.postType === PostType.Lost ? "Start chat with Finder" : "Start chat with Seeker";
 
   return (
-    <>
-      {/* Image Carousel */}
-      <View className="bg-white">
-        <ImageCarousel data={post.imageUrls} showLoadingIndicator={true} autoScrollInterval={4000} />
-      </View>
+    <Animated.ScrollView
+      onScroll={Animated.event(
+        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+        { useNativeDriver: false }
+      )}
+      showsVerticalScrollIndicator={false}
+      scrollEventThrottle={16}
+      contentContainerStyle={{ paddingBottom: bottom + 20 }}
+    >
+      <ImageCarousel data={post.imageUrls} />
 
-      {/* Post Details */}
-      <View className="m-4 bg-white rounded-3xl border-2 border-slate-200 overflow-hidden">
-        {/* Header */}
+      <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">
             <Text className="flex-1 text-[22px] font-extrabold text-slate-900 leading-7" numberOfLines={2}>
               {post.itemName}
             </Text>
-            <PostStatusBadge status={post.postType} />
+            <PostStatusBadge status={post.postType} size="md" />
           </View>
 
-          {/* Description */}
-          <Text className="mt-3 text-[13px] leading-[19px] text-slate-600" numberOfLines={3}>
-            {post.description}
-          </Text>
+          {!!post.description && (
+            <Text className="mt-3 text-[13px] leading-[19px] text-slate-600">
+              {post.description}
+            </Text>
+          )}
         </View>
 
-        <View className="h-[1px] bg-slate-900/5 mx-4" />
+        <Divider />
 
-        {/* Info Section */}
-        <View className="p-4 gap-4">
-          {/* Last seen location */}
-          <View className="flex-row gap-3 items-start">
-            <View className="w-8 h-8 items-center justify-center">
-              <MapPinIcon size={28} color={colors.primary} weight="fill" />
-            </View>
-            <View className="flex-1 justify-center">
-              <Text className="text-sm text-slate-500 font-display">Last seen location</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <Text className="text-base mt-0.5">{post.displayAddress || 'N/A'}</Text>
-              </ScrollView>
-            </View>
-          </View>
-
-          {/* Distinctive marks */}
-          <View className="flex-row gap-3 items-start">
-            <View className="w-8 h-8 items-center justify-center">
-              <TagIcon size={28} color={colors.primary} weight="fill" />
-            </View>
-            <View className="flex-1 justify-center">
-              <Text className="text-sm text-slate-500 font-display">Distinctive marks</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <Text className="text-base mt-0.5">{post.distinctiveMarks || 'N/A'}</Text>
-              </ScrollView>
-            </View>
-          </View>
-
-          {/* Event time */}
-          <View className="flex-row gap-3 items-start">
-            <View className="w-8 h-8 items-center justify-center">
-              <CalendarIcon size={28} color={colors.primary} weight="fill" />
-            </View>
-            <View className="flex-1 justify-center">
-              <Text className="text-sm text-slate-500 font-display">Event time</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <Text className="text-base mt-0.5">{eventTimeText}</Text>
-              </ScrollView>
-            </View>
-          </View>
+        <View className="p-5 gap-4">
+          <InfoRow
+            icon={<MapPinIcon size={20} color={colors.primary} weight="fill" />}
+            label="Last seen location"
+            value={post.displayAddress || "N/A"}
+          />
+          <InfoRow
+            icon={<CalendarIcon size={20} color={colors.primary} weight="fill" />}
+            label="Event time"
+            value={formatIsoDate(post.eventTime)}
+          />
         </View>
       </View>
 
-      <View className="m-6 mt-0">
-        {!isOwner && <TouchableOpacity
-          className="w-full bg-primary rounded-lg py-3 items-center justify-center"
-          disabled={isCreatingConversation}
-          onPress={handleCreateConversation}
-        >
-          <Text className="text-white"> Start Chat with {post.postType === PostType.Lost ? 'Seeker' : 'Finder'}</Text>
-        </TouchableOpacity>}
+      {
+        !isOwner && (
+          <View className="mx-4 mt-4">
+            <PrimaryButton title={chatLabel} disabled={isCreatingConversation} onPress={handleCreateConversation} />
+          </View>
+        )
+      }
 
-        <TouchableOpacity onPress={() => {
-          router.push(POST_ROUTE.matching(postId) as ExternalPathString | RelativePathString);
-        }}>
-          <Text className="text-white"> Start Matching</Text>
-        </TouchableOpacity>
-      </View>
+      {
+        !!similarPosts?.length && (
+          <View className="mx-4 mt-6">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-[16px] font-extrabold text-slate-900">Similar Posts</Text>
+              <Text className="text-[12px] text-slate-500">{similarPosts.length}</Text>
+            </View>
 
-      {/* Similar Posts */}
-      {similarPosts && similarPosts.length > 0 && (
-        <View className="mx-4 mb-6">
-          <Text className="text-lg font-bold text-slate-900 mb-3">Similar Posts</Text>
-          <ScrollView contentContainerStyle={{ gap: 12 }}>
-            {similarPosts.map((item: typeof similarPosts[number]) => (<SimilarPostCard key={item.id} postId={post.id} matchPost={item} />))}
-          </ScrollView>
-        </View>
-      )}
-    </>
-  )
+            <View className="mt-3 gap-3">
+              {similarPosts.map((p) => (
+                <SimilarPostCard key={p.id} postId={post.id} matchPost={p} />
+              ))}
+            </View>
+          </View>
+        )
+      }
+    </Animated.ScrollView >
+  );
 };

@@ -6,20 +6,19 @@ import {
 import { DEFAULT_RADIUS_KM } from "@/src/features/map/constants";
 import { useReverseGeocoding, useUserLocation } from "@/src/features/map/hooks";
 import { useLocationSelectionStore } from "@/src/features/map/store";
-import { PostDetails } from "@/src/features/post/components";
+import { PostDetails, PostList } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostsFiltersOptions } from "@/src/features/post/hooks/usePosts";
-import { PostHomeScreen } from "@/src/features/post/screens";
 import type { PostFilters } from "@/src/features/post/types";
 import { BottomSheet } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";
 import { useUIStore } from "@/src/shared/store/ui.store";
 import colors from "@/src/shared/theme/colors";
 import { router } from "expo-router";
-import { MagnifyingGlassIcon } from "phosphor-react-native";
+import { CaretLeftIcon } from "phosphor-react-native";
 import type { ReactNode } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import type { LatLng, Region } from "react-native-maps";
 import MapView from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -68,9 +67,6 @@ export const MapScreen = () => {
       location: selection?.location,
       radiusInKm: selection?.radiusKm,
     };
-
-    console.log("filter", nextFilter);
-
     return {
       filters: nextFilter,
       enabled: true,
@@ -129,56 +125,54 @@ export const MapScreen = () => {
   };
 
   return (
-    <View className="flex-1" style={{}}>
+    <View className="flex-1">
       {/* Map (base) */}
-      <View
-        style={{
-          flex: 1,
-          zIndex: 0,
-        }}
+      <MapView
+        ref={mapRef}
+        style={{ flex: 1 }}
+        showsCompass={true}
+        compassOffset={{ x: -16, y: 60 }}
       >
-        <MapView ref={mapRef} style={{ flex: 1 }}>
-          {selection?.location && (
-            <>
-              <UserPlaceMarker
-                coordinate={selection.location}
+        {selection?.location && (
+          <>
+            <UserPlaceMarker
+              coordinate={selection.location}
+              disabled={false}
+              radiusKm={selection.radiusKm}
+              onPress={() => {
+                handleOpenSheet();
+                bottomSheetElement.current = (
+                  <View
+                    className="px-4"
+                    style={{ paddingBottom: insets.bottom }}
+                  >
+                    <Text className="text-lg font-bold mb-4">Posts</Text>
+                    <PostList
+                      direction="horizontal"
+                      filters={postParams.filters}
+                    />
+                  </View>
+                );
+              }}
+            />
+
+            {items.map((item) => (
+              <ItemPlaceMarker
+                key={item.id}
+                item={item}
+                coordinate={item.location}
                 disabled={false}
-                radiusKm={selection.radiusKm}
                 onPress={() => {
                   handleOpenSheet();
                   bottomSheetElement.current = (
-                    <View
-                      className="px-4"
-                      style={{ paddingBottom: insets.bottom }}
-                    >
-                      <Text className="text-lg font-bold mb-4">Posts</Text>
-                      <PostHomeScreen
-                        direction="horizontal"
-                        filters={postParams.filters}
-                      />
-                    </View>
+                    <PostDetails postId={item.id} />
                   );
                 }}
               />
-
-              {items.map((item) => (
-                <ItemPlaceMarker
-                  key={item.id}
-                  item={item}
-                  coordinate={item.location}
-                  disabled={false}
-                  onPress={() => {
-                    handleOpenSheet();
-                    bottomSheetElement.current = (
-                      <PostDetails postId={item.id} />
-                    );
-                  }}
-                />
-              ))}
-            </>
-          )}
-        </MapView>
-      </View>
+            ))}
+          </>
+        )}
+      </MapView>
 
       {/* SearchBar overlay */}
       <View
@@ -191,27 +185,38 @@ export const MapScreen = () => {
         }}
         pointerEvents="box-none"
       >
-        <TouchableOpacity
-          onPress={() => router.push(MAP_ROUTE.search)}
-          activeOpacity={0.9}
-          className="rounded-full p-4 flex-row items-center bg-white shadow-sm shadow-black/10"
-        >
-          <MagnifyingGlassIcon size={18} color={colors.slate[600]} />
-          <Text
-            className="flex-1 ml-4 text-sm text-slate-600"
-            numberOfLines={1}
-          >
-            {searchDisplayText}
-          </Text>
-        </TouchableOpacity>
+        <View className="rounded-full bg-white shadow-sm shadow-black/10 overflow-hidden">
+          <View className="flex-row items-center">
+            {/* Back icon inside the pill */}
+            <Pressable
+              onPress={() => router.back()}
+              hitSlop={10}
+              style={{ paddingLeft: 16, paddingRight: 10, paddingVertical: 14 }}
+            >
+              <CaretLeftIcon size={20} color={colors.slate[700]} weight="bold" />
+            </Pressable>
+
+            {/* Tap area for search */}
+            <Pressable
+              onPress={() => router.push(MAP_ROUTE.search)}
+              hitSlop={10}
+              className="flex-1"
+              style={{ paddingRight: 16, paddingVertical: 14 }}
+            >
+              <Text className="text-sm text-slate-600" numberOfLines={1}>
+                {searchDisplayText}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
       </View>
 
       {/* FAB overlay */}
       <View
         style={{
           position: "absolute",
-          right: 16,
-          bottom: 128,
+          right: 20,
+          bottom: 20,
           zIndex: 20,
         }}
         pointerEvents="box-none"
