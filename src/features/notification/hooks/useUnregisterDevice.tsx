@@ -1,8 +1,8 @@
 import { unregisterDeviceApi } from "@/src/features/notification/api/device.api";
 import {
   ExpoTokenValue,
+  PushTokenDeviceUpdateRequest,
   StorageKey,
-  UpdatePushTokenRequest,
 } from "@/src/features/notification/types";
 import { createAsyncStorageKey } from "@/src/features/notification/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -18,7 +18,7 @@ export const useUnregisterDeviceMutation = () => {
       const saved = await storage.get();
       if (!saved) return;
 
-      const req: UpdatePushTokenRequest = {
+      const req: PushTokenDeviceUpdateRequest = {
         token: saved.token,
         deviceId: saved.deviceId,
       };

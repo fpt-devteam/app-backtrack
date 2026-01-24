@@ -26,15 +26,6 @@ export const NOTIFICATION_EVENT = {
 export type NotificationEvent =
   (typeof NOTIFICATION_EVENT)[keyof typeof NOTIFICATION_EVENT];
 
-export const PUSH_NOTIFICATION_PROVIDER = {
-  expo: "expo",
-  fcm: "fcm",
-  apns: "apns",
-} as const;
-
-export type PushNotificationProvider =
-  (typeof PUSH_NOTIFICATION_PROVIDER)[keyof typeof PUSH_NOTIFICATION_PROVIDER];
-
 /**
  * MODELS
  */
@@ -56,14 +47,31 @@ export type NotificationsFilterRequest = {
   status?: NotificationStatus;
 } & CursorPaginationParams;
 
-export type UpdateNotificationStatusRequest = {
+export type NotificationStatusUpdateRequest = {
   notificationIds: string[];
   status: NotificationStatus;
 };
 
-export type UpdatePushTokenRequest = {
+export type PushTokenDeviceUpdateRequest = {
   token: string;
   deviceId: string;
+};
+
+export type NotificationSendRequest = {
+  target: {
+    userId: string;
+  };
+  source: {
+    name: string;
+    eventId: string;
+  };
+  title: string;
+  body: string;
+  type: NotificationEvent;
+  data?: {
+    screen?: string;
+    params?: Record<string, string>;
+  };
 };
 
 /*
