@@ -1,3 +1,4 @@
+import colors from "@/src/shared/theme/colors";
 import { Stack } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -49,7 +50,7 @@ export default function PostsStackLayout() {
           headerShown: false,
           contentStyle: {
             paddingTop: insets.top,
-            paddingBottom: insets.bottom,
+            backgroundColor: colors.white,
           },
         }}
       />

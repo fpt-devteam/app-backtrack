@@ -54,7 +54,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
             }
 
             if (isFocused && !event.defaultPrevented) {
-              const nestedState = route.state as any;
+              const nestedState = route.state;
               const nestedIndex =
                 typeof nestedState?.index === "number" ? nestedState.index : 0;
               const nestedKey =

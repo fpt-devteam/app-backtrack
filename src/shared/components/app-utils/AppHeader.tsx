@@ -1,71 +1,102 @@
 import colors from "@/src/shared/theme/colors";
 import { cn } from "@/src/shared/utils/cn";
 import { router } from "expo-router";
-import { ArrowLeftIcon } from "phosphor-react-native";
+import { CaretLeftIcon, DotsThreeIcon, IconProps, XIcon } from "phosphor-react-native";
 import React from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, PressableProps, Text, View, ViewStyle } from "react-native";
 
 type AppHeaderProps = {
-  title: string;
-  showBackButton?: boolean;
-  onBackPress?: () => void;
-  rightActionButton?: React.ReactNode;
+  left?: React.ReactNode,
+  center?: React.ReactNode,
+  right?: React.ReactNode,
+  className?: string
 };
 
-export const AppHeader = ({
-  title,
-  showBackButton = true,
-  onBackPress,
-  rightActionButton
-}: AppHeaderProps) => {
-  const handleBackPress = () => {
-    if (onBackPress) {
-      onBackPress();
-    } else {
-      router.back();
-    }
-  };
-
+export const AppHeader = ({ left, center, right, className }: AppHeaderProps) => {
   return (
-    <View className="flex-row items-center justify-between px-4 py-4">
-      {/* Back Button */}
-      {showBackButton && (
-        <Pressable
-          onPress={handleBackPress}
-          style={({ pressed }) => ({
-            opacity: pressed ? 0.5 : 1,
-            top: 12
-          })}
-        >
-          <ArrowLeftIcon size={24} color={colors.black} weight="bold" />
-        </Pressable>
-      )}
+    <View className={cn("flex-row h-16 items-center overflow-hidden px-4", className)}>
+      <View className="flex-row flex-1 items-center justify-start">
+        {left}
+      </View>
 
-      {/* Centered Title */}
-      <Text className="text-2xl font-bold text-black">
-        {title}
-      </Text>
+      <View className="flex-row items-center justify-center shrink-0">
+        {center}
+      </View>
 
-      {rightActionButton || <View style={{ width: 24 }} />}
+      <View className="flex-row flex-1 items-center justify-end gap-2">
+        {right}
+      </View>
     </View>
   );
 };
 
+// Icon Buttons
+interface IconButtonProps extends PressableProps {
+  icon: React.ComponentType<IconProps>;
+}
+
+const IconButton = ({
+  icon: Icon,
+  style,
+  ...props
+}: IconButtonProps) => {
+  return (
+    <Pressable
+      {...props}
+      style={({ pressed }) => [style as ViewStyle]}
+    >
+      <Icon size={24} color={colors.black} weight="bold" />
+    </Pressable>
+  );
+};
+
+export const BackButton = (props: PressableProps) => (
+  <IconButton icon={CaretLeftIcon} onPress={() => router.back()} {...props} />
+);
+
+export const CloseButton = (props: PressableProps) => (
+  <IconButton icon={XIcon} onPress={() => router.back()} {...props} />
+);
+
+export const DotsThreeButton = (props: PressableProps) => (
+  <IconButton icon={DotsThreeIcon} {...props} />
+);
 
 
-export const DefaultTopRightActionButton = ({ label, onPress, disabled, isSubmitting }: { label: string; onPress: () => void; disabled?: boolean; isSubmitting?: boolean }) => (
+// Text Button
+interface TextButtonProps extends PressableProps {
+  label: string;
+  disabled?: boolean;
+  isSubmitting?: boolean;
+}
+export const TextButton = ({
+  label,
+  isSubmitting,
+  disabled,
+  ...props
+}: TextButtonProps) => (
   <Pressable
-    onPress={onPress}
     disabled={disabled}
     style={({ pressed }) => ({
       opacity: pressed ? 0.5 : 1,
       top: 12
     })}
+    {...props}
   >
     {isSubmitting ? (
       <ActivityIndicator />
     ) : (
-      <Text className={cn("text-base font-semibold", disabled ? "text-gray-400" : "text-default")}> {label}</Text>
+      <Text className={cn("text-base font-semibold", disabled ? "text-muted" : "text-main")}> {label}</Text>
     )}
   </Pressable>
 );
+
+// Header Title
+export const HeaderTitle = ({ title, className }: { title: string, className?: string }) => (
+  <View className={cn("min-w-80 items-start", className)}>
+    <Text className="text-2xl font-semibold text-main">
+      {title}
+    </Text>
+  </View>
+);
+

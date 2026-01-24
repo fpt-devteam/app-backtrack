@@ -1,5 +1,4 @@
-import { AppHeader } from '@/src/shared/components';
-import { DotThreeButton } from '@/src/shared/components/ui/DotThreeButton';
+import { AppHeader, DotsThreeButton, HeaderTitle } from '@/src/shared/components';
 import { MenuBottomSheet, type MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 
 import { QR_ROUTE } from '@/src/shared/constants';
@@ -77,7 +76,7 @@ export const QRCodeDetail = ({
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader title="QR Code Details" rightActionButton={<DotThreeButton onPress={() => setIsMenuOpen(true)} />} />
+      <AppHeader left={<HeaderTitle title="QR Code Details" />} right={<DotsThreeButton onPress={() => setIsMenuOpen(true)} />} />
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <ItemImage imageUrl={imageUrl} />

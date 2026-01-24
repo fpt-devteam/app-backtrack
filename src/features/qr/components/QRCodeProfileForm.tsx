@@ -1,6 +1,4 @@
-import { AppHeader } from '@/src/shared/components';
-import { DefaultTopRightActionButton } from '@/src/shared/components/app-utils/AppHeader';
-import { ImageField } from '@/src/shared/components/fields';
+import { AppHeader, HeaderTitle, ImageField, TextButton } from '@/src/shared/components';
 import { toast } from '@/src/shared/components/ui/toast';
 import colors from '@/src/shared/theme/colors';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -105,9 +103,9 @@ export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting 
   return (
     <View className="flex-1" style={{ paddingBottom: insets.bottom }}>
       <AppHeader
-        title={headerTitleMap[mode]}
-        rightActionButton={
-          <DefaultTopRightActionButton
+        left={<HeaderTitle title={headerTitleMap[mode]} />}
+        right={
+          <TextButton
             label={submitButtonText}
             onPress={handleSubmit(
               onSubmit,

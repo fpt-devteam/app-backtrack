@@ -1,5 +1,5 @@
 import { LoginForm } from "@/src/features/auth/components";
-import { AppLogo } from "@/src/shared/components/app-utils";
+import { AppLogo } from "@/src/shared/components";
 import { Link } from "expo-router";
 import React from "react";
 import {
@@ -15,7 +15,7 @@ import {
 export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
-      className="flex-1 "
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>

@@ -55,7 +55,7 @@ export const LocationField = ({
       onPressOut={() => setPressed(false)}
       activeOpacity={0.9}
       className={[
-        "border rounded-sm p-3 flex-row items-center bg-white shadow-sm shadow-black/10",
+        "border rounded-xl p-3 min-h-[40px] flex-row items-center bg-white shadow-sm shadow-black/10",
         pressed ? "border-slate-300 bg-slate-50" : "border-slate-200",
       ].join(" ")}
     >

@@ -1,4 +1,4 @@
-import { AppLogo } from "@/src/shared/components/app-utils";
+import { AppLogo } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
