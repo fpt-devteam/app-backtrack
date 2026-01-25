@@ -17,6 +17,7 @@ type Props = {
   Icon: React.ElementType<IconProps>;
   label: string;
   onPress: () => void;
+  badge?: number;
 };
 
 export const TabBarButton = ({
@@ -24,6 +25,7 @@ export const TabBarButton = ({
   Icon,
   label,
   onPress,
+  badge,
 }: Props) => {
   const pressOpacity = useSharedValue(1);
 
@@ -34,7 +36,7 @@ export const TabBarButton = ({
 
     pressOpacity.value = withSequence(
       withTiming(0.6, { duration: metrics.motion.press.in }),
-      withTiming(1, { duration: metrics.motion.press.out })
+      withTiming(1, { duration: metrics.motion.press.out }),
     );
 
     onPress();
@@ -57,8 +59,15 @@ export const TabBarButton = ({
         <Icon
           weight="fill"
           size={metrics.tabBar.iconSize}
-          color={isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive}
+          color={
+            isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive
+          }
         />
+        {badge !== undefined && badge > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{badge > 99 ? "99+" : badge}</Text>
+          </View>
+        )}
       </View>
 
       <Text
@@ -91,6 +100,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 2,
+    position: "relative",
   },
   label: {
     fontFamily: Platform.select({
@@ -98,6 +108,24 @@ const styles = StyleSheet.create({
       android: "Roboto",
       default: "System",
     }),
+    textAlign: "center",
+  },
+  badge: {
+    position: "absolute",
+    top: -4,
+    right: -10,
+    backgroundColor: "#ef4444",
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 11,
+    fontWeight: "700",
     textAlign: "center",
   },
 });

@@ -6,7 +6,8 @@ export const BottomTabBar = () => {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false, tabBarHideOnKeyboard: true,
+        headerShown: false,
+        tabBarHideOnKeyboard: true,
       }}
       tabBar={(props) => <TabBarContent {...props} />}
     >
@@ -17,4 +18,4 @@ export const BottomTabBar = () => {
       <Tabs.Screen name="profile" options={{ title: "Profile" }} />
     </Tabs>
   );
-}
+};

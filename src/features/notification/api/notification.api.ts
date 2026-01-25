@@ -3,6 +3,7 @@ import {
   NotificationsFilterRequest,
   NotificationsFilterResponse,
   NotificationStatusUpdateRequest,
+  UnreadCountResponse,
 } from "@/src/features/notification/types";
 import { privateClient } from "@/src/shared/api";
 
@@ -10,6 +11,7 @@ const NOTIFICATION_API = {
   FILTER: "/api/notification",
   UPDATE_STATUS: "/api/notification",
   SEND: "/api/notification",
+  UNREAD_COUNT: "/api/notification/unread-count",
 } as const;
 
 export const filterNotificationsApi = async (
@@ -27,4 +29,9 @@ export const updateStatusNotifications = async (
 
 export const sendNotificationApi = async (req: NotificationSendRequest) => {
   await privateClient.post(NOTIFICATION_API.SEND, req);
+};
+
+export const getUnreadCountApi = async () => {
+  const result = await privateClient.get(NOTIFICATION_API.UNREAD_COUNT);
+  return result.data as UnreadCountResponse;
 };
