@@ -1,33 +1,37 @@
-import { useAppUser } from '@/src/features/auth/providers/user.provider'
-import { AppInlineError, AppLoader } from '@/src/shared/components'
-import { toast } from '@/src/shared/components/ui/toast'
-import { socketService } from '@/src/shared/services'
-import React, { useCallback, useEffect, useMemo } from 'react'
+import { useAppUser } from "@/src/features/auth/providers/user.provider";
+import { ConversationHeader } from "@/src/features/chat/components/ConversationHeader";
+import { MessageInput } from "@/src/features/chat/components/MessageInput";
+import { MessageList } from "@/src/features/chat/components/MessageList";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  View
-} from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useConversationDetail, useMessages, useSendMessage } from '@/src/features/chat/hooks'
-import { MessageItem } from '@/src/features/chat/types'
-import { ConversationHeader } from '@/src/features/chat/components/ConversationHeader'
-import { MessageInput } from '@/src/features/chat/components/MessageInput'
-import { MessageList } from '@/src/features/chat/components/MessageList'
+  useConversationDetail,
+  useMessages,
+  useSendMessage,
+} from "@/src/features/chat/hooks";
+import { MessageItem } from "@/src/features/chat/types";
+import { useSendNotification } from "@/src/features/notification/hooks";
+import { NOTIFICATION_EVENT } from "@/src/features/notification/types";
+import { AppInlineError, AppLoader } from "@/src/shared/components";
+import { toast } from "@/src/shared/components/ui/toast";
+import { socketService } from "@/src/shared/services";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ConversationDetailScreenProps {
-  conversationId: string
+  conversationId: string;
 }
 
-export const ConversationDetailScreen = ({ conversationId }: ConversationDetailScreenProps) => {
+export const ConversationDetailScreen = ({
+  conversationId,
+}: ConversationDetailScreenProps) => {
   const insets = useSafeAreaInsets();
 
-  const { user } = useAppUser()
-  const { sendMessage, isSendingMessage } = useSendMessage()
-  const {
-    data: conversationDetail,
-    isLoading: isLoadingConversation,
-  } = useConversationDetail(conversationId)
+  const { user } = useAppUser();
+  const { sendMessage, isSendingMessage } = useSendMessage();
+  const { data: conversationDetail, isLoading: isLoadingConversation } =
+    useConversationDetail(conversationId);
+  const { sendNotification } = useSendNotification();
+
   const {
     data: messagesData,
     isLoading: isLoadingMessages,
@@ -36,69 +40,87 @@ export const ConversationDetailScreen = ({ conversationId }: ConversationDetailS
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useMessages(conversationId)
+  } = useMessages(conversationId);
 
   // Socket management
   useEffect(() => {
-    if (!conversationId) return
+    if (!conversationId) return;
 
-    let cleanup: (() => void) | undefined
+    let cleanup: (() => void) | undefined;
 
     const initSocket = async () => {
       try {
-        await socketService.connect()
-        socketService.joinConversation(conversationId)
+        await socketService.connect();
+        socketService.joinConversation(conversationId);
 
         cleanup = socketService.onReceiveMessage((message: MessageItem) => {
-          console.log('📨 New message received:', message)
-          refetchMessages()
-        })
+          console.log("📨 New message received:", message);
+          refetchMessages();
+        });
       } catch (error) {
-        console.error('Failed to initialize socket:', error)
+        console.error("Failed to initialize socket:", error);
       }
-    }
-    initSocket()
+    };
+    initSocket();
 
     return () => {
-      if (cleanup) cleanup()
-      socketService.leaveConversation(conversationId)
-    }
-  }, [conversationId, refetchMessages])
+      if (cleanup) cleanup();
+      socketService.leaveConversation(conversationId);
+    };
+  }, [conversationId, refetchMessages]);
 
   const messages = useMemo<MessageItem[]>(() => {
-    if (!messagesData || !user) return []
+    if (!messagesData || !user) return [];
     return messagesData.map((message) => ({
       id: message.id,
       content: message.content,
       senderId: message.senderId,
       createdAt: message.createdAt,
       isMine: message.senderId === user.id,
-    }))
-  }, [messagesData, user])
+    }));
+  }, [messagesData, user]);
 
   const handleLoadMore = useCallback(() => {
-    if (!hasNextPage || isFetchingNextPage) return
+    if (!hasNextPage || isFetchingNextPage) return;
     fetchNextPage().catch(() => {
-      console.log('Error fetching more messages')
-    })
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+      console.log("Error fetching more messages");
+    });
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSendMessage = useCallback(
     async (messageText: string) => {
-      if (!conversationId || !user) return
+      if (!conversationId || !user) return;
 
       try {
         await sendMessage({
           conversationId,
           request: { content: messageText },
-        })
+        });
+
+        const req = {
+          target: {
+            userId: "user-123",
+          },
+          source: {
+            name: "ChatSystem",
+            eventId: "msg-456",
+          },
+          type: NOTIFICATION_EVENT.ChatEvent,
+          title: "Message Sent",
+          body: `Your message: "${messageText}" has been sent successfully.`,
+          data: {
+            screenPath: "chat/conversations/" + conversationId,
+            imageUrl: user.avatar,
+          },
+        };
+        await sendNotification(req);
       } catch (error) {
-        toast.error('Failed to send message. Please try again.');
-        console.log('Error sending message:', error);
+        toast.error("Failed to send message. Please try again.");
+        console.log("Error sending message:", error);
       }
     },
-    [conversationId, user, sendMessage]
-  )
+    [conversationId, user, sendMessage, sendNotification],
+  );
 
   if (isLoadingMessages) {
     return (
@@ -109,7 +131,7 @@ export const ConversationDetailScreen = ({ conversationId }: ConversationDetailS
         />
         <AppLoader />
       </View>
-    )
+    );
   }
 
   if (isMessagesError) {
@@ -121,13 +143,13 @@ export const ConversationDetailScreen = ({ conversationId }: ConversationDetailS
         />
         <AppInlineError message="Failed to load messages. Please try again." />
       </View>
-    )
+    );
   }
 
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-background-light"
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ConversationHeader
         partnerName={conversationDetail?.partner.displayName}
@@ -140,11 +162,8 @@ export const ConversationDetailScreen = ({ conversationId }: ConversationDetailS
         onLoadMore={handleLoadMore}
       />
       <View style={{ paddingBottom: insets.bottom }}>
-
         <MessageInput onSend={handleSendMessage} isSending={isSendingMessage} />
       </View>
     </KeyboardAvoidingView>
-  )
-}
-
-
+  );
+};

@@ -69,8 +69,8 @@ export type NotificationSendRequest = {
   body: string;
   type: NotificationEvent;
   data?: {
-    screen?: string;
-    params?: Record<string, string>;
+    screenPath?: string;
+    imageUrl?: string;
   };
 };
 
