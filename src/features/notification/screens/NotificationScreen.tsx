@@ -173,7 +173,7 @@ const NotificationScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       {mode === "normal" && (
-        <AppHeader center={<HeaderTitle title="Notifications" />} />
+        <AppHeader left={<HeaderTitle title="Notifications" />} />
       )}
 
       {mode === "candidate" && (

@@ -80,3 +80,9 @@ export type NotificationSendRequest = {
 export type NotificationsFilterResponse = ApiResponse<
   CursorScrollResponse<UserNotification>
 >;
+
+export type UnreadCountResult = {
+  count: number;
+};
+
+export type UnreadCountResponse = ApiResponse<UnreadCountResult>;

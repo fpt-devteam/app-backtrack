@@ -1,3 +1,4 @@
+import { useUnreadCount } from "@/src/features/notification/hooks";
 import { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarButton";
 import { colors, metrics } from "@/src/shared/theme";
@@ -9,7 +10,7 @@ import {
   BellIcon,
   ChatCircleIcon,
   HouseIcon,
-  QrCodeIcon
+  QrCodeIcon,
 } from "phosphor-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
@@ -25,10 +26,10 @@ const TAB_ICONS: Record<string, TabIcon> = {
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
+  const { count } = useUnreadCount();
+
   return (
-    <View
-      style={styles.wrapper}
-    >
+    <View style={styles.wrapper}>
       <BlurView
         intensity={55}
         tint="systemUltraThinMaterialLight"
@@ -58,7 +59,9 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
               const nestedIndex =
                 typeof nestedState?.index === "number" ? nestedState.index : 0;
               const nestedKey =
-                typeof nestedState?.key === "string" ? nestedState.key : undefined;
+                typeof nestedState?.key === "string"
+                  ? nestedState.key
+                  : undefined;
 
               if (nestedIndex > 0 && nestedKey) {
                 navigation.dispatch({
@@ -76,6 +79,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
               Icon={tabConfig.Icon}
               label={tabConfig.label}
               onPress={handlePress}
+              badge={route.name === "notification" ? count : undefined}
             />
           );
         })}
