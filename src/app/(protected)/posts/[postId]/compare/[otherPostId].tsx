@@ -9,7 +9,6 @@ const DetailCompareRoute = () => {
   if (!postId || !otherPostId) {
     return <AppInlineError message="Invalid comparison parameters" />
   }
-
   return <ComparePostsScreen postId={postId} otherPostId={otherPostId} />
 }
 

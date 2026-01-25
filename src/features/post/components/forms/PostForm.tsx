@@ -3,9 +3,7 @@ import type { UserLocation } from "@/src/features/map/types";
 import { useAnalyzeImage, useCreatePost } from "@/src/features/post/hooks";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
-import { DateTimePickerField, ImageField } from "@/src/shared/components";
-import { AppHeader, AppLoader } from "@/src/shared/components/app-utils";
-import { DefaultTopRightActionButton } from "@/src/shared/components/app-utils/AppHeader";
+import { AppHeader, AppLoader, CloseButton, DateTimePickerField, HeaderTitle, ImageField, TextButton } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
@@ -18,10 +16,9 @@ import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import { SparkleIcon } from "phosphor-react-native";
 import React, { useState } from "react";
-import type { SubmitHandler } from "react-hook-form";
+import type { SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import * as yup from "yup";
 
 const postSchema = yup
@@ -96,9 +93,8 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
       console.error("Analyze error:", error);
     },
   });
-  const insets = useSafeAreaInsets();
 
-  const loading = isUploadingImages || isCreatingPost;
+  const loading = isUploadingImages || isCreatingPost || isAnalyzing;
 
   const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<PostFormSchema>({
     defaultValues: {
@@ -184,27 +180,14 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
     }
   };
 
-  const headerTitle =
-    postType === PostType.Found ? "Add Found Item" : "Add Lost Item";
-
   return (
-    <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader
-        title={headerTitle}
-        rightActionButton={
-          <DefaultTopRightActionButton
-            label={mode === 'edit' ? 'Save' : 'Upload'}
-            onPress={handleSubmit(
-              onSubmit,
-              (errs) => {
-                console.log("FORM INVALID:", errs);
-                toast.error("Form invalid", "please check required fields");
-              }
-            )}
-            disabled={isCreatingPost || isUploadingImages}
-            isSubmitting={isCreatingPost || isUploadingImages}
-          />
-        }
+    <View className="flex-1">
+      <PostFormHeader
+        title={postType === PostType.Found ? "Add Found Item" : "Add Lost Item"}
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        disabled={loading}
+        isSubmitting={isCreatingPost}
       />
 
       {/* Loading Modal */}
@@ -222,9 +205,12 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         </View>
       </Modal>
 
-      <ScrollView className="flex-1 p-4">
+      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={40} className="flex-1">
         {/* Form Fields */}
-        <View className="bg-white rounded-3xl p-4 my-3 shadow-md border border-slate-300">
+        <ScrollView
+          className="bg-white p-4 border-t border-slate-100 flex-1"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
           {/* Image Picker */}
           <View className="mb-4">
             <Controller
@@ -266,7 +252,7 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               name="itemName"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? "border-red-500" : "border-slate-300"}`}
+                  className={`border rounded-xl px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? "border-red-500" : "border-slate-300"}`}
                   placeholder="e.g. Blue Backpack, iPhone 14"
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -292,7 +278,7 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               name="description"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-sm px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? "border-red-500" : "border-slate-300"}`}
+                  className={`border rounded-xl px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? "border-red-500" : "border-slate-300"}`}
                   placeholder="Describe the item in detail."
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -354,8 +340,34 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
               </Text>
             )}
           </View>
-        </View>
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View >
+  );
+};
+
+const PostFormHeader = ({ title, handleSubmit, onSubmit, disabled, isSubmitting }: { title: string; handleSubmit: UseFormHandleSubmit<PostFormSchema>; onSubmit: SubmitHandler<PostFormSchema>; disabled: boolean; isSubmitting: boolean }) => {
+  return (
+    <AppHeader
+      left={<CloseButton />}
+      center={<HeaderTitle title={title} className="items-center" />}
+      right={
+        <TextButton
+          label="Submit"
+          disabled={disabled}
+          isSubmitting={isSubmitting}
+          onPress={
+            handleSubmit(
+              onSubmit,
+              (errs) => {
+                console.log("FORM INVALID:", errs);
+                toast.error("Form invalid", "please check required fields");
+              }
+            )
+          }
+        />
+      }
+      className="h-12 bg-white px-4"
+    />
   );
 };

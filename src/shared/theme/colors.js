@@ -23,23 +23,20 @@ const palette = {
 const semantic = {
   primary: palette.sky[500],
   secondary: palette.slate[200],
-  success: palette.emerald[600],
-  error: palette.red[600],
-  warning: palette.amber[500],
-  info: palette.cyan[500],
-
-  // Layout & UI
-  background: {
-    DEFAULT: "#f6f7f8",
-    dark: "#101922",
-  },
   text: {
-    DEFAULT: palette.slate[900], // label, input
-    muted: palette.gray[600],   // placeholder
-    normal: palette.slate[700],
+    main: palette.slate[900],
+    sub: palette.slate[500],
+    muted: palette.gray[400],
+    inverse: palette.white,
+    error: palette.red[500],
+  },
+  status: {
+    success: palette.emerald[600],
+    error: palette.red[600],
+    warning: palette.amber[500],
+    info: palette.cyan[500],
   },
   border: palette.slate[200],
-  ring: palette.blue.highlight,
 };
 
 const components = {
@@ -49,38 +46,11 @@ const components = {
     inactive: palette.gray[400],
     indicator: semantic.primary,
     border: "rgba(0, 0, 0, 0.2)",
-  },
-  card: {
-    default: palette.white,
-    foreground: semantic.text.DEFAULT,
-  },
-  popover: {
-    DEFAULT: palette.white,
-    foreground: semantic.text.DEFAULT,
-  },
-  muted: {
-    DEFAULT: palette.slate[100],
-    foreground: semantic.text.muted,
-  },
-  accent: {
-    DEFAULT: palette.slate[100],
-    foreground: palette.blue.highlight,
-  },
-  destructive: {
-    DEFAULT: palette.red[500],
-    foreground: palette.white,
-  },
+  }
 };
 
 module.exports = {
   ...palette,
   ...semantic,
   ...components,
-
-  placeholder: semantic.text.muted,
-  input: semantic.text.DEFAULT,
-  label: semantic.text.DEFAULT,
-  normal: semantic.text.normal,
-  "background-light": semantic.background.DEFAULT,
-  "background-dark": semantic.background.dark,
 };

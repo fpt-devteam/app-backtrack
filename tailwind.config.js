@@ -23,6 +23,21 @@ module.exports = {
       colors: {
         ...themeColors,
       },
+      textColor: {
+        main: themeColors.text.main,
+        sub: themeColors.text.sub,
+        muted: themeColors.text.muted,
+        inverse: themeColors.text.inverse,
+
+        error: themeColors.status.error,
+
+        ...themeColors,
+      },
+
+      borderColor: {
+        DEFAULT: themeColors.border,
+        ...themeColors,
+      },
 
       fontFamily: {
         ...themeTypography.fontFamily,

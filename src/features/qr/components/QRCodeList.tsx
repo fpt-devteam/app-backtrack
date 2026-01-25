@@ -1,3 +1,4 @@
+import { QRCodeCard } from '@/src/features/qr/components/QRCodeCard';
 import { useQRCodes } from '@/src/features/qr/hooks';
 import type { QrCodeData } from '@/src/features/qr/types';
 import { AppEndOfFeed, AppInlineError, AppLoader } from '@/src/shared/components';
@@ -5,7 +6,6 @@ import colors from '@/src/shared/theme/colors';
 import { QrCodeIcon } from 'phosphor-react-native';
 import React, { useCallback } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
-import { QRCodeCard } from '@/src/features/qr/components/QRCodeCard';
 
 type QRCodeListProps = {
   onItemPress?: (item: QrCodeData) => void;

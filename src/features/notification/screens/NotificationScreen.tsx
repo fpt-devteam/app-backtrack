@@ -7,7 +7,10 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
-import { AppHeader } from "@/src/shared/components/app-utils/AppHeader";
+import {
+  AppHeader,
+  HeaderTitle,
+} from "@/src/shared/components/app-utils/AppHeader";
 import { RelativePathString, router } from "expo-router";
 import {
   ArchiveIcon,
@@ -170,7 +173,7 @@ const NotificationScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       {mode === "normal" && (
-        <AppHeader title="Notifications" showBackButton={false} />
+        <AppHeader center={<HeaderTitle title="Notifications" />} />
       )}
 
       {mode === "candidate" && (

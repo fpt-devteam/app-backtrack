@@ -205,22 +205,20 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
         )
       }
 
-      {
-        !!similarPosts?.length && (
-          <View className="mx-4 mt-6">
-            <View className="flex-row items-center justify-between">
-              <Text className="text-[16px] font-extrabold text-slate-900">Similar Posts</Text>
-              <Text className="text-[12px] text-slate-500">{similarPosts.length}</Text>
-            </View>
-
-            <View className="mt-3 gap-3">
-              {similarPosts.map((p) => (
-                <SimilarPostCard key={p.id} postId={post.id} matchPost={p} />
-              ))}
-            </View>
+      {!!similarPosts?.length && (
+        <View className="mx-4 mt-6">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-[16px] font-extrabold text-slate-900">Similar Posts</Text>
+            <Text className="text-[12px] text-slate-500">{similarPosts.length}</Text>
           </View>
-        )
-      }
+
+          <View className="mt-3 gap-3">
+            {similarPosts.map((p) => (
+              <SimilarPostCard key={p.id} postId={post.id} matchPost={p} />
+            ))}
+          </View>
+        </View>
+      )}
     </Animated.ScrollView >
   );
 };

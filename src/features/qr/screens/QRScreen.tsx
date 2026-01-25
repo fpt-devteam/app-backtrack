@@ -1,7 +1,6 @@
 import { QRCodeList } from '@/src/features/qr/components';
 import type { QrCodeData } from '@/src/features/qr/types';
-import { AppHeader } from '@/src/shared/components';
-import { DotThreeButton } from '@/src/shared/components/ui/DotThreeButton';
+import { AppHeader, DotsThreeButton, HeaderTitle } from '@/src/shared/components';
 import { QR_ROUTE } from '@/src/shared/constants';
 import { RelativePathString, router } from 'expo-router';
 import React from 'react';
@@ -18,10 +17,8 @@ export const QRScreen = () => {
 
   return (
     <SafeAreaView className="flex-1">
-      <AppHeader title="My Protected Items" showBackButton={false} rightActionButton={<DotThreeButton onPress={handleMenuOpen} />} />
-
+      <AppHeader left={<HeaderTitle title="My Protected Items" />} right={<DotsThreeButton onPress={handleMenuOpen} />} />
       <QRCodeList onItemPress={handleQRCodePress} />
-
     </SafeAreaView>
   );
 };

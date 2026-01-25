@@ -8,6 +8,7 @@ import { useLocationSelectionStore } from "@/src/features/map/store";
 import { AppHeader } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";
 import colors from "@/src/shared/theme/colors";
+import { Header } from "@react-navigation/elements";
 import { router } from "expo-router";
 import { MagnifyingGlassIcon } from "phosphor-react-native";
 import React, { useEffect, useMemo, useRef } from "react";
@@ -87,9 +88,8 @@ export const MapOnlySearchScreen = () => {
   return (
     <View className="flex-1">
       <AppHeader
-        title="Select Location"
-        onBackPress={() => router.back()}
-        rightActionButton={
+        left={<Header title="Select Location" />}
+        right={
           <TouchableOpacity
             onPress={() => router.push(MAP_ROUTE.search)}
             activeOpacity={0.9}
