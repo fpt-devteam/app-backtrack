@@ -26,10 +26,8 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.fptdevteam.backtrack",
-      "googleServicesFile": "./GoogleService-Info.plist",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "googleServicesFile": "./google-services.json",
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "output": "static",
@@ -56,14 +54,18 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends.",
           "cameraPermission": "The app accesses your camera to let you take photos and share them with your friends."
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": false
     },
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "b7f7ee19-90e9-49bb-b5b3-aeb645c8944e"
+      }
     }
   }
 }

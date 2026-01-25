@@ -1,59 +1,67 @@
-import { auth } from '@/src/shared/lib';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useSync } from '@/src/features/auth/hooks';
-import type { AppUser } from '@/src/features/auth/types';
-import { useAuth } from '@/src/features/auth/providers/auth.provider';
+import { useSync } from "@/src/features/auth/hooks";
+import { useAuth } from "@/src/features/auth/providers/auth.provider";
+import type { AppUser } from "@/src/features/auth/types";
+
+import { useRegisterDeviceMutation } from "@/src/features/notification/hooks";
+import { auth } from "@/src/shared/lib";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type AppUserContextType = {
-  user: AppUser | null
-  isUserReady: boolean
-  isSyncing: boolean
-  error: Error | null
-  refreshUser: () => Promise<void>
-  clearUser: () => void
+  user: AppUser | null;
+  isSyncing: boolean;
+  error: Error | null;
+  clearUser: () => void;
 };
 
-const AppUserContext = React.createContext<AppUserContextType | undefined>(undefined);
+const AppUserContext = React.createContext<AppUserContextType | undefined>(
+  undefined,
+);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppUserProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { isAppReady, isLoggedIn } = useAuth();
+
   const { syncUser, loading, error } = useSync();
+  const { mutateAsync: syncExpoToken } = useRegisterDeviceMutation();
 
   const [user, setUser] = useState<AppUser | null>(null);
-  const [isUserReady, setIsUserReady] = useState(false);
 
   const mountedRef = useRef(true);
   const lastUidRef = useRef<string | null>(null);
+
   useEffect(() => {
-    mountedRef.current = true
+    mountedRef.current = true;
     return () => {
-      mountedRef.current = false
-    }
+      mountedRef.current = false;
+    };
   }, []);
 
   const clearUser = useCallback(() => {
     setUser(null);
-    setIsUserReady(true);
     lastUidRef.current = null;
   }, []);
 
   const doSync = useCallback(async () => {
     const firebaseUser = auth.currentUser;
-    if (!firebaseUser) throw new Error('No firebase user');
+    if (!firebaseUser) throw new Error("No firebase user");
+    if (!mountedRef.current) return;
 
     const uid = firebaseUser.uid;
     const idToken = await firebaseUser.getIdToken();
 
+    await syncExpoToken();
     const backendUser = (await syncUser({ idToken })).data;
-
-    console.log('Syncing user with UID:', uid);
-    console.log('idToken:', idToken);
-    console.log('User synced:', backendUser);
-
-    if (!mountedRef.current) return;
     setUser(backendUser);
     lastUidRef.current = uid;
-  }, [syncUser]);
+  }, [syncUser, syncExpoToken]);
 
   useEffect(() => {
     const run = async () => {
@@ -66,56 +74,39 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       try {
-        setIsUserReady(false);
-
         const firebaseUser = auth.currentUser;
         if (!firebaseUser) {
           if (mountedRef.current) clearUser();
           return;
         }
-
-        if (lastUidRef.current === firebaseUser.uid && user) {
-          if (mountedRef.current) setIsUserReady(true);
-          return;
-        } await doSync();
+        if (lastUidRef.current === firebaseUser.uid && user) return;
+        await doSync();
       } catch (e) {
-        console.log('User sync failed:', e);
+        console.log("User sync failed:", e);
         if (mountedRef.current) setUser(null);
-      } finally {
-        if (mountedRef.current) setIsUserReady(true);
       }
-    }
+    };
 
     run();
-  }, [isAppReady, isLoggedIn, clearUser, doSync, user]);
+  }, [isAppReady, isLoggedIn, syncExpoToken, clearUser, doSync, user]);
 
-  const refreshUser = useCallback(async () => {
-    if (!isLoggedIn) return;
-    try {
-      setIsUserReady(false);
-      await doSync();
-    } catch (e) {
-      console.log('refreshUser failed:', e);
-      if (mountedRef.current) setUser(null);
-    } finally {
-      if (mountedRef.current) setIsUserReady(true);
-    }
-  }, [isLoggedIn, doSync]);
+  const value = useMemo<AppUserContextType>(
+    () => ({
+      user,
+      isSyncing: loading,
+      error: error ?? null,
+      clearUser,
+    }),
+    [user, loading, error, clearUser],
+  );
 
-  const value = useMemo<AppUserContextType>(() => ({
-    user,
-    isUserReady,
-    isSyncing: loading,
-    error: error ?? null,
-    refreshUser,
-    clearUser,
-  }), [user, isUserReady, loading, error, refreshUser, clearUser]);
-
-  return <AppUserContext.Provider value={value}>{children}</AppUserContext.Provider>
-}
+  return (
+    <AppUserContext.Provider value={value}>{children}</AppUserContext.Provider>
+  );
+};
 
 export const useAppUser = () => {
-  const ctx = useContext(AppUserContext)
-  if (!ctx) throw new Error('useAppUser must be used within UserProvider')
-  return ctx
-}
+  const ctx = useContext(AppUserContext);
+  if (!ctx) throw new Error("useAppUser must be used within UserProvider");
+  return ctx;
+};
