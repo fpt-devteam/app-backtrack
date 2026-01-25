@@ -31,7 +31,6 @@ export const useNotifications = ({
       };
 
       const res = await filterNotificationsApi(filterRequest);
-      console.log("Res", res);
       if (!res) throw new Error("Failed to fetch notifications");
       return res;
     },

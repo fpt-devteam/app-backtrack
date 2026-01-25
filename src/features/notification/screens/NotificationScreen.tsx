@@ -7,6 +7,8 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
+import { AppHeader } from "@/src/shared/components/app-utils/AppHeader";
+import { RelativePathString, router } from "expo-router";
 import {
   ArchiveIcon,
   EnvelopeSimpleIcon,
@@ -97,8 +99,11 @@ const NotificationScreen = () => {
   };
 
   const handleNormalPress = (notification: UserNotification) => {
-    // Navigation will be implemented when notification detail route is available
-    console.log("Navigate to:", notification);
+    const screenPath = notification.data?.screenPath as RelativePathString;
+    if (!screenPath) return;
+
+    console.log("Navigate to:", screenPath);
+    router.push(screenPath);
   };
 
   const handleEndReached = () => {
@@ -165,21 +170,17 @@ const NotificationScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       {mode === "normal" && (
-        <View className="bg-white border-b border-slate-200 px-4 py-3">
-          <Text className="text-2xl font-bold text-slate-900">
-            Notifications
-          </Text>
-        </View>
+        <AppHeader title="Notifications" showBackButton={false} />
       )}
 
       {mode === "candidate" && (
-        <View className="bg-white border-b border-slate-200 px-4 py-3">
+        <View className="bg-white border-b border-slate-200 px-4 py-4">
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-3">
               <Pressable onPress={onExitCandidate} hitSlop={8}>
                 <XIcon size={24} color="#0ea5e9" weight="bold" />
               </Pressable>
-              <Text className="text-lg font-semibold text-slate-900">
+              <Text className="text-2xl font-bold text-slate-900">
                 {selectedCount} selected
               </Text>
             </View>
