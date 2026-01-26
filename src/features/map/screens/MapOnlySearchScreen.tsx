@@ -38,13 +38,13 @@ export const MapOnlySearchScreen = () => {
 
       onChangeSelection(initSelection);
     })();
-  }, []);
+  }, [getUserLocation, onChangeSelection]);
 
   useEffect(() => {
     const coords = selection?.location;
     if (!coords) return;
     handleMoveMarker(coords);
-  });
+  }, [selection]);
 
   const onCoordinateChange = async (coord: LatLng) => {
     const geocodeResult = await reverseGeocode({ location: coord });

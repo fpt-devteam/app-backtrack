@@ -3,7 +3,15 @@ import type { UserLocation } from "@/src/features/map/types";
 import { useAnalyzeImage, useCreatePost } from "@/src/features/post/hooks";
 import type { Post, PostCreateRequest } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
-import { AppHeader, AppLoader, CloseButton, DateTimePickerField, HeaderTitle, ImageField, TextButton } from "@/src/shared/components";
+import {
+  AppHeader,
+  AppLoader,
+  CloseButton,
+  DateTimePickerField,
+  HeaderTitle,
+  ImageField,
+  TextButton,
+} from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
@@ -18,7 +26,15 @@ import { SparkleIcon } from "phosphor-react-native";
 import React, { useState } from "react";
 import type { SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as yup from "yup";
 
 const postSchema = yup
@@ -78,7 +94,7 @@ type PostFormProps = {
   initialData: Nullable<Post>;
 };
 
-export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
+export const PostForm = ({ postType, initialData }: PostFormProps) => {
   const [postData, setPostData] = useState<Nullable<Post>>(initialData);
   const { uploadImages, isUploadingImages } = useUploadImage();
   const { createPost, isCreatingPost } = useCreatePost();
@@ -96,17 +112,23 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
 
   const loading = isUploadingImages || isCreatingPost || isAnalyzing;
 
-  const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<PostFormSchema>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<PostFormSchema>({
     defaultValues: {
       itemName: postData?.itemName ?? "",
       description: postData?.description ?? "",
       eventTime: postData?.eventTime ? new Date(postData.eventTime) : undefined,
       detailLocation: postData?.location
         ? {
-          location: postData?.location,
-          externalPlaceId: postData?.externalPlaceId ?? null,
-          displayAddress: postData?.displayAddress ?? null,
-        }
+            location: postData?.location,
+            externalPlaceId: postData?.externalPlaceId ?? null,
+            displayAddress: postData?.displayAddress ?? null,
+          }
         : undefined,
       images: [] as ImagePickerAsset[],
     },
@@ -173,7 +195,9 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         toast.error("Failed to create post. Please try again.");
         return;
       }
-      router.push(POST_ROUTE.matching(postId) as RelativePathString | ExternalPathString);
+      router.push(
+        POST_ROUTE.matching(postId) as RelativePathString | ExternalPathString,
+      );
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("Failed to submit post. Please try again.");
@@ -205,12 +229,17 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
         </View>
       </Modal>
 
-      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={40} className="flex-1">
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={40}
+        className="flex-1"
+      >
         {/* Form Fields */}
         <ScrollView
           className="bg-white p-4 border-t border-slate-100 flex-1"
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+        >
           {/* Image Picker */}
           <View className="mb-4">
             <Controller
@@ -342,11 +371,23 @@ export const PostForm = ({ postType, mode, initialData }: PostFormProps) => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </View >
+    </View>
   );
 };
 
-const PostFormHeader = ({ title, handleSubmit, onSubmit, disabled, isSubmitting }: { title: string; handleSubmit: UseFormHandleSubmit<PostFormSchema>; onSubmit: SubmitHandler<PostFormSchema>; disabled: boolean; isSubmitting: boolean }) => {
+const PostFormHeader = ({
+  title,
+  handleSubmit,
+  onSubmit,
+  disabled,
+  isSubmitting,
+}: {
+  title: string;
+  handleSubmit: UseFormHandleSubmit<PostFormSchema>;
+  onSubmit: SubmitHandler<PostFormSchema>;
+  disabled: boolean;
+  isSubmitting: boolean;
+}) => {
   return (
     <AppHeader
       left={<CloseButton />}
@@ -356,15 +397,10 @@ const PostFormHeader = ({ title, handleSubmit, onSubmit, disabled, isSubmitting 
           label="Submit"
           disabled={disabled}
           isSubmitting={isSubmitting}
-          onPress={
-            handleSubmit(
-              onSubmit,
-              (errs) => {
-                console.log("FORM INVALID:", errs);
-                toast.error("Form invalid", "please check required fields");
-              }
-            )
-          }
+          onPress={handleSubmit(onSubmit, (errs) => {
+            console.log("FORM INVALID:", errs);
+            toast.error("Form invalid", "please check required fields");
+          })}
         />
       }
       className="h-12 bg-white px-4"
