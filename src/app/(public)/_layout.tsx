@@ -13,7 +13,7 @@ function PublicLayout() {
     return <Redirect href={POST_ROUTE.index as RelativePathString} />;
   }
   return (
-    <SafeAreaView className="flex-1 p-6">
+    <SafeAreaView className="flex-1 p-6 bg-background">
       <Slot />
     </SafeAreaView>
   );
