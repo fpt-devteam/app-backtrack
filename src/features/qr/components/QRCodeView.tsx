@@ -1,12 +1,13 @@
 import { getQrCodeImage } from '@/src/features/qr/api';
 import { AppHeader, AppInlineError, AppLoader, HeaderTitle } from '@/src/shared/components';
-import colors from '@/src/shared/theme/colors';
+import { colors } from "@/src/shared/theme/colors";
 import * as Clipboard from 'expo-clipboard';
 import { Image } from 'expo-image';
 import { CopyIcon, DownloadSimpleIcon } from 'phosphor-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+;
 
 type QRCodeViewProps = {
   publicCode: string;

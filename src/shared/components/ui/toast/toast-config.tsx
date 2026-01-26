@@ -1,4 +1,4 @@
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import { BlurView } from "expo-blur";
 import {
   CheckCircleIcon,
@@ -20,10 +20,10 @@ const TOKENS: Record<
     Icon: React.FC<IconProps>;
   }
 > = {
-  info: { color: colors.info, Icon: InfoIcon },
-  warning: { color: colors.warning, Icon: WarningIcon },
-  error: { color: colors.error, Icon: WarningCircleIcon },
-  success: { color: colors.success, Icon: CheckCircleIcon },
+  info: { color: colors.status.info, Icon: InfoIcon },
+  warning: { color: colors.status.warning, Icon: WarningIcon },
+  error: { color: colors.status.error, Icon: WarningCircleIcon },
+  success: { color: colors.status.success, Icon: CheckCircleIcon },
 };
 
 const IOSGlassToast = ({
@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "600",
-    color: colors.text.primary,
+    color: colors.text.main,
     letterSpacing: -0.4,
   },
   subtitle: {
     fontSize: 14,
     fontWeight: "400",
-    color: colors.text.normal,
+    color: colors.text.sub,
     opacity: 0.6,
     marginTop: 2,
     lineHeight: 18,

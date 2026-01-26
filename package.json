@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "ts": "tsc --noEmit",
-    "check": "tsc --noEmit && eslint .",
+    "check:all": "tsc --noEmit && eslint .",
+    "check:changed": "lint-staged",
     "prepare": "husky"
   },
   "dependencies": {
@@ -86,8 +87,8 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "husky": "^9.1.7",
-    "react-native-svg-transformer": "^1.5.2",
-    "typescript": "~5.9.2"
+    "lint-staged": "^16.2.7",
+    "react-native-svg-transformer": "^1.5.2"
   },
   "private": true
 }

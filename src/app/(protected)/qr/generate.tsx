@@ -35,7 +35,7 @@ const GenerateQRScreen = () => {
     } as CreateQrCodeRequest);
   }
 
-  const buildInitialDescription = (): string => {
+  const buildInitialDescription = React.useCallback((): string => {
     if (!user) return '';
 
     const ownerName = user.displayName || 'Owner';
@@ -46,7 +46,7 @@ const GenerateQRScreen = () => {
 Owner Contact: ${ownerContact}
 
 If you found this item, please contact the owner. Your kindness and help in returning this item would be greatly appreciated!`;
-  }
+  }, [user]);
 
   const initializeFormData = useMemo((): QRCodeProfileFormSchema => {
     return {
@@ -54,7 +54,7 @@ If you found this item, please contact the owner. Your kindness and help in retu
       description: buildInitialDescription(),
       images: [],
     };
-  }, [user])
+  }, [buildInitialDescription]);
 
   return (
     <QRCodeProfileForm

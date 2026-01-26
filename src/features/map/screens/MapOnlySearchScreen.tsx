@@ -7,11 +7,11 @@ import { useReverseGeocoding, useUserLocation } from "@/src/features/map/hooks";
 import { useLocationSelectionStore } from "@/src/features/map/store";
 import { AppHeader } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import { Header } from "@react-navigation/elements";
 import { router } from "expo-router";
 import { MagnifyingGlassIcon } from "phosphor-react-native";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import type { LatLng, Region } from "react-native-maps";
 import MapView from "react-native-maps";
@@ -25,13 +25,6 @@ export const MapOnlySearchScreen = () => {
   const { selection, onChangeSelection, onConfirmSelection } =
     useLocationSelectionStore();
   const { reverseGeocode } = useReverseGeocoding();
-
-  const searchDisplayText = useMemo(() => {
-    if (!selection) return placeholder;
-
-    const displayText = selection ? selection.displayAddress : placeholder;
-    return displayText;
-  }, [selection]);
 
   useEffect(() => {
     (async () => {
@@ -51,7 +44,7 @@ export const MapOnlySearchScreen = () => {
     const coords = selection?.location;
     if (!coords) return;
     handleMoveMarker(coords);
-  }, [selection]);
+  });
 
   const onCoordinateChange = async (coord: LatLng) => {
     const geocodeResult = await reverseGeocode({ location: coord });

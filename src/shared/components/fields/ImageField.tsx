@@ -1,9 +1,10 @@
 import { ensureMediaPermission } from '@/src/shared/services';
-import colors from '@/src/shared/theme/colors';
+import { colors } from "@/src/shared/theme/colors";
 import { launchImageLibraryAsync, type ImagePickerAsset, type ImagePickerOptions, } from 'expo-image-picker';
 import { CameraIcon, PlusIcon, XIcon } from 'phosphor-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+;
 
 const MAX_IMAGES = 5;
 

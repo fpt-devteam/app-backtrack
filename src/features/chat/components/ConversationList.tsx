@@ -1,22 +1,10 @@
-import { ConversationCard } from '@/src/features/chat/components/ConversationCard'
-import { useConversations } from '@/src/features/chat/hooks'
-import { AppInlineError, AppLoader } from '@/src/shared/components'
-import colors from '@/src/shared/theme/colors'
-import { EmptyIcon } from 'phosphor-react-native'
-import React, { useCallback, useMemo, useRef } from 'react'
-import { FlatList, RefreshControl } from 'react-native'
-
-interface FooterProps {
-  isFetchingNextPage: boolean
-  hasNextPage: boolean
-}
-
-const Footer = ({ isFetchingNextPage, hasNextPage }: FooterProps) => {
-  if (isFetchingNextPage) {
-    return <AppLoader />;
-  }
-  return null;
-}
+import { ConversationCard } from '@/src/features/chat/components/ConversationCard';
+import { useConversations } from '@/src/features/chat/hooks';
+import { AppInlineError, AppListFooter, AppSplashScreen } from '@/src/shared/components';
+import { colors } from "@/src/shared/theme/colors";
+import { EmptyIcon } from 'phosphor-react-native';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { FlatList, RefreshControl } from 'react-native';
 
 export const ConversationList = () => {
   const {
@@ -53,7 +41,7 @@ export const ConversationList = () => {
   }, [isFetching, isFetchingNextPage])
 
   if (isLoading) {
-    return <AppLoader />
+    return <AppSplashScreen />;
   }
 
   if (isError) {
@@ -70,7 +58,7 @@ export const ConversationList = () => {
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.35}
       ListFooterComponent={
-        <Footer isFetchingNextPage={isFetchingNextPage} hasNextPage={!!hasNextPage} />
+        <AppListFooter isFetchingNextPage={isFetchingNextPage} hasNextPage={!!hasNextPage} />
       }
       ListEmptyComponent={<EmptyIcon color={colors.slate[400]} />}
       refreshControl={

@@ -1,6 +1,6 @@
-export { AppEndOfFeed } from "@/src/shared/components/app-utils/AppEndOfFeed";
 export { AppHeader, BackButton, CloseButton, DotsThreeButton, HeaderTitle, TextButton } from "@/src/shared/components/app-utils/AppHeader";
 export { AppInlineError } from "@/src/shared/components/app-utils/AppInlineError";
+export { AppListFooter } from "@/src/shared/components/app-utils/AppListFooter";
 export { AppLoader } from '@/src/shared/components/app-utils/AppLoader';
 export { AppLogo } from "@/src/shared/components/app-utils/AppLogo";
 export { AppSlogan } from "@/src/shared/components/app-utils/AppSlogan";

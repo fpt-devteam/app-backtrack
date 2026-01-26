@@ -1,5 +1,5 @@
 import { useUserCoordinates } from "@/src/features/map/hooks";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import { NavigationArrowIcon } from "phosphor-react-native";
 import React from "react";
 import type { GestureResponderEvent } from "react-native";

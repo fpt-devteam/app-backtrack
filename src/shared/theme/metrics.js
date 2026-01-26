@@ -1,18 +1,4 @@
-/**
- * Design System Metrics - Source of Truth
- *
- * Layout and spacing tokens that work across both Web (Tailwind) and Native (RN).
- * These values are imported by:
- * - tailwind.config.js (for web/NativeWind)
- * - app-metrics.ts (for React Native specific metrics)
- *
- * Note: Typography tokens are in typography.js
- */
-
-module.exports = {
-  // ============================================================================
-  // SPACING SCALE
-  // ============================================================================
+const metrics = {
   spacing: {
     xs: 4,
     sm: 8,
@@ -22,9 +8,6 @@ module.exports = {
     "2xl": 48,
   },
 
-  // ============================================================================
-  // BORDER RADIUS
-  // ============================================================================
   borderRadius: {
     none: 0,
     sm: 4,
@@ -36,18 +19,15 @@ module.exports = {
     full: 9999,
   },
 
-  // ============================================================================
-  // LAYOUT DIMENSIONS
-  // ============================================================================
   layout: {
-    // Common heights
-    buttonHeight: {
-      sm: 32,
-      md: 40,
-      lg: 48,
+    controlHeight: {
+      xs: 16,
+      sm: 24,
+      md: 32,
+      lg: 40,
+      xl: 48,
     },
 
-    // Container max widths
     container: {
       sm: 640,
       md: 768,
@@ -56,19 +36,15 @@ module.exports = {
     },
   },
 
-  // ============================================================================
-  // ANIMATION DURATIONS (in milliseconds)
-  // ============================================================================
-  duration: {
-    fast: 100,
-    normal: 200,
-    slow: 300,
-    slower: 500,
+  motion: {
+    duration: {
+      fast: 100,
+      normal: 200,
+      slow: 300,
+      slower: 500,
+    },
   },
 
-  // ============================================================================
-  // TAB BAR METRICS (React Native specific)
-  // ============================================================================
   tabBar: {
     height: 75,
     iconSize: 28,
@@ -85,28 +61,6 @@ module.exports = {
     },
   },
 
-  // ============================================================================
-  // MOTION TIMINGS (React Native animations)
-  // ============================================================================
-  motion: {
-    press: {
-      in: 100,
-      out: 100,
-    },
-    bottomSheet: {
-      in: 300,
-      out: 250,
-    },
-    transition: {
-      fast: 200,
-      normal: 300,
-      slow: 500,
-    },
-  },
-
-  // ============================================================================
-  // SHADOWS (Platform-specific)
-  // ============================================================================
   shadows: {
     sm: {
       ios: {
@@ -154,3 +108,5 @@ module.exports = {
     },
   },
 };
+
+module.exports = { metrics };

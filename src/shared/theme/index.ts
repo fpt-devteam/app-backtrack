@@ -1,19 +1,7 @@
-/**
- * Theme Exports - Design System Entry Point
- *
- * Re-exports design tokens from JS source files for TypeScript consumption.
- * The JS files are the source of truth used by:
- * - Tailwind CSS configuration
- * - React Native components
- * - Type definitions
- */
+import { colors as colorsJS } from "@/src/shared/theme/colors";
+import { metrics as metricsJS } from "@/src/shared/theme/metrics";
+import { typography as typographyJS } from "@/src/shared/theme/typography";
 
-// Import JS source files
-const colorsJS = require('./colors');
-const metricsJS = require('./metrics');
-const typographyJS = require('./typography');
-
-// Export with proper types for TypeScript
 export const colors = colorsJS;
 export const metrics = metricsJS;
 export const typography = typographyJS;
@@ -23,3 +11,5 @@ export type AppTheme = {
   metrics: typeof metrics;
   typography: typeof typography;
 };
+
+export type ColorKeys = keyof typeof colors;

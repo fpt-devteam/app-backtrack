@@ -35,8 +35,8 @@ export const TabBarButton = ({
     }
 
     pressOpacity.value = withSequence(
-      withTiming(0.6, { duration: metrics.motion.press.in }),
-      withTiming(1, { duration: metrics.motion.press.out }),
+      withTiming(0.6, { duration: metrics.motion.duration.fast }),
+      withTiming(1, { duration: metrics.motion.duration.slower })
     );
 
     onPress();
@@ -59,9 +59,7 @@ export const TabBarButton = ({
         <Icon
           weight="fill"
           size={metrics.tabBar.iconSize}
-          color={
-            isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive
-          }
+          color={isFocused ? colors.primary : colors.gray[400]}
         />
         {badge !== undefined && badge > 0 && (
           <View style={styles.badge}>
@@ -71,7 +69,7 @@ export const TabBarButton = ({
       </View>
 
       <Text
-        className={isFocused ? "text-tab-bar-active" : "text-tab-bar-inactive"}
+        className={isFocused ? "text-primary" : "text-gray-400"}
         style={[
           styles.label,
           {

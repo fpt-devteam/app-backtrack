@@ -3,6 +3,7 @@ import { POST_ROUTE } from "@/src/shared/constants";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import {
+  IconProps,
   MagnifyingGlassIcon,
   MapTrifoldIcon,
   PlusCircleIcon,
@@ -12,7 +13,7 @@ import { Pressable, View } from "react-native";
 
 type HeaderAction = {
   key: string;
-  Icon: React.ElementType<{ size: number; color: string; weight?: any }>;
+  Icon: React.ComponentType<IconProps>;
   onPress: () => void;
 };
 

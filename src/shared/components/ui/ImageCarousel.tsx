@@ -41,12 +41,12 @@ export const ImageCarousel = ({ data, height = 480, initialIndex = 0 }: Props) =
         keyExtractor={(uri, i) => `${uri}-${i}`}
         horizontal
         pagingEnabled
-        scrollEnabled={true}                // ✅ cho swipe
-        onMomentumScrollEnd={onMomentumScrollEnd} // ✅ cập nhật index
+        scrollEnabled={true}               
+        onMomentumScrollEnd={onMomentumScrollEnd} 
         showsHorizontalScrollIndicator={false}
         initialScrollIndex={safeInitial}
         onScrollToIndexFailed={onScrollToIndexFailed}
-        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })} // ✅ giảm lỗi scrollToIndex
+        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })} 
         renderItem={({ item }) => (
           <View style={{ width, height, justifyContent: "center" }}>
             <Image

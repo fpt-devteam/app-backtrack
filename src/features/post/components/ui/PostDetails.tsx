@@ -10,7 +10,7 @@ import { ImageCarousel } from "@/src/shared/components";
 import { Divider } from "@/src/shared/components/ui/Divider";
 import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE } from "@/src/shared/constants";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
