@@ -57,7 +57,7 @@ export const MapScreen = () => {
 
       onChangeSelection(initSelection);
     })();
-  }, []);
+  }, [getUserLocation, onChangeSelection]);
 
   const postParams = useMemo(() => {
     if (!selection?.location || !selection?.radiusKm)
@@ -90,7 +90,7 @@ export const MapScreen = () => {
     return () => {
       setBottomTabBarState("open");
     };
-  }, [sheetVisible]);
+  }, [sheetVisible, setBottomTabBarState]);
 
   useEffect(() => {
     const coords = selection?.location;
@@ -164,9 +164,7 @@ export const MapScreen = () => {
                 disabled={false}
                 onPress={() => {
                   handleOpenSheet();
-                  bottomSheetElement.current = (
-                    <PostDetails postId={item.id} />
-                  );
+                  bottomSheetElement.current = <PostDetails postId={item.id} />;
                 }}
               />
             ))}
@@ -193,7 +191,11 @@ export const MapScreen = () => {
               hitSlop={10}
               style={{ paddingLeft: 16, paddingRight: 10, paddingVertical: 14 }}
             >
-              <CaretLeftIcon size={20} color={colors.slate[700]} weight="bold" />
+              <CaretLeftIcon
+                size={20}
+                color={colors.slate[700]}
+                weight="bold"
+              />
             </Pressable>
 
             {/* Tap area for search */}

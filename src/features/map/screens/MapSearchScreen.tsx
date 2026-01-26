@@ -101,7 +101,7 @@ export const MapSearchScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [displayMode]);
+  }, [displayMode, fade, slide]);
 
   const handleSelectPlace = async (prediction: PlacePrediction) => {
     try {

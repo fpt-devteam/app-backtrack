@@ -33,8 +33,7 @@ export const LocationField = ({
   useEffect(() => {
     if (!confirmedSelection) return;
     onChange(confirmedSelection);
-    console.log("Data at field: ", confirmedSelection);
-  }, [confirmedSelection]);
+  }, [confirmedSelection, onChange]);
 
   const handlePress = () =>
     router.push(POST_ROUTE.searchLocation as RelativePathString);
