@@ -1,14 +1,17 @@
-import { getQrCodeImage } from '@/src/features/qr/api';
-import { AppHeader, AppInlineError, AppLoader, HeaderTitle } from '@/src/shared/components';
+import { getQrCodeImage } from "@/src/features/qr/api";
+import {
+  AppHeader,
+  AppInlineError,
+  AppLoader,
+  HeaderTitle,
+} from "@/src/shared/components";
 import { colors } from "@/src/shared/theme/colors";
-import * as Clipboard from 'expo-clipboard';
-import { Image } from 'expo-image';
-import { CopyIcon, DownloadSimpleIcon } from 'phosphor-react-native';
-import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-;
-
+import * as Clipboard from "expo-clipboard";
+import { Image } from "expo-image";
+import { CopyIcon, DownloadSimpleIcon } from "phosphor-react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 type QRCodeViewProps = {
   publicCode: string;
   itemName?: string;
@@ -20,33 +23,31 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadQRCodeImage();
-  }, [publicCode]);
-
-  const loadQRCodeImage = async () => {
+  const loadQRCodeImage = React.useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
       const imageBuffer = await getQrCodeImage(publicCode);
-
-      // Convert ArrayBuffer to base64
       const base64 = arrayBufferToBase64(imageBuffer);
       const dataUri = `data:image/png;base64,${base64}`;
 
       setQrImageUri(dataUri);
     } catch (err) {
-      console.error('Failed to load QR code:', err);
-      setError('Failed to load QR code. Please try again.');
+      console.error("Failed to load QR code:", err);
+      setError("Failed to load QR code. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [publicCode]);
+
+  useEffect(() => {
+    loadQRCodeImage();
+  }, [loadQRCodeImage]);
 
   const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
     const bytes = new Uint8Array(buffer);
-    let binary = '';
+    let binary = "";
     for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCodePoint(bytes[i]);
     }
@@ -56,31 +57,35 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
   const handleCopyCode = async () => {
     try {
       await Clipboard.setStringAsync(publicCode);
-      Alert.alert('Copied!', 'QR code copied to clipboard.');
+      Alert.alert("Copied!", "QR code copied to clipboard.");
     } catch (err) {
       console.log(err);
-      Alert.alert('Error', 'Failed to copy code.');
+      Alert.alert("Error", "Failed to copy code.");
     }
   };
 
   const handleDownload = () => {
-    Alert.alert('Coming Soon', 'QR code download feature is under development.');
+    Alert.alert(
+      "Coming Soon",
+      "QR code download feature is under development.",
+    );
   };
 
   return (
     <View className="flex-1 bg-white" style={{ paddingBottom: insets.bottom }}>
-      <AppHeader
-        left={<HeaderTitle title={"QR Code"} />} />
+      <AppHeader left={<HeaderTitle title={"QR Code"} />} />
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ padding: 16, alignItems: 'center' }}
+        contentContainerStyle={{ padding: 16, alignItems: "center" }}
         showsVerticalScrollIndicator={false}
       >
         {/* Item Name */}
         {itemName && (
           <View className="w-full mb-6">
-            <Text className="text-xl font-bold text-gray-900 text-center">{itemName}</Text>
+            <Text className="text-xl font-bold text-gray-900 text-center">
+              {itemName}
+            </Text>
           </View>
         )}
 
@@ -88,7 +93,7 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
         <View
           className="w-full max-w-sm aspect-square rounded-3xl mb-6 items-center justify-center"
           style={{
-            backgroundColor: 'white',
+            backgroundColor: "white",
             borderWidth: 1,
             borderColor: colors.slate[200],
             shadowColor: colors.black,
@@ -106,7 +111,7 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
             <View className="w-[85%] h-[85%] items-center justify-center">
               <Image
                 source={{ uri: qrImageUri }}
-                style={{ width: '100%', height: '100%' }}
+                style={{ width: "100%", height: "100%" }}
                 contentFit="contain"
               />
             </View>
@@ -115,12 +120,16 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
 
         {/* QR Code ID */}
         <View className="w-full mb-6">
-          <Text className="text-xs text-gray-500 text-center mb-1">QR CODE ID</Text>
+          <Text className="text-xs text-gray-500 text-center mb-1">
+            QR CODE ID
+          </Text>
           <Pressable
             onPress={handleCopyCode}
             className="flex-row items-center justify-center py-2 px-4 rounded-lg active:bg-gray-100"
           >
-            <Text className="text-lg font-mono font-semibold text-gray-900">{publicCode}</Text>
+            <Text className="text-lg font-mono font-semibold text-gray-900">
+              {publicCode}
+            </Text>
             <CopyIcon size={18} color={colors.slate[600]} weight="regular" />
           </Pressable>
         </View>
@@ -138,21 +147,27 @@ export const QRCodeView = ({ publicCode, itemName }: QRCodeViewProps) => {
             }}
           >
             <DownloadSimpleIcon size={20} color="white" weight="bold" />
-            <Text className="text-base font-semibold text-white ml-2">Download QR Code</Text>
+            <Text className="text-base font-semibold text-white ml-2">
+              Download QR Code
+            </Text>
           </Pressable>
         </View>
 
         {/* Instructions */}
-        <View className="w-full max-w-sm mt-8 p-4 rounded-2xl" style={{ backgroundColor: colors.slate[50] }}>
-          <Text className="text-sm font-semibold text-gray-900 mb-2">How to use this QR Code</Text>
+        <View
+          className="w-full max-w-sm mt-8 p-4 rounded-2xl"
+          style={{ backgroundColor: colors.slate[50] }}
+        >
+          <Text className="text-sm font-semibold text-gray-900 mb-2">
+            How to use this QR Code
+          </Text>
           <Text className="text-sm text-gray-600 leading-5">
-            Anyone who scans this QR code will be able to view the item details and contact you if
-            they find your lost item or want to return your found item.
+            Anyone who scans this QR code will be able to view the item details
+            and contact you if they find your lost item or want to return your
+            found item.
           </Text>
         </View>
       </ScrollView>
     </View>
   );
 };
-
-

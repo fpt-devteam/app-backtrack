@@ -85,7 +85,7 @@ const RecentListService = {
   STORAGE_KEY: "recent_searches_v1",
 
   normalize(term: string) {
-    return term.trim().replace(/\s+/g, " ");
+    return term.trim().replaceAll(/\s+/g, " ");
   },
 
   async load(): Promise<string[]> {
@@ -104,7 +104,7 @@ const RecentListService = {
   async save(list: string[]) {
     try {
       await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
-    } catch { }
+    } catch {}
   },
 
   buildAddedList(current: string[], term: string, max = 10) {
@@ -192,7 +192,7 @@ export const PostSearchScreen = () => {
   const fade = useRef(new Animated.Value(1)).current;
   const slide = useRef(new Animated.Value(0)).current;
 
-  const runSwapAnimation = () => {
+  const runSwapAnimation = React.useCallback(() => {
     fade.setValue(0);
     slide.setValue(8);
 
@@ -210,7 +210,7 @@ export const PostSearchScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  };
+  }, [fade, slide]);
 
   useEffect(() => {
     (async () => {
@@ -266,7 +266,7 @@ export const PostSearchScreen = () => {
     return () => {
       cancelled = true;
     };
-  }, [debouncedQuery, isFocused]);
+  }, [debouncedQuery, isFocused, displayType, query, recent, runSwapAnimation]);
 
   const clearRecent = async () => {
     const next = await RecentListService.clearAndPersist();

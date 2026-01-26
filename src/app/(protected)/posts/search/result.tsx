@@ -1,4 +1,3 @@
-import type { UserLocation } from "@/src/features/map/types";
 import { MinimalPostCard } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
@@ -6,90 +5,29 @@ import { PostType } from "@/src/features/post/types";
 import { AppListFooter, ChipsRow } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import type { LocationFilterValue } from "@/src/shared/types";
-import { yupResolver } from "@hookform/resolvers/yup";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router, useLocalSearchParams } from "expo-router";
 import { ArrowLeftIcon, MagnifyingGlassIcon } from "phosphor-react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useForm } from "react-hook-form";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-import * as yup from "yup";
-const filterSchema = yup
-  .object({
-    detailLocation: yup.mixed<UserLocation>().defined(),
-  })
-  .required();
-
-type FilterSchema = yup.InferType<typeof filterSchema>;
-
-const isLocationFilterValue = (
-  value: unknown,
-): value is LocationFilterValue => {
-  if (!value || typeof value !== "object") return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.lat === "number" &&
-    typeof record.lng === "number" &&
-    typeof record.radius === "number" &&
-    (record.label === undefined || typeof record.label === "string") &&
-    (record.placeId === undefined || typeof record.placeId === "string")
-  );
-};
-
-const parseLocationFilter = (raw?: string): LocationFilterValue | null => {
-  if (!raw) return null;
-  try {
-    const parsed: unknown = JSON.parse(raw);
-    return isLocationFilterValue(parsed) ? parsed : null;
-  } catch {
-    return null;
-  }
-};
+type PostChipType = PostType | "All";
 
 export default function PostSearchResultScreen() {
-  const { termSearch, locationFilter } = useLocalSearchParams<{
+  const { termSearch } = useLocalSearchParams<{
     termSearch?: string;
-    locationFilter?: string;
   }>();
 
-  useForm<FilterSchema>({
-    defaultValues: {
-      detailLocation: undefined,
-    },
-    resolver: yupResolver(filterSchema),
-    mode: "onSubmit",
-  });
-
-  const searchTermData = (termSearch ?? "").toString();
-
-  const parsedLocationFilter = useMemo(
-    () => parseLocationFilter(locationFilter),
-    [locationFilter],
-  );
-
   const isEndOfFeedRef = useRef(false);
+  const [selectedPostType, setSelectedPostType] = useState<PostChipType>("All");
 
-  const [selectedPostType, setSelectedPostType] = useState<PostType | "All">(
-    "All",
+  const searchTermData = React.useMemo(
+    () => (termSearch ?? "").toString(),
+    [termSearch],
   );
 
   const [filters, setFilters] = useState<PostFilters>({
     searchTerm: searchTermData || undefined,
-    location: parsedLocationFilter
-      ? {
-        latitude: parsedLocationFilter.lat,
-        longitude: parsedLocationFilter.lng,
-      }
-      : undefined,
-    radiusInKm: parsedLocationFilter?.radius,
   });
 
   const { items, hasMore, loadMore, isLoadingNextPage } = usePosts({
@@ -101,18 +39,10 @@ export default function PostSearchResultScreen() {
   }, [hasMore]);
 
   useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
+    setFilters({
       searchTerm: searchTermData || undefined,
-      location: parsedLocationFilter
-        ? {
-          latitude: parsedLocationFilter.lat,
-          longitude: parsedLocationFilter.lng,
-        }
-        : undefined,
-      radiusInKm: parsedLocationFilter?.radius,
-    }));
-  }, [parsedLocationFilter, searchTermData]);
+    });
+  }, [searchTermData]);
 
   const handleEndReached = useCallback(() => {
     if (!hasMore) return;
@@ -199,7 +129,12 @@ export default function PostSearchResultScreen() {
         renderItem={({ item }) => <MinimalPostCard post={item} />}
         onEndReached={handleEndReached}
         scrollEventThrottle={16}
-        ListFooterComponent={<AppListFooter isFetchingNextPage={isLoadingNextPage} hasNextPage={!!hasMore} />}
+        ListFooterComponent={
+          <AppListFooter
+            isFetchingNextPage={isLoadingNextPage}
+            hasNextPage={!!hasMore}
+          />
+        }
         contentContainerStyle={{ padding: 16 }}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
