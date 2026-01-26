@@ -12,6 +12,7 @@ export { DateTimePickerField } from "@/src/shared/components/fields/DateTimePick
 export { EmailField } from "@/src/shared/components/fields/EmailField";
 export { ImageField } from "@/src/shared/components/fields/ImageField";
 export { PasswordField } from "@/src/shared/components/fields/PasswordField";
+export { ParallaxScrollView } from '@/src/shared/components/ui/bna/ParallaxScrollview';
 export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
 export { ChipsRow } from '@/src/shared/components/ui/ChipsRow';
 export { FAB } from '@/src/shared/components/ui/FAB';
@@ -20,4 +21,3 @@ export { ImageCarousel } from '@/src/shared/components/ui/ImageCarousel';
 export { MenuBottomSheet } from '@/src/shared/components/ui/MenuBottomSheet';
 export type { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 export { SuggestRow } from '@/src/shared/components/ui/SuggestRow';
-

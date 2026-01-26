@@ -16,7 +16,7 @@ export const QRScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-background">
       <AppHeader left={<HeaderTitle title="My Protected Items" />} right={<DotsThreeButton onPress={handleMenuOpen} />} />
       <QRCodeList onItemPress={handleQRCodePress} />
     </SafeAreaView>

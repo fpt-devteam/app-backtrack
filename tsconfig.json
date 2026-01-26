@@ -19,6 +19,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts",
-    "src/shared/theme/colors.ts"
+    "docs/contents/audio-waveform.mdx"
   ]
 }

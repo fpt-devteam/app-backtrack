@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export const PostScreen = () => {
   return (
-    <SafeAreaView>
+    <SafeAreaView className="flex-1 bg-background">
       <PostHomeScreenHeader />
       <PostList />
     </SafeAreaView >
