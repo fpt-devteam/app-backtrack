@@ -1,9 +1,10 @@
 import type { QrCodeData, QrCodeEntity, QrItemEntity } from '@/src/features/qr/types';
-import colors from '@/src/shared/theme/colors';
+import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from '@/src/shared/utils';
 import { CalendarIcon, QrCodeIcon } from 'phosphor-react-native';
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+;
 
 
 type QRCodeCardProps = {

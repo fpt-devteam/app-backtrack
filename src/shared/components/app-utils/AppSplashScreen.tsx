@@ -1,6 +1,23 @@
-import colors from '@/src/shared/theme/colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { colors } from "@/src/shared/theme/colors";
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  BackpackIcon,
+  CameraIcon,
+  CheckIcon,
+  CreditCardIcon,
+  DeviceMobileIcon,
+  EyeglassesIcon,
+  HeadphonesIcon,
+  IconProps,
+  KeyIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  NotebookIcon,
+  UmbrellaIcon,
+  UsbIcon,
+  WalletIcon,
+  WatchIcon
+} from 'phosphor-react-native';
 import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
@@ -18,18 +35,18 @@ import Animated, {
 
 const { width, height } = Dimensions.get('window');
 
-type IconName = 'key-variant' | 'wallet' | 'cellphone' | 'bag-personal' | 'watch' | 'glasses' | 'headphones' | 'camera';
+type PhosphorIcon = React.ComponentType<IconProps>;
 
 interface FloatingItemProps {
   delay: number;
   startX: number;
   startY: number;
-  icon: IconName;
+  Icon: PhosphorIcon;
   size: number;
   color: string;
 }
 
-function FloatingItem({ delay, startX, startY, icon, size, color }: FloatingItemProps) {
+function FloatingItem({ delay, startX, startY, Icon, size, color }: Readonly<FloatingItemProps>) {
   const translateY = useSharedValue(0);
   const translateX = useSharedValue(0);
   const opacity = useSharedValue(0);
@@ -44,8 +61,8 @@ function FloatingItem({ delay, startX, startY, icon, size, color }: FloatingItem
       delay,
       withRepeat(
         withSequence(
-          withTiming(-20, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
-          withTiming(20, { duration: 2500, easing: Easing.inOut(Easing.ease) })
+          withTiming(-15, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(15, { duration: 2000, easing: Easing.inOut(Easing.ease) })
         ),
         -1,
         true
@@ -56,8 +73,8 @@ function FloatingItem({ delay, startX, startY, icon, size, color }: FloatingItem
       delay,
       withRepeat(
         withSequence(
-          withTiming(15, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(-15, { duration: 3000, easing: Easing.inOut(Easing.ease) })
+          withTiming(10, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+          withTiming(-10, { duration: 2500, easing: Easing.inOut(Easing.ease) })
         ),
         -1,
         true
@@ -68,8 +85,8 @@ function FloatingItem({ delay, startX, startY, icon, size, color }: FloatingItem
       delay,
       withRepeat(
         withSequence(
-          withTiming(10, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-          withTiming(-10, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+          withTiming(8, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
+          withTiming(-8, { duration: 1800, easing: Easing.inOut(Easing.ease) })
         ),
         -1,
         true
@@ -94,9 +111,9 @@ function FloatingItem({ delay, startX, startY, icon, size, color }: FloatingItem
           position: 'absolute',
           left: startX,
           top: startY,
-          width: size + 20,
-          height: size + 20,
-          borderRadius: (size + 20) / 2,
+          width: size + 16,
+          height: size + 16,
+          borderRadius: (size + 16) / 2,
           backgroundColor: 'rgba(255, 255, 255, 0.9)',
           justifyContent: 'center',
           alignItems: 'center',
@@ -109,7 +126,7 @@ function FloatingItem({ delay, startX, startY, icon, size, color }: FloatingItem
         animatedStyle,
       ]}
     >
-      <MaterialCommunityIcons name={icon} size={size} color={color} />
+      <Icon size={size} color={color} weight="fill" />
     </Animated.View>
   );
 }
@@ -214,7 +231,7 @@ function MagnifierIcon() {
   return (
     <Animated.View style={[styles.magnifierContainer, animatedStyle]}>
       <View style={styles.magnifierCircle}>
-        <MaterialCommunityIcons name="magnify" size={70} color="#fff" />
+        <MagnifyingGlassIcon size={70} color="#fff" weight="bold" />
       </View>
     </Animated.View>
   );
@@ -245,7 +262,7 @@ function LocationPin() {
 
   return (
     <Animated.View style={[styles.locationPin, animatedStyle]}>
-      <MaterialCommunityIcons name="map-marker" size={32} color="#ef4444" />
+      <MapPinIcon size={32} color="#ef4444" weight="fill" />
     </Animated.View>
   );
 }
@@ -254,20 +271,22 @@ interface AppSplashScreenProps {
   onAnimationComplete?: () => void;
 }
 
-export function AppSplashScreen({ onAnimationComplete }: AppSplashScreenProps) {
+// Calculate center position
+const centerX = width / 2;
+const centerY = height / 2;
+
+export function AppSplashScreen({ onAnimationComplete }: Readonly<AppSplashScreenProps>) {
   const gradientProgress = useSharedValue(0);
   const checkmarkScale = useSharedValue(0);
   const checkmarkOpacity = useSharedValue(0);
 
   useEffect(() => {
-    // Background gradient animation
     gradientProgress.value = withRepeat(
       withTiming(1, { duration: 5000, easing: Easing.inOut(Easing.ease) }),
       -1,
       true
     );
 
-    // Checkmark animation (found!)
     checkmarkScale.value = withDelay(1200, withSpring(1, { damping: 8 }));
     checkmarkOpacity.value = withDelay(1200, withTiming(1, { duration: 300 }));
 
@@ -291,16 +310,23 @@ export function AppSplashScreen({ onAnimationComplete }: AppSplashScreenProps) {
     opacity: checkmarkOpacity.value,
   }));
 
-  // Lost & Found themed floating items
+  // Crowded floating items around the magnifier
   const floatingItems: FloatingItemProps[] = [
-    { delay: 100, startX: width * 0.05, startY: height * 0.12, icon: 'key-variant', size: 28, color: '#f59e0b' },
-    { delay: 300, startX: width * 0.75, startY: height * 0.08, icon: 'wallet', size: 26, color: '#8b5cf6' },
-    { delay: 200, startX: width * 0.8, startY: height * 0.35, icon: 'cellphone', size: 26, color: '#3b82f6' },
-    { delay: 500, startX: width * 0.02, startY: height * 0.4, icon: 'bag-personal', size: 28, color: '#ec4899' },
-    { delay: 400, startX: width * 0.1, startY: height * 0.72, icon: 'watch', size: 24, color: '#14b8a6' },
-    { delay: 600, startX: width * 0.7, startY: height * 0.75, icon: 'glasses', size: 26, color: '#6366f1' },
-    { delay: 350, startX: width * 0.4, startY: height * 0.05, icon: 'headphones', size: 26, color: '#f43f5e' },
-    { delay: 550, startX: width * 0.78, startY: height * 0.6, icon: 'camera', size: 24, color: '#0ea5e9' },
+    // Inner ring (closer to magnifier)
+    { delay: 100, startX: centerX - 120, startY: centerY - 130, Icon: KeyIcon, size: 22, color: '#f59e0b' },
+    { delay: 150, startX: centerX + 70, startY: centerY - 120, Icon: WalletIcon, size: 20, color: '#8b5cf6' },
+    { delay: 200, startX: centerX + 100, startY: centerY - 30, Icon: DeviceMobileIcon, size: 22, color: '#3b82f6' },
+    { delay: 250, startX: centerX + 80, startY: centerY + 70, Icon: WatchIcon, size: 20, color: '#14b8a6' },
+    { delay: 300, startX: centerX - 30, startY: centerY + 100, Icon: EyeglassesIcon, size: 22, color: '#6366f1' },
+    { delay: 350, startX: centerX - 130, startY: centerY + 50, Icon: HeadphonesIcon, size: 20, color: '#f43f5e' },
+    { delay: 400, startX: centerX - 140, startY: centerY - 40, Icon: CameraIcon, size: 22, color: '#0ea5e9' },
+    { delay: 450, startX: centerX + 30, startY: centerY - 140, Icon: BackpackIcon, size: 20, color: '#ec4899' },
+
+    // Outer ring (further but still visible)
+    { delay: 500, startX: centerX - 160, startY: centerY - 180, Icon: CreditCardIcon, size: 18, color: '#10b981' },
+    { delay: 550, startX: centerX + 120, startY: centerY - 170, Icon: UmbrellaIcon, size: 18, color: '#f97316' },
+    { delay: 600, startX: centerX + 150, startY: centerY + 40, Icon: NotebookIcon, size: 18, color: '#a855f7' },
+    { delay: 650, startX: centerX - 170, startY: centerY + 120, Icon: UsbIcon, size: 18, color: '#06b6d4' },
   ];
 
   return (
@@ -332,7 +358,7 @@ export function AppSplashScreen({ onAnimationComplete }: AppSplashScreenProps) {
         {/* Found checkmark */}
         <Animated.View style={[styles.checkmark, checkmarkStyle]}>
           <View style={styles.checkmarkCircle}>
-            <MaterialCommunityIcons name="check" size={18} color="#fff" />
+            <CheckIcon size={18} color="#fff" weight="bold" />
           </View>
         </Animated.View>
       </View>
@@ -345,7 +371,7 @@ export function AppSplashScreen({ onAnimationComplete }: AppSplashScreenProps) {
 
       {/* Decorative dots pattern */}
       <View style={styles.dotsPattern}>
-        {[...Array(5)].map((_, i) => (
+        {Array.from({ length: 5 }).map((_, i) => (
           <View
             key={i}
             style={[

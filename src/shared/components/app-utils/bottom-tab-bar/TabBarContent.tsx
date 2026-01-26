@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   border: {
     ...StyleSheet.absoluteFillObject,
     borderTopWidth: 1,
-    borderTopColor: colors["tab-bar"].border,
+    borderTopColor: colors.border.DEFAULT,
   },
   tabsRow: {
     flex: 1,

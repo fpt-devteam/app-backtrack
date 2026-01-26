@@ -29,9 +29,6 @@ export const ConversationCard = ({ conversation }: Props) => {
     )
   }, [conversation.lastMessage?.timestamp, conversation.updatedAt])
 
-  const unread = conversation.unreadCount ?? 0
-  const showUnread = unread > 0
-
   return (
     <Pressable
       onPress={() => {

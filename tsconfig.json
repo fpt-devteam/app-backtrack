@@ -2,6 +2,8 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
     "paths": {
       "@/*": [
         "./*"
@@ -17,6 +19,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts",
-    "src/shared/theme/colors.js"
+    "src/shared/theme/colors.ts"
   ]
 }

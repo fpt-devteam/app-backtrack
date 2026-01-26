@@ -1,11 +1,12 @@
 import { QRCodeCard } from '@/src/features/qr/components/QRCodeCard';
 import { useQRCodes } from '@/src/features/qr/hooks';
 import type { QrCodeData } from '@/src/features/qr/types';
-import { AppEndOfFeed, AppInlineError, AppLoader } from '@/src/shared/components';
-import colors from '@/src/shared/theme/colors';
+import { AppInlineError, AppListFooter } from '@/src/shared/components';
+import { colors } from "@/src/shared/theme/colors";
 import { QrCodeIcon } from 'phosphor-react-native';
 import React, { useCallback } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
+;
 
 type QRCodeListProps = {
   onItemPress?: (item: QrCodeData) => void;
@@ -16,18 +17,6 @@ export const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
   const { items, isLoading, error, hasMore, loadMore, isLoadingNextPage, refresh, isRefetching } = useQRCodes({
     pageSize,
   });
-
-  const renderFooter = useCallback(() => {
-    if (!isRefetching && (isLoading || isLoadingNextPage)) {
-      return <AppLoader />;
-    }
-
-    if (!hasMore && items.length > 0) {
-      return <AppEndOfFeed />;
-    }
-
-    return null;
-  }, [isLoading, isLoadingNextPage, hasMore, items.length]);
 
   const renderEmpty = useCallback(() => {
     if (isLoading) return null;
@@ -71,7 +60,7 @@ export const QRCodeList = ({ onItemPress, pageSize = 20 }: QRCodeListProps) => {
       numColumns={1}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
-      ListFooterComponent={renderFooter}
+      ListFooterComponent={<AppListFooter isFetchingNextPage={isLoadingNextPage} hasNextPage={!!hasMore} />}
       ListEmptyComponent={renderEmpty}
       showsVerticalScrollIndicator={false}
       refreshControl={

@@ -1,9 +1,9 @@
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import { cn } from "@/src/shared/utils/cn";
 import { router } from "expo-router";
 import { CaretLeftIcon, DotsThreeIcon, IconProps, XIcon } from "phosphor-react-native";
 import React from "react";
-import { ActivityIndicator, Pressable, PressableProps, Text, View, ViewStyle } from "react-native";
+import { ActivityIndicator, Pressable, PressableProps, Text, View } from "react-native";
 
 type AppHeaderProps = {
   left?: React.ReactNode,
@@ -14,7 +14,7 @@ type AppHeaderProps = {
 
 export const AppHeader = ({ left, center, right, className }: AppHeaderProps) => {
   return (
-    <View className={cn("flex-row h-16 items-center overflow-hidden px-4", className)}>
+    <View className={cn("flex-row h-16 overflow-hidden px-4", className)}>
       <View className="flex-row flex-1 items-center justify-start">
         {left}
       </View>
@@ -37,13 +37,11 @@ interface IconButtonProps extends PressableProps {
 
 const IconButton = ({
   icon: Icon,
-  style,
   ...props
 }: IconButtonProps) => {
   return (
     <Pressable
       {...props}
-      style={({ pressed }) => [style as ViewStyle]}
     >
       <Icon size={24} color={colors.black} weight="bold" />
     </Pressable>
@@ -68,25 +66,26 @@ interface TextButtonProps extends PressableProps {
   label: string;
   disabled?: boolean;
   isSubmitting?: boolean;
+  className?: string;
 }
 export const TextButton = ({
   label,
   isSubmitting,
   disabled,
+  className,
   ...props
 }: TextButtonProps) => (
   <Pressable
     disabled={disabled}
     style={({ pressed }) => ({
-      opacity: pressed ? 0.5 : 1,
-      top: 12
+      opacity: pressed ? 0.5 : 1
     })}
     {...props}
-  >
+    className={cn("items-center justify-center min-w-16", className)}  >
     {isSubmitting ? (
       <ActivityIndicator />
     ) : (
-      <Text className={cn("text-base font-semibold", disabled ? "text-muted" : "text-main")}> {label}</Text>
+      <Text className={cn("text-base font-semibold min-w-16", disabled ? "text-muted" : "text-main")}>{label}</Text>
     )}
   </Pressable>
 );

@@ -1,5 +1,5 @@
 import { metrics } from "@/src/shared/theme";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import * as Haptics from "expo-haptics";
 import { PlusCircleIcon } from "phosphor-react-native";
 import React from "react";
@@ -28,12 +28,12 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
     }
 
     pressOpacity.value = withSequence(
-      withTiming(0.6, { duration: metrics.motion.press.in }),
-      withTiming(1, { duration: metrics.motion.press.out })
+      withTiming(0.6, { duration: metrics.motion.duration.fast }),
+      withTiming(1, { duration: metrics.motion.duration.slower })
     );
     scale.value = withSequence(
-      withTiming(0.9, { duration: metrics.motion.press.in }),
-      withTiming(1, { duration: metrics.motion.press.out })
+      withTiming(0.9, { duration: metrics.motion.duration.fast }),
+      withTiming(1, { duration: metrics.motion.duration.slower })
     );
 
     onPress();
@@ -44,7 +44,7 @@ export const CreatePostButton = ({ onPress, isFocused }: Props) => {
     transform: [{ scale: scale.value }],
   }));
 
-  const iconColor = isFocused ? colors["tab-bar"].active : colors["tab-bar"].inactive;
+  const iconColor = isFocused ? colors.primary : colors.gray[400];
 
   return (
     <AnimatedPressable

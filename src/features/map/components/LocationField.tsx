@@ -1,7 +1,7 @@
 import { useLocationSelectionStore } from "@/src/features/map/store";
 import type { UserLocation } from "@/src/features/map/types";
 import { POST_ROUTE } from "@/src/shared/constants";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import * as Haptics from "expo-haptics";
 import { RelativePathString, router } from "expo-router";
 import { CaretRightIcon, MapPinIcon } from "phosphor-react-native";
@@ -28,7 +28,7 @@ export const LocationField = ({
     reset();
     onConfirmSelection(value);
     return () => reset();
-  }, []);
+  });
 
   useEffect(() => {
     if (!confirmedSelection) return;

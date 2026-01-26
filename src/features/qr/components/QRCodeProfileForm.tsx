@@ -1,6 +1,6 @@
 import { AppHeader, HeaderTitle, ImageField, TextButton } from '@/src/shared/components';
 import { toast } from '@/src/shared/components/ui/toast';
-import colors from '@/src/shared/theme/colors';
+import { colors } from "@/src/shared/theme/colors";
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { ImagePickerAsset } from 'expo-image-picker';
 import { BookmarkIcon, SparkleIcon } from 'phosphor-react-native';
@@ -10,6 +10,7 @@ import { Text, TextInput, View } from 'react-native';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as yup from 'yup';
+;
 
 
 const qrCodeProfileSchema = yup
@@ -138,7 +139,7 @@ export const QRCodeProfileForm = ({ mode, initialValues, onSubmit, isSubmitting 
           {!!errors.images && (
             <Text className="text-red-500 text-xs mt-1 ml-1">
               {(() => {
-                const err = errors.images as any;
+                const err = errors.images;
 
                 // Array error if exists: min/max/required
                 if (typeof err?.message === "string") return err.message;

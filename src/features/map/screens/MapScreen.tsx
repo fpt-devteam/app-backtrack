@@ -13,7 +13,7 @@ import type { PostFilters } from "@/src/features/post/types";
 import { BottomSheet } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";
 import { useUIStore } from "@/src/shared/store/ui.store";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
 import { CaretLeftIcon } from "phosphor-react-native";
 import type { ReactNode } from "react";

@@ -109,7 +109,7 @@ const APP_ERRORS: ErrorMapping = {
   UNKNOWN_ERROR: "An unexpected error occurred. Please try again.",
 };
 const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ERROR_MESSAGES: ErrorMapping = {
   ...FIREBASE_AUTH_ERRORS,
   ...API_ERRORS,
@@ -118,8 +118,11 @@ const ERROR_MESSAGES: ErrorMapping = {
 
 export function getErrorMessage(error: unknown, fallback = DEFAULT_ERROR_MESSAGE): string {
   return (
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any)?.response?.data?.error?.message ||
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any)?.error?.message ||
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any)?.message ||
     fallback
   )

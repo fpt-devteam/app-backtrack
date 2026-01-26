@@ -1,8 +1,9 @@
 import { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
-import colors from '@/src/shared/theme/colors';
+import { colors } from "@/src/shared/theme/colors";
 import { DotsThreeIcon, type PhosphorLogoIcon } from 'phosphor-react-native';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
+;
 
 export type MenuOption = {
   id: string;

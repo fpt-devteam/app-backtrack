@@ -3,7 +3,7 @@ import { MinimalPostCard } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
-import { AppEndOfFeed, AppLoader, ChipsRow } from "@/src/shared/components";
+import { AppListFooter, ChipsRow } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import type { LocationFilterValue } from "@/src/shared/types";
@@ -60,9 +60,7 @@ export default function PostSearchResultScreen() {
     locationFilter?: string;
   }>();
 
-  const {
-    formState: { errors },
-  } = useForm<FilterSchema>({
+  useForm<FilterSchema>({
     defaultValues: {
       detailLocation: undefined,
     },
@@ -94,7 +92,7 @@ export default function PostSearchResultScreen() {
     radiusInKm: parsedLocationFilter?.radius,
   });
 
-  const { items, isLoading, hasMore, loadMore, isLoadingNextPage } = usePosts({
+  const { items, hasMore, loadMore, isLoadingNextPage } = usePosts({
     filters,
   });
 
@@ -137,24 +135,6 @@ export default function PostSearchResultScreen() {
       postType: type === "All" ? undefined : type,
     }));
   };
-
-  const renderFooter = useCallback(() => {
-    if (isLoading || isLoadingNextPage)
-      return (
-        <View className="mt-4">
-          <AppLoader />
-        </View>
-      );
-
-    if (!hasMore)
-      return (
-        <View className="mt-4">
-          <AppEndOfFeed />
-        </View>
-      );
-
-    return null;
-  }, [isLoadingNextPage, hasMore, isLoading]);
 
   return (
     <View className="bg-white flex-1">
@@ -219,7 +199,7 @@ export default function PostSearchResultScreen() {
         renderItem={({ item }) => <MinimalPostCard post={item} />}
         onEndReached={handleEndReached}
         scrollEventThrottle={16}
-        ListFooterComponent={renderFooter}
+        ListFooterComponent={<AppListFooter isFetchingNextPage={isLoadingNextPage} hasNextPage={!!hasMore} />}
         contentContainerStyle={{ padding: 16 }}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}

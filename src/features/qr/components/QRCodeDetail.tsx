@@ -2,7 +2,7 @@ import { AppHeader, DotsThreeButton, HeaderTitle } from '@/src/shared/components
 import { MenuBottomSheet, type MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 
 import { QR_ROUTE } from '@/src/shared/constants';
-import colors from '@/src/shared/theme/colors';
+import { colors } from "@/src/shared/theme/colors";
 import { formatDateTime } from '@/src/shared/utils';
 import { Image } from 'expo-image';
 import { RelativePathString, router } from 'expo-router';
@@ -15,6 +15,7 @@ import {
 import React, { memo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+;
 
 type QRCodeDetailProps = {
   id: string;

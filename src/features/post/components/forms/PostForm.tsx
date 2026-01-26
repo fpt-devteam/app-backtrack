@@ -7,7 +7,7 @@ import { AppHeader, AppLoader, CloseButton, DateTimePickerField, HeaderTitle, Im
 import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { useUploadImage } from "@/src/shared/hooks";
-import colors from "@/src/shared/theme/colors";
+import { colors } from "@/src/shared/theme/colors";
 import type { Nullable } from "@/src/shared/types";
 import { prepareImageForAnalysis } from "@/src/shared/utils/image.utils";
 import { yupResolver } from "@hookform/resolvers/yup";
