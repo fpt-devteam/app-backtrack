@@ -1,23 +1,37 @@
 import { colors } from "@/src/shared/theme/colors";
 import { cn } from "@/src/shared/utils/cn";
 import { router } from "expo-router";
-import { CaretLeftIcon, DotsThreeIcon, IconProps, XIcon } from "phosphor-react-native";
+import {
+  CaretLeftIcon,
+  DotsThreeIcon,
+  IconProps,
+  XIcon,
+} from "phosphor-react-native";
 import React from "react";
-import { ActivityIndicator, Pressable, PressableProps, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  PressableProps,
+  Text,
+  View,
+} from "react-native";
 
 type AppHeaderProps = {
-  left?: React.ReactNode,
-  center?: React.ReactNode,
-  right?: React.ReactNode,
-  className?: string
+  left?: React.ReactNode;
+  center?: React.ReactNode;
+  right?: React.ReactNode;
+  className?: string;
 };
 
-export const AppHeader = ({ left, center, right, className }: AppHeaderProps) => {
+export const AppHeader = ({
+  left,
+  center,
+  right,
+  className,
+}: AppHeaderProps) => {
   return (
     <View className={cn("flex-row h-16 overflow-hidden px-4", className)}>
-      <View className="flex-row flex-1 items-center justify-start">
-        {left}
-      </View>
+      <View className="flex-row flex-1 items-center justify-start">{left}</View>
 
       <View className="flex-row items-center justify-center shrink-0">
         {center}
@@ -35,14 +49,9 @@ interface IconButtonProps extends PressableProps {
   icon: React.ComponentType<IconProps>;
 }
 
-const IconButton = ({
-  icon: Icon,
-  ...props
-}: IconButtonProps) => {
+const IconButton = ({ icon: Icon, ...props }: IconButtonProps) => {
   return (
-    <Pressable
-      {...props}
-    >
+    <Pressable {...props}>
       <Icon size={24} color={colors.black} weight="bold" />
     </Pressable>
   );
@@ -59,7 +68,6 @@ export const CloseButton = (props: PressableProps) => (
 export const DotsThreeButton = (props: PressableProps) => (
   <IconButton icon={DotsThreeIcon} {...props} />
 );
-
 
 // Text Button
 interface TextButtonProps extends PressableProps {
@@ -78,24 +86,35 @@ export const TextButton = ({
   <Pressable
     disabled={disabled}
     style={({ pressed }) => ({
-      opacity: pressed ? 0.5 : 1
+      opacity: pressed ? 0.5 : 1,
     })}
     {...props}
-    className={cn("items-center justify-center min-w-16", className)}  >
+    className={cn("items-center justify-center min-w-20", className)}
+  >
     {isSubmitting ? (
       <ActivityIndicator />
     ) : (
-      <Text className={cn("text-base font-semibold min-w-16", disabled ? "text-muted" : "text-main")}>{label}</Text>
+      <Text
+        className={cn(
+          "text-base font-semibold",
+          disabled ? "text-muted" : "text-main",
+        )}
+      >
+        {label}
+      </Text>
     )}
   </Pressable>
 );
 
 // Header Title
-export const HeaderTitle = ({ title, className }: { title: string, className?: string }) => (
+export const HeaderTitle = ({
+  title,
+  className,
+}: {
+  title: string;
+  className?: string;
+}) => (
   <View className={cn("min-w-80 items-start", className)}>
-    <Text className="text-2xl font-semibold text-main">
-      {title}
-    </Text>
+    <Text className="text-2xl font-semibold text-main">{title}</Text>
   </View>
 );
-

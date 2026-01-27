@@ -101,11 +101,15 @@ const NotificationScreen = () => {
     });
   };
 
-  const handleNormalPress = (notification: UserNotification) => {
+  const handleNormalPress = async (notification: UserNotification) => {
     const screenPath = notification.data?.screenPath as RelativePathString;
     if (!screenPath) return;
 
-    console.log("Navigate to:", screenPath);
+    await updateStatus({
+      notificationIds: [notification.id],
+      status: NOTIFICATION_STATUS.Read,
+    });
+
     router.push(screenPath);
   };
 

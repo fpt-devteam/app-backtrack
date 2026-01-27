@@ -1,33 +1,71 @@
-import { colors } from '@/src/shared/theme'
-import { useRouter } from 'expo-router'
-import { ArrowLeftIcon } from 'phosphor-react-native'
-import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { AppUser } from "@/src/features/auth/types";
+import { ConversationAvatar } from "@/src/features/chat/components/ConversationAvatar";
+import { colors } from "@/src/shared/theme";
+import { useRouter } from "expo-router";
+import { ArrowLeftIcon, DotsThreeOutlineIcon } from "phosphor-react-native";
+import React, { useMemo } from "react";
+import { Pressable, Text, View } from "react-native";
 
 interface ConversationHeaderProps {
-  partnerName?: string | null
-  isLoading?: boolean
+  user: AppUser;
+  onPressMenu?: () => void;
 }
 
-export const ConversationHeader = ({ partnerName, isLoading }: ConversationHeaderProps) => {
-  const router = useRouter()
+export const ConversationHeader = ({
+  user,
+  onPressMenu,
+}: ConversationHeaderProps) => {
+  const router = useRouter();
+
+  const displayPartnerName = useMemo(
+    () => user?.displayName || "Chat",
+    [user?.displayName],
+  );
 
   return (
-    <View className="bg-white border-b border-slate-200 px-4 py-3 flex-row items-center">
-      <TouchableOpacity onPress={() => router.back()} className="mr-3">
-        <ArrowLeftIcon size={24} color={colors.slate[500]} />
-      </TouchableOpacity>
-      <View className="flex-1">
-        {isLoading ? (
-          <Text className="text-slate-400">Loading...</Text>
-        ) : (
-          <Text className="font-semibold text-lg text-slate-900">
-            {partnerName || 'Chat'}
-          </Text>
-        )}
+    <View className="bg-white border-b border-slate-200 px-4 py-3">
+      <View className="flex-row items-center">
+        {/* Left: Back */}
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={10}
+          className="w-10 h-10 items-center justify-center -ml-1 mr-2"
+        >
+          <ArrowLeftIcon size={24} color={colors.slate[600]} />
+        </Pressable>
+
+        {/* Center: Avatar + Name (takes remaining space) */}
+        <View className="flex-1 flex-row items-center min-w-0">
+          <ConversationAvatar user={user} size={40} />
+
+          <View className="ml-3 flex-1 min-w-0">
+            <Text
+              className="text-base font-semibold text-slate-900"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {displayPartnerName}
+            </Text>
+
+            <Text className="text-xs text-slate-500" numberOfLines={1}>
+              Active now
+            </Text>
+          </View>
+        </View>
+
+        {/* Right: Menu */}
+        <Pressable
+          onPress={onPressMenu}
+          hitSlop={10}
+          className="w-10 h-10 items-center justify-start ml-2"
+        >
+          <DotsThreeOutlineIcon
+            size={28}
+            weight="duotone"
+            color={colors.slate[700]}
+          />
+        </Pressable>
       </View>
     </View>
-  )
-}
-
-
+  );
+};

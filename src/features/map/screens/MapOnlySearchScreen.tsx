@@ -5,10 +5,9 @@ import {
 import { DEFAULT_RADIUS_KM } from "@/src/features/map/constants";
 import { useReverseGeocoding, useUserLocation } from "@/src/features/map/hooks";
 import { useLocationSelectionStore } from "@/src/features/map/store";
-import { AppHeader } from "@/src/shared/components";
+import { AppHeader, BackButton } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
-import { Header } from "@react-navigation/elements";
 import { router } from "expo-router";
 import { MagnifyingGlassIcon } from "phosphor-react-native";
 import React, { useEffect, useRef } from "react";
@@ -38,13 +37,13 @@ export const MapOnlySearchScreen = () => {
 
       onChangeSelection(initSelection);
     })();
-  }, []);
+  }, [getUserLocation, onChangeSelection]);
 
   useEffect(() => {
     const coords = selection?.location;
     if (!coords) return;
     handleMoveMarker(coords);
-  });
+  }, [selection]);
 
   const onCoordinateChange = async (coord: LatLng) => {
     const geocodeResult = await reverseGeocode({ location: coord });
@@ -81,7 +80,7 @@ export const MapOnlySearchScreen = () => {
   return (
     <View className="flex-1">
       <AppHeader
-        left={<Header title="Select Location" />}
+        left={<BackButton />}
         right={
           <TouchableOpacity
             onPress={() => router.push(MAP_ROUTE.search)}

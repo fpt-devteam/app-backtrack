@@ -75,7 +75,6 @@ export const MapSearchScreen = () => {
       router.back();
     } else {
       router.replace(MAP_ROUTE.index as RelativePathString);
-      console.log("Can not go back, replacing to map index");
     }
   };
 
@@ -101,7 +100,7 @@ export const MapSearchScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [displayMode]);
+  }, [displayMode, fade, slide]);
 
   const handleSelectPlace = async (prediction: PlacePrediction) => {
     try {

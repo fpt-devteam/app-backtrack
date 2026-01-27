@@ -10,7 +10,7 @@ import {
 import { MessageItem } from "@/src/features/chat/types";
 import { useSendNotification } from "@/src/features/notification/hooks";
 import { NOTIFICATION_EVENT } from "@/src/features/notification/types";
-import { AppInlineError, AppLoader } from "@/src/shared/components";
+import { AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { socketService } from "@/src/shared/services";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -90,6 +90,7 @@ export const ConversationDetailScreen = ({
   const handleSendMessage = useCallback(
     async (messageText: string) => {
       if (!conversationId || !user) return;
+      if (!conversationDetail) return;
 
       try {
         await sendMessage({
@@ -97,17 +98,19 @@ export const ConversationDetailScreen = ({
           request: { content: messageText },
         });
 
+        const partnerId = conversationDetail.partner.id;
+
         const req = {
           target: {
-            userId: "user-123",
+            userId: partnerId,
           },
           source: {
             name: "ChatSystem",
-            eventId: "msg-456",
+            eventId: Date.now().toString(),
           },
           type: NOTIFICATION_EVENT.ChatEvent,
-          title: "Message Sent",
-          body: `Your message: "${messageText}" has been sent successfully.`,
+          title: "New Message",
+          body: `New message for you: ${messageText}.`,
           data: {
             screenPath: "chat/conversations/" + conversationId,
             imageUrl: user.avatar,
@@ -119,29 +122,13 @@ export const ConversationDetailScreen = ({
         console.log("Error sending message:", error);
       }
     },
-    [conversationId, user, sendMessage, sendNotification],
+    [conversationId, user, sendMessage, sendNotification, conversationDetail],
   );
 
-  if (isLoadingMessages) {
+  if (!conversationDetail || isLoadingConversation) {
     return (
       <View className="flex-1 bg-background-light">
-        <ConversationHeader
-          partnerName={conversationDetail?.partner.displayName}
-          isLoading={isLoadingConversation}
-        />
         <AppLoader />
-      </View>
-    );
-  }
-
-  if (isMessagesError) {
-    return (
-      <View className="flex-1 bg-background-light">
-        <ConversationHeader
-          partnerName={conversationDetail?.partner.displayName}
-          isLoading={isLoadingConversation}
-        />
-        <AppInlineError message="Failed to load messages. Please try again." />
       </View>
     );
   }
@@ -149,17 +136,16 @@ export const ConversationDetailScreen = ({
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-background-light"
+      style={{ paddingTop: insets.top }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ConversationHeader
-        partnerName={conversationDetail?.partner.displayName}
-        isLoading={isLoadingConversation}
-      />
+      <ConversationHeader user={conversationDetail.partner} />
       <MessageList
         messages={messages}
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         onLoadMore={handleLoadMore}
+        partnerAvatar={conversationDetail.partner.avatar}
       />
       <View style={{ paddingBottom: insets.bottom }}>
         <MessageInput onSend={handleSendMessage} isSending={isSendingMessage} />

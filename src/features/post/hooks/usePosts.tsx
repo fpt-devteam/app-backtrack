@@ -20,6 +20,8 @@ export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
     initialPageParam: 1,
     queryFn: async ({ pageParam }) => {
       const filtersRequest: PostsRequest = {
+        searchTerm: filters.searchTerm,
+        postType: filters.postType,
         latitude: filters.location?.latitude,
         longitude: filters.location?.longitude,
         radiusInKm: filters.radiusInKm,

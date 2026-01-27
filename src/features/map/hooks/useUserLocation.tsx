@@ -21,7 +21,6 @@ export const useUserLocation = () => {
     mutationFn: async () => {
       const hasPermission = await ensureLocationPermission();
       if (!hasPermission) {
-        console.log("Location permission denied");
         return null;
       }
 
