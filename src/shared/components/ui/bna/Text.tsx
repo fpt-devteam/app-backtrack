@@ -20,10 +20,10 @@ interface TextProps extends RNTextProps {
   darkColor?: string;
   children: React.ReactNode;
 }
-
+// eslint-disable-next-line react/display-name
 export const Text = forwardRef<RNText, TextProps>(
   (
-    { variant = 'body', lightColor, darkColor, style, children, ...props },
+    { variant = 'body', style, children, ...props },
     ref
   ) => {
     const textColor = colors.text.main;

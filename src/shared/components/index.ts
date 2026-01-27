@@ -28,3 +28,5 @@ export { ImageCarousel } from '@/src/shared/components/ui/ImageCarousel';
 export { MenuBottomSheet } from '@/src/shared/components/ui/MenuBottomSheet';
 export type { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 export { SuggestRow } from '@/src/shared/components/ui/SuggestRow';
+export { DrawerProvider, DrawerMenuButton, useDrawer, defaultQRDrawerTabs } from '@/src/shared/components/ui/Drawer';
+export type { DrawerTab } from '@/src/shared/components/ui/Drawer';
