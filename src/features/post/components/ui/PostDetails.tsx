@@ -164,7 +164,6 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
       contentContainerStyle={{ paddingBottom: bottom + 20 }}
     >
       <ImageCarousel data={post.imageUrls} />
-
       <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">

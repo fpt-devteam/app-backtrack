@@ -6,7 +6,7 @@ import { timeSincePast } from '@/src/shared/utils';
 import { useLocalSearchParams } from "expo-router";
 import React from 'react';
 import { Image, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PostDetailHeader = ({ avatarUrl, authorName, createdAt }: { avatarUrl: string; authorName: string; createdAt: Date }) => {
   return (
@@ -30,12 +30,14 @@ const PostDetailHeader = ({ avatarUrl, authorName, createdAt }: { avatarUrl: str
             </Text>
           </View>
         </View>
-      } />
+      }
+    />
   )
 };
 export const PostDetailScreen = () => {
   const params = useLocalSearchParams<{ postId: string }>();
   const postId = params.postId;
+  const { top } = useSafeAreaInsets();
 
   const { data: post, isLoading, error } = useGetPostById({ postId });
   if (isLoading) return <AppSplashScreen />;
@@ -45,13 +47,13 @@ export const PostDetailScreen = () => {
   const avatarUrl = post.author?.avatarUrl || getRandomAvatarUrl();
 
   return (
-    <SafeAreaView>
+    <View className="flex-1 bg-background" style={{ paddingTop: top }}>
       <PostDetailHeader
         avatarUrl={avatarUrl}
         authorName={authorName}
         createdAt={post.createdAt}
       />
       < PostDetails postId={post.id} />
-    </SafeAreaView>
+    </View>
   )
 }

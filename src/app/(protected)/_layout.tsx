@@ -18,7 +18,6 @@ export default function ProtectedLayout() {
           options={{
             presentation: "transparentModal",
             animation: "fade",
-            contentStyle: { backgroundColor: "transparent" },
           }}
         />
         <Stack.Screen
@@ -26,7 +25,6 @@ export default function ProtectedLayout() {
           options={{
             presentation: "transparentModal",
             animation: "fade",
-            contentStyle: { backgroundColor: "transparent" },
           }}
         />
       </Stack>

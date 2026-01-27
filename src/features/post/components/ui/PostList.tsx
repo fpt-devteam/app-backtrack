@@ -20,7 +20,9 @@ export const PostList = ({
   const { bottom } = useSafeAreaInsets();
   const isHorizontal = direction === "horizontal";
   const queryClient = useQueryClient();
-  const { items, hasMore, loadMore, isLoading, isLoadingNextPage } = usePosts({ filters });
+  const { items, hasMore, loadMore, isLoading, isLoadingNextPage } = usePosts({
+    filters,
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleEndReached = useCallback(() => {
@@ -36,7 +38,7 @@ export const PostList = ({
 
   const ItemSeparatorComponent = useCallback(
     () => <View style={isHorizontal ? { width: 8 } : { height: 8 }} />,
-    [isHorizontal]
+    [isHorizontal],
   );
 
   const refreshControl = useMemo(() => {
@@ -48,7 +50,7 @@ export const PostList = ({
     ({ item }: { item: (typeof items)[number] }) => (
       <PostCard item={item} isFetching={isLoading} type={direction} />
     ),
-    [isLoading, direction, items]
+    [isLoading, direction],
   );
 
   return (
@@ -66,7 +68,11 @@ export const PostList = ({
       alwaysBounceVertical={!isHorizontal}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={isHorizontal ? undefined : { padding: 8, paddingBottom: bottom + metrics.tabBar.height }}
+      contentContainerStyle={
+        isHorizontal
+          ? undefined
+          : { padding: 8, paddingBottom: bottom + metrics.tabBar.height }
+      }
       refreshControl={refreshControl}
     />
   );

@@ -1,7 +1,14 @@
-export { AppHeader, BackButton, CloseButton, DotsThreeButton, HeaderTitle, TextButton } from "@/src/shared/components/app-utils/AppHeader";
+export {
+  AppHeader,
+  BackButton,
+  CloseButton,
+  DotsThreeButton,
+  HeaderTitle,
+  TextButton,
+} from "@/src/shared/components/app-utils/AppHeader";
 export { AppInlineError } from "@/src/shared/components/app-utils/AppInlineError";
 export { AppListFooter } from "@/src/shared/components/app-utils/AppListFooter";
-export { AppLoader } from '@/src/shared/components/app-utils/AppLoader';
+export { AppLoader } from "@/src/shared/components/app-utils/AppLoader";
 export { AppLogo } from "@/src/shared/components/app-utils/AppLogo";
 export { AppSlogan } from "@/src/shared/components/app-utils/AppSlogan";
 export { AppSplashScreen } from "@/src/shared/components/app-utils/AppSplashScreen";
@@ -12,6 +19,7 @@ export { DateTimePickerField } from "@/src/shared/components/fields/DateTimePick
 export { EmailField } from "@/src/shared/components/fields/EmailField";
 export { ImageField } from "@/src/shared/components/fields/ImageField";
 export { PasswordField } from "@/src/shared/components/fields/PasswordField";
+export { ParallaxScrollView } from '@/src/shared/components/ui/bna/ParallaxScrollview';
 export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
 export { ChipsRow } from '@/src/shared/components/ui/ChipsRow';
 export { FAB } from '@/src/shared/components/ui/FAB';
@@ -20,4 +28,3 @@ export { ImageCarousel } from '@/src/shared/components/ui/ImageCarousel';
 export { MenuBottomSheet } from '@/src/shared/components/ui/MenuBottomSheet';
 export type { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 export { SuggestRow } from '@/src/shared/components/ui/SuggestRow';
-

@@ -71,6 +71,7 @@ const semantic = {
 
   popover: palette.white,
   popoverForeground: palette.slate[900],
+  
   card: palette.white,
   cardForeground: palette.slate[900],
 
