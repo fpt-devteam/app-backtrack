@@ -11,14 +11,18 @@ import {
   AppHeader,
   HeaderTitle,
 } from "@/src/shared/components/app-utils/AppHeader";
+import EmptyList from "@/src/shared/components/ui/EmptyList";
+import { SHARED_ROUTE } from "@/src/shared/constants";
+import { colors } from "@/src/shared/theme";
 import { RelativePathString, router } from "expo-router";
 import {
   ArchiveIcon,
+  BellSimpleSlashIcon,
   EnvelopeSimpleIcon,
   EnvelopeSimpleOpenIcon,
   XIcon,
 } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -36,6 +40,8 @@ const NotificationScreen = () => {
   const { items, isLoading, refresh, hasMore, loadMore, isLoadingNextPage } =
     useNotifications();
 
+  const allItems = useMemo(() => [...items], [items]);
+
   const { updateStatus, isUpdatingStatus } = useUpdateNotificationStatus();
 
   const handleLongPress = (notification: UserNotification) => {
@@ -49,8 +55,8 @@ const NotificationScreen = () => {
   const firstSelected = React.useMemo(() => {
     if (selectedCount === 0) return null;
     const firstId = selectedIdList[0];
-    return items.find((x) => x.id === firstId) ?? null;
-  }, [items, selectedIdList, selectedCount]);
+    return allItems.find((x) => x.id === firstId) ?? null;
+  }, [allItems, selectedIdList, selectedCount]);
 
   const isFirstSelectedRead =
     firstSelected?.status === NOTIFICATION_STATUS.Read;
@@ -102,15 +108,19 @@ const NotificationScreen = () => {
   };
 
   const handleNormalPress = async (notification: UserNotification) => {
-    const screenPath = notification.data?.screenPath as RelativePathString;
-    if (!screenPath) return;
+    try {
+      await updateStatus({
+        notificationIds: [notification.id],
+        status: NOTIFICATION_STATUS.Read,
+      });
 
-    await updateStatus({
-      notificationIds: [notification.id],
-      status: NOTIFICATION_STATUS.Read,
-    });
-
-    router.push(screenPath);
+      const screenPath = notification.data?.screenPath as RelativePathString;
+      router.push(screenPath);
+    } catch (error) {
+      console.log("Error when update notification status: ", error);
+      router.push(SHARED_ROUTE.notAvailable);
+      return;
+    }
   };
 
   const handleEndReached = () => {
@@ -133,9 +143,18 @@ const NotificationScreen = () => {
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
-      <View className="flex-1 items-center justify-center py-20">
-        <Text className="text-slate-500 text-base">No notifications</Text>
-      </View>
+      <EmptyList
+        icon={
+          <BellSimpleSlashIcon
+            size={96}
+            weight="light"
+            color={colors.primary}
+          />
+        }
+        title="You don't have any notifications yet."
+        subtitle="Once you receive notifications, they will appear here."
+        backButton={null}
+      />
     );
   };
 
@@ -166,7 +185,7 @@ const NotificationScreen = () => {
     </View>
   );
 
-  if (isLoading && items.length === 0) {
+  if (isLoading && allItems.length === 0) {
     return (
       <SafeAreaView className="flex-1 bg-slate-50">
         {renderSkeleton()}
@@ -240,7 +259,7 @@ const NotificationScreen = () => {
       )}
 
       <FlatList
-        data={items}
+        data={allItems}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={renderEmpty}

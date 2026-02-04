@@ -36,3 +36,8 @@ export const MAP_ROUTE = {
   index: "/(protected)/map",
   search: "/(protected)/map/search",
 } as const;
+
+
+export const SHARED_ROUTE = {
+  notAvailable: "/shared/not-available",
+} as const;
