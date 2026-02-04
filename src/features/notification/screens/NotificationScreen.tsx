@@ -1,4 +1,7 @@
-import { NotificationRow } from "@/src/features/notification/components/NotificationRow";
+import {
+  NotificationChip,
+  NotificationRow,
+} from "@/src/features/notification/components";
 import {
   useNotifications,
   useUpdateNotificationStatus,
@@ -7,6 +10,7 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
+import { AppLoader } from "@/src/shared/components";
 import {
   AppHeader,
   HeaderTitle,
@@ -22,25 +26,44 @@ import {
   EnvelopeSimpleOpenIcon,
   XIcon,
 } from "phosphor-react-native";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
+  ScrollView,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type FilterType = "all" | "unread" | "archived";
+
 const NotificationScreen = () => {
   const [mode, setMode] = useState<"normal" | "candidate">("normal");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [filter, setFilter] = useState<FilterType>("all");
 
-  const { items, isLoading, refresh, hasMore, loadMore, isLoadingNextPage } =
-    useNotifications();
+  const getFilterStatus = (filterType: FilterType) => {
+    if (filterType === "all") return undefined;
+    if (filterType === "unread") return NOTIFICATION_STATUS.Unread;
+    return NOTIFICATION_STATUS.Archived;
+  };
 
-  const allItems = useMemo(() => [...items], [items]);
+  const filterStatus = getFilterStatus(filter);
+
+  const {
+    items,
+    isLoading,
+    refresh,
+    hasMore,
+    loadMore,
+    isLoadingNextPage,
+    isRefreshing,
+  } = useNotifications({ status: filterStatus });
+
+  const allItems = items;
 
   const { updateStatus, isUpdatingStatus } = useUpdateNotificationStatus();
 
@@ -167,36 +190,35 @@ const NotificationScreen = () => {
     );
   };
 
-  const renderSkeleton = () => (
-    <View className="flex-1 bg-slate-50">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <View
-          key={i}
-          className="flex-row items-start gap-3 px-4 py-3 bg-white border-b border-slate-100"
-        >
-          <View className="w-8 h-8 rounded-full bg-slate-200" />
-          <View className="flex-1 gap-2">
-            <View className="h-4 bg-slate-200 rounded w-3/4" />
-            <View className="h-3 bg-slate-200 rounded w-full" />
-          </View>
-          <View className="h-3 bg-slate-200 rounded w-8" />
-        </View>
-      ))}
-    </View>
-  );
-
-  if (isLoading && allItems.length === 0) {
-    return (
-      <SafeAreaView className="flex-1 bg-slate-50">
-        {renderSkeleton()}
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       {mode === "normal" && (
-        <AppHeader left={<HeaderTitle title="Notifications" />} />
+        <>
+          <AppHeader left={<HeaderTitle title="Notifications" />} />
+          <View className="px-4 py-3">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerClassName="gap-2"
+            >
+              <NotificationChip
+                label="All"
+                isActive={filter === "all"}
+                onPress={() => setFilter("all")}
+              />
+              <NotificationChip
+                label="Unread"
+                isActive={filter === "unread"}
+                onPress={() => setFilter("unread")}
+              />
+              <NotificationChip
+                label="Archived"
+                isActive={filter === "archived"}
+                onPress={() => setFilter("archived")}
+              />
+            </ScrollView>
+          </View>
+        </>
       )}
 
       {mode === "candidate" && (
@@ -258,22 +280,26 @@ const NotificationScreen = () => {
         </View>
       )}
 
-      <FlatList
-        data={allItems}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={renderEmpty}
-        ListFooterComponent={renderFooter}
-        onEndReached={handleEndReached}
-        onEndReachedThreshold={0.5}
-        refreshControl={
-          <RefreshControl
-            refreshing={false}
-            onRefresh={refresh}
-            tintColor="#0ea5e9"
-          />
-        }
-      />
+      {isLoading && allItems.length === 0 ? (
+        <AppLoader />
+      ) : (
+        <FlatList
+          data={allItems}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={renderEmpty}
+          ListFooterComponent={renderFooter}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={refresh}
+              tintColor="#0ea5e9"
+            />
+          }
+        />
+      )}
     </SafeAreaView>
   );
 };
