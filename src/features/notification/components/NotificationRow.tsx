@@ -1,7 +1,18 @@
 import type { UserNotification } from "@/src/features/notification/types";
+import { colors } from "@/src/shared/theme";
 import { cn } from "@/src/shared/utils/cn";
-import React from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import {
+  ChatsIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  MapPinIcon,
+  QrCodeIcon,
+  SparkleIcon,
+  WarningCircleIcon,
+} from "phosphor-react-native";
+import React, { useMemo } from "react";
+import { Linking, Pressable, Text, View } from "react-native";
+import { LatLng } from "react-native-maps";
 
 type NotificationRowProps = {
   mode: "normal" | "candidate";
@@ -29,8 +40,16 @@ const formatTime = (date: Date | string): string => {
   return `${day}/${month}`;
 };
 
-const DEFAULT_NOTIFICATION_IMAGE = require("@/assets/images/icon.png");
 const AVATAR_SIZE = 40;
+
+const icon = {
+  ChatEvent: <ChatsIcon size={AVATAR_SIZE} color={colors.primary} />,
+  AIMatchingEvent: <SparkleIcon size={AVATAR_SIZE} color={colors.amber[500]} />,
+  QRScanEvent: <QrCodeIcon size={AVATAR_SIZE} color={colors.status.info} />,
+  SystemAlertEvent: (
+    <WarningCircleIcon size={AVATAR_SIZE} color={colors.status.error} />
+  ),
+} as const;
 
 export const NotificationRow = ({
   mode,
@@ -51,84 +70,67 @@ export const NotificationRow = ({
     if (mode === "normal") onLongPress(notification);
   };
 
-  const imageSource =
-    typeof notification.data?.imageUrl === "string" &&
-    notification.data.imageUrl.length > 0
-      ? { uri: notification.data.imageUrl }
-      : DEFAULT_NOTIFICATION_IMAGE;
+  const bodyDisplay = useMemo(() => {
+    const type = notification.type;
+    if (type === "QRScanEvent") {
+      if (!notification?.data?.location)
+        return "The scanner did not share their location!";
+
+      const location = notification.data?.location as LatLng;
+      const { latitude, longitude } = location;
+
+      const displayAddress = notification.data?.displayAddress as string;
+
+      return (
+        <View className="flex-row items-center justify-between gap-4">
+          <View className="flex-1 flex-row items-center gap-1 min-w-0">
+            <MapPinIcon size={16} color={colors.slate[600]} weight="fill" />
+            <Text className="text-sm flex-1" numberOfLines={1}>
+              {displayAddress ??
+                `lat: ${latitude.toFixed(2)}, lng: ${longitude.toFixed(2)}`}
+            </Text>
+          </View>
+
+          <Pressable
+            onPress={() => {
+              const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+              Linking.openURL(url);
+            }}
+            className="bg-blue-50 px-3 py-1.5 rounded-full"
+          >
+            <Text className="text-primary text-xs font-medium">View Map</Text>
+          </Pressable>
+        </View>
+      );
+    }
+
+    return notification.body;
+  }, [notification]);
 
   return (
     <Pressable
       onPress={handlePress}
       onLongPress={handleLongPress}
-      hitSlop={{ top: 8, bottom: 8, left: 16, right: 16 }}
-      className={cn(
-        "flex-row items-start gap-3 px-4 py-3 bg-white border-b border-slate-100",
-        mode === "candidate" && isSelected && "bg-sky-50/60",
-      )}
+      className="flex-row items-start gap-3 p-4 bg-white border-b border-slate-100"
       style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
     >
-      {/* Left: Avatar + overlays (unread dot / selection tick) */}
-      <View style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }}>
-        <Image
-          source={imageSource}
-          style={{
-            width: AVATAR_SIZE,
-            height: AVATAR_SIZE,
-            borderRadius: AVATAR_SIZE / 2,
-          }}
-          resizeMode="cover"
-        />
-
-        {/* Candidate mode selection overlay (Gmail-like) */}
-        {mode === "candidate" && (
-          <>
-            {/* Dim avatar a bit in candidate mode for clarity */}
-            <View
-              className="absolute inset-0 rounded-full"
-              style={{
-                backgroundColor: isSelected
-                  ? "rgba(2,132,199,0.10)"
-                  : "rgba(15,23,42,0.04)",
-              }}
+      {mode === "candidate" && (
+        <View className="items-center justify-center rounded-full">
+          {isSelected ? (
+            <CheckCircleIcon
+              size={32}
+              color={colors.primary}
+              weight="duotone"
             />
-            <View
-              className={cn("absolute inset-0 items-center justify-center")}
-            >
-              <View
-                style={{
-                  width: AVATAR_SIZE,
-                  height: AVATAR_SIZE,
-                  borderRadius: AVATAR_SIZE / 2,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {isSelected && (
-                  <View
-                    className="items-center justify-center rounded-full bg-sky-500"
-                    style={{
-                      width: AVATAR_SIZE,
-                      height: AVATAR_SIZE,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: Math.round(AVATAR_SIZE * 0.3),
-                        fontWeight: "700",
-                        lineHeight: Math.round(AVATAR_SIZE * 0.4),
-                        textAlign: "center",
-                      }}
-                    >
-                      ✓
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-          </>
-        )}
+          ) : (
+            <CircleIcon size={32} color={colors.primary} />
+          )}
+        </View>
+      )}
+
+      {/* Left: Avatar + overlays  */}
+      <View className="items-center justify-center rounded-full">
+        {icon[notification.type]}
       </View>
 
       {/* Center: Content */}
@@ -137,7 +139,7 @@ export const NotificationRow = ({
         <View className="flex-row items-start justify-between gap-3">
           <Text
             className={cn(
-              "flex-1 text-[15px] leading-5",
+              "flex-1 text-base leading-5",
               isUnread
                 ? "font-semibold text-slate-900"
                 : "font-normal text-slate-800",
@@ -149,7 +151,7 @@ export const NotificationRow = ({
 
           <Text
             className={cn(
-              "text-[12px] leading-5",
+              "text-sm leading-5",
               isUnread
                 ? "font-semibold text-slate-900"
                 : "font-normal text-slate-500",
@@ -167,9 +169,9 @@ export const NotificationRow = ({
               ? "font-medium text-slate-800"
               : "font-normal text-slate-500",
           )}
-          numberOfLines={2}
+          numberOfLines={1}
         >
-          {notification.body ?? ""}
+          {bodyDisplay}
         </Text>
       </View>
     </Pressable>

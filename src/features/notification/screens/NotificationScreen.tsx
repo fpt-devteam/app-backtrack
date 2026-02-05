@@ -10,11 +10,7 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
-import { AppLoader } from "@/src/shared/components";
-import {
-  AppHeader,
-  HeaderTitle,
-} from "@/src/shared/components/app-utils/AppHeader";
+import { AppHeader, AppLoader, HeaderTitle } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { SHARED_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
@@ -32,7 +28,6 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -181,6 +176,98 @@ const NotificationScreen = () => {
     );
   };
 
+  const renderHeader = () => {
+    return (
+      <>
+        {mode === "candidate" ? (
+          <View className="bg-white border-b border-slate-200 px-4 py-4">
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center gap-3">
+                <Pressable onPress={onExitCandidate} hitSlop={8}>
+                  <XIcon size={24} color="#0ea5e9" weight="bold" />
+                </Pressable>
+                <Text className="text-2xl font-bold text-slate-900">
+                  {selectedCount} selected
+                </Text>
+              </View>
+              <View className="flex-row gap-4">
+                <Pressable
+                  onPress={onBulkMark}
+                  disabled={selectedCount === 0 || isUpdatingStatus}
+                  hitSlop={8}
+                >
+                  {isFirstSelectedRead ? (
+                    <EnvelopeSimpleIcon
+                      size={24}
+                      color={
+                        selectedCount === 0 || isUpdatingStatus
+                          ? "#cbd5e1"
+                          : "#0ea5e9"
+                      }
+                      weight="regular"
+                    />
+                  ) : (
+                    <EnvelopeSimpleOpenIcon
+                      size={24}
+                      color={
+                        selectedCount === 0 || isUpdatingStatus
+                          ? "#cbd5e1"
+                          : "#0ea5e9"
+                      }
+                      weight="regular"
+                    />
+                  )}
+                </Pressable>
+                <Pressable
+                  onPress={onBulkArchive}
+                  disabled={selectedCount === 0 || isUpdatingStatus}
+                  hitSlop={8}
+                >
+                  <ArchiveIcon
+                    size={24}
+                    color={
+                      selectedCount === 0 || isUpdatingStatus
+                        ? "#cbd5e1"
+                        : "#0ea5e9"
+                    }
+                    weight="regular"
+                  />
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <AppHeader left={<HeaderTitle title="Notifications" />} />
+        )}
+
+        <View className="p-4 pt-0">
+          <View className="flex-row gap-2">
+            <NotificationChip
+              label="All"
+              isActive={filter === "all"}
+              onPress={() => setFilter("all")}
+              disabled={mode === "candidate"}
+            />
+
+            <NotificationChip
+              label="Unread"
+              isActive={filter === "unread"}
+              onPress={() => setFilter("unread")}
+              disabled={mode === "candidate"}
+            />
+
+            <NotificationChip
+              label="Archived"
+              isActive={filter === "archived"}
+              onPress={() => setFilter("archived")}
+              disabled={mode === "candidate"}
+            />
+          </View>
+        </View>
+      </>
+    );
+  };
+
   const renderFooter = () => {
     if (!isLoadingNextPage) return null;
     return (
@@ -191,95 +278,7 @@ const NotificationScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
-      {mode === "normal" && (
-        <>
-          <AppHeader left={<HeaderTitle title="Notifications" />} />
-          <View className="px-4 py-3">
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="gap-2"
-            >
-              <NotificationChip
-                label="All"
-                isActive={filter === "all"}
-                onPress={() => setFilter("all")}
-              />
-              <NotificationChip
-                label="Unread"
-                isActive={filter === "unread"}
-                onPress={() => setFilter("unread")}
-              />
-              <NotificationChip
-                label="Archived"
-                isActive={filter === "archived"}
-                onPress={() => setFilter("archived")}
-              />
-            </ScrollView>
-          </View>
-        </>
-      )}
-
-      {mode === "candidate" && (
-        <View className="bg-white border-b border-slate-200 px-4 py-4">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-3">
-              <Pressable onPress={onExitCandidate} hitSlop={8}>
-                <XIcon size={24} color="#0ea5e9" weight="bold" />
-              </Pressable>
-              <Text className="text-2xl font-bold text-slate-900">
-                {selectedCount} selected
-              </Text>
-            </View>
-            <View className="flex-row gap-4">
-              <Pressable
-                onPress={onBulkMark}
-                disabled={selectedCount === 0 || isUpdatingStatus}
-                hitSlop={8}
-              >
-                {isFirstSelectedRead ? (
-                  <EnvelopeSimpleIcon
-                    size={24}
-                    color={
-                      selectedCount === 0 || isUpdatingStatus
-                        ? "#cbd5e1"
-                        : "#0ea5e9"
-                    }
-                    weight="regular"
-                  />
-                ) : (
-                  <EnvelopeSimpleOpenIcon
-                    size={24}
-                    color={
-                      selectedCount === 0 || isUpdatingStatus
-                        ? "#cbd5e1"
-                        : "#0ea5e9"
-                    }
-                    weight="regular"
-                  />
-                )}
-              </Pressable>
-              <Pressable
-                onPress={onBulkArchive}
-                disabled={selectedCount === 0 || isUpdatingStatus}
-                hitSlop={8}
-              >
-                <ArchiveIcon
-                  size={24}
-                  color={
-                    selectedCount === 0 || isUpdatingStatus
-                      ? "#cbd5e1"
-                      : "#0ea5e9"
-                  }
-                  weight="regular"
-                />
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      )}
-
+    <SafeAreaView className="flex-1 bg-white pb-[56px]">
       {isLoading && allItems.length === 0 ? (
         <AppLoader />
       ) : (
@@ -287,6 +286,7 @@ const NotificationScreen = () => {
           data={allItems}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
+          ListHeaderComponent={renderHeader}
           ListEmptyComponent={renderEmpty}
           ListFooterComponent={renderFooter}
           onEndReached={handleEndReached}

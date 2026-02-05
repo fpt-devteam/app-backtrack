@@ -6,12 +6,14 @@ type NotificationChipProps = {
   label: string;
   isActive: boolean;
   onPress: () => void;
+  disabled?: boolean;
 };
 
 export const NotificationChip = ({
   label,
   isActive,
   onPress,
+  disabled,
 }: NotificationChipProps) => {
   return (
     <Pressable
@@ -19,7 +21,9 @@ export const NotificationChip = ({
       className={cn(
         "px-4 py-2 rounded-full border",
         isActive ? "bg-sky-500 border-sky-500" : "bg-white border-slate-300",
+        disabled && "opacity-50",
       )}
+      disabled={disabled}
     >
       <Text
         className={cn(
