@@ -4,13 +4,13 @@ import type { UnreadCountResponse } from "@/src/features/notification/types";
 
 import { useQuery } from "@tanstack/react-query";
 
-export type UseUnreadCountOptions = {
+export type useUnreadNotificationCountOptions = {
   enabled?: boolean;
 };
 
-export const useUnreadCount = ({
+export const useUnreadNotificationCount = ({
   enabled = true,
-}: UseUnreadCountOptions = {}) => {
+}: useUnreadNotificationCountOptions = {}) => {
   const query = useQuery<UnreadCountResponse>({
     queryKey: [...NOTIFICATIONS_QUERY_KEY, "unread-count"],
     enabled,

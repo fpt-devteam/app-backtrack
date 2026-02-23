@@ -22,12 +22,11 @@ import {
   EnvelopeSimpleOpenIcon,
   XIcon,
 } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  RefreshControl,
   Text,
   View,
 } from "react-native";
@@ -40,13 +39,20 @@ const NotificationScreen = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<FilterType>("all");
 
+  const filterRef = useRef<FilterType>("all");
+
+  const handleChangeFilter = (newFilter: FilterType) => {
+    setFilter(newFilter);
+    filterRef.current = newFilter;
+  };
+
   const getFilterStatus = (filterType: FilterType) => {
     if (filterType === "all") return undefined;
     if (filterType === "unread") return NOTIFICATION_STATUS.Unread;
     return NOTIFICATION_STATUS.Archived;
   };
 
-  const filterStatus = getFilterStatus(filter);
+  const filterStatus = getFilterStatus(filterRef.current);
 
   const {
     items,
@@ -61,11 +67,6 @@ const NotificationScreen = () => {
   const allItems = items;
 
   const { updateStatus, isUpdatingStatus } = useUpdateNotificationStatus();
-
-  const handleLongPress = (notification: UserNotification) => {
-    setMode("candidate");
-    setSelectedIds(new Set([notification.id]));
-  };
 
   const selectedIdList = Array.from(selectedIds);
   const selectedCount = selectedIdList.length;
@@ -113,6 +114,11 @@ const NotificationScreen = () => {
     }
   };
 
+  const handleLongPress = (notification: UserNotification) => {
+    setMode("candidate");
+    setSelectedIds(new Set([notification.id]));
+  };
+
   const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -133,7 +139,12 @@ const NotificationScreen = () => {
       });
 
       const screenPath = notification.data?.screenPath as RelativePathString;
-      router.push(screenPath);
+
+      if (screenPath) {
+        router.push(screenPath);
+      } else {
+        router.push(SHARED_ROUTE.notAvailable);
+      }
     } catch (error) {
       console.log("Error when update notification status: ", error);
       router.push(SHARED_ROUTE.notAvailable);
@@ -176,11 +187,21 @@ const NotificationScreen = () => {
     );
   };
 
-  const renderHeader = () => {
+  const renderFooter = () => {
+    if (!isLoadingNextPage) return null;
     return (
+      <View className="py-4">
+        <ActivityIndicator size="small" color="#0ea5e9" />
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white pb-[56px]">
+      {/* Screen Header  */}
       <>
         {mode === "candidate" ? (
-          <View className="bg-white border-b border-slate-200 px-4 py-4">
+          <View className="bg-white h-16 px-4 py-4">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-3">
                 <Pressable onPress={onExitCandidate} hitSlop={8}>
@@ -239,46 +260,32 @@ const NotificationScreen = () => {
         ) : (
           <AppHeader left={<HeaderTitle title="Notifications" />} />
         )}
-
-        <View className="p-4 pt-0">
-          <View className="flex-row gap-2">
-            <NotificationChip
-              label="All"
-              isActive={filter === "all"}
-              onPress={() => setFilter("all")}
-              disabled={mode === "candidate"}
-            />
-
-            <NotificationChip
-              label="Unread"
-              isActive={filter === "unread"}
-              onPress={() => setFilter("unread")}
-              disabled={mode === "candidate"}
-            />
-
-            <NotificationChip
-              label="Archived"
-              isActive={filter === "archived"}
-              onPress={() => setFilter("archived")}
-              disabled={mode === "candidate"}
-            />
-          </View>
-        </View>
       </>
-    );
-  };
 
-  const renderFooter = () => {
-    if (!isLoadingNextPage) return null;
-    return (
-      <View className="py-4">
-        <ActivityIndicator size="small" color="#0ea5e9" />
+      <View className="p-4 pt-0">
+        <View className="flex-row gap-2">
+          <NotificationChip
+            label="All"
+            isActive={filter === "all"}
+            onPress={() => handleChangeFilter("all")}
+            disabled={mode === "candidate"}
+          />
+
+          <NotificationChip
+            label="Unread"
+            isActive={filter === "unread"}
+            onPress={() => handleChangeFilter("unread")}
+            disabled={mode === "candidate"}
+          />
+
+          <NotificationChip
+            label="Archived"
+            isActive={filter === "archived"}
+            onPress={() => handleChangeFilter("archived")}
+            disabled={mode === "candidate"}
+          />
+        </View>
       </View>
-    );
-  };
-
-  return (
-    <SafeAreaView className="flex-1 bg-white pb-[56px]">
       {isLoading && allItems.length === 0 ? (
         <AppLoader />
       ) : (
@@ -286,18 +293,10 @@ const NotificationScreen = () => {
           data={allItems}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          ListHeaderComponent={renderHeader}
           ListEmptyComponent={renderEmpty}
           ListFooterComponent={renderFooter}
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={refresh}
-              tintColor="#0ea5e9"
-            />
-          }
         />
       )}
     </SafeAreaView>

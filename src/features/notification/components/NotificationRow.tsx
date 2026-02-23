@@ -73,8 +73,7 @@ export const NotificationRow = ({
   const bodyDisplay = useMemo(() => {
     const type = notification.type;
     if (type === "QRScanEvent") {
-      if (!notification?.data?.location)
-        return "The scanner did not share their location!";
+      if (!notification?.data?.location) return notification.body;
 
       const location = notification.data?.location as LatLng;
       const { latitude, longitude } = location;
