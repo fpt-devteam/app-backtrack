@@ -30,9 +30,6 @@ export const useRegisterDeviceMutation = () => {
         .data;
       const deviceId = token;
 
-      const saved = await storage.get();
-      if (saved?.token === token && saved?.deviceId === deviceId) return;
-
       const req: PushTokenDeviceUpdateRequest = {
         token,
         deviceId,

@@ -53,6 +53,7 @@ export const useNotifications = ({
     },
     isLoading: query.isLoading || query.isFetching,
     isLoadingNextPage: query.isFetchingNextPage,
+    isRefreshing: query.isRefetching,
     refresh: () => query.refetch(),
   };
 };

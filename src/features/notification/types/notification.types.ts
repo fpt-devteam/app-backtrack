@@ -21,6 +21,9 @@ export type NotificationStatus =
 
 export const NOTIFICATION_EVENT = {
   ChatEvent: "ChatEvent",
+  AIMatchingEvent: "AIMatchingEvent",
+  QRScanEvent: "QRScanEvent",
+  SystemAlertEvent: "SystemAlertEvent",
 } as const;
 
 export type NotificationEvent =
