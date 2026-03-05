@@ -1,4 +1,4 @@
-import { useUnreadCount } from "@/src/features/notification/hooks";
+import { useUnreadNotificationCount } from "@/src/features/notification/hooks";
 import { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarButton";
 import { colors, metrics } from "@/src/shared/theme";
@@ -26,7 +26,7 @@ const TAB_ICONS: Record<string, TabIcon> = {
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
-  const { count } = useUnreadCount();
+  const { count } = useUnreadNotificationCount();
 
   return (
     <View style={styles.wrapper}>
