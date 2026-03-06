@@ -1,10 +1,11 @@
-import type { MeResponse, SyncRequest, SyncResponse } from "@/src/features/auth/types";
+import type { EmailStatusCheckResponse, MeResponse, SyncRequest, SyncResponse } from "@/src/features/auth/types";
 import type { ApiResponse } from "@/src/shared/api";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 const AUTH = {
   me: "/api/core/users",
   sync: "/api/core/users",
+  emailCheck: "/auth/check-email",
 };
 
 export async function meApi() {
@@ -21,5 +22,10 @@ export async function syncUserApi(body: SyncRequest) {
     },
   });
   return res.data as SyncResponse;
+}
+
+export async function checkEmailStatusApi(email: string) {
+  const res = await publicClient.post(AUTH.emailCheck, { email });
+  return res.data as EmailStatusCheckResponse;
 }
 

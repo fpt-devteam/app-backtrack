@@ -3,7 +3,7 @@ import BottomSheetPrimitive, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 type Props = {
   isVisible: boolean;
@@ -24,9 +24,17 @@ export const BottomSheet = ({
 }: Props) => {
   const bottomSheetRef = useRef<BottomSheetPrimitive>(null);
 
+  useEffect(() => {
+    if (isVisible) {
+      bottomSheetRef.current?.snapToIndex(0);
+    } else {
+      bottomSheetRef.current?.close();
+    }
+  }, [isVisible]);
+
   const snapPoints = useMemo(
     () => customSnapPoints || ["25%", "50%", "75%"],
-    [customSnapPoints]
+    [customSnapPoints],
   );
 
   const renderBackdrop = useCallback(
@@ -39,7 +47,7 @@ export const BottomSheet = ({
         pressBehavior="close"
       />
     ),
-    []
+    [],
   );
 
   return (
@@ -52,7 +60,11 @@ export const BottomSheet = ({
       onClose={onClose}
       backdropComponent={renderBackdrop}
       backgroundStyle={{ backgroundColor: "white" }}
-      handleIndicatorStyle={{ backgroundColor: "#D1D5DB", width: 40, height: 6 }}
+      handleIndicatorStyle={{
+        backgroundColor: "#D1D5DB",
+        width: 40,
+        height: 6,
+      }}
       maxDynamicContentSize={maxDynamicContentSize}
       animationConfigs={{ duration: 90 }}
     >
@@ -62,5 +74,3 @@ export const BottomSheet = ({
     </BottomSheetPrimitive>
   );
 };
-
-

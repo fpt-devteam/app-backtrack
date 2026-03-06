@@ -16,3 +16,11 @@ export type AuthState = {
 export type UserGlobalData = {
   user: Nullable<AppUser>;
 };
+
+export const EMAIL_STATUS = {
+  VERIFIED: "Verified",
+  NOT_VERIFIED: "NotVerified",
+  NOT_FOUND: "NotFound",
+}
+
+export type EmailStatus = typeof EMAIL_STATUS[keyof typeof EMAIL_STATUS];
