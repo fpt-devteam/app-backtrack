@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostsRequest, PostsResponse } from "@/src/features/post/types";
 import { type ApiResponse, privateClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -7,6 +7,7 @@ export const POST_API = {
   detail: (postId: string) => `/api/core/posts/${postId}`,
   matching: (postId: string) => `/api/core/posts/${postId}/similar`,
   analyzeImage: "/api/core/image-analysis/analyze",
+  getAllMyPost: "/api/core/posts/me"
 } as const;
 
 export async function filterPostsApi(params: PostsRequest) {
@@ -39,5 +40,10 @@ export async function analyzeImageApi(req: AnalyzeImageRequest) {
       'Content-Type': 'application/json',
     },
   });
+  return response.data;
+}
+
+export async function getAllMyPost() {
+  const response = await privateClient.get<GetAllMyPostResponse>(POST_API.getAllMyPost);
   return response.data;
 }
