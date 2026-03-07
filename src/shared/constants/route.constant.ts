@@ -25,7 +25,7 @@ export const QR_ROUTE = {
   index: "/qr",
   purchase: "/qr/purchase",
   profile: "/qr/qr-profile",
-  cusomize: "/qr/qr-customize",
+  customize: "/qr/qr-customize",
   profileSetting: "/qr/qr-profile-setting",
 } as const;
 

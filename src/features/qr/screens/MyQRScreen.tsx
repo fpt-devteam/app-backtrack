@@ -5,7 +5,7 @@ import {
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
 import { AppHeader, HeaderTitle } from "@/src/shared/components";
-import { QR_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { QR_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
@@ -20,9 +20,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const MyQRScreenHeader = () => {
   const handleEditQRProfile = useCallback(() => {
-    router.push(
-      SHARED_ROUTE.notAvailable as ExternalPathString | RelativePathString,
-    );
+    router.push(QR_ROUTE.customize as ExternalPathString | RelativePathString);
   }, []);
 
   const handleNavigateSettingScreen = useCallback(() => {

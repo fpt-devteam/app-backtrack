@@ -66,6 +66,12 @@ export const MOCK_QR_PROFILE = {
   phone: "+1 (555) 012-3456",
 };
 
+export const MOCK_QR_CUSTOMIZE_DEFAULTS = {
+  decor: "none" as const,
+  background: "clean" as const,
+  frame: "rounded" as const,
+};
+
 export const MOCK_QR_PROFILE_SETTINGS = {
   showFullName: true,
   showPhoneNumber: true,
