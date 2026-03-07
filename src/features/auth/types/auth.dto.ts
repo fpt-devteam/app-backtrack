@@ -1,4 +1,4 @@
-import type { AppUser } from "@/src/features/auth/types";
+import type { AppUser, EmailStatus } from "@/src/features/auth/types";
 import type { ApiResponse } from "@/src/shared/api";
 
 export type SyncRequest = {
@@ -34,3 +34,14 @@ export type ForgotPasswordRequest = {
 export type ForgotPasswordResponse = {
   ok: true;
 };
+
+export type EmailStatusCheckRequest = {
+  email: string;
+};
+
+export type EmailStatusCheckResult = {
+  status: EmailStatus;
+  email: string;
+}
+
+export type EmailStatusCheckResponse = ApiResponse<EmailStatusCheckResult>;
