@@ -1,5 +1,9 @@
+import { MinimalPostCard } from "@/src/features/post/components/cards/MinimalPostCard";
+import { useGetAllMyPost } from "@/src/features/post/hooks";
+import type { Post } from "@/src/features/post/types";
 import {
   IS_QR_FEATURE_MOCK,
+  MOCK_MY_POSTS,
   MOCK_QR_PROFILE_SETTINGS,
 } from "@/src/features/qr/constants";
 import { colors } from "@/src/shared/theme/colors";
@@ -7,11 +11,14 @@ import { router } from "expo-router";
 import {
   CaretLeftIcon,
   ChatTeardropTextIcon,
+  CheckSquareIcon,
   EyeIcon,
   ListBulletsIcon,
+  SquareIcon,
 } from "phosphor-react-native";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   Switch,
@@ -82,6 +89,28 @@ const QRProfileSettingScreen = () => {
     defaults.showEmailAddress,
   );
   const [customMessage, setCustomMessage] = useState(defaults.customMessage);
+  const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const { data: fetchedPosts, isLoading: isPostsLoading } = useGetAllMyPost();
+
+  const myPosts = useMemo(() => {
+    if (IS_QR_FEATURE_MOCK) return MOCK_MY_POSTS;
+    return fetchedPosts ?? [];
+  }, [fetchedPosts]);
+
+  const togglePost = useCallback((post: Post) => {
+    setSelectedPostIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(post.id)) {
+        next.delete(post.id);
+      } else {
+        next.add(post.id);
+      }
+      return next;
+    });
+  }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
@@ -156,17 +185,67 @@ const QRProfileSettingScreen = () => {
           />
         </SectionCard>
 
-        {/* Select Active Posts to Show — header only */}
+        {/* Select Active Posts to Show */}
         <SectionCard
           icon={
             <ListBulletsIcon size={18} color={colors.primary} weight="fill" />
           }
           title="Select Active Posts to Show"
         >
-          <Text className="text-xs text-slate-400 leading-4">
+          <Text className="text-xs text-slate-400 leading-4 mb-3">
             Choose which lost item posts appear on your QR profile.
           </Text>
-          {/* Posts list — not implemented yet */}
+
+          {isPostsLoading && (
+            <ActivityIndicator size="small" color={colors.primary} />
+          )}
+
+          {!isPostsLoading && myPosts?.length === 0 && (
+            <Text className="text-sm text-slate-400 text-center py-2">
+              No posts found.
+            </Text>
+          )}
+
+          {!isPostsLoading &&
+            myPosts?.map((post) => {
+              const isSelected = selectedPostIds.has(post.id);
+              return (
+                <Pressable
+                  key={post.id}
+                  onPress={() => togglePost(post)}
+                  className="mb-3"
+                >
+                  <View
+                    style={{
+                      borderWidth: 2,
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      borderColor: isSelected
+                        ? colors.primary
+                        : colors.transparent,
+                    }}
+                  >
+                    <MinimalPostCard post={post} />
+                  </View>
+                  {/* Checkbox overlay */}
+                  <View className="absolute top-3 left-3 bg-white rounded-md">
+                    {isSelected ? (
+                      <CheckSquareIcon
+                        size={24}
+                        color={colors.primary}
+                        weight="fill"
+                      />
+                    ) : (
+                      <SquareIcon
+                        size={24}
+                        color={colors.slate[300]}
+                        weight="regular"
+                      />
+                    )}
+                  </View>
+                </Pressable>
+              );
+            })}
         </SectionCard>
       </ScrollView>
     </SafeAreaView>

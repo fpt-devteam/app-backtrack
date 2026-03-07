@@ -1,3 +1,4 @@
+import { Post, PostType } from "@/src/features/post/types";
 import { SubscriptionStatus, UserSubscription, UserSubscriptionPlan } from "@/src/features/qr/types";
 
 export const IS_QR_FEATURE_MOCK = true;
@@ -71,3 +72,57 @@ export const MOCK_QR_PROFILE_SETTINGS = {
   showEmailAddress: false,
   customMessage: MOCK_QR_PROFILE.ownerNote
 };
+
+const MOCK_AUTHOR = {
+  id: "user_mock_123",
+  displayName: "Alex Johnson",
+  avatarUrl: "https://i.pravatar.cc/150?img=12",
+};
+
+export const MOCK_MY_POSTS: Post[] = [
+  {
+    id: "post_mock_001",
+    postType: PostType.Lost,
+    itemName: "Lost Car Keys",
+    description: "Lost my car keys near the parking lot.",
+    distinctiveMarks: "Red keychain with a small flashlight",
+    imageUrls: ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400"],
+    eventTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    location: { latitude: 10.7769, longitude: 106.7009 },
+    displayAddress: "Central Park",
+    externalPlaceId: null,
+    radiusKm: 0,
+    author: MOCK_AUTHOR,
+  },
+  {
+    id: "post_mock_002",
+    postType: PostType.Lost,
+    itemName: "Black Leather Wallet",
+    description: "Left my wallet on the bus seat.",
+    distinctiveMarks: 'Initials "A.J." engraved on the inside',
+    imageUrls: ["https://images.unsplash.com/photo-1627123424574-724758594e93?w=400"],
+    eventTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+    location: { latitude: 10.7821, longitude: 106.6994 },
+    displayAddress: "Downtown Bus #42",
+    externalPlaceId: null,
+    radiusKm: 0,
+    author: MOCK_AUTHOR,
+  },
+  {
+    id: "post_mock_003",
+    postType: PostType.Lost,
+    itemName: "AirPods Pro Case",
+    description: "Forgot my AirPods case at the coffee shop.",
+    distinctiveMarks: "White case with a small sticker on the back",
+    imageUrls: ["https://images.unsplash.com/photo-1606741965509-717c4efde069?w=400"],
+    eventTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    location: { latitude: 10.7756, longitude: 106.7019 },
+    displayAddress: "Coffee Shop",
+    externalPlaceId: null,
+    radiusKm: 0,
+    author: MOCK_AUTHOR,
+  },
+];
