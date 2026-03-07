@@ -23,13 +23,10 @@ export const CHAT_ROUTE = {
 
 export const QR_ROUTE = {
   index: "/qr",
-  generate: "/qr/generate",
-  edit: (qrCodeId: string) => `/qr/${qrCodeId}/edit`,
-  scan: "/qr/scan",
   purchase: "/qr/purchase",
-  detail: (qrCodeId: string) => `/qr/${qrCodeId}`,
-  qrView: (qrCodeId: string, publicCode: string) =>
-    `/qr/${qrCodeId}/qr-view/${publicCode}`,
+  profile: "/qr/qr-profile",
+  cusomize: "/qr/qr-customize",
+  profileSetting: "/qr/qr-profile-setting",
 } as const;
 
 export const MAP_ROUTE = {

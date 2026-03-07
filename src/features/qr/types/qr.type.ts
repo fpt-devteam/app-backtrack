@@ -1,25 +1,45 @@
-export type QrCodeEntity = {
+export type UserQrCode = {
   id: string;
   publicCode: string;
-  linkedAt: string;
+  userId: string;
   createdAt: string;
+  updatedAt: string;
 };
 
-export type QrItemEntity = {
-  name: string;
-  description: string;
-  imageUrls: string[];
-};
+export const SubscriptionPlan = {
+  Monthly: 'Monthly',
+  Yearly: 'Yearly',
+} as const;
 
-export type QrOwnerEntity = {
+export type SubscriptionPlanType = typeof SubscriptionPlan[keyof typeof SubscriptionPlan];
+
+export const SubscriptionStatus = {
+  Active: 'Active',
+  PastDue: 'PastDue',
+  Unpaid: 'Unpaid',
+  Incomplete: 'Incomplete',
+  IncompleteExpired: 'IncompleteExpired',
+  Canceled: 'Canceled',
+} as const;
+
+export type SubscriptionStatusType = typeof SubscriptionStatus[keyof typeof SubscriptionStatus];
+
+export type UserSubscription = {
   id: string;
-  email: string;
-  displayName?: string | null;
-};
+  userId: string;
+  planType: SubscriptionPlanType;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  status: SubscriptionStatusType;
+  cancelAtPeriodEnd: boolean;
+}
 
-export type QrCodeData = {
-  qrCode: QrCodeEntity;
-  item: QrItemEntity;
-  ownerId: string;
-  owner?: QrOwnerEntity;
+export type UserSubscriptionPlan = {
+  id: string;
+  label: string;
+  description: string;
+  price: string;
+  unit: string;
+  priceId: string;
+  badge: string | null;
 };
