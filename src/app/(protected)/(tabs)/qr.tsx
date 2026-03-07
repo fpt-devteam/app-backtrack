@@ -1,2 +1,1 @@
-export { QRScreen as default } from '@/src/features/qr/screens';
-
+export { MyQRScreen as default } from "@/src/features/qr/screens";

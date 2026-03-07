@@ -101,7 +101,6 @@ const LoginScreen = () => {
 
       const req: LoginRequest = { email: data.email, password: data.password };
       await login(req);
-      router.replace(POST_ROUTE.index as RelativePathString);
     } catch (err) {
       console.log("Login error:", err);
     }

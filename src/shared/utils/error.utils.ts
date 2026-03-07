@@ -107,12 +107,15 @@ const APP_ERRORS: ErrorMapping = {
   INVALID_INPUT: "Invalid input. Please check and try again.",
   OPERATION_FAILED: "Operation failed. Please try again.",
   UNKNOWN_ERROR: "An unexpected error occurred. Please try again.",
+  NoActiveSubscription: "You don't have an active subscription",
+  SubscriptionAlreadySubscribed: "You are already subscribed to a plan",
 };
+
 const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
 
 const ERROR_MESSAGES: ErrorMapping = {
   ...FIREBASE_AUTH_ERRORS,
-  ...API_ERRORS,
+  // ...API_ERRORS,
   ...APP_ERRORS,
 };
 

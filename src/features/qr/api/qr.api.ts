@@ -1,35 +1,29 @@
-import type { CreateQrCodeRequest, CreateQrCodeResponse, GetQrCodeByIdResponse, GetQrCodesRequest, GetQrCodesResponse, UpdateQrCodeRequest, UpdateQrCodeResponse } from "@/src/features/qr/types";
-import { DEFAULT_PAGED_REQUEST, privateClient } from "@/src/shared/api";
+import type { GetMyQrCodeResponse, GetMySubscriptionResponse, SubscriptionRequest } from "@/src/features/qr/types";
+import { privateClient } from "@/src/shared/api";
 
 export const QR_API = {
-  base: "/api/qr/qr-codes",
-  detail: (id: string) => `/api/qr/qr-codes/${id}`,
-  image: (publicCode: string) => `/api/qr/qr-codes/${publicCode}/image`,
+  me: "/api/qr/me",
+  getMySubscription: "/api/qr/subscriptions/me",
+  cancelSubscription: "/api/qr/subscriptions/me",
+  subscription: "/api/qr/subscriptions",
 } as const;
 
-export const createQrCode = async (req: CreateQrCodeRequest) => {
-  const response = await privateClient.post<CreateQrCodeResponse>(QR_API.base, req);
+export async function getMyQRCode(): Promise<GetMyQrCodeResponse> {
+  const response = await privateClient.get<GetMyQrCodeResponse>(QR_API.me);
   return response.data;
-};
+}
 
-export const updateQrCode = async (id: string, req: UpdateQrCodeRequest) => {
-  const response = await privateClient.put<UpdateQrCodeResponse>(`${QR_API.detail(id)}/item`, req);
+export async function getMySubscription() {
+  const response = await privateClient.get<GetMySubscriptionResponse>(QR_API.getMySubscription);
   return response.data;
-};
+}
 
-export const getQrCodeById = async (id: string) => {
-  const response = await privateClient.get<GetQrCodeByIdResponse>(QR_API.detail(id));
+export async function cancelSubscription() {
+  const response = await privateClient.delete<GetMyQrCodeResponse>(QR_API.cancelSubscription);
   return response.data;
-};
+}
 
-export const getQrCodes = async (params: GetQrCodesRequest = DEFAULT_PAGED_REQUEST) => {
-  const response = await privateClient.get<GetQrCodesResponse>(QR_API.base, { params });
+export async function subscription(req: SubscriptionRequest) {
+  const response = await privateClient.post<GetMyQrCodeResponse>(QR_API.subscription, req);
   return response.data;
-};
-
-export const getQrCodeImage = async (publicCode: string) => {
-  const response = await privateClient.get(QR_API.image(publicCode), {
-    responseType: 'arraybuffer',
-  });
-  return response.data;
-};
+}

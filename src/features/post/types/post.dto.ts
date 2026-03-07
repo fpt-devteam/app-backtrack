@@ -62,3 +62,5 @@ export type AnalyzeImageData = {
 };
 
 export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
+
+export type GetAllMyPostResponse = ApiResponse<Post[]>;

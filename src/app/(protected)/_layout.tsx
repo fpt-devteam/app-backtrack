@@ -14,13 +14,6 @@ export default function ProtectedLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
-          name="(bottom-sheet)/qr-menu"
-          options={{
-            presentation: "transparentModal",
-            animation: "fade",
-          }}
-        />
-        <Stack.Screen
           name="(bottom-sheet)/post-menu"
           options={{
             presentation: "transparentModal",
