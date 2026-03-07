@@ -1,43 +1,25 @@
 import { auth } from "@/src/shared/lib";
-import { getErrorMessage } from "@/src/shared/utils";
+import { mapErrorToMessage } from "@/src/shared/utils";
 import { useMutation } from "@tanstack/react-query";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
 
 import { LOGIN_QUERY_KEY } from "@/src/features/auth/constants";
-import type { LoginRequest, LoginResponse } from "@/src/features/auth/types";
+import type { LoginRequest } from "@/src/features/auth/types";
 
 export function useLogin() {
-  const mutation = useMutation<LoginResponse, Error, LoginRequest>({
+  const mutation = useMutation({
     mutationKey: LOGIN_QUERY_KEY,
-    mutationFn: async (req) => {
-      try {
-        const email = req.email.trim();
-        const password = req.password;
-
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const idToken = await cred.user.getIdToken();
-
-        if (!idToken) {
-          throw new Error("Failed to get ID token.");
-        }
-
-        return { idToken } as LoginResponse;
-      } catch (error) {
-        const friendlyMessage = getErrorMessage(error);
-        throw new Error(friendlyMessage);
-      }
-    },
-
-    onError: (err) => {
-      console.log("Login failed:", err.message);
+    mutationFn: async (req: LoginRequest) => {
+      const { email, password } = req;
+      await signInWithEmailAndPassword(auth, email, password);
     },
   });
 
-
   const errorMessage = useMemo(() => {
     if (!mutation.error) return null;
-    return mutation.error.message;
+    const friendlyMessage = mapErrorToMessage(mutation.error);
+    return friendlyMessage;
   }, [mutation.error]);
 
   return {
@@ -46,5 +28,6 @@ export function useLogin() {
     error: errorMessage,
     data: mutation.data,
     reset: mutation.reset,
+    success: mutation.isSuccess,
   };
 }

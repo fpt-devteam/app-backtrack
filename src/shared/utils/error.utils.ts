@@ -109,21 +109,66 @@ const APP_ERRORS: ErrorMapping = {
   UNKNOWN_ERROR: "An unexpected error occurred. Please try again.",
 };
 const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const ERROR_MESSAGES: ErrorMapping = {
   ...FIREBASE_AUTH_ERRORS,
   ...API_ERRORS,
   ...APP_ERRORS,
 };
 
-export function getErrorMessage(error: unknown, fallback = DEFAULT_ERROR_MESSAGE): string {
+/**
+ * Maps error codes to user-friendly messages
+ */
+export function mapErrorToMessage(
+  error: unknown,
+  fallback = DEFAULT_ERROR_MESSAGE
+): string {
+  if (!error) return fallback;
+
+  // Extract error code from Firebase errors
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorCode = (error as any)?.code;
+  if (errorCode && ERROR_MESSAGES[errorCode]) {
+    return ERROR_MESSAGES[errorCode];
+  }
+
+  // Extract HTTP status code from API errors
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const statusCode = (error as any)?.response?.status;
+  if (statusCode && ERROR_MESSAGES[String(statusCode)]) {
+    return ERROR_MESSAGES[String(statusCode)];
+  }
+
+  // Check for network/timeout errors
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const errorMessage = (error as any)?.message || "";
+  if (errorMessage.toLowerCase().includes("network")) {
+    return ERROR_MESSAGES.NETWORK_ERROR;
+  }
+  if (errorMessage.toLowerCase().includes("timeout")) {
+    return ERROR_MESSAGES.TIMEOUT_ERROR;
+  }
+
+  // Fallback to generic error message extraction
+  return getErrorMessage(error, fallback);
+}
+
+/**
+ * Extracts error message from various error structures
+ */
+export function getErrorMessage(
+  error: unknown,
+  fallback = DEFAULT_ERROR_MESSAGE
+): string {
+
+  console.log("Error: ", error)
   return (
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any)?.response?.data?.error?.message ||
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any)?.error?.message ||
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any)?.message ||
     fallback
-  )
+  );
 }
