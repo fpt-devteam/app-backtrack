@@ -44,8 +44,6 @@ export type MatchingPostsRequest = {
 };
 
 export type MatchingPostsData = {
-  embeddingStatus: PostMatchingStatus;
-  isReady: boolean;
   similarPosts: SimilarPost[];
 };
 
@@ -64,3 +62,14 @@ export type AnalyzeImageData = {
 export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
 
 export type GetAllMyPostResponse = ApiResponse<Post[]>;
+
+// Post Matching Status Check
+export type PostMatchingStatusCheckRequest = {
+  postId: string;
+};
+
+export type PostMatchingStatusCheckResponse = ApiResponse<{
+  postId: string;
+  embeddingStatus: PostMatchingStatus;
+  matchingStatus: PostMatchingStatus;
+}>;
