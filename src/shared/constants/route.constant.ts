@@ -1,3 +1,5 @@
+import { ExternalPathString, RelativePathString } from "@/.expo/types/router";
+
 export const PROFILE_ROUTE = {
   index: "/(protected)/profile",
 } as const;
@@ -22,11 +24,11 @@ export const CHAT_ROUTE = {
 } as const;
 
 export const QR_ROUTE = {
-  index: "/qr",
-  purchase: "/qr/purchase",
-  profile: "/qr/qr-profile",
-  customize: "/qr/qr-customize",
-  profileSetting: "/qr/qr-profile-setting",
+  index: "/qr" as ExternalPathString | RelativePathString,
+  purchase: "/qr/purchase" as ExternalPathString | RelativePathString,
+  profile: "/qr/qr-profile" as ExternalPathString | RelativePathString,
+  customize: "/qr/qr-customize" as ExternalPathString | RelativePathString,
+  profileSetting: "/qr/qr-profile-setting" as ExternalPathString | RelativePathString,
 } as const;
 
 export const MAP_ROUTE = {

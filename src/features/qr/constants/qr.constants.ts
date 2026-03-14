@@ -1,0 +1,1 @@
+export const SUBSCRIPTION_LINK = "https://thebacktrack.vercel.app/premium";

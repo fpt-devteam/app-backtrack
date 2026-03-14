@@ -2,51 +2,25 @@ import {
   IS_QR_FEATURE_MOCK,
   MOCK_QR_PLAN_DATA,
 } from "@/src/features/qr/constants";
-import {
-  useCancelSubscription,
-  useGetMySubscription,
-} from "@/src/features/qr/hooks";
+import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus, UserSubscription } from "@/src/features/qr/types";
-import { AppInlineError } from "@/src/shared/components";
 import { QR_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
-import { toDate } from "@/src/shared/utils";
-import { ExternalPathString, RelativePathString, router } from "expo-router";
+import { formatDate } from "@/src/shared/utils";
+import { router } from "expo-router";
 import {
   ArrowRightIcon,
   CheckCircleIcon,
   LockKeyIcon,
-  ProhibitIcon,
   WarningIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-const MONTH_NAMES = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-function formatDate(input: string): string {
-  const d = toDate(input);
-  if (!d) return "Unknown";
-  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
 type CardBodyProps = {
   readonly isLoading: boolean;
   readonly isActive: boolean;
-  readonly subscription: UserSubscription | undefined;
+  readonly subscription: UserSubscription | null | undefined;
 };
 
 function CardBody({ isLoading, isActive, subscription }: CardBodyProps) {
@@ -100,32 +74,20 @@ function CardBody({ isLoading, isActive, subscription }: CardBodyProps) {
   );
 }
 
-type Props = {
-  showCancelButton?: boolean;
-};
-
-export const UserSubscriptionPlanCard = ({ showCancelButton }: Props) => {
+export const UserSubscriptionPlanPressableCard = () => {
   const { data: subscription, isLoading } = useGetMySubscription();
-  const { cancelSubscription, isCanceling, error } = useCancelSubscription();
 
   const handleNavigatePlanScreen = useCallback(() => {
-    router.push(QR_ROUTE.purchase as ExternalPathString | RelativePathString);
+    router.push(QR_ROUTE.purchase);
   }, []);
 
-  const handleCancelSubscription = useCallback(async () => {
-    try {
-      await cancelSubscription();
-    } catch {}
-  }, [cancelSubscription]);
-
   const isActiveDisplay = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK || !subscription) return MOCK_QR_PLAN_DATA.isActive;
+    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.isActive;
     return !!subscription && subscription.status === SubscriptionStatus.Active;
   }, [subscription]);
 
   const subscriptionData = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK || !subscription)
-      return MOCK_QR_PLAN_DATA.subscription;
+    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.subscription;
     return subscription;
   }, [subscription]);
 
@@ -146,32 +108,6 @@ export const UserSubscriptionPlanCard = ({ showCancelButton }: Props) => {
           />
         </View>
       </Pressable>
-
-      {/* Cancel Button */}
-      {showCancelButton && (
-        <>
-          <Pressable
-            onPress={handleCancelSubscription}
-            disabled={isCanceling}
-            className="flex-row items-center justify-center gap-2 mt-3 py-3 rounded-xl border border-red-100 bg-red-50 active:opacity-70"
-          >
-            {isCanceling ? (
-              <ActivityIndicator size="small" color={colors.status.error} />
-            ) : (
-              <ProhibitIcon
-                size={16}
-                color={colors.status.error}
-                weight="fill"
-              />
-            )}
-            <Text className="text-sm font-medium text-red-500">
-              {isCanceling ? "Cancelling..." : "Cancel Subscription"}
-            </Text>
-          </Pressable>
-
-          {error && <AppInlineError message={error} />}
-        </>
-      )}
     </View>
   );
 };

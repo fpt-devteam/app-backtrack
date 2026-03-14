@@ -1,15 +1,21 @@
-import { SimilarPostCard } from '@/src/features/post/components';
-import { useGetPostById, useMatchingPost } from '@/src/features/post/hooks';
-import { MatchingErrorScreen } from '@/src/features/post/screens/MatchingErrorScreen';
-import { MatchingNoResultScreen } from '@/src/features/post/screens/MatchingNoResultScreen';
-import { MatchingWaitingScreen } from '@/src/features/post/screens/MatchingWaitingScreen';
-import { AppHeader, BackButton, HeaderTitle } from '@/src/shared/components/app-utils/AppHeader';
-import { getErrorMessage } from '@/src/shared/utils';
-import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { SimilarPostCard } from "@/src/features/post/components";
+import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
+import { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoResultScreen";
+import { MatchingWaitingScreen } from "@/src/features/post/screens/MatchingWaitingScreen";
+import {
+  AppHeader,
+  BackButton,
+  HeaderTitle,
+} from "@/src/shared/components/app-utils/AppHeader";
+import { getErrorMessage } from "@/src/shared/utils";
+import { useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { FlatList, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const MatchingScreen = () => {
+  const insets = useSafeAreaInsets();
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { postId } = useLocalSearchParams<{ postId: string }>();
 
@@ -24,24 +30,38 @@ export const MatchingScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (applyingInterval || isMatching || !yourItem) return <MatchingWaitingScreen />;
+  if (applyingInterval || !yourItem || isMatching) {
+    console.log("Matching Waiting Screen");
+    return <MatchingWaitingScreen />;
+  }
 
-  if (error) return <MatchingErrorScreen errorMessage={getErrorMessage(error)} />;
+  if (error) {
+    console.log("Matching Error Screen");
+    return <MatchingErrorScreen errorMessage={getErrorMessage(error)} />;
+  }
 
-  if (similarPosts.length === 0) return <MatchingNoResultScreen />;
+  if (similarPosts.length === 0) {
+    console.log("Matching No Result Screen");
+    return <MatchingNoResultScreen />;
+  }
 
   return (
-    <View>
-      <AppHeader left={<BackButton />} center={<HeaderTitle title="Matching result" />} />
+    <View style={{ paddingTop: insets.top }}>
+      <AppHeader
+        left={<BackButton />}
+        center={<HeaderTitle title="Matching result" />}
+      />
 
       {/* Results */}
       <FlatList
         data={similarPosts}
-        renderItem={({ item }) => <SimilarPostCard matchPost={item} postId={postId} />}
+        renderItem={({ item }) => (
+          <SimilarPostCard matchPost={item} postId={postId} />
+        )}
         keyExtractor={(item) => item.id}
-        className='p-3'
+        className="p-3"
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
       />
     </View>
   );
-}
+};

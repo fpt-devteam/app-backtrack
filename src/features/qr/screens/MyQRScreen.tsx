@@ -1,39 +1,40 @@
 import {
-  UserQRCodeCard,
-  UserSubscriptionPlanCard,
+  UserQRCodePressableCard,
+  UserSubscriptionPlanPressableCard,
 } from "@/src/features/qr/components";
+import {
+  IS_QR_FEATURE_MOCK,
+  MOCK_QR_PLAN_DATA,
+} from "@/src/features/qr/constants";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
 import { AppHeader, HeaderTitle } from "@/src/shared/components";
 import { QR_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
-import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import {
   GearSixIcon,
   LightbulbIcon,
-  PencilSimpleIcon,
+  MagicWandIcon,
 } from "phosphor-react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const MyQRScreenHeader = () => {
   const handleEditQRProfile = useCallback(() => {
-    router.push(QR_ROUTE.customize as ExternalPathString | RelativePathString);
+    router.push(QR_ROUTE.customize);
   }, []);
 
   const handleNavigateSettingScreen = useCallback(() => {
-    router.push(
-      QR_ROUTE.profileSetting as ExternalPathString | RelativePathString,
-    );
+    router.push(QR_ROUTE.profileSetting);
   }, []);
 
   return (
     <View className="flex-row gap-4 px-2">
       {/* Edit QR Profile */}
       <Pressable onPress={handleEditQRProfile} hitSlop={10}>
-        <PencilSimpleIcon size={22} color={colors.black} weight="bold" />
+        <MagicWandIcon size={22} color={colors.black} weight="bold" />
       </Pressable>
       {/* Edit Profile Setting */}
       <Pressable onPress={handleNavigateSettingScreen} hitSlop={10}>
@@ -60,27 +61,31 @@ const TipCard = () => {
 const MyQRScreen = () => {
   const { data: subscription } = useGetMySubscription();
 
-  const isSubscribed =
-    !!subscription && subscription.status === SubscriptionStatus.Active;
+  const isSubscripted = useMemo(() => {
+    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.isActive;
+    return !!subscription && subscription.status === SubscriptionStatus.Active;
+  }, [subscription]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
       <AppHeader
         left={<HeaderTitle title="My Backtrack QR" />}
-        right={<MyQRScreenHeader />}
+        right={isSubscripted && <MyQRScreenHeader />}
       />
 
       <View className="px-4 mt-4">
-        {/*  User QRCode*/}
+        {/*  User QRCode */}
         <View className="w-full items-center">
-          <UserQRCodeCard isSubscripted={isSubscribed} />
+          <UserQRCodePressableCard isSubscripted={isSubscripted} />
           <TipCard />
         </View>
 
         {/* Subscription Plan Card */}
-        <View className="mt-6">
-          <UserSubscriptionPlanCard />
-        </View>
+        {isSubscripted && (
+          <View className="mt-6">
+            <UserSubscriptionPlanPressableCard />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

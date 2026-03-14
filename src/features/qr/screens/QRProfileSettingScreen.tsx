@@ -2,6 +2,10 @@ import { MinimalPostCard } from "@/src/features/post/components/cards/MinimalPos
 import { useGetAllMyPost } from "@/src/features/post/hooks";
 import type { Post } from "@/src/features/post/types";
 import {
+  UserSettingSectionCard,
+  UserSettingToggleRow,
+} from "@/src/features/qr/components";
+import {
   IS_QR_FEATURE_MOCK,
   MOCK_MY_POSTS,
   MOCK_QR_PROFILE_SETTINGS,
@@ -21,59 +25,11 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  Switch,
   Text,
   TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-type ToggleRowProps = {
-  label: string;
-  subtitle?: string;
-  value: boolean;
-  onValueChange: (v: boolean) => void;
-};
-
-const ToggleRow = ({
-  label,
-  subtitle,
-  value,
-  onValueChange,
-}: ToggleRowProps) => (
-  <View className="flex-row items-center justify-between py-3">
-    <View className="flex-1 pr-4">
-      <Text className="text-sm font-medium text-slate-800">{label}</Text>
-      {!!subtitle && (
-        <Text className="text-xs text-slate-400 mt-0.5">{subtitle}</Text>
-      )}
-    </View>
-    <Switch
-      value={value}
-      onValueChange={onValueChange}
-      trackColor={{ false: colors.slate[200], true: colors.primary }}
-      thumbColor={colors.white}
-    />
-  </View>
-);
-
-const SectionCard = ({
-  icon,
-  title,
-  children,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <View className="bg-white rounded-2xl border border-slate-100 px-4 py-4 gap-1">
-    <View className="flex-row items-center gap-2 mb-1">
-      {icon}
-      <Text className="text-sm font-bold text-slate-800">{title}</Text>
-    </View>
-    {children}
-  </View>
-);
 
 const QRProfileSettingScreen = () => {
   const defaults = useMemo(() => {
@@ -133,33 +89,37 @@ const QRProfileSettingScreen = () => {
         keyboardShouldPersistTaps="handled"
       >
         {/* Contact Visibility */}
-        <SectionCard
+        <UserSettingSectionCard
           icon={<EyeIcon size={18} color={colors.primary} weight="fill" />}
           title="Contact Visibility"
         >
-          <ToggleRow
+          <UserSettingToggleRow
             label="Show Full Name"
             subtitle="Visible to anyone who scans"
             value={showFullName}
             onValueChange={setShowFullName}
           />
+
           <View className="h-px bg-slate-100" />
-          <ToggleRow
+
+          <UserSettingToggleRow
             label="Show Phone Number"
             subtitle="Allow direct calls"
             value={showPhoneNumber}
             onValueChange={setShowPhoneNumber}
           />
+
           <View className="h-px bg-slate-100" />
-          <ToggleRow
+
+          <UserSettingToggleRow
             label="Show Email Address"
             value={showEmailAddress}
             onValueChange={setShowEmailAddress}
           />
-        </SectionCard>
+        </UserSettingSectionCard>
 
         {/* Custom Message to Finders */}
-        <SectionCard
+        <UserSettingSectionCard
           icon={
             <ChatTeardropTextIcon
               size={18}
@@ -183,10 +143,10 @@ const QRProfileSettingScreen = () => {
             className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm text-slate-700"
             style={{ minHeight: 80 }}
           />
-        </SectionCard>
+        </UserSettingSectionCard>
 
         {/* Select Active Posts to Show */}
-        <SectionCard
+        <UserSettingSectionCard
           icon={
             <ListBulletsIcon size={18} color={colors.primary} weight="fill" />
           }
@@ -246,7 +206,7 @@ const QRProfileSettingScreen = () => {
                 </Pressable>
               );
             })}
-        </SectionCard>
+        </UserSettingSectionCard>
       </ScrollView>
     </SafeAreaView>
   );

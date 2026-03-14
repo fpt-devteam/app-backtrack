@@ -1,25 +1,25 @@
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { matchingPostsApi } from '@/src/features/post/api';
-import { POST_MATCHING_QUERY_KEY } from '@/src/features/post/constants';
-import type { MatchingPostsRequest, MatchingPostsResponse } from '@/src/features/post/types';
-import { PostMatchingStatus } from '@/src/features/post/types';
-
-const TIME_INTERVAL_MS = 2000;
+import { matchingPostsApi } from "@/src/features/post/api";
+import { POST_MATCHING_QUERY_KEY } from "@/src/features/post/constants";
+import type {
+  MatchingPostsRequest,
+  MatchingPostsResponse,
+} from "@/src/features/post/types";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useCheckPostMatchingStatus } from "./useCheckPostMatchingStatus";
 
 export const useMatchingPost = (postId: string) => {
+  const { isMatching } = useCheckPostMatchingStatus(postId);
+
   const query = useQuery<MatchingPostsResponse>({
-    queryKey: [...POST_MATCHING_QUERY_KEY, postId],
+    queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
+    enabled: !isMatching,
     queryFn: async () => {
       const request: MatchingPostsRequest = { postId };
       const response = await matchingPostsApi(request);
+
       if (!response?.success) throw new Error("Matching failed");
-      if (!response?.data?.embeddingStatus) throw new Error("Matching failed");
       return response;
-    },
-    refetchInterval: (query) => {
-      const status = query.state.data?.data?.embeddingStatus;
-      return status === PostMatchingStatus.Ready ? false : TIME_INTERVAL_MS;
     },
   });
 
@@ -31,8 +31,7 @@ export const useMatchingPost = (postId: string) => {
 
   return {
     error,
-    isMatching: query?.data?.data?.embeddingStatus !== PostMatchingStatus.Ready,
     similarPosts: query?.data?.data?.similarPosts || [],
-    retry: query.refetch,
+    isMatching,
   };
 };

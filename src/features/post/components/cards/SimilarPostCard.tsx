@@ -66,7 +66,7 @@ export const SimilarPostCard = ({ postId, matchPost }: SimilarPostCardProps) => 
 
           <View className="ml-2 flex-row items-center rounded-full bg-sky-50 px-3 py-1">
             <Text className="text-sm font-extrabold tracking-wide text-primary">
-              {(matchPost.similarityScore * 100).toFixed(0)}% Match
+              {(matchPost.matchScore * 100).toFixed(0)}% Match
             </Text>
           </View>
         </View>
