@@ -12,6 +12,6 @@ export enum PostStatus {
 export enum PostMatchingStatus {
   Pending = 'Pending',
   Processing = 'Processing',
-  Ready = 'Ready',
+  Completed = 'Completed',
   Failed = 'Failed',
 }

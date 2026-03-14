@@ -1,11 +1,10 @@
-import type { GetMyQrCodeResponse, GetMySubscriptionResponse, SubscriptionRequest } from "@/src/features/qr/types";
+import type { GetAllSubscriptionPlansResponse, GetMyQrCodeResponse, GetMySubscriptionResponse } from "@/src/features/qr/types";
 import { privateClient } from "@/src/shared/api";
 
 export const QR_API = {
   me: "/api/qr/me",
   getMySubscription: "/api/qr/subscriptions/me",
-  cancelSubscription: "/api/qr/subscriptions/me",
-  subscription: "/api/qr/subscriptions",
+  getAllSubscriptionPlans: "/api/qr/subscriptions/plans",
 } as const;
 
 export async function getMyQRCode(): Promise<GetMyQrCodeResponse> {
@@ -18,12 +17,7 @@ export async function getMySubscription() {
   return response.data;
 }
 
-export async function cancelSubscription() {
-  const response = await privateClient.delete<GetMyQrCodeResponse>(QR_API.cancelSubscription);
-  return response.data;
-}
-
-export async function subscription(req: SubscriptionRequest) {
-  const response = await privateClient.post<GetMyQrCodeResponse>(QR_API.subscription, req);
+export async function getAllSubscriptionPlans() {
+  const response = await privateClient.get<GetAllSubscriptionPlansResponse>(QR_API.getAllSubscriptionPlans);
   return response.data;
 }

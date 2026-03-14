@@ -110,3 +110,25 @@ export function formatIsoDate(
 
   return pattern.replace(/HH|mm|dd|MM|yyyy/g, (t) => tokens[t] ?? t);
 }
+
+
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+export function formatDate(input: string): string {
+  const d = toDate(input);
+  if (!d) return "Unknown";
+  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}

@@ -14,9 +14,9 @@ export function PostMenuBottomSheet() {
 
   const dismiss = () => {
     setVisible(false);
-    setTimeout(() => {
-      router.back();
-    }, BottomSheetUtil.CLOSE_TIME_MS);
+    // setTimeout(() => {
+    //   router.back();
+    // }, BottomSheetUtil.CLOSE_TIME_MS);
   };
 
   const goTo = (href: RelativePathString) => {

@@ -27,5 +27,6 @@ export type Post = {
 } & UserLocation;
 
 export type SimilarPost = Post & {
-  similarityScore: number;
+  matchScore: number;
+  distanceMeters: number;
 };

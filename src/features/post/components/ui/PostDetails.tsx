@@ -47,16 +47,27 @@ export const PostDetailsSkeleton = () => {
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.9, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.45, duration: 700, useNativeDriver: true }),
-      ])
+        Animated.timing(opacity, {
+          toValue: 0.9,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0.45,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+      ]),
     );
     anim.start();
     return () => anim.stop();
   }, [opacity]);
 
   const S = ({ className }: { className: string }) => (
-    <Animated.View style={{ opacity }} className={`bg-slate-200 ${className}`} />
+    <Animated.View
+      style={{ opacity }}
+      className={`bg-slate-200 ${className}`}
+    />
   );
 
   return (
@@ -107,8 +118,9 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
   const { bottom } = useSafeAreaInsets();
   const { user } = useAppUser();
   const { isLoading, data: post } = useGetPostById({ postId });
-  const { isMatching, similarPosts } = useMatchingPost(postId);
-  const { createConversation, isCreatingConversation } = useCreateConversation();
+  const { similarPosts } = useMatchingPost(postId);
+  const { createConversation, isCreatingConversation } =
+    useCreateConversation();
 
   const isOwner = !!post && post.author.id === user?.id;
 
@@ -117,7 +129,8 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
 
     const req: ConversationCreateRequest = {
       partnerId: post.author.id,
-      creatorKeyName: post.postType === PostType.Found ? PostType.Lost : PostType.Found,
+      creatorKeyName:
+        post.postType === PostType.Found ? PostType.Lost : PostType.Found,
       partnerKeyName: post.postType,
     };
 
@@ -125,7 +138,9 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
       const response = await createConversation(req);
       const id = response?.data?.conversationId;
       if (!id) return;
-      router.push(CHAT_ROUTE.message(id) as ExternalPathString | RelativePathString);
+      router.push(
+        CHAT_ROUTE.message(id) as ExternalPathString | RelativePathString,
+      );
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
@@ -148,16 +163,23 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
   }, [region]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
-  if (isLoading || isMatching || !post) return <PostDetailsSkeleton />;
+
+  if (isLoading || !post) {
+    console.log("isLoading", isLoading);
+    console.log("post", post);
+    return <PostDetailsSkeleton />;
+  }
 
   const chatLabel =
-    post.postType === PostType.Lost ? "Start chat with Finder" : "Start chat with Seeker";
+    post.postType === PostType.Lost
+      ? "Start chat with Finder"
+      : "Start chat with Seeker";
 
   return (
     <Animated.ScrollView
       onScroll={Animated.event(
         [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-        { useNativeDriver: false }
+        { useNativeDriver: false },
       )}
       showsVerticalScrollIndicator={false}
       scrollEventThrottle={16}
@@ -167,7 +189,10 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
       <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">
-            <Text className="flex-1 text-[22px] font-extrabold text-slate-900 leading-7" numberOfLines={2}>
+            <Text
+              className="flex-1 text-[22px] font-extrabold text-slate-900 leading-7"
+              numberOfLines={2}
+            >
               {post.itemName}
             </Text>
             <PostStatusBadge status={post.postType} size="md" />
@@ -189,26 +214,34 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
             value={post.displayAddress || "N/A"}
           />
           <InfoRow
-            icon={<CalendarIcon size={20} color={colors.primary} weight="fill" />}
+            icon={
+              <CalendarIcon size={20} color={colors.primary} weight="fill" />
+            }
             label="Event time"
             value={formatIsoDate(post.eventTime)}
           />
         </View>
       </View>
 
-      {
-        !isOwner && (
-          <View className="mx-4 mt-4">
-            <PrimaryButton title={chatLabel} disabled={isCreatingConversation} onPress={handleCreateConversation} />
-          </View>
-        )
-      }
+      {!isOwner && (
+        <View className="mx-4 mt-4">
+          <PrimaryButton
+            title={chatLabel}
+            disabled={isCreatingConversation}
+            onPress={handleCreateConversation}
+          />
+        </View>
+      )}
 
       {!!similarPosts?.length && (
         <View className="mx-4 mt-6">
           <View className="flex-row items-center justify-between">
-            <Text className="text-[16px] font-extrabold text-slate-900">Similar Posts</Text>
-            <Text className="text-[12px] text-slate-500">{similarPosts.length}</Text>
+            <Text className="text-[16px] font-extrabold text-slate-900">
+              Similar Posts
+            </Text>
+            <Text className="text-[12px] text-slate-500">
+              {similarPosts.length}
+            </Text>
           </View>
 
           <View className="mt-3 gap-3">
@@ -218,6 +251,6 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
           </View>
         </View>
       )}
-    </Animated.ScrollView >
+    </Animated.ScrollView>
   );
 };

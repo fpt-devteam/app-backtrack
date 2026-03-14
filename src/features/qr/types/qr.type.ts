@@ -36,10 +36,9 @@ export type UserSubscription = {
 
 export type UserSubscriptionPlan = {
   id: string;
-  label: string;
-  description: string;
+  name: string;
   price: string;
-  unit: string;
-  priceId: string;
-  badge: string | null;
+  currency: string;
+  features: string[];
+  providerPriceId: string;
 };
