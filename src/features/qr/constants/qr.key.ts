@@ -5,3 +5,5 @@ export const QR_SUBSCRIPTION_ME_QUERY_KEY = ["qr-subscription", "me"] as const;
 export const QR_CANCEL_SUBSCRIPTION_MUTATION_KEY = ["qr-cancel-subscription"] as const;
 
 export const QR_SUBSCRIBE_MUTATION_KEY = ["qr-subscription", "create"] as const;
+
+export const QR_GET_ALL_SUBSCRIPTION_PLANS_QUERY_KEY = ["qr-subscription", "plans"] as const;

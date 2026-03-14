@@ -1,5 +1,5 @@
 import { Post, PostType } from "@/src/features/post/types";
-import { SubscriptionStatus, UserSubscription, UserSubscriptionPlan } from "@/src/features/qr/types";
+import { SubscriptionStatus, UserSubscription } from "@/src/features/qr/types";
 
 export const IS_QR_FEATURE_MOCK = true;
 
@@ -27,36 +27,6 @@ export const MOCK_QR_PLAN_DATA = {
   isActive: true,
   subscription: MOCK_SUBSCRIPTION
 }
-
-export const MOCK_USER_SUBSCRIPTION_PLANS: UserSubscriptionPlan[] = [
-  {
-    id: "monthly",
-    label: "1 Month",
-    description: "Billed monthly",
-    price: "$4.99",
-    unit: "/mo",
-    priceId: "price_1T3B5zQqedaIws15A0XEX6HR",
-    badge: null,
-  },
-  {
-    id: "quarterly",
-    label: "3 Months",
-    description: "Billed quarterly",
-    price: "$12.99",
-    unit: "/3 mos",
-    priceId: "price_1T3B5zQqedaIws15A0XEX6HR",
-    badge: null,
-  },
-  {
-    id: "yearly",
-    label: "1 Year",
-    description: "Save 33% annually",
-    price: "$39.99",
-    unit: "/yr",
-    priceId: "price_1T3B5zQqedaIws15A0XEX6HR",
-    badge: "BEST VALUE",
-  },
-];
 
 export const MOCK_QR_PROFILE = {
   memberSince: "2021",
