@@ -1,6 +1,9 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { useCreateConversation } from "@/src/features/chat/hooks";
-import type { ConversationCreateRequest } from "@/src/features/chat/types";
+import {
+  CONVERSATION_TYPE,
+  type ConversationCreateRequest,
+} from "@/src/features/chat/types";
 import { PostStatusBadge } from "@/src/features/post/components/badges/PostStatusBadge";
 import { SimilarPostCard } from "@/src/features/post/components/cards/SimilarPostCard";
 import { InfoRow } from "@/src/features/post/components/ui/PostInfoRow";
@@ -12,7 +15,6 @@ import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
-import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import { CalendarIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
@@ -128,19 +130,15 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
     if (!post) return;
 
     const req: ConversationCreateRequest = {
-      partnerId: post.author.id,
-      creatorKeyName:
-        post.postType === PostType.Found ? PostType.Lost : PostType.Found,
-      partnerKeyName: post.postType,
+      memberId: post.author.id,
+      type: CONVERSATION_TYPE.PERSONAL,
     };
 
     try {
       const response = await createConversation(req);
       const id = response?.data?.conversationId;
       if (!id) return;
-      router.push(
-        CHAT_ROUTE.message(id) as ExternalPathString | RelativePathString,
-      );
+      router.push(CHAT_ROUTE.message(id));
     } catch {
       toast.error("Something went wrong. Please try again.");
     }
