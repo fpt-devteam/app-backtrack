@@ -2,12 +2,12 @@ import { SimilarPostCard } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
 import { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoResultScreen";
-import { MatchingWaitingScreen } from "@/src/features/post/screens/MatchingWaitingScreen";
 import {
   AppHeader,
   BackButton,
   HeaderTitle,
 } from "@/src/shared/components/app-utils/AppHeader";
+import { AppSplashScreen } from "@/src/shared/components/app-utils/AppSplashScreen";
 import { getErrorMessage } from "@/src/shared/utils";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ export const MatchingScreen = () => {
 
   if (applyingInterval || !yourItem || isMatching) {
     console.log("Matching Waiting Screen");
-    return <MatchingWaitingScreen />;
+    return <AppSplashScreen />;
   }
 
   if (error) {
