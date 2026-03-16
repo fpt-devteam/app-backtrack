@@ -18,9 +18,9 @@ export const POST_ROUTE = {
 } as const;
 
 export const CHAT_ROUTE = {
-  conversations: `/(protected)/chat/conversations`,
+  conversations: `/(protected)/chat/conversations` as ExternalPathString | RelativePathString,
   message: (conversationId: string) =>
-    `/(protected)/chat/conversations/${conversationId}`,
+    `/(protected)/chat/conversations/${conversationId}` as ExternalPathString | RelativePathString,
 } as const;
 
 export const QR_ROUTE = {

@@ -1,8 +1,15 @@
-import { sendMessageApi } from '@/src/features/chat/api';
-import { CHAT_QUERY_KEY } from '@/src/features/chat/constants';
-import type { MessageSendRequest, MessageSendResponse } from '@/src/features/chat/types/chat.dto';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import {
+  CHAT_QUERY_KEY,
+  IS_CHAT_FEATURE_MOCK,
+  sendMockMessage,
+} from "@/src/features/chat/constants";
+import { socketChatService } from "@/src/features/chat/services";
+import type {
+  MessageSendRequest,
+  MessageSendResponse,
+} from "@/src/features/chat/types/chat.dto";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 type SendMessageParams = {
   conversationId: string;
@@ -14,13 +21,29 @@ export const useSendMessage = () => {
   const mutation = useMutation<MessageSendResponse, Error, SendMessageParams>({
     mutationKey: CHAT_QUERY_KEY.messageSend,
     mutationFn: async ({ conversationId, request }) => {
-      const response = await sendMessageApi(conversationId, request);
-      if (!response?.success) throw new Error("Failed to send message");
-      return response;
+      if (IS_CHAT_FEATURE_MOCK) {
+        return sendMockMessage({
+          conversationId,
+          type: request.type ?? "text",
+          content: request.content,
+        });
+      }
+
+      await socketChatService.connect();
+      socketChatService.joinConversation(conversationId);
+
+      return socketChatService.sendMessage({
+        conversationId,
+        type: request.type ?? "text",
+        content: request.content,
+      });
     },
     onSuccess: (_res, vars) => {
-      qc.invalidateQueries({ queryKey: CHAT_QUERY_KEY.messages(vars.conversationId) })
-    }
+      qc.invalidateQueries({
+        queryKey: CHAT_QUERY_KEY.messages(vars.conversationId),
+      });
+      qc.invalidateQueries({ queryKey: CHAT_QUERY_KEY.conversations });
+    },
   });
 
   const error = useMemo(() => {
@@ -36,5 +59,3 @@ export const useSendMessage = () => {
     reset: mutation.reset,
   };
 };
-
-

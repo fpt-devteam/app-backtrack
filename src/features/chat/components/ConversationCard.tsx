@@ -2,7 +2,7 @@ import { ConversationAvatar } from "@/src/features/chat/components/ConversationA
 import { Conversation } from "@/src/features/chat/types";
 import { CHAT_ROUTE } from "@/src/shared/constants/route.constant";
 import * as Haptics from "expo-haptics";
-import { ExternalPathString, RelativePathString, router } from "expo-router";
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { Animated, Easing, Pressable, Text, View } from "react-native";
 import ReanimatedAnimated, {
@@ -47,46 +47,45 @@ const formatLastMessageTime = (iso?: string) => {
 };
 
 export const ConversationCard = ({ conversation }: Props) => {
-  const isLastMessageMine = useMemo(() => true, []); // mock
-  const isLastMessageUnread = useMemo(() => false, []); // mock
+  const isLastMessageMine = useMemo(() => {
+    return conversation.lastMessage?.senderId === conversation.partner?.id;
+  }, [conversation]);
+
+  const isLastMessageUnread = useMemo(() => {
+    return conversation.unreadCount > 0 && !isLastMessageMine;
+  }, [conversation, isLastMessageMine]);
 
   const displayPartnerName = useMemo(() => {
     const defaultName = "Unknown User";
     if (!conversation.partner) return defaultName;
     return conversation.partner?.displayName || defaultName;
-  }, [conversation.partner]);
+  }, [conversation]);
 
-  const displayLastText = useMemo(() => {
+  const displayLastMessage = useMemo(() => {
+    const defaultContent = `Say something to ${
+      conversation.partner?.displayName || "your partner"
+    }!`;
+
+    const lastContent = conversation.lastMessage?.content;
+    if (!lastContent) return defaultContent;
+
     const prefix = isLastMessageMine ? "You: " : "";
-
-    const lastContent = conversation.lastMessage?.lastContent;
-    if (!lastContent) {
-      return `Say something to ${
-        conversation.partner?.displayName || "your partner"
-      }!`;
-    }
-
     return `${prefix}${lastContent}`;
-  }, [
-    conversation.lastMessage?.lastContent,
-    conversation.partner,
-    isLastMessageMine,
-  ]);
+  }, [conversation, isLastMessageMine]);
 
   const displayTimeText = useMemo(() => {
+    if (!conversation.lastMessage?.timestamp || !conversation.updatedAt)
+      return "";
+
     return (
       formatLastMessageTime(conversation.lastMessage?.timestamp) ||
       formatLastMessageTime(conversation.updatedAt)
     );
-  }, [conversation.lastMessage?.timestamp, conversation.updatedAt]);
+  }, [conversation]);
 
   const handlePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(
-      CHAT_ROUTE.message(conversation.conversationId) as
-        | ExternalPathString
-        | RelativePathString,
-    );
+    router.push(CHAT_ROUTE.message(conversation.conversationId));
   }, [conversation.conversationId]);
 
   const nameTextClass = isLastMessageUnread
@@ -141,7 +140,7 @@ export const ConversationCard = ({ conversation }: Props) => {
             {/* Last message · time */}
             <View className="flex-row items-center mt-1">
               <Text className={`${subtitleTextClass}`} numberOfLines={1}>
-                {displayLastText}
+                {displayLastMessage}
               </Text>
 
               {!!displayTimeText && (

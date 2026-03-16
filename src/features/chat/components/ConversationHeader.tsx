@@ -1,5 +1,6 @@
-import { AppUser } from "@/src/features/auth/types";
+import type { AppUser } from "@/src/features/auth/types";
 import { ConversationAvatar } from "@/src/features/chat/components/ConversationAvatar";
+import type { ConversationPartner } from "@/src/features/chat/types";
 import { colors } from "@/src/shared/theme";
 import { useRouter } from "expo-router";
 import { ArrowLeftIcon, DotsThreeOutlineIcon } from "phosphor-react-native";
@@ -7,7 +8,7 @@ import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 
 interface ConversationHeaderProps {
-  user: AppUser;
+  user: AppUser | ConversationPartner | null;
   onPressMenu?: () => void;
 }
 

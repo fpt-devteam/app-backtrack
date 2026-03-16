@@ -1,6 +1,10 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { getMessagesApi } from '@/src/features/chat/api';
-import { CHAT_QUERY_KEY } from '@/src/features/chat/constants';
+import { getMessagesApi } from "@/src/features/chat/api";
+import {
+  CHAT_QUERY_KEY,
+  getMockMessages,
+  IS_CHAT_FEATURE_MOCK,
+} from "@/src/features/chat/constants";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export const useMessages = (conversationId: string) => {
   const query = useInfiniteQuery({
@@ -11,20 +15,23 @@ export const useMessages = (conversationId: string) => {
         limit: 10,
       };
 
+      if (IS_CHAT_FEATURE_MOCK) {
+        return getMockMessages(conversationId, params);
+      }
+
       const response = await getMessagesApi(conversationId, params);
       if (!response?.success) throw new Error("Failed to fetch messages");
-
       return response.data;
     },
     enabled: !!conversationId,
     getNextPageParam: (lastPage) => {
-      return lastPage?.hasMore ? lastPage.nextCursor : undefined;
+      return lastPage?.hasMore ? (lastPage.nextCursor ?? undefined) : undefined;
     },
     initialPageParam: undefined as string | undefined,
   });
 
   return {
-    data: query.data?.pages.flatMap(page => page?.items || []) || [],
+    data: query.data?.pages.flatMap((page) => page?.messages || []) || [],
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isError: query.isError,
@@ -35,5 +42,3 @@ export const useMessages = (conversationId: string) => {
     isFetchingNextPage: query.isFetchingNextPage,
   };
 };
-
-
