@@ -2,7 +2,6 @@ import {
   ConversationList,
   MessageSearchBar,
 } from "@/src/features/chat/components";
-import { StartChatChip } from "@/src/features/chat/components/StartChatChip";
 import { AppHeader, HeaderTitle } from "@/src/shared/components";
 import { useState } from "react";
 import { View } from "react-native";
@@ -11,8 +10,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export const ChatScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleStartChat = () => {
-    console.log("Start new chat");
+  const handleSearchChat = (query: string) => {
+    setSearchQuery(query);
   };
 
   return (
@@ -25,16 +24,8 @@ export const ChatScreen = () => {
       <View className="px-4">
         <MessageSearchBar
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={handleSearchChat}
           placeholder="Search messages..."
-        />
-      </View>
-
-      {/* Conversation Chips */}
-      <View>
-        <ConversationList
-          mode="horizontal"
-          ListHeaderComponent={<StartChatChip onPress={handleStartChat} />}
         />
       </View>
 

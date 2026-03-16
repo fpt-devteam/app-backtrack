@@ -1,4 +1,5 @@
-import { AppUser } from "@/src/features/auth/types";
+import type { AppUser } from "@/src/features/auth/types";
+import type { ConversationPartner } from "@/src/features/chat/types";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Image, View } from "react-native";
 import Animated, {
@@ -10,7 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 type Props = {
-  user: AppUser;
+  user: AppUser | ConversationPartner | null;
   size?: number;
 };
 
@@ -21,9 +22,12 @@ export const ConversationAvatar = ({ user, size = 64 }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const displayAvatar = useMemo(() => {
-    if (user.avatar && user.avatar.trim() !== "") return user.avatar;
+    const avatar = (user as AppUser | null)?.avatar;
+    const avatarUrl = (user as ConversationPartner | null)?.avatarUrl;
+    const resolvedAvatar = avatar || avatarUrl || "";
+    if (resolvedAvatar.trim() !== "") return resolvedAvatar;
     return DEFAULT_AVATAR;
-  }, [user.avatar]);
+  }, [user]);
 
   useEffect(() => {
     setIsLoading(true);

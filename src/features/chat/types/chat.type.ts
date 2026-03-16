@@ -1,13 +1,6 @@
-import type { AppUser } from "@/src/features/auth/types";
 import type { Nullable } from "@/src/shared/types";
 
-export type Conversation = {
-  conversationId: string;
-  partner: AppUser;
-  lastMessage: Nullable<LastMessage>;
-  unreadCount?: number;
-  updatedAt?: string;
-};
+
 
 export type Message = {
   id: string;
@@ -21,9 +14,28 @@ export type Message = {
 };
 
 // --------------------------------
+export type ConversationPartner = {
+  id: string;
+  displayName: string | null;
+  email: string | null;
+  avatarUrl: string | null;
+};
+
+export type Conversation = {
+  conversationId: string;
+  type: ConversationType;
+  partner: Nullable<ConversationPartner>;
+  orgId: Nullable<string>;
+  lastMessage: Nullable<LastMessage>;
+  unreadCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 type LastMessage = {
-  lastContent: string;
-  timestamp: string;
+  senderId: string | null;
+  content: string;
+  timestamp: string | null;
 };
 
 export type MessageItem = {
@@ -33,3 +45,10 @@ export type MessageItem = {
   createdAt: string;
   isMine: boolean;
 };
+
+export const CONVERSATION_TYPE = {
+  PERSONAL: 'personal',
+  ORGANIZATION: 'organization',
+} as const;
+
+export type ConversationType = typeof CONVERSATION_TYPE[keyof typeof CONVERSATION_TYPE];

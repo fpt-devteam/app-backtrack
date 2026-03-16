@@ -1,24 +1,37 @@
-import type { Conversation, Message } from "@/src/features/chat/types/chat.type";
-import type { PostType } from "@/src/features/post/types";
+import type { Conversation, ConversationType, Message } from "@/src/features/chat/types/chat.type";
 import type { ApiResponse } from "@/src/shared/api";
-import { CursorScrollResponse } from "@/src/shared/api";
 
 export type ConversationCreateRequest = {
-  partnerId: string,
-  creatorKeyName: PostType,
-  partnerKeyName: PostType,
+  memberId: string,
+  type: ConversationType,
 };
 
 export type MessageSendRequest = {
+  conversationId?: string;
+  recipientId?: string;
+  orgId?: string;
+  type?: string;
   content: string,
 };
 
-export type ConversationCreateResponse = ApiResponse<Pick<Conversation, 'conversationId'>>;
+export type ConversationCreateResponse = ApiResponse<{ conversation: Conversation | null }>;
 
-export type ConversationsGetResponse = ApiResponse<CursorScrollResponse<Conversation>>;
+export type ConversationsGetResponse = ApiResponse<{
+  conversations: Conversation[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}>;
 
-export type MessagesGetResponse = ApiResponse<CursorScrollResponse<Message>>;
+export type MessagesGetResponse = ApiResponse<{
+  messages: Message[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}>;
 
-export type MessageSendResponse = ApiResponse<Message>;
+export type MessageSendResponse = {
+  conversationId: string;
+  message: Message;
+  isNewConversation?: boolean;
+};
 
-export type ConversationDetailResponse = ApiResponse<Conversation>;
+export type ConversationDetailResponse = ApiResponse<{ conversation: Conversation | null }>;

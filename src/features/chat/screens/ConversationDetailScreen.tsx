@@ -2,17 +2,17 @@ import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { ConversationHeader } from "@/src/features/chat/components/ConversationHeader";
 import { MessageInput } from "@/src/features/chat/components/MessageInput";
 import { MessageList } from "@/src/features/chat/components/MessageList";
+import { IS_CHAT_FEATURE_MOCK } from "@/src/features/chat/constants";
 import {
   useConversationDetail,
   useMessages,
   useSendMessage,
 } from "@/src/features/chat/hooks";
+import { socketChatService } from "@/src/features/chat/services";
 import { MessageItem } from "@/src/features/chat/types";
 import { useSendNotification } from "@/src/features/notification/hooks";
-import { NOTIFICATION_EVENT } from "@/src/features/notification/types";
 import { AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { socketService } from "@/src/shared/services";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,8 +34,6 @@ export const ConversationDetailScreen = ({
 
   const {
     data: messagesData,
-    isLoading: isLoadingMessages,
-    isError: isMessagesError,
     refetch: refetchMessages,
     fetchNextPage,
     hasNextPage,
@@ -44,16 +42,17 @@ export const ConversationDetailScreen = ({
 
   // Socket management
   useEffect(() => {
+    if (IS_CHAT_FEATURE_MOCK) return;
     if (!conversationId) return;
 
     let cleanup: (() => void) | undefined;
 
     const initSocket = async () => {
       try {
-        await socketService.connect();
-        socketService.joinConversation(conversationId);
+        await socketChatService.connect();
+        socketChatService.joinConversation(conversationId);
 
-        cleanup = socketService.onReceiveMessage((message: MessageItem) => {
+        cleanup = socketChatService.onReceiveMessage((message: MessageItem) => {
           console.log("📨 New message received:", message);
           refetchMessages();
         });
@@ -65,7 +64,7 @@ export const ConversationDetailScreen = ({
 
     return () => {
       if (cleanup) cleanup();
-      socketService.leaveConversation(conversationId);
+      socketChatService.leaveConversation(conversationId);
     };
   }, [conversationId, refetchMessages]);
 
@@ -95,28 +94,29 @@ export const ConversationDetailScreen = ({
       try {
         await sendMessage({
           conversationId,
-          request: { content: messageText },
+          request: { conversationId, type: "text", content: messageText },
         });
 
-        const partnerId = conversationDetail.partner.id;
+        // const partnerId = conversationDetail.partner?.id;
+        // if (!partnerId) return;
 
-        const req = {
-          target: {
-            userId: partnerId,
-          },
-          source: {
-            name: "ChatSystem",
-            eventId: Date.now().toString(),
-          },
-          type: NOTIFICATION_EVENT.ChatEvent,
-          title: "New Message",
-          body: `New message for you: ${messageText}.`,
-          data: {
-            screenPath: "chat/conversations/" + conversationId,
-            imageUrl: user.avatar,
-          },
-        };
-        await sendNotification(req);
+        // const req = {
+        //   target: {
+        //     userId: partnerId,
+        //   },
+        //   source: {
+        //     name: "ChatSystem",
+        //     eventId: Date.now().toString(),
+        //   },
+        //   type: NOTIFICATION_EVENT.ChatEvent,
+        //   title: "New Message",
+        //   body: `New message for you: ${messageText}.`,
+        //   data: {
+        //     screenPath: "chat/conversations/" + conversationId,
+        //     imageUrl: user.avatar,
+        //   },
+        // };
+        // await sendNotification(req);
       } catch (error) {
         toast.error("Failed to send message. Please try again.");
         console.log("Error sending message:", error);
@@ -145,7 +145,7 @@ export const ConversationDetailScreen = ({
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         onLoadMore={handleLoadMore}
-        partnerAvatar={conversationDetail.partner.avatar}
+        partnerAvatar={conversationDetail.partner?.avatarUrl ?? undefined}
       />
       <View style={{ paddingBottom: insets.bottom }}>
         <MessageInput onSend={handleSendMessage} isSending={isSendingMessage} />

@@ -1,6 +1,10 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { getConversationsApi } from '@/src/features/chat/api';
-import { CHAT_QUERY_KEY } from '@/src/features/chat/constants';
+import { getConversationsApi } from "@/src/features/chat/api";
+import {
+  CHAT_QUERY_KEY,
+  getMockConversations,
+  IS_CHAT_FEATURE_MOCK,
+} from "@/src/features/chat/constants";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export const useConversations = () => {
   const query = useInfiniteQuery({
@@ -11,19 +15,22 @@ export const useConversations = () => {
         limit: 10,
       };
 
+      if (IS_CHAT_FEATURE_MOCK) {
+        return getMockConversations(params);
+      }
+
       const response = await getConversationsApi(params);
       if (!response?.success) throw new Error("Failed to fetch conversations");
-
       return response.data;
     },
     getNextPageParam: (lastPage) => {
-      return lastPage?.hasMore ? lastPage.nextCursor : undefined;
+      return lastPage?.hasMore ? (lastPage.nextCursor ?? undefined) : undefined;
     },
     initialPageParam: undefined as string | undefined,
   });
 
   return {
-    data: query.data?.pages.flatMap(page => page?.items || []) || [],
+    data: query.data?.pages.flatMap((page) => page?.conversations || []) || [],
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isError: query.isError,
@@ -34,5 +41,3 @@ export const useConversations = () => {
     isFetchingNextPage: query.isFetchingNextPage,
   };
 };
-
-
