@@ -1,8 +1,7 @@
-import { ConversationAvatar } from "@/src/features/chat/components/ConversationAvatar";
 import { Conversation } from "@/src/features/chat/types";
 import { CHAT_ROUTE } from "@/src/shared/constants/route.constant";
 import * as Haptics from "expo-haptics";
-import { ExternalPathString, RelativePathString, router } from "expo-router";
+import { router } from "expo-router";
 import React, { useCallback, useMemo, useRef } from "react";
 import { Animated, Easing, Pressable, Text } from "react-native";
 
@@ -22,11 +21,7 @@ export const ConversationChips = ({ conversation }: Props) => {
 
   const handlePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(
-      CHAT_ROUTE.message(conversation.conversationId) as
-        | ExternalPathString
-        | RelativePathString,
-    );
+    router.push(CHAT_ROUTE.message(conversation.conversationId));
   }, [conversation.conversationId]);
 
   const scale = useRef(new Animated.Value(1)).current;
@@ -54,7 +49,7 @@ export const ConversationChips = ({ conversation }: Props) => {
         }}
       >
         {/* Avatar */}
-        <ConversationAvatar user={conversation.partner} size={80} />
+        {/* <ConversationAvatar user={conversation.partner} size={80} /> */}
 
         {/* Name */}
         <Text

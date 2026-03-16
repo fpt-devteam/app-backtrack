@@ -1,6 +1,4 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { useCreateConversation } from "@/src/features/chat/hooks";
-import type { ConversationCreateRequest } from "@/src/features/chat/types";
 import { PostStatusBadge } from "@/src/features/post/components/badges/PostStatusBadge";
 import { SimilarPostCard } from "@/src/features/post/components/cards/SimilarPostCard";
 import { InfoRow } from "@/src/features/post/components/ui/PostInfoRow";
@@ -8,17 +6,11 @@ import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import { ImageCarousel } from "@/src/shared/components";
 import { Divider } from "@/src/shared/components/ui/Divider";
-import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
-import type { ExternalPathString, RelativePathString } from "expo-router";
-import { router } from "expo-router";
 import { CalendarIcon, MapPinIcon } from "phosphor-react-native";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
-import type MapView from "react-native-maps";
-import type { Region } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PostDetailsProps = { postId: string };
@@ -119,54 +111,12 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
   const { user } = useAppUser();
   const { isLoading, data: post } = useGetPostById({ postId });
   const { similarPosts } = useMatchingPost(postId);
-  const { createConversation, isCreatingConversation } =
-    useCreateConversation();
 
   const isOwner = !!post && post.author.id === user?.id;
-
-  const handleCreateConversation = useCallback(async () => {
-    if (!post) return;
-
-    const req: ConversationCreateRequest = {
-      partnerId: post.author.id,
-      creatorKeyName:
-        post.postType === PostType.Found ? PostType.Lost : PostType.Found,
-      partnerKeyName: post.postType,
-    };
-
-    try {
-      const response = await createConversation(req);
-      const id = response?.data?.conversationId;
-      if (!id) return;
-      router.push(
-        CHAT_ROUTE.message(id) as ExternalPathString | RelativePathString,
-      );
-    } catch {
-      toast.error("Something went wrong. Please try again.");
-    }
-  }, [post, createConversation]);
-
-  const mapRef = useRef<MapView>(null);
-  const region: Region | undefined = useMemo(() => {
-    if (!post?.location) return undefined;
-    return {
-      latitude: post.location.latitude,
-      longitude: post.location.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    };
-  }, [post?.location]);
-
-  useEffect(() => {
-    if (!region) return;
-    mapRef.current?.animateToRegion(region, 650);
-  }, [region]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
   if (isLoading || !post) {
-    console.log("isLoading", isLoading);
-    console.log("post", post);
     return <PostDetailsSkeleton />;
   }
 
@@ -227,8 +177,9 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
         <View className="mx-4 mt-4">
           <PrimaryButton
             title={chatLabel}
-            disabled={isCreatingConversation}
-            onPress={handleCreateConversation}
+            onPress={() => {
+              console.log("Move to chat screen with postId:", post.id);
+            }}
           />
         </View>
       )}

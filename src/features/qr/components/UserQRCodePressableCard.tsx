@@ -27,9 +27,11 @@ export const UserQRCodePressableCard = ({
     [user?.avatar],
   );
 
-  const publicCode = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_CODE.publicCode;
-    return qrCode?.publicCode;
+  const qrValue = useMemo(() => {
+    const code = IS_QR_FEATURE_MOCK
+      ? MOCK_QR_CODE.publicCode
+      : qrCode?.publicCode;
+    return "https://thebacktrack.vercel.app/profile/" + code;
   }, [qrCode?.publicCode]);
 
   const handlePreviewProfile = useCallback(() => {
@@ -101,7 +103,7 @@ export const UserQRCodePressableCard = ({
     >
       <View className="items-center">
         <QRCode
-          value={publicCode}
+          value={qrValue}
           size={240}
           logo={logoSource}
           logoSize={60}

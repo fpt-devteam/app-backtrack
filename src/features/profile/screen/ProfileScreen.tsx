@@ -1,4 +1,5 @@
 import { useAppUser } from "@/src/features/auth/providers";
+import { socketChatService } from "@/src/features/chat/services";
 import { useUnregisterDeviceMutation } from "@/src/features/notification/hooks";
 import { UserSubscriptionPlanDetailCard } from "@/src/features/qr/components";
 import { auth } from "@/src/shared/lib/firebase";
@@ -71,6 +72,7 @@ export function ProfileScreen() {
   };
 
   const handleLogout = async () => {
+    await socketChatService.disconnect();
     await unregisterDevice();
     await signOut(auth);
   };
