@@ -15,6 +15,7 @@ export const MessageItemCard = ({
   partnerAvatar,
 }: MessageItemCardProps) => {
   const [showTime, setShowTime] = useState(false);
+  const messageContent = item.content?.trim() || "...";
 
   const avatarSource = partnerAvatar?.trim()
     ? { uri: partnerAvatar }
@@ -40,17 +41,21 @@ export const MessageItemCard = ({
         )}
 
         {/* Message Bubble and Time Container */}
-        <View className={`${item.isMine ? "items-end" : "items-start"}`}>
+        <View
+          className={`${item.isMine ? "items-end" : "items-start"}`}
+          style={{ maxWidth: "78%" }}
+        >
           <View
             className={`rounded-lg px-4 py-2 ${
               item.isMine ? "bg-primary" : "bg-slate-100"
             }`}
-            style={{ minWidth: 80, maxWidth: "75%" }}
+            style={{ minWidth: 80 }}
           >
             <Text
               className={`text-base ${item.isMine ? "text-white" : "text-slate-900"}`}
+              style={{ flexShrink: 1 }}
             >
-              {item.content}
+              {messageContent}
             </Text>
           </View>
 

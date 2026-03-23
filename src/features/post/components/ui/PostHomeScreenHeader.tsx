@@ -1,5 +1,5 @@
 import { AppLogo } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
+import { MAP_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import {
@@ -24,7 +24,9 @@ export const PostHomeScreenHeader = () => {
       Icon: PlusCircleIcon,
       onPress: () => {
         router.push(
-          "/(bottom-sheet)/post-menu" as ExternalPathString | RelativePathString
+          "/(bottom-sheet)/post-menu" as
+            | ExternalPathString
+            | RelativePathString,
         );
       },
     },
@@ -32,14 +34,14 @@ export const PostHomeScreenHeader = () => {
       key: "search",
       Icon: MagnifyingGlassIcon,
       onPress: () => {
-        router.push(POST_ROUTE.search as ExternalPathString | RelativePathString);
+        router.push(POST_ROUTE.search);
       },
     },
     {
       key: "map",
       Icon: MapTrifoldIcon,
       onPress: () => {
-        router.push("/map" as ExternalPathString | RelativePathString);
+        router.push(MAP_ROUTE.index);
       },
     },
   ];

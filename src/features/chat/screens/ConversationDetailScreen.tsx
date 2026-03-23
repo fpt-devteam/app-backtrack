@@ -31,6 +31,7 @@ export const ConversationDetailScreen = ({
   const { data: conversationDetail, isLoading: isLoadingConversation } =
     useConversationDetail(conversationId);
   const { sendNotification } = useSendNotification();
+  console.log("Conversation Id", conversationId);
 
   const {
     data: messagesData,
@@ -135,7 +136,7 @@ export const ConversationDetailScreen = ({
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-background-light"
+      className="flex-1 bg-white"
       style={{ paddingTop: insets.top }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >

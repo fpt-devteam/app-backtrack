@@ -10,6 +10,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { getRandomAvatarUrl } from "@/src/shared/mocks/avatar.mock";
+
 type Props = {
   user: AppUser | ConversationPartner | null;
   size?: number;
@@ -22,11 +24,12 @@ export const ConversationAvatar = ({ user, size = 64 }: Props) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const displayAvatar = useMemo(() => {
-    const avatar = (user as AppUser | null)?.avatar;
-    const avatarUrl = (user as ConversationPartner | null)?.avatarUrl;
-    const resolvedAvatar = avatar || avatarUrl || "";
-    if (resolvedAvatar.trim() !== "") return resolvedAvatar;
-    return DEFAULT_AVATAR;
+    return getRandomAvatarUrl();
+    // const avatar = (user as AppUser | null)?.avatar;
+    // const avatarUrl = (user as ConversationPartner | null)?.avatarUrl;
+    // const resolvedAvatar = avatar || avatarUrl || "";
+    // if (resolvedAvatar.trim() !== "") return resolvedAvatar;
+    // return getRandomAvatarUrl();
   }, [user]);
 
   useEffect(() => {
