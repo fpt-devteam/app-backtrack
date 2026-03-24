@@ -29,7 +29,7 @@ export const ConversationHeader = ({ partner }: Props) => {
 
   return (
     <View className="bg-white border-b border-slate-200 px-4 py-3">
-      <View className="flex-row items-center">
+      <View className="flex-row items-center gap-2">
         {/* Left: Back */}
         <TouchableIconButton
           onPress={handleNavigateBack}

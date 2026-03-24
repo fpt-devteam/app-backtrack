@@ -14,12 +14,7 @@ export const TouchableIconButton = ({ onPress, icon, disabled }: Props) => {
   };
 
   return (
-    <TouchableOpacity
-      className="p-2"
-      onPress={handlePress}
-      disabled={disabled}
-      hitSlop={10}
-    >
+    <TouchableOpacity onPress={handlePress} disabled={disabled} hitSlop={10}>
       {icon}
     </TouchableOpacity>
   );

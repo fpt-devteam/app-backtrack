@@ -6,16 +6,16 @@ export const PROFILE_ROUTE = {
 } as const;
 
 export const POST_ROUTE = {
-  index: "/(protected)/(tabs)/posts",
-  create: "/(protected)/posts/create",
-  details: (postId: string) => `/(protected)/posts/${postId}`,
-  matching: (postId: string) => `/(protected)/posts/${postId}/matching`,
+  index: "/(protected)/(tabs)/posts" as ExternalPathString | RelativePathString,
+  create: "/(protected)/posts/create" as ExternalPathString | RelativePathString,
+  details: (postId: string) => `/(protected)/posts/${postId}` as ExternalPathString | RelativePathString,
+  matching: (postId: string) => `/(protected)/posts/${postId}/matching` as ExternalPathString | RelativePathString,
   detailMatch: (postId: string, otherPostId: string) =>
-    `/(protected)/posts/${postId}/compare/${otherPostId}`,
-  search: "/(protected)/posts/search",
-  searchLocationInput: "/(protected)/posts/search/location-search",
-  searchLocation: "/(protected)/posts/search/location",
-  searchResult: "/(protected)/posts/search/result",
+    `/(protected)/posts/${postId}/compare/${otherPostId}` as ExternalPathString | RelativePathString,
+  search: "/(protected)/posts/search" as ExternalPathString | RelativePathString,
+  searchLocationInput: "/(protected)/posts/search/location-search" as ExternalPathString | RelativePathString,
+  searchLocation: "/(protected)/posts/search/location" as ExternalPathString | RelativePathString,
+  searchResult: "/(protected)/posts/search/result" as ExternalPathString | RelativePathString,
 } as const;
 
 export const CHAT_ROUTE = {
@@ -33,11 +33,14 @@ export const QR_ROUTE = {
 } as const;
 
 export const MAP_ROUTE = {
-  index: "/(protected)/map",
-  search: "/(protected)/map/search",
+  index: "/(protected)/map" as ExternalPathString | RelativePathString,
+  search: "/(protected)/map/search" as ExternalPathString | RelativePathString,
 } as const;
 
+export const NOTIFICATION_ROUTE = {
+  index: "/(protected)/(tabs)/notification" as ExternalPathString | RelativePathString,
+} as const;
 
 export const SHARED_ROUTE = {
-  notAvailable: "/shared/not-available",
+  notAvailable: "/shared/not-available" as ExternalPathString | RelativePathString,
 } as const;
