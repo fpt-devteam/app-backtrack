@@ -1,60 +1,92 @@
-import { colors } from '@/src/shared/theme'
-import { PaperPlaneRightIcon } from 'phosphor-react-native'
-import React, { useState } from 'react'
-import { ActivityIndicator, TextInput, TouchableOpacity, View } from 'react-native'
+import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
+import { colors } from "@/src/shared/theme";
+import {
+  CameraIcon,
+  ImageIcon,
+  PaperPlaneRightIcon,
+  PlusCircleIcon,
+} from "phosphor-react-native";
+import React, { useState } from "react";
+import { TextInput, View } from "react-native";
 
-interface MessageInputProps {
-  onSend: (message: string) => Promise<void>
-  isSending?: boolean
-}
+type MessageInputProps = {
+  onSend: (message: string) => Promise<void>;
+  isSending?: boolean;
+};
 
 export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
-  const [messageText, setMessageText] = useState('')
+  const [messageText, setMessageText] = useState("");
 
   const handleSend = async () => {
-    if (!messageText.trim() || isSending) return
+    if (!messageText.trim() || isSending) return;
 
-    const currentMessage = messageText.trim()
-    setMessageText('')
+    const currentMessage = messageText.trim();
+    setMessageText("");
 
     try {
-      await onSend(currentMessage)
+      await onSend(currentMessage);
     } catch (error) {
       setMessageText(currentMessage);
-      console.log('Error sending message:', error)
+      console.log("Error sending message:", error);
     }
-  }
+  };
+
+  const handleUploadImage = async () => {
+    console.log("Uploading image...");
+  };
+
+  const handleTakePhoto = async () => {
+    console.log("Taking photo...");
+  };
+
+  const handlePlusAction = async () => {
+    console.log("Plus action triggered...");
+  };
 
   return (
-    <View className="bg-white border-t border-slate-200 px-4 py-3 mb-4">
-      <View className="flex-row items-center gap-3">
-        <View className="flex-1 min-h-[40px] max-h-[120px] bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
-          <TextInput
-            value={messageText}
-            onChangeText={setMessageText}
-            placeholder="Type a message..."
-            placeholderTextColor={colors.slate[400]}
-            multiline
-            className="text-slate-900 text-base flex-1"
-            textAlignVertical="center"
-          />
-        </View>
+    <View className="flex-row items-center gap-4 px-4 mb-2">
+      <View className="flex-row items-center gap-4  ">
+        {/* Plus Button */}
+        <TouchableIconButton
+          icon={
+            <PlusCircleIcon size={28} color={colors.primary} weight="fill" />
+          }
+          onPress={handlePlusAction}
+        />
 
-        <TouchableOpacity
-          onPress={handleSend}
-          disabled={!messageText.trim() || isSending}
-          className={`w-10 h-10 rounded-lg items-center justify-center ${messageText.trim() && !isSending ? 'bg-primary' : 'bg-slate-300'
-            }`}
-        >
-          {isSending ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <PaperPlaneRightIcon size={18} color="white" />
-          )}
-        </TouchableOpacity>
+        {/* Camera Button */}
+        <TouchableIconButton
+          icon={<CameraIcon size={28} color={colors.primary} weight="fill" />}
+          onPress={handleTakePhoto}
+        />
+
+        {/* Image Upload Button */}
+        <TouchableIconButton
+          icon={<ImageIcon size={28} color={colors.primary} weight="fill" />}
+          onPress={handleUploadImage}
+        />
       </View>
+
+      {/* Message Input */}
+      <TextInput
+        value={messageText}
+        onChangeText={setMessageText}
+        placeholder="Aa"
+        placeholderTextColor={colors.slate[500]}
+        multiline
+        className="rounded-full text-slate-900 text-base flex-1 px-4 py-3 justify-center"
+        textAlignVertical="center"
+        style={{ backgroundColor: colors.slate[100] }}
+      />
+
+      {/* Send Button  */}
+      <TouchableIconButton
+        disabled={!messageText.trim() || isSending}
+        icon={
+          <PaperPlaneRightIcon size={28} color={colors.primary} weight="fill" />
+        }
+        onPress={handleSend}
+      />
     </View>
-  )
-}
-
-
+  );
+};

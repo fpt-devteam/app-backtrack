@@ -1,5 +1,5 @@
-import type { Conversation, ConversationType, Message } from "@/src/features/chat/types/chat.type";
 import type { ApiResponse } from "@/src/shared/api";
+import { Conversation, ConversationType, DirectConversation, Message, UserMessage } from "./chat.type";
 
 export type ConversationCreateRequest = {
   memberId: string,
@@ -35,3 +35,16 @@ export type MessageSendResponse = {
 };
 
 export type ConversationDetailResponse = ApiResponse<{ conversation: Conversation | null }>;
+
+
+export type DirectConversationCreateRequest = {
+  memberId: string;
+};
+
+export type DirectConversationCreateResponse = ApiResponse<DirectConversation>
+
+export type MessagesPaginationGetResponse = ApiResponse<{
+  messages: UserMessage[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}>;

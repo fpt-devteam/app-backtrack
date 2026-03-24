@@ -1,6 +1,7 @@
-import { ConversationAvatar } from "@/src/features/chat/components/ConversationAvatar";
 import { Conversation } from "@/src/features/chat/types";
+import { AppUserAvatar } from "@/src/shared/components";
 import { CHAT_ROUTE } from "@/src/shared/constants/route.constant";
+import { formatMessageTimestamp } from "@/src/shared/utils/datetime.utils";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
@@ -17,43 +18,14 @@ type Props = {
   conversation: Conversation;
 };
 
-const formatLastMessageTime = (iso?: string) => {
-  if (!iso) return "";
-
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-
-  const now = new Date();
-
-  const isSameDay =
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate();
-
-  if (isSameDay) {
-    let hours = d.getHours();
-    const minutes = String(d.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-
-    hours = hours % 12;
-    if (hours === 0) hours = 12;
-
-    return `${hours}:${minutes} ${ampm}`;
-  }
-
-  const MM = String(d.getMonth() + 1).padStart(2, "0");
-  const DD = String(d.getDate()).padStart(2, "0");
-  return `${MM}:${DD}`;
-};
-
 export const ConversationCard = ({ conversation }: Props) => {
-  const isLastMessageMine = useMemo(() => {
+  const isLastMessageFromPartner = useMemo(() => {
     return conversation.lastMessage?.senderId === conversation.partner?.id;
   }, [conversation]);
 
   const isLastMessageUnread = useMemo(() => {
-    return conversation.unreadCount > 0 && !isLastMessageMine;
-  }, [conversation, isLastMessageMine]);
+    return conversation.unreadCount > 0 && isLastMessageFromPartner;
+  }, [conversation, isLastMessageFromPartner]);
 
   const displayPartnerName = useMemo(() => {
     const defaultName = "Unknown User";
@@ -69,17 +41,17 @@ export const ConversationCard = ({ conversation }: Props) => {
     const lastContent = conversation.lastMessage?.content;
     if (!lastContent) return defaultContent;
 
-    const prefix = isLastMessageMine ? "You: " : "";
+    const prefix = isLastMessageFromPartner ? "" : "You: ";
     return `${prefix}${lastContent}`;
-  }, [conversation, isLastMessageMine]);
+  }, [conversation, isLastMessageFromPartner]);
 
   const displayTimeText = useMemo(() => {
     if (!conversation.lastMessage?.timestamp || !conversation.updatedAt)
       return "";
 
     return (
-      formatLastMessageTime(conversation.lastMessage?.timestamp) ||
-      formatLastMessageTime(conversation.updatedAt)
+      formatMessageTimestamp(conversation.lastMessage?.timestamp) ||
+      formatMessageTimestamp(conversation.updatedAt)
     );
   }, [conversation]);
 
@@ -122,7 +94,10 @@ export const ConversationCard = ({ conversation }: Props) => {
       >
         <View className="flex-row items-center">
           {/* Avatar */}
-          <ConversationAvatar user={conversation.partner} />
+          <AppUserAvatar
+            avatarUrl={conversation.partner?.avatarUrl}
+            size={56}
+          />
 
           {/* Main */}
           <View className="flex-1 ml-3">
