@@ -14,8 +14,8 @@ export const BottomTabBar = () => {
       <Tabs.Screen name="posts" options={{ title: "Home" }} />
       <Tabs.Screen name="qr" options={{ title: "QRs" }} />
       <Tabs.Screen name="chat" options={{ title: "Chat" }} />
-      <Tabs.Screen name="notification" options={{ title: "Inbox" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+      <Tabs.Screen name="notification" options={{ animation: "shift" }} />
+      <Tabs.Screen name="profile" options={{ title: "You" }} />
     </Tabs>
   );
 };

@@ -1,7 +1,4 @@
-import {
-  NotificationChip,
-  NotificationRow,
-} from "@/src/features/notification/components";
+import { NotificationRow } from "@/src/features/notification/components";
 import {
   useNotifications,
   useUpdateNotificationStatus,
@@ -10,7 +7,11 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
-import { AppHeader, AppLoader, HeaderTitle } from "@/src/shared/components";
+import {
+  AppLoader,
+  ChipsRow,
+  TouchableIconButton,
+} from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { SHARED_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
@@ -18,18 +19,12 @@ import { RelativePathString, router } from "expo-router";
 import {
   ArchiveIcon,
   BellSimpleSlashIcon,
+  CaretLeftIcon,
   EnvelopeSimpleIcon,
   EnvelopeSimpleOpenIcon,
-  XIcon,
 } from "phosphor-react-native";
-import React, { useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import React, { useMemo, useRef, useState } from "react";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type FilterType = "all" | "unread" | "archived";
@@ -54,15 +49,8 @@ const NotificationScreen = () => {
 
   const filterStatus = getFilterStatus(filterRef.current);
 
-  const {
-    items,
-    isLoading,
-    refresh,
-    hasMore,
-    loadMore,
-    isLoadingNextPage,
-    isRefreshing,
-  } = useNotifications({ status: filterStatus });
+  const { items, isLoading, hasMore, loadMore, isLoadingNextPage } =
+    useNotifications({ status: filterStatus });
 
   const allItems = items;
 
@@ -196,96 +184,87 @@ const NotificationScreen = () => {
     );
   };
 
+  const colorIcon = useMemo(() => {
+    return selectedCount === 0 || isUpdatingStatus
+      ? colors.slate[400]
+      : colors.primary;
+  }, [selectedCount, isUpdatingStatus]);
+
   return (
-    <SafeAreaView className="flex-1 bg-white pb-[56px]">
+    <SafeAreaView className="flex-1 bg-white pb-[56px] px-4">
       {/* Screen Header  */}
-      <>
-        {mode === "candidate" ? (
-          <View className="bg-white h-16 px-4 py-4">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-3">
-                <Pressable onPress={onExitCandidate} hitSlop={8}>
-                  <XIcon size={24} color="#0ea5e9" weight="bold" />
-                </Pressable>
-                <Text className="text-2xl font-bold text-slate-900">
-                  {selectedCount} selected
-                </Text>
-              </View>
-              <View className="flex-row gap-4">
-                <Pressable
-                  onPress={onBulkMark}
-                  disabled={selectedCount === 0 || isUpdatingStatus}
-                  hitSlop={8}
-                >
-                  {isFirstSelectedRead ? (
-                    <EnvelopeSimpleIcon
-                      size={24}
-                      color={
-                        selectedCount === 0 || isUpdatingStatus
-                          ? "#cbd5e1"
-                          : "#0ea5e9"
-                      }
-                      weight="regular"
-                    />
-                  ) : (
-                    <EnvelopeSimpleOpenIcon
-                      size={24}
-                      color={
-                        selectedCount === 0 || isUpdatingStatus
-                          ? "#cbd5e1"
-                          : "#0ea5e9"
-                      }
-                      weight="regular"
-                    />
-                  )}
-                </Pressable>
-                <Pressable
-                  onPress={onBulkArchive}
-                  disabled={selectedCount === 0 || isUpdatingStatus}
-                  hitSlop={8}
-                >
-                  <ArchiveIcon
+      <View className="flex-row items-center gap-2 h-16 pr-4">
+        <TouchableIconButton
+          icon={<CaretLeftIcon size={28} weight="bold" />}
+          onPress={() => {
+            router.back();
+          }}
+        />
+        <View className="flex-1 items-start ">
+          <Text className="text-xl font-semibold text-main">Notifications</Text>
+        </View>
+
+        {mode === "candidate" && (
+          <View className="bg-white flex-row items-center justify-between gap-4">
+            {/* Mark as Read/Unread Button */}
+            <TouchableIconButton
+              onPress={onBulkMark}
+              disabled={selectedCount === 0 || isUpdatingStatus}
+              icon={
+                isFirstSelectedRead ? (
+                  <EnvelopeSimpleIcon
                     size={24}
-                    color={
-                      selectedCount === 0 || isUpdatingStatus
-                        ? "#cbd5e1"
-                        : "#0ea5e9"
-                    }
+                    color={colorIcon}
                     weight="regular"
                   />
-                </Pressable>
-              </View>
-            </View>
+                ) : (
+                  <EnvelopeSimpleOpenIcon
+                    size={24}
+                    color={colorIcon}
+                    weight="regular"
+                  />
+                )
+              }
+            />
+
+            {/* Archive Button */}
+            <TouchableIconButton
+              onPress={onBulkArchive}
+              disabled={selectedCount === 0 || isUpdatingStatus}
+              icon={
+                <ArchiveIcon size={24} color={colorIcon} weight="regular" />
+              }
+            />
           </View>
-        ) : (
-          <AppHeader left={<HeaderTitle title="Notifications" />} />
         )}
-      </>
-
-      <View className="p-4 pt-0">
-        <View className="flex-row gap-2">
-          <NotificationChip
-            label="All"
-            isActive={filter === "all"}
-            onPress={() => handleChangeFilter("all")}
-            disabled={mode === "candidate"}
-          />
-
-          <NotificationChip
-            label="Unread"
-            isActive={filter === "unread"}
-            onPress={() => handleChangeFilter("unread")}
-            disabled={mode === "candidate"}
-          />
-
-          <NotificationChip
-            label="Archived"
-            isActive={filter === "archived"}
-            onPress={() => handleChangeFilter("archived")}
-            disabled={mode === "candidate"}
-          />
-        </View>
       </View>
+
+      {/* Filter Chips */}
+      <View className="py-4 pt-0">
+        <ChipsRow
+          chips={[
+            {
+              label: "All",
+              selected: filter === "all",
+              onPress: () => handleChangeFilter("all"),
+              disabled: mode === "candidate",
+            },
+            {
+              label: "Unread",
+              selected: filter === "unread",
+              onPress: () => handleChangeFilter("unread"),
+              disabled: mode === "candidate",
+            },
+            {
+              label: "Archived",
+              selected: filter === "archived",
+              onPress: () => handleChangeFilter("archived"),
+              disabled: mode === "candidate",
+            },
+          ]}
+        />
+      </View>
+
       {isLoading && allItems.length === 0 ? (
         <AppLoader />
       ) : (

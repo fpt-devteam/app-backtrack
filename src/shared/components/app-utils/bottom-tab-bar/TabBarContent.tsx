@@ -6,12 +6,7 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import type { IconProps } from "phosphor-react-native";
-import {
-  BellIcon,
-  ChatCircleIcon,
-  HouseIcon,
-  QrCodeIcon,
-} from "phosphor-react-native";
+import { ChatCircleIcon, HouseIcon, QrCodeIcon } from "phosphor-react-native";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 
@@ -21,8 +16,7 @@ const TAB_ICONS: Record<string, TabIcon> = {
   posts: { Icon: HouseIcon, label: "Home" },
   qr: { Icon: QrCodeIcon, label: "QRs" },
   chat: { Icon: ChatCircleIcon, label: "Chat" },
-  notification: { Icon: BellIcon, label: "Inbox" },
-  profile: { Icon: AppUserAvatarIcon, label: "Profile" },
+  profile: { Icon: AppUserAvatarIcon, label: "You" },
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {

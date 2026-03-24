@@ -3,13 +3,12 @@ import {
   ConversationCardSkeleton,
 } from "@/src/features/chat/components/ConversationCard";
 import { useConversations } from "@/src/features/chat/hooks";
-import { AppInlineError } from "@/src/shared/components";
+import { AppInlineError, ChipsRow } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { colors } from "@/src/shared/theme/colors";
 import { MailboxIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
-import { ConversationChipsRow } from "./ConversationChipRow";
 
 const CHIP = {
   ALL: "All",
@@ -81,7 +80,7 @@ export const ConversationList = () => {
       onEndReachedThreshold={0.35}
       ListHeaderComponent={
         <View className="mb-4">
-          <ConversationChipsRow
+          <ChipsRow
             chips={[
               {
                 label: CHIP.ALL,
