@@ -29,11 +29,12 @@ export const MessageSearchBar = ({
   return (
     <View
       className={cn(
-        "flex-row items-center bg-white rounded-full p-4 border-2 border-slate-300",
+        "flex-row items-center rounded-full p-4",
         isFocused && "border-primary",
       )}
+      style={{ backgroundColor: colors.slate[100] }}
     >
-      <MagnifyingGlassIcon size={20} color={colors.slate[400]} weight="bold" />
+      <MagnifyingGlassIcon size={20} color={colors.slate[700]} weight="bold" />
       <TextInput
         ref={inputRef}
         value={value}
@@ -41,8 +42,8 @@ export const MessageSearchBar = ({
         onBlur={handleUnFocus}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={colors.slate[400]}
-        className="flex-1 ml-2 text-base text-slate-900"
+        placeholderTextColor={colors.slate[700]}
+        className="flex-1 ml-2  "
       />
     </View>
   );

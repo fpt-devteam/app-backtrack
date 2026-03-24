@@ -1,8 +1,6 @@
 import { getMessagesApi } from "@/src/features/chat/api";
 import {
-  CHAT_QUERY_KEY,
-  getMockMessages,
-  IS_CHAT_FEATURE_MOCK,
+  CHAT_QUERY_KEY
 } from "@/src/features/chat/constants";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -14,10 +12,6 @@ export const useMessages = (conversationId: string) => {
         cursor: pageParam || undefined,
         limit: 10,
       };
-
-      if (IS_CHAT_FEATURE_MOCK) {
-        return getMockMessages(conversationId, params);
-      }
 
       const response = await getMessagesApi(conversationId, params);
       if (!response?.success) throw new Error("Failed to fetch messages");
