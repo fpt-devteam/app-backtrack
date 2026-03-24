@@ -1,7 +1,8 @@
 import { ExternalPathString, RelativePathString } from "@/.expo/types/router";
 
 export const PROFILE_ROUTE = {
-  index: "/(protected)/profile",
+  index: "/(protected)/profile" as ExternalPathString | RelativePathString,
+  other: (userId: string) => `/(protected)/profile/${userId}` as ExternalPathString | RelativePathString,
 } as const;
 
 export const POST_ROUTE = {
