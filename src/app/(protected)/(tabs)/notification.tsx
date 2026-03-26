@@ -1,1 +1,2 @@
-export { NotificationScreen as default } from "@/src/features/notification/screens";
+export { InboxScreen as default } from "@/src/features/notification/screens";
+

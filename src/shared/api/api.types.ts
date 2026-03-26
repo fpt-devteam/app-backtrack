@@ -10,9 +10,7 @@ export const DEFAULT_PAGED_REQUEST: PagedRequest = {
 
 export type PagedResponse<T> = {
   items: T[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
+  total: number;
 }
 
 export type ApiError = {

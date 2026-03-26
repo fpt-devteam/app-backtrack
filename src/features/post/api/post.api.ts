@@ -12,8 +12,8 @@ export const POST_API = {
 } as const;
 
 export async function filterPostsApi(params: PostsRequest) {
-  const response = await privateClient.get<PostsResponse>(POST_API.filter);
-  return response.data;
+  const response = await privateClient.post(POST_API.filter, params);
+  return response.data as PostsResponse;
 }
 
 export const createPost = async (req: PostCreateRequest) => {

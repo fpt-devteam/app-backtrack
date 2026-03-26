@@ -5,8 +5,10 @@ import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import { ImageCarousel } from "@/src/shared/components";
 import { Divider } from "@/src/shared/components/ui/Divider";
+import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
+import { router } from "expo-router";
 import { CalendarIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
@@ -123,7 +125,12 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
   const handleCreateChat = async () => {
     try {
       const req = { memberId: post.author.id };
-      await create(req);
+      const res = await create(req);
+      if (!res.data?.conversation?.conversationId) {
+        console.log("Missing conversation ID in response:", res.data);
+        return;
+      }
+      router.push(CHAT_ROUTE.message(res.data?.conversation?.conversationId));
     } catch (error) {
       console.error("Failed to create conversation:", error);
     }

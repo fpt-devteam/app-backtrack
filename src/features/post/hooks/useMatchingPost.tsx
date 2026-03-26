@@ -33,5 +33,6 @@ export const useMatchingPost = (postId: string) => {
     error,
     similarPosts: query?.data?.data?.similarPosts || [],
     isMatching,
+    isLoading: isMatching || query.isLoading,
   };
 };

@@ -10,14 +10,15 @@ import type {
   PagedRequest,
   PagedResponse,
 } from "@/src/shared/api";
+import { Nullable } from "@/src/shared/types";
+import { LatLng } from "react-native-maps";
 
 export type PostsRequest = {
   postType?: PostType;
   searchTerm?: string;
   radiusInKm?: number;
   authorId?: string;
-  latitude?: number;
-  longitude?: number;
+  location: Nullable<LatLng>;
 } & PagedRequest;
 
 export type PostsResponse = ApiResponse<PagedResponse<Post>>;

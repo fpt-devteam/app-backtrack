@@ -1,12 +1,10 @@
+import { useLocationSelectionStore } from "@/src/features/map/store";
 import { PostCard } from "@/src/features/post/components/PostCard";
-import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import { usePosts } from "@/src/features/post/hooks";
-import type { PostFilters } from "@/src/features/post/types";
-import { metrics } from "@/src/shared/theme";
-import { useQueryClient } from "@tanstack/react-query";
-import React, { useCallback, useMemo, useState } from "react";
+import type { Post, PostFilters } from "@/src/features/post/types";
+import { AppLoader } from "@/src/shared/components";
+import React, { useCallback, useMemo } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PostListProps = {
   direction?: "vertical" | "horizontal";
@@ -15,52 +13,46 @@ type PostListProps = {
 
 export const PostList = ({
   direction = "vertical",
-  filters = {},
+  filters,
 }: PostListProps) => {
-  const { bottom } = useSafeAreaInsets();
-  const isHorizontal = direction === "horizontal";
-  const queryClient = useQueryClient();
-  const { items, hasMore, loadMore, isLoading, isLoadingNextPage } = usePosts({
-    filters,
+  const { confirmedSelection } = useLocationSelectionStore();
+
+  const { items, loadMore, isLoading, refetch, isRefetching } = usePosts({
+    enabled: !!confirmedSelection,
+    filters: { ...filters, location: confirmedSelection?.location! },
   });
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleEndReached = useCallback(() => {
-    if (!hasMore || isLoadingNextPage) return;
-    loadMore();
-  }, [hasMore, isLoadingNextPage, loadMore]);
-
-  const onRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await queryClient.invalidateQueries({ queryKey: POSTS_QUERY_KEY });
-    setIsRefreshing(false);
-  }, [queryClient]);
-
-  const ItemSeparatorComponent = useCallback(
-    () => <View style={isHorizontal ? { width: 8 } : { height: 8 }} />,
-    [isHorizontal],
-  );
+  const isHorizontal = direction === "horizontal";
 
   const refreshControl = useMemo(() => {
     if (isHorizontal) return undefined;
-    return <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />;
-  }, [isHorizontal, isRefreshing, onRefresh]);
+    return <RefreshControl refreshing={isRefetching} onRefresh={refetch} />;
+  }, [isHorizontal, isRefetching, refetch]);
 
   const renderItem = useCallback(
-    ({ item }: { item: (typeof items)[number] }) => (
-      <PostCard item={item} isFetching={isLoading} type={direction} />
-    ),
+    ({ item }: { item: Post }) => <PostCard item={item} type={direction} />,
     [isLoading, direction],
   );
+
+  const renderSeparator = useCallback(
+    () => <View style={isHorizontal ? { width: 12 } : { height: 12 }} />,
+    [isHorizontal],
+  );
+
+  const renderFooter = useCallback(() => {
+    if (!isLoading || items.length === 0) return null;
+    return <AppLoader />;
+  }, [isLoading, items.length]);
 
   return (
     <FlatList
       data={items}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
-      ItemSeparatorComponent={ItemSeparatorComponent}
+      ItemSeparatorComponent={renderSeparator}
+      ListFooterComponent={renderFooter}
       onEndReachedThreshold={0.1}
-      onEndReached={handleEndReached}
+      onEndReached={loadMore}
       scrollEventThrottle={16}
       bounces
       horizontal={isHorizontal}
@@ -68,12 +60,11 @@ export const PostList = ({
       alwaysBounceVertical={!isHorizontal}
       showsVerticalScrollIndicator={false}
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={
-        isHorizontal
-          ? undefined
-          : { padding: 8, paddingBottom: bottom + metrics.tabBar.height }
-      }
       refreshControl={refreshControl}
+      numColumns={isHorizontal ? undefined : 2}
+      columnWrapperStyle={
+        isHorizontal ? undefined : { justifyContent: "space-between" }
+      }
     />
   );
 };

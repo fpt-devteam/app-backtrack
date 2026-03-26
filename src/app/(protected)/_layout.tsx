@@ -15,10 +15,10 @@ export default function ProtectedLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="posts"
-          options={{
-            presentation: "card",
-            animation: "fade_from_bottom",
-          }}
+          // options={{
+          //   presentation: "card",
+          //   animation: "fade_from_bottom",
+          // }}
         />
         <Stack.Screen name="profile" />
       </Stack>
