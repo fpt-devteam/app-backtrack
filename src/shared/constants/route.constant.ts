@@ -1,5 +1,13 @@
 import { ExternalPathString, RelativePathString } from "@/.expo/types/router";
 
+type RoutePath = ExternalPathString | RelativePathString;
+const createPath = <T extends string>(path: T): RoutePath => path as RoutePath;
+
+const PROTECTED = "/(protected)" as const;
+const POST_BASE = `${PROTECTED}/posts` as const;
+const CHAT_BASE = `${PROTECTED}/chat/conversations` as const;
+const QR_BASE = "/qr" as const;
+
 export const PROFILE_ROUTE = {
   index: "/(protected)/profile" as ExternalPathString | RelativePathString,
   other: (userId: string) => `/(protected)/profile/${userId}` as ExternalPathString | RelativePathString,
@@ -23,17 +31,16 @@ export const POST_ROUTE = {
 } as const;
 
 export const CHAT_ROUTE = {
-  conversations: `/(protected)/chat/conversations` as ExternalPathString | RelativePathString,
-  message: (conversationId: string) =>
-    `/(protected)/chat/conversations/${conversationId}` as ExternalPathString | RelativePathString,
+  conversations: createPath(CHAT_BASE),
+  message: (id: string) => createPath(`${CHAT_BASE}/${id}`),
 } as const;
 
 export const QR_ROUTE = {
-  index: "/qr" as ExternalPathString | RelativePathString,
-  purchase: "/qr/purchase" as ExternalPathString | RelativePathString,
-  profile: "/qr/qr-profile" as ExternalPathString | RelativePathString,
-  customize: "/qr/qr-customize" as ExternalPathString | RelativePathString,
-  profileSetting: "/qr/qr-profile-setting" as ExternalPathString | RelativePathString,
+  index: createPath(QR_BASE),
+  purchase: createPath(`${QR_BASE}/purchase`),
+  profile: createPath(`${QR_BASE}/qr-profile`),
+  customize: createPath(`${QR_BASE}/qr-customize`),
+  profileSetting: createPath(`${QR_BASE}/qr-profile-setting`),
 } as const;
 
 export const MAP_ROUTE = {

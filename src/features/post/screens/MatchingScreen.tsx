@@ -1,7 +1,6 @@
 import { SimilarPostCard } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
-import { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoResultScreen";
 import {
   AppHeader,
   BackButton,
@@ -40,13 +39,16 @@ export const MatchingScreen = () => {
     return <MatchingErrorScreen errorMessage={getErrorMessage(error)} />;
   }
 
-  if (similarPosts.length === 0) {
-    console.log("Matching No Result Screen");
-    return <MatchingNoResultScreen />;
-  }
+  // if (similarPosts.length === 0) {
+  //   console.log("Matching No Result Screen");
+  //   return <MatchingNoResultScreen />;
+  // }
 
   return (
-    <View style={{ paddingTop: insets.top }}>
+    <View
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      className="flex-1 bg-white"
+    >
       <AppHeader
         left={<BackButton />}
         center={<HeaderTitle title="Matching result" />}
