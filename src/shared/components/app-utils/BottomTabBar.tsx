@@ -1,4 +1,4 @@
-import { TabBarContent } from "@/src/shared/components/app-utils/bottom-tab-bar/TabBarContent";
+import { TabBarContent } from "@/src/shared/components/app-utils/TabBarContent";
 import { Tabs } from "expo-router";
 import React from "react";
 
@@ -11,11 +11,11 @@ export const BottomTabBar = () => {
       }}
       tabBar={(props) => <TabBarContent {...props} />}
     >
-      <Tabs.Screen name="posts" options={{ title: "Home" }} />
-      <Tabs.Screen name="qr" options={{ title: "QRs" }} />
-      <Tabs.Screen name="chat" options={{ title: "Chat" }} />
+      <Tabs.Screen name="posts" />
+      <Tabs.Screen name="qr" />
+      <Tabs.Screen name="chat" />
       <Tabs.Screen name="notification" options={{ animation: "shift" }} />
-      <Tabs.Screen name="profile" options={{ title: "You" }} />
+      <Tabs.Screen name="profile" />
     </Tabs>
   );
 };

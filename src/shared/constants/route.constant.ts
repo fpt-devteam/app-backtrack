@@ -3,11 +3,15 @@ import { ExternalPathString, RelativePathString } from "@/.expo/types/router";
 export const PROFILE_ROUTE = {
   index: "/(protected)/profile" as ExternalPathString | RelativePathString,
   other: (userId: string) => `/(protected)/profile/${userId}` as ExternalPathString | RelativePathString,
+  edit: "/(protected)/profile/edit" as ExternalPathString | RelativePathString,
+  setting: "/(protected)/profile/setting" as ExternalPathString | RelativePathString,
+  menuTab: "/(protected)/profile/menu-tab" as ExternalPathString | RelativePathString,
 } as const;
 
 export const POST_ROUTE = {
   index: "/(protected)/(tabs)/posts" as ExternalPathString | RelativePathString,
   create: "/(protected)/posts/create" as ExternalPathString | RelativePathString,
+  createOptions: "/(protected)/posts/create-options" as ExternalPathString | RelativePathString,
   details: (postId: string) => `/(protected)/posts/${postId}` as ExternalPathString | RelativePathString,
   matching: (postId: string) => `/(protected)/posts/${postId}/matching` as ExternalPathString | RelativePathString,
   detailMatch: (postId: string, otherPostId: string) =>

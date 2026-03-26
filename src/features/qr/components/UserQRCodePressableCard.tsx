@@ -23,8 +23,8 @@ export const UserQRCodePressableCard = ({
   const { user } = useAppUser();
 
   const logoSource = useMemo(
-    () => (user?.avatar ? { uri: user.avatar } : undefined),
-    [user?.avatar],
+    () => (user?.avatarUrl ? { uri: user.avatarUrl } : undefined),
+    [user?.avatarUrl],
   );
 
   const qrValue = useMemo(() => {

@@ -2,10 +2,13 @@ import type { Nullable } from "@/src/shared/types";
 
 export type AppUser = {
   id: string;
-  email: string | null;
-  displayName: string | null;
-  avatar: string;
+  email: Nullable<string>;
+  phone: Nullable<string>;
+  displayName: Nullable<string>;
+  avatarUrl: string;
   globalRole: string;
+  showEmail: boolean;
+  showPhone: boolean;
 };
 
 export type AuthState = {

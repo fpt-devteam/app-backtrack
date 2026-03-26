@@ -3,7 +3,7 @@ import { type ApiResponse, privateClient } from "@/src/shared/api";
 
 export const POST_API = {
   create: "/api/core/posts",
-  filter: "/api/core/posts",
+  filter: "/api/core/posts/feed",
   detail: (postId: string) => `/api/core/posts/${postId}`,
   matching: (postId: string) => `/api/core/posts/${postId}/similar`,
   checkPostMatchingStatus: (postId: string) => `/api/core/posts/${postId}/matching-status`,
@@ -12,7 +12,7 @@ export const POST_API = {
 } as const;
 
 export async function filterPostsApi(params: PostsRequest) {
-  const response = await privateClient.get<PostsResponse>(POST_API.filter, { params });
+  const response = await privateClient.get<PostsResponse>(POST_API.filter);
   return response.data;
 }
 

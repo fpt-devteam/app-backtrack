@@ -13,7 +13,7 @@ export { AppLogo } from "@/src/shared/components/app-utils/AppLogo";
 export { AppSlogan } from "@/src/shared/components/app-utils/AppSlogan";
 export { AppSplashScreen } from "@/src/shared/components/app-utils/AppSplashScreen";
 export { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
-export { BottomTabBar } from "@/src/shared/components/app-utils/bottom-tab-bar/BottomTabBar";
+export { BottomTabBar } from "@/src/shared/components/app-utils/BottomTabBar";
 export { ConfirmPasswordField } from "@/src/shared/components/fields/ConfirmPasswordField";
 export { DateTimePickerField } from "@/src/shared/components/fields/DateTimePickerField";
 export { EmailField } from "@/src/shared/components/fields/EmailField";

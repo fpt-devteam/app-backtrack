@@ -20,7 +20,7 @@ export const ConversationHeader = ({ partner }: Props) => {
 
   const displayPartnerAvatar = useMemo(() => {
     if (!partner) return null;
-    return "avatarUrl" in partner ? partner.avatarUrl : partner.avatar;
+    return "avatarUrl" in partner ? partner.avatarUrl : partner.avatarUrl;
   }, [partner]);
 
   const handleNavigateBack = () => {
