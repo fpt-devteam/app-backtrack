@@ -7,6 +7,7 @@ import type {
 } from "@/src/features/post/types";
 import { DEFAULT_PAGED_REQUEST } from "@/src/shared/api";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 
 export type PostsFiltersOptions = {
   filters: PostFilters;
@@ -14,50 +15,52 @@ export type PostsFiltersOptions = {
 };
 
 export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
+  const pageNumberRef = useRef(1);
+  console.log("herer", enabled, filters);
+
   const query = useInfiniteQuery<PostsResponse>({
     queryKey: [...POSTS_QUERY_KEY, filters],
     enabled,
-    initialPageParam: 1,
+    initialPageParam: pageNumberRef.current,
     queryFn: async ({ pageParam }) => {
       const filtersRequest: PostsRequest = {
         searchTerm: filters.searchTerm,
         postType: filters.postType,
-        latitude: filters.location?.latitude,
-        longitude: filters.location?.longitude,
+        location: {
+          latitude: filters.location?.latitude,
+          longitude: filters.location?.longitude,
+        },
         radiusInKm: filters.radiusInKm,
         page: Number(pageParam),
         pageSize: DEFAULT_PAGED_REQUEST.pageSize,
       };
 
-      const res: PostsResponse = await filterPostsApi(filtersRequest);
-      if (!res) throw new Error("Failed to fetch posts");
-      if (!res.success || !res.data)
-        throw new Error(res.error?.message || "Failed to fetch posts");
+      const res = await filterPostsApi(filtersRequest);
+      if (!res.success || !res.data) throw new Error("Failed to fetch posts");
       return res;
     },
 
     getNextPageParam: (lastPage) => {
-      if (!lastPage.data) return undefined;
-      const loadedCount = lastPage.data.page * lastPage.data.pageSize;
-      return loadedCount < lastPage.data.totalCount
-        ? lastPage.data.page + 1
-        : undefined;
+      if (lastPage.data?.items.length === 0) return undefined;
+      pageNumberRef.current += 1;
+      return pageNumberRef.current;
     },
   });
 
   const items = query.data?.pages.flatMap((p) => p.data?.items ?? []) ?? [];
-  const totalCount = query.data?.pages?.[0]?.data?.totalCount ?? 0;
+
+  const handleLoadMore = () => {
+    if (!query.hasNextPage || query.isFetchingNextPage) return;
+    query.fetchNextPage();
+  };
 
   return {
-    ...query,
     items,
-    totalCount,
     hasMore: query.hasNextPage,
-    loadMore: () => {
-      if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
-    },
+    loadMore: handleLoadMore,
     isLoading: query.isLoading || query.isFetching,
-    isLoadingNextPage: query.isFetchingNextPage,
-    refresh: () => query.refetch(),
+    isFetchingNextPage: query.isFetchingNextPage,
+    isRefetching: query.isRefetching,
+    refetch: query.refetch,
   };
 };

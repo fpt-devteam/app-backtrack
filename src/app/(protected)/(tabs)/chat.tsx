@@ -1,1 +1,1 @@
-export { ChatScreen as default } from '@/src/features/chat/screens';
+export { InboxScreen as default } from "@/src/features/notification/screens";

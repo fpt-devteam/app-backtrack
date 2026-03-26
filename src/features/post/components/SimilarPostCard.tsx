@@ -2,7 +2,6 @@ import type { SimilarPost } from "@/src/features/post/types";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils";
-import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import { MapPinIcon } from "phosphor-react-native";
 import React from "react";
@@ -47,17 +46,11 @@ export const SimilarPostCard = ({
 }: SimilarPostCardProps) => {
   if (!matchPost) return <SimilarPostCardSkeleton />;
 
-  const imgUrl = matchPost.images?.[0];
+  const imgUrl = matchPost.images?.[0]?.url;
 
   return (
     <Pressable
-      onPress={() =>
-        router.push(
-          POST_ROUTE.detailMatch(postId, matchPost.id) as
-            | ExternalPathString
-            | RelativePathString,
-        )
-      }
+      onPress={() => router.push(POST_ROUTE.detailMatch(postId, matchPost.id))}
       className="flex-row gap-3 bg-white rounded-2xl border border-slate-200 p-3"
     >
       <Image

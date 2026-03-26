@@ -30,7 +30,12 @@ export default function PostSearchResultScreen() {
     searchTerm: searchTermData || undefined,
   });
 
-  const { items, hasMore, loadMore, isLoadingNextPage } = usePosts({
+  const {
+    items,
+    hasMore,
+    loadMore,
+    isFetchingNextPage: isLoadingNextPage,
+  } = usePosts({
     filters,
   });
 

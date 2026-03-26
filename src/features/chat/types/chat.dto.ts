@@ -41,7 +41,7 @@ export type DirectConversationCreateRequest = {
   memberId: string;
 };
 
-export type DirectConversationCreateResponse = ApiResponse<DirectConversation>
+export type DirectConversationCreateResponse = ApiResponse<{ conversation: DirectConversation }>
 
 export type MessagesPaginationGetResponse = ApiResponse<{
   messages: UserMessage[];

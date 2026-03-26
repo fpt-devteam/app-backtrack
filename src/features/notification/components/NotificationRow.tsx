@@ -3,8 +3,6 @@ import { colors } from "@/src/shared/theme";
 import { cn } from "@/src/shared/utils/cn";
 import {
   ChatsIcon,
-  CheckCircleIcon,
-  CircleIcon,
   MapPinIcon,
   QrCodeIcon,
   SparkleIcon,
@@ -15,12 +13,8 @@ import { Linking, Pressable, Text, View } from "react-native";
 import { LatLng } from "react-native-maps";
 
 type NotificationRowProps = {
-  mode: "normal" | "candidate";
   notification: UserNotification;
-  isSelected?: boolean;
-  onLongPress: (notification: UserNotification) => void;
-  onPress?: (notification: UserNotification) => void;
-  onToggleSelect?: (id: string) => void;
+  onPress: (notification: UserNotification) => void;
 };
 
 const formatTime = (date: Date | string): string => {
@@ -52,22 +46,13 @@ const icon = {
 } as const;
 
 export const NotificationRow = ({
-  mode,
   notification,
-  isSelected = false,
-  onLongPress,
   onPress,
-  onToggleSelect,
 }: NotificationRowProps) => {
   const isUnread = notification.status === "Unread";
 
   const handlePress = () => {
-    if (mode === "candidate") onToggleSelect?.(notification.id);
-    else onPress?.(notification);
-  };
-
-  const handleLongPress = () => {
-    if (mode === "normal") onLongPress(notification);
+    onPress(notification);
   };
 
   const bodyDisplay = useMemo(() => {
@@ -109,24 +94,9 @@ export const NotificationRow = ({
   return (
     <Pressable
       onPress={handlePress}
-      onLongPress={handleLongPress}
       className="flex-row items-start gap-3 p-4 bg-white border-b border-slate-100"
       style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
     >
-      {mode === "candidate" && (
-        <View className="items-center justify-center rounded-full">
-          {isSelected ? (
-            <CheckCircleIcon
-              size={32}
-              color={colors.primary}
-              weight="duotone"
-            />
-          ) : (
-            <CircleIcon size={32} color={colors.primary} />
-          )}
-        </View>
-      )}
-
       {/* Left: Avatar + overlays  */}
       <View className="items-center justify-center rounded-full">
         {icon[notification.type]}

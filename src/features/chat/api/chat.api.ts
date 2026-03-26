@@ -35,5 +35,5 @@ export const getConversationDetailApi = async (conversationId: string) => {
 
 export const createDirectConversationApi = async (req: DirectConversationCreateRequest) => {
   const response = await privateClient.post(CHAT_API.createDirectConversation, req);
-  return response.data.data as DirectConversationCreateResponse;
+  return response.data as DirectConversationCreateResponse;
 };
