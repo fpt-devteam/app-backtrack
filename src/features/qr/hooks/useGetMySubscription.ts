@@ -6,6 +6,11 @@ import { useMemo } from "react";
 export const useGetMySubscription = () => {
   const query = useQuery({
     queryKey: [...QR_SUBSCRIPTION_ME_QUERY_KEY],
+    gcTime: 0,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     queryFn: async () => {
       const response = await getMySubscription();
       if (!response.success) throw new Error("Failed to fetch subscription");
