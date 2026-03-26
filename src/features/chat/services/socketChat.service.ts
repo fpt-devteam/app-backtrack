@@ -1,5 +1,5 @@
 import { SOCKET_CONFIG } from "@/src/features/chat/constants";
-import type { MessageItem } from "@/src/features/chat/types";
+import type { UserMessage } from "@/src/features/chat/types";
 import type { MessageSendRequest, MessageSendResponse } from "@/src/features/chat/types/chat.dto";
 import { auth } from "@/src/shared/lib/firebase";
 import type { Socket } from "socket.io-client";
@@ -84,7 +84,7 @@ export class SocketChatService {
     this.socket.emit("leave:conversation", conversationId);
   }
 
-  onReceiveMessage(callback: (message: MessageItem) => void): () => void {
+  onReceiveMessage(callback: (message: UserMessage) => void): () => void {
     if (!this.socket) {
       console.warn("Socket not initialized");
       return () => { };

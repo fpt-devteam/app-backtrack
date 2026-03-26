@@ -1,4 +1,4 @@
-import { PostCard } from "@/src/features/post/components/cards/PostCard";
+import { PostCard } from "@/src/features/post/components/PostCard";
 import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";

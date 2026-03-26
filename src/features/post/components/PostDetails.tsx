@@ -1,7 +1,6 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { PostStatusBadge } from "@/src/features/post/components/badges/PostStatusBadge";
-import { SimilarPostCard } from "@/src/features/post/components/cards/SimilarPostCard";
-import { InfoRow } from "@/src/features/post/components/ui/PostInfoRow";
+import { useCreateDirectConversation } from "@/src/features/chat/hooks";
+import { InfoRow } from "@/src/features/post/components/PostInfoRow";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import { ImageCarousel } from "@/src/shared/components";
@@ -12,6 +11,8 @@ import { CalendarIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useEffect, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PostStatusBadge } from "./PostStatusBadge";
+import { SimilarPostCard } from "./SimilarPostCard";
 
 type PostDetailsProps = { postId: string };
 
@@ -111,19 +112,29 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
   const { user } = useAppUser();
   const { isLoading, data: post } = useGetPostById({ postId });
   const { similarPosts } = useMatchingPost(postId);
+  const { create } = useCreateDirectConversation();
 
   const isOwner = !!post && post.author.id === user?.id;
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  if (isLoading || !post) {
-    return <PostDetailsSkeleton />;
-  }
+  if (isLoading || !post) return <PostDetailsSkeleton />;
+
+  const handleCreateChat = async () => {
+    try {
+      const req = { memberId: post.author.id };
+      await create(req);
+    } catch (error) {
+      console.error("Failed to create conversation:", error);
+    }
+  };
 
   const chatLabel =
     post.postType === PostType.Lost
       ? "Start chat with Finder"
       : "Start chat with Seeker";
+
+  const postImageUrls = post.images.map((img) => img.url);
 
   return (
     <Animated.ScrollView
@@ -135,7 +146,7 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
       scrollEventThrottle={16}
       contentContainerStyle={{ paddingBottom: bottom + 20 }}
     >
-      <ImageCarousel data={post.imageUrls} />
+      <ImageCarousel data={postImageUrls} />
       <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">
@@ -175,12 +186,7 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
 
       {!isOwner && (
         <View className="mx-4 mt-4">
-          <PrimaryButton
-            title={chatLabel}
-            onPress={() => {
-              console.log("Move to chat screen with postId:", post.id);
-            }}
-          />
+          <PrimaryButton title={chatLabel} onPress={handleCreateChat} />
         </View>
       )}
 

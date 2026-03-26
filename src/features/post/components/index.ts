@@ -1,17 +1,16 @@
-export { PostStatusBadge } from "@/src/features/post/components/badges/PostStatusBadge";
-export { MinimalPostCard } from "@/src/features/post/components/cards/MinimalPostCard";
-export { PostComparisonCard } from "@/src/features/post/components/cards/PostComparisonCard";
-export {
-  SimilarPostCard,
-  SimilarPostCardSkeleton
-} from "@/src/features/post/components/cards/SimilarPostCard";
-export { PostForm } from "@/src/features/post/components/forms/PostForm";
-export { MatchedAttributesSection } from "@/src/features/post/components/ui/MatchedAttributesSection";
+export { MatchedAttributesSection } from "@/src/features/post/components/MatchedAttributesSection";
+export { MinimalPostCard } from "@/src/features/post/components/MinimalPostCard";
+export { PostComparisonCard } from "@/src/features/post/components/PostComparisonCard";
 export {
   PostDetails,
   PostDetailsSkeleton
-} from "@/src/features/post/components/ui/PostDetails";
-export { PostHomeScreenHeader } from "@/src/features/post/components/ui/PostHomeScreenHeader";
-export { PostList } from "@/src/features/post/components/ui/PostList";
-export { PostMenuBottomSheet } from "@/src/features/post/components/ui/PostMenuBottomSheet";
+} from "@/src/features/post/components/PostDetails";
+export { PostForm } from "@/src/features/post/components/PostForm";
+export { PostHomeScreenHeader } from "@/src/features/post/components/PostHomeScreenHeader";
+export { PostList } from "@/src/features/post/components/PostList";
+export { PostStatusBadge } from "@/src/features/post/components/PostStatusBadge";
+export {
+  SimilarPostCard,
+  SimilarPostCardSkeleton
+} from "@/src/features/post/components/SimilarPostCard";
 

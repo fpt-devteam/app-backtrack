@@ -1,12 +1,15 @@
 import { AppLogo } from "@/src/shared/components";
-import { MAP_ROUTE, POST_ROUTE } from "@/src/shared/constants";
-import type { ExternalPathString, RelativePathString } from "expo-router";
+import {
+  MAP_ROUTE,
+  NOTIFICATION_ROUTE,
+  POST_ROUTE,
+} from "@/src/shared/constants";
 import { router } from "expo-router";
 import {
+  BellIcon,
   IconProps,
   MagnifyingGlassIcon,
   MapTrifoldIcon,
-  PlusCircleIcon,
 } from "phosphor-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
@@ -20,14 +23,17 @@ type HeaderAction = {
 export const PostHomeScreenHeader = () => {
   const actions: HeaderAction[] = [
     {
-      key: "create",
-      Icon: PlusCircleIcon,
+      key: "map",
+      Icon: MapTrifoldIcon,
       onPress: () => {
-        router.push(
-          "/(bottom-sheet)/post-menu" as
-            | ExternalPathString
-            | RelativePathString,
-        );
+        router.push(MAP_ROUTE.index);
+      },
+    },
+    {
+      key: "notifications",
+      Icon: BellIcon,
+      onPress: () => {
+        router.push(NOTIFICATION_ROUTE.index);
       },
     },
     {
@@ -35,13 +41,6 @@ export const PostHomeScreenHeader = () => {
       Icon: MagnifyingGlassIcon,
       onPress: () => {
         router.push(POST_ROUTE.search);
-      },
-    },
-    {
-      key: "map",
-      Icon: MapTrifoldIcon,
-      onPress: () => {
-        router.push(MAP_ROUTE.index);
       },
     },
   ];

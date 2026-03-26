@@ -65,7 +65,7 @@ const PARTNERS: ConversationPartner[] = [
 const initialConversations: Conversation[] = [
   {
     conversationId: "conv_mock_001",
-    type: "personal",
+    type: 'direct',
     partner: PARTNERS[0],
     orgId: null,
     lastMessage: {
@@ -79,7 +79,7 @@ const initialConversations: Conversation[] = [
   },
   {
     conversationId: "conv_mock_002",
-    type: "personal",
+    type: 'direct',
     partner: PARTNERS[1],
     orgId: null,
     lastMessage: {
@@ -107,7 +107,7 @@ const initialConversations: Conversation[] = [
   },
   {
     conversationId: "conv_mock_004",
-    type: "personal",
+    type: 'direct',
     partner: PARTNERS[3],
     orgId: null,
     lastMessage: {
@@ -121,7 +121,7 @@ const initialConversations: Conversation[] = [
   },
   {
     conversationId: "conv_mock_005",
-    type: "personal",
+    type: 'direct',
     partner: PARTNERS[4],
     orgId: null,
     lastMessage: {

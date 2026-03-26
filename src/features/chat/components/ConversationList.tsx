@@ -2,23 +2,22 @@ import {
   ConversationCard,
   ConversationCardSkeleton,
 } from "@/src/features/chat/components/ConversationCard";
-import { ConversationChips } from "@/src/features/chat/components/ConversationChips";
 import { useConversations } from "@/src/features/chat/hooks";
-import { AppInlineError } from "@/src/shared/components";
+import { AppInlineError, ChipsRow } from "@/src/shared/components";
+import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { colors } from "@/src/shared/theme/colors";
-import { EmptyIcon } from "phosphor-react-native";
-import React, { useCallback, useMemo, useRef } from "react";
+import { MailboxIcon } from "phosphor-react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, RefreshControl, View } from "react-native";
 
-type Props = {
-  mode: "vertical" | "horizontal";
-  ListHeaderComponent?: React.ReactElement;
+const CHIP = {
+  ALL: "All",
+  UNREAD: "Unread",
 };
 
-export const ConversationList = ({
-  mode = "vertical",
-  ListHeaderComponent,
-}: Props) => {
+type ChipType = (typeof CHIP)[keyof typeof CHIP];
+
+export const ConversationList = () => {
   const {
     data,
     isLoading,
@@ -52,6 +51,8 @@ export const ConversationList = ({
     return isFetching && !isFetchingNextPage;
   }, [isFetching, isFetchingNextPage]);
 
+  const [chipSelected, setChipSelected] = useState<ChipType>("All");
+
   if (isLoading) {
     return (
       <View className="px-4 flex-1 pt-4">
@@ -68,24 +69,6 @@ export const ConversationList = ({
     );
   }
 
-  if (mode === "horizontal") {
-    return (
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.conversationId}
-        renderItem={({ item }) => <ConversationChips conversation={item} />}
-        contentContainerStyle={{ alignItems: "center" }}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-4"
-        onEndReached={onLoadMore}
-        onEndReachedThreshold={0.35}
-        ListEmptyComponent={<EmptyIcon color={colors.slate[400]} />}
-        ListHeaderComponent={ListHeaderComponent}
-      />
-    );
-  }
-
   return (
     <FlatList
       data={data}
@@ -95,7 +78,36 @@ export const ConversationList = ({
       showsVerticalScrollIndicator={false}
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.35}
-      ListEmptyComponent={<EmptyIcon color={colors.slate[400]} />}
+      ListHeaderComponent={
+        <View className="mb-4">
+          <ChipsRow
+            chips={[
+              {
+                label: CHIP.ALL,
+                selected: chipSelected === "All",
+                onPress: () => {
+                  setChipSelected("All");
+                },
+              },
+              {
+                label: CHIP.UNREAD,
+                selected: chipSelected === "Unread",
+                onPress: () => {
+                  setChipSelected("Unread");
+                },
+              },
+            ]}
+          />
+        </View>
+      }
+      ListEmptyComponent={
+        <EmptyList
+          icon={<MailboxIcon size={96} weight="light" color={colors.primary} />}
+          title="You don't have any conversations yet."
+          subtitle="Once you receive messages, they will appear here."
+          backButton={null}
+        />
+      }
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

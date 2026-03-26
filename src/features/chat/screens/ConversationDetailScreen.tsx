@@ -1,91 +1,26 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { ConversationHeader } from "@/src/features/chat/components/ConversationHeader";
 import { MessageInput } from "@/src/features/chat/components/MessageInput";
-import { MessageList } from "@/src/features/chat/components/MessageList";
-import { IS_CHAT_FEATURE_MOCK } from "@/src/features/chat/constants";
+import { UserMessageList } from "@/src/features/chat/components/UserMessageList";
 import {
   useConversationDetail,
-  useMessages,
   useSendMessage,
 } from "@/src/features/chat/hooks";
-import { socketChatService } from "@/src/features/chat/services";
-import { MessageItem } from "@/src/features/chat/types";
-import { useSendNotification } from "@/src/features/notification/hooks";
 import { AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback } from "react";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-interface ConversationDetailScreenProps {
+type Props = {
   conversationId: string;
-}
+};
 
-export const ConversationDetailScreen = ({
-  conversationId,
-}: ConversationDetailScreenProps) => {
-  const insets = useSafeAreaInsets();
-
+export const ConversationDetailScreen = ({ conversationId }: Props) => {
   const { user } = useAppUser();
   const { sendMessage, isSendingMessage } = useSendMessage();
   const { data: conversationDetail, isLoading: isLoadingConversation } =
     useConversationDetail(conversationId);
-  const { sendNotification } = useSendNotification();
-  console.log("Conversation Id", conversationId);
-
-  const {
-    data: messagesData,
-    refetch: refetchMessages,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useMessages(conversationId);
-
-  // Socket management
-  useEffect(() => {
-    if (IS_CHAT_FEATURE_MOCK) return;
-    if (!conversationId) return;
-
-    let cleanup: (() => void) | undefined;
-
-    const initSocket = async () => {
-      try {
-        await socketChatService.connect();
-        socketChatService.joinConversation(conversationId);
-
-        cleanup = socketChatService.onReceiveMessage((message: MessageItem) => {
-          console.log("📨 New message received:", message);
-          refetchMessages();
-        });
-      } catch (error) {
-        console.error("Failed to initialize socket:", error);
-      }
-    };
-    initSocket();
-
-    return () => {
-      if (cleanup) cleanup();
-      socketChatService.leaveConversation(conversationId);
-    };
-  }, [conversationId, refetchMessages]);
-
-  const messages = useMemo<MessageItem[]>(() => {
-    if (!messagesData || !user) return [];
-    return messagesData.map((message) => ({
-      id: message.id,
-      content: message.content,
-      senderId: message.senderId,
-      createdAt: message.createdAt,
-      isMine: message.senderId === user.id,
-    }));
-  }, [messagesData, user]);
-
-  const handleLoadMore = useCallback(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-    fetchNextPage().catch(() => {
-      console.log("Error fetching more messages");
-    });
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleSendMessage = useCallback(
     async (messageText: string) => {
@@ -97,60 +32,32 @@ export const ConversationDetailScreen = ({
           conversationId,
           request: { conversationId, type: "text", content: messageText },
         });
-
-        // const partnerId = conversationDetail.partner?.id;
-        // if (!partnerId) return;
-
-        // const req = {
-        //   target: {
-        //     userId: partnerId,
-        //   },
-        //   source: {
-        //     name: "ChatSystem",
-        //     eventId: Date.now().toString(),
-        //   },
-        //   type: NOTIFICATION_EVENT.ChatEvent,
-        //   title: "New Message",
-        //   body: `New message for you: ${messageText}.`,
-        //   data: {
-        //     screenPath: "chat/conversations/" + conversationId,
-        //     imageUrl: user.avatar,
-        //   },
-        // };
-        // await sendNotification(req);
       } catch (error) {
         toast.error("Failed to send message. Please try again.");
         console.log("Error sending message:", error);
       }
     },
-    [conversationId, user, sendMessage, sendNotification, conversationDetail],
+    [conversationId, user, sendMessage, conversationDetail],
   );
 
   if (!conversationDetail || isLoadingConversation) {
     return (
-      <View className="flex-1 bg-background-light">
+      <View className="flex-1 bg-white">
         <AppLoader />
       </View>
     );
   }
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white"
-      style={{ paddingTop: insets.top }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ConversationHeader user={conversationDetail.partner} />
-      <MessageList
-        messages={messages}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        onLoadMore={handleLoadMore}
-        partnerAvatar={conversationDetail.partner?.avatarUrl ?? undefined}
-      />
-      <View style={{ paddingBottom: insets.bottom }}>
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        className="flex-1 bg-white"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ConversationHeader partner={conversationDetail.partner} />
+        <UserMessageList conversationId={conversationId} />
         <MessageInput onSend={handleSendMessage} isSending={isSendingMessage} />
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };

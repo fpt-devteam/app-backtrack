@@ -1,43 +1,44 @@
 import type { AppUser } from "@/src/features/auth/types";
-import { ConversationAvatar } from "@/src/features/chat/components/ConversationAvatar";
 import type { ConversationPartner } from "@/src/features/chat/types";
+import { AppUserAvatar, TouchableIconButton } from "@/src/shared/components";
 import { colors } from "@/src/shared/theme";
 import { useRouter } from "expo-router";
-import { ArrowLeftIcon, DotsThreeOutlineIcon } from "phosphor-react-native";
+import { ArrowLeftIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-interface ConversationHeaderProps {
-  user: AppUser | ConversationPartner | null;
-  onPressMenu?: () => void;
-}
+type Props = {
+  partner: AppUser | ConversationPartner | null;
+};
 
-export const ConversationHeader = ({
-  user,
-  onPressMenu,
-}: ConversationHeaderProps) => {
+export const ConversationHeader = ({ partner }: Props) => {
   const router = useRouter();
 
-  const displayPartnerName = useMemo(
-    () => user?.displayName || "Chat",
-    [user?.displayName],
-  );
+  const displayPartnerName = useMemo(() => {
+    return partner?.displayName || "Unknown User";
+  }, [partner]);
+
+  const displayPartnerAvatar = useMemo(() => {
+    if (!partner) return null;
+    return "avatarUrl" in partner ? partner.avatarUrl : partner.avatarUrl;
+  }, [partner]);
+
+  const handleNavigateBack = () => {
+    router.back();
+  };
 
   return (
     <View className="bg-white border-b border-slate-200 px-4 py-3">
-      <View className="flex-row items-center">
+      <View className="flex-row items-center gap-2">
         {/* Left: Back */}
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={10}
-          className="w-10 h-10 items-center justify-center -ml-1 mr-2"
-        >
-          <ArrowLeftIcon size={24} color={colors.slate[600]} />
-        </Pressable>
+        <TouchableIconButton
+          onPress={handleNavigateBack}
+          icon={<ArrowLeftIcon size={24} color={colors.primary} />}
+        />
 
         {/* Center: Avatar + Name (takes remaining space) */}
         <View className="flex-1 flex-row items-center min-w-0">
-          <ConversationAvatar user={user} size={40} />
+          <AppUserAvatar avatarUrl={displayPartnerAvatar} size={40} />
 
           <View className="ml-3 flex-1 min-w-0">
             <Text
@@ -53,19 +54,6 @@ export const ConversationHeader = ({
             </Text>
           </View>
         </View>
-
-        {/* Right: Menu */}
-        <Pressable
-          onPress={onPressMenu}
-          hitSlop={10}
-          className="w-10 h-10 items-center justify-start ml-2"
-        >
-          <DotsThreeOutlineIcon
-            size={28}
-            weight="duotone"
-            color={colors.slate[700]}
-          />
-        </Pressable>
       </View>
     </View>
   );
