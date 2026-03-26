@@ -96,9 +96,9 @@ const QRProfileScreen = () => {
         <View className="items-center gap-2 mt-2">
           {/* Avatar with verification badge */}
           <View>
-            {user?.avatar ? (
+            {user?.avatarUrl ? (
               <Image
-                source={{ uri: user.avatar }}
+                source={{ uri: user.avatarUrl }}
                 className="w-24 h-24 rounded-full"
               />
             ) : (

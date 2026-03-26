@@ -1,4 +1,3 @@
-import { PostStatusBadge } from "@/src/features/post/components/badges/PostStatusBadge";
 import type { Post } from "@/src/features/post/types";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { getRandomAvatarUrl } from "@/src/shared/mocks/avatar.mock";
@@ -8,10 +7,14 @@ import { router } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { DimensionValue } from "react-native";
 import { Animated, Easing, Image, Pressable, Text, View } from "react-native";
+import { PostStatusBadge } from "./PostStatusBadge";
 
 type CardType = "vertical" | "horizontal";
 
-const CARD: Record<CardType, { width: DimensionValue; height: DimensionValue }> = {
+const CARD: Record<
+  CardType,
+  { width: DimensionValue; height: DimensionValue }
+> = {
   vertical: { width: "100%", height: 520 },
   horizontal: { width: 320, height: 440 },
 };
@@ -22,8 +25,12 @@ type PostCardProps = {
   type?: CardType;
 };
 
-export const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps) => {
-  const imageUrl = item.imageUrls?.[0];
+export const PostCard = ({
+  item,
+  isFetching,
+  type = "vertical",
+}: PostCardProps) => {
+  const imageUrl = item.images?.[0];
   const authorName = item.author?.displayName?.trim() || "Anonymous";
   const avatarUrl = item.author?.avatarUrl || getRandomAvatarUrl();
 
@@ -43,12 +50,16 @@ export const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps)
   }, [ready, contentOpacity]);
 
   const handleOpenDetail = useCallback(() => {
-    router.push(POST_ROUTE.details(item.id) as ExternalPathString | RelativePathString);
+    router.push(
+      POST_ROUTE.details(item.id) as ExternalPathString | RelativePathString,
+    );
   }, [item.id]);
 
   return (
     <View style={{ width: CARD[type].width, height: CARD[type].height }}>
-      <Animated.View style={{ opacity: contentOpacity, width: "100%", height: "100%" }}>
+      <Animated.View
+        style={{ opacity: contentOpacity, width: "100%", height: "100%" }}
+      >
         <Pressable
           onPress={handleOpenDetail}
           className="bg-white rounded-2xl overflow-hidden border border-slate-200"
@@ -66,7 +77,10 @@ export const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps)
             </View>
 
             <View className="flex-1 min-w-0 ml-3">
-              <Text className="text-base font-extrabold text-slate-900" numberOfLines={1}>
+              <Text
+                className="text-base font-extrabold text-slate-900"
+                numberOfLines={1}
+              >
                 {authorName}
               </Text>
               <Text className="text-xs text-slate-500" numberOfLines={1}>
@@ -82,7 +96,10 @@ export const PostCard = ({ item, isFetching, type = "vertical" }: PostCardProps)
 
           {/* Body text */}
           <View className="px-4 pb-3">
-            <Text className="mb-3 text-md leading-5 text-slate-700" numberOfLines={2}>
+            <Text
+              className="mb-3 text-md leading-5 text-slate-700"
+              numberOfLines={2}
+            >
               {item.itemName}
             </Text>
           </View>
@@ -131,7 +148,7 @@ const PostCardSkeleton = ({ type }: SkeletonProps) => {
           easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
         }),
-      ])
+      ]),
     );
     loop.start();
     return () => loop.stop();
@@ -140,7 +157,11 @@ const PostCardSkeleton = ({ type }: SkeletonProps) => {
   return (
     <Animated.View
       className="bg-white rounded-2xl overflow-hidden border border-slate-200"
-      style={{ opacity: pulse, width: CARD[type].width, height: CARD[type].height }}
+      style={{
+        opacity: pulse,
+        width: CARD[type].width,
+        height: CARD[type].height,
+      }}
     >
       {/* Header skeleton */}
       <View className="px-4 pt-4 pb-2 flex-row items-center">

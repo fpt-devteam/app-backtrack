@@ -14,12 +14,13 @@ export default function ProtectedLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
-          name="(bottom-sheet)/post-menu"
+          name="posts"
           options={{
-            presentation: "transparentModal",
-            animation: "fade",
+            presentation: "card",
+            animation: "fade_from_bottom",
           }}
         />
+        <Stack.Screen name="profile" />
       </Stack>
     </LocationSelectionProvider>
   );

@@ -3,15 +3,17 @@ import { RelativePathString, router } from "expo-router";
 import React, { useMemo } from "react";
 import { Image, Pressable, View } from "react-native";
 
-const FALLBACK_SOURCE = { uri: "https://i.pravatar.cc/150?u=a04258a2462d826712d" };
+const FALLBACK_SOURCE = {
+  uri: "https://i.pravatar.cc/150?u=a04258a2462d826712d",
+};
 
 export const AppUserAvatarIcon = () => {
   const { user } = useAppUser();
 
   const source = useMemo(() => {
-    const url = user?.avatar?.trim();
+    const url = user?.avatarUrl?.trim();
     return url ? { uri: url } : FALLBACK_SOURCE;
-  }, [user?.avatar]);
+  }, [user?.avatarUrl]);
 
   const handlePress = () => {
     router.push("/profile" as RelativePathString);

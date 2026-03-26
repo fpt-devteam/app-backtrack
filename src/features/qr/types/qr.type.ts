@@ -1,9 +1,12 @@
+import { Nullable } from "@/src/shared/types";
+
 export type UserQrCode = {
   id: string;
   publicCode: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
+  note: Nullable<string>;
 };
 
 export const SubscriptionPlan = {

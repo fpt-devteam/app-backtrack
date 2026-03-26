@@ -1,34 +1,21 @@
-import { MinimalPostCard } from "@/src/features/post/components/cards/MinimalPostCard";
-import { useGetAllMyPost } from "@/src/features/post/hooks";
-import type { Post } from "@/src/features/post/types";
 import {
   UserSettingSectionCard,
   UserSettingToggleRow,
 } from "@/src/features/qr/components";
 import {
   IS_QR_FEATURE_MOCK,
-  MOCK_MY_POSTS,
   MOCK_QR_PROFILE_SETTINGS,
 } from "@/src/features/qr/constants";
+import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
 import {
   CaretLeftIcon,
   ChatTeardropTextIcon,
-  CheckSquareIcon,
   EyeIcon,
-  ListBulletsIcon,
-  SquareIcon,
 } from "phosphor-react-native";
-import React, { useCallback, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import React, { useMemo, useState } from "react";
+import { ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const QRProfileSettingScreen = () => {
@@ -38,43 +25,34 @@ const QRProfileSettingScreen = () => {
   }, []);
 
   const [showFullName, setShowFullName] = useState(defaults.showFullName);
+
   const [showPhoneNumber, setShowPhoneNumber] = useState(
     defaults.showPhoneNumber,
   );
+
   const [showEmailAddress, setShowEmailAddress] = useState(
     defaults.showEmailAddress,
   );
+
   const [customMessage, setCustomMessage] = useState(defaults.customMessage);
-  const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(
-    new Set(),
-  );
 
-  const { data: fetchedPosts, isLoading: isPostsLoading } = useGetAllMyPost();
+  const handleSave = () => {
+    // Implement save logic when API is ready
+  };
 
-  const myPosts = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_MY_POSTS;
-    return fetchedPosts ?? [];
-  }, [fetchedPosts]);
-
-  const togglePost = useCallback((post: Post) => {
-    setSelectedPostIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(post.id)) {
-        next.delete(post.id);
-      } else {
-        next.add(post.id);
-      }
-      return next;
-    });
-  }, []);
+  const handleBack = () => {
+    router.back();
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50">
       {/* Header */}
       <View className="flex-row items-center px-4 py-3 bg-slate-50">
-        <Pressable onPress={() => router.back()} hitSlop={10}>
-          <CaretLeftIcon size={22} color={colors.black} weight="bold" />
-        </Pressable>
+        <TouchableIconButton
+          onPress={handleBack}
+          icon={<CaretLeftIcon size={22} color={colors.black} weight="bold" />}
+        />
+
         <Text className="flex-1 text-center text-base font-bold text-slate-900">
           Public Profile Settings
         </Text>
@@ -138,74 +116,9 @@ const QRProfileSettingScreen = () => {
             placeholder="Write a message for finders..."
             placeholderTextColor={colors.slate[400]}
             multiline
-            numberOfLines={3}
             textAlignVertical="top"
-            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 text-sm text-slate-700"
-            style={{ minHeight: 80 }}
+            className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700"
           />
-        </UserSettingSectionCard>
-
-        {/* Select Active Posts to Show */}
-        <UserSettingSectionCard
-          icon={
-            <ListBulletsIcon size={18} color={colors.primary} weight="fill" />
-          }
-          title="Select Active Posts to Show"
-        >
-          <Text className="text-xs text-slate-400 leading-4 mb-3">
-            Choose which lost item posts appear on your QR profile.
-          </Text>
-
-          {isPostsLoading && (
-            <ActivityIndicator size="small" color={colors.primary} />
-          )}
-
-          {!isPostsLoading && myPosts?.length === 0 && (
-            <Text className="text-sm text-slate-400 text-center py-2">
-              No posts found.
-            </Text>
-          )}
-
-          {!isPostsLoading &&
-            myPosts?.map((post) => {
-              const isSelected = selectedPostIds.has(post.id);
-              return (
-                <Pressable
-                  key={post.id}
-                  onPress={() => togglePost(post)}
-                  className="mb-3"
-                >
-                  <View
-                    style={{
-                      borderWidth: 2,
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      borderColor: isSelected
-                        ? colors.primary
-                        : colors.transparent,
-                    }}
-                  >
-                    <MinimalPostCard post={post} />
-                  </View>
-                  {/* Checkbox overlay */}
-                  <View className="absolute top-3 left-3 bg-white rounded-md">
-                    {isSelected ? (
-                      <CheckSquareIcon
-                        size={24}
-                        color={colors.primary}
-                        weight="fill"
-                      />
-                    ) : (
-                      <SquareIcon
-                        size={24}
-                        color={colors.slate[300]}
-                        weight="regular"
-                      />
-                    )}
-                  </View>
-                </Pressable>
-              );
-            })}
         </UserSettingSectionCard>
       </ScrollView>
     </SafeAreaView>
