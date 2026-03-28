@@ -16,8 +16,6 @@ export type PostsFiltersOptions = {
 
 export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
   const pageNumberRef = useRef(1);
-  console.log("herer", enabled, filters);
-
   const query = useInfiniteQuery<PostsResponse>({
     queryKey: [...POSTS_QUERY_KEY, filters],
     enabled,

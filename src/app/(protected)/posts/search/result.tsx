@@ -2,7 +2,7 @@ import { MinimalPostCard } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFilters } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
-import { AppListFooter, ChipsRow } from "@/src/shared/components";
+import { AppChipsRow, AppListFooter } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import type { ExternalPathString, RelativePathString } from "expo-router";
@@ -105,7 +105,7 @@ export default function PostSearchResultScreen() {
 
         {/* Post Type Filter*/}
         <View className="mt-4">
-          <ChipsRow
+          <AppChipsRow
             chips={[
               {
                 label: "All",

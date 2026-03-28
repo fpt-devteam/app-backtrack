@@ -1,6 +1,5 @@
 export { MatchedAttributesSection } from "@/src/features/post/components/MatchedAttributesSection";
 export { MinimalPostCard } from "@/src/features/post/components/MinimalPostCard";
-export { PostComparisonCard } from "@/src/features/post/components/PostComparisonCard";
 export {
   PostDetails,
   PostDetailsSkeleton

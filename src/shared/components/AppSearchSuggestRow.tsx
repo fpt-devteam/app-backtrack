@@ -5,19 +5,19 @@ import React from "react";
 import type { GestureResponderEvent } from "react-native";
 import { Text, TouchableOpacity } from "react-native";
 
-type SuggestRowProps = {
+type AppSearchSuggestRowProps = {
   readonly IconComponent?: React.ElementType<IconProps>;
   readonly text: string;
   readonly onPress: () => void;
   readonly onRemove?: () => void;
 };
 
-export const SuggestRow = ({
+export const AppSearchSuggestRow = ({
   IconComponent = Clock,
   text,
   onPress,
   onRemove,
-}: SuggestRowProps) => {
+}: AppSearchSuggestRowProps) => {
   const handleRemove = (e: GestureResponderEvent) => {
     e.stopPropagation();
     onRemove?.();
@@ -26,10 +26,7 @@ export const SuggestRow = ({
   return (
     <TouchableOpacity onPress={onPress} className="flex-row items-center p-2">
       <IconComponent size={18} color={colors.slate[500]} />
-      <Text
-        style={{ fontSize: 15, marginLeft: 10, flex: 1 }}
-        numberOfLines={1}
-      >
+      <Text style={{ fontSize: 15, marginLeft: 10, flex: 1 }} numberOfLines={1}>
         {text}
       </Text>
 
@@ -40,6 +37,4 @@ export const SuggestRow = ({
       ) : null}
     </TouchableOpacity>
   );
-}
-
-
+};

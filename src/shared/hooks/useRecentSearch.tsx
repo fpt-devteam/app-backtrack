@@ -23,14 +23,16 @@ const recentSearchQueryKey = (namespace: string) =>
 
 const recentSearchMutationKey = (
   namespace: string,
-  action: "add" | "remove" | "clear"
+  action: "add" | "remove" | "clear",
 ) => [...RECENT_SEARCH_QUERY_KEY, namespace, action] as const;
 
 function normalize(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) return "";
   const collapsed = trimmed.replace(/\s+/g, " ");
-  return typeof collapsed.normalize === "function" ? collapsed.normalize("NFC") : collapsed;
+  return typeof collapsed.normalize === "function"
+    ? collapsed.normalize("NFC")
+    : collapsed;
 }
 
 function compareKey(value: string): string {
@@ -40,16 +42,20 @@ function compareKey(value: string): string {
 function isRecentSearchItem(value: unknown): value is RecentSearchItem {
   if (!value || typeof value !== "object") return false;
   const record = value as Record<string, unknown>;
-  return typeof record.value === "string" && typeof record.updatedAt === "number";
+  return (
+    typeof record.value === "string" && typeof record.updatedAt === "number"
+  );
 }
 
-function sortByUpdatedAtDesc(items: readonly RecentSearchItem[]): RecentSearchItem[] {
+function sortByUpdatedAtDesc(
+  items: readonly RecentSearchItem[],
+): RecentSearchItem[] {
   return [...items].sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
 async function loadRecentSearches(
   storageKey: string,
-  maxItems: number
+  maxItems: number,
 ): Promise<RecentSearchItem[]> {
   try {
     const raw = await AsyncStorage.getItem(storageKey);
@@ -69,7 +75,7 @@ async function loadRecentSearches(
 
 async function saveRecentSearches(
   storageKey: string,
-  items: readonly RecentSearchItem[]
+  items: readonly RecentSearchItem[],
 ): Promise<void> {
   await AsyncStorage.setItem(storageKey, JSON.stringify(items));
 }
@@ -77,7 +83,7 @@ async function saveRecentSearches(
 function buildAddedList(
   current: readonly RecentSearchItem[],
   value: string,
-  maxItems: number
+  maxItems: number,
 ): RecentSearchItem[] {
   if (!value) return sortByUpdatedAtDesc(current).slice(0, maxItems);
   const key = compareKey(value);
@@ -90,7 +96,7 @@ function buildAddedList(
 function buildRemovedList(
   current: readonly RecentSearchItem[],
   value: string,
-  maxItems: number
+  maxItems: number,
 ): RecentSearchItem[] {
   if (!value) return sortByUpdatedAtDesc(current).slice(0, maxItems);
   const key = compareKey(value);
@@ -111,7 +117,12 @@ export function useRecentSearch({
     queryFn: () => loadRecentSearches(storageKey, maxItems),
   });
 
-  const addMutation = useMutation<RecentSearchItem[], Error, string, MutationContext>({
+  const addMutation = useMutation<
+    RecentSearchItem[],
+    Error,
+    string,
+    MutationContext
+  >({
     mutationKey: recentSearchMutationKey(namespace, "add"),
     onMutate: (valueRaw) => {
       const previous = queryClient.getQueryData<RecentSearchItem[]>(queryKey);
@@ -119,7 +130,7 @@ export function useRecentSearch({
       if (!normalized) return { previous };
 
       queryClient.setQueryData<RecentSearchItem[]>(queryKey, (current) =>
-        buildAddedList(current ?? [], normalized, maxItems)
+        buildAddedList(current ?? [], normalized, maxItems),
       );
       return { previous };
     },
@@ -140,7 +151,7 @@ export function useRecentSearch({
     onError: (_error, _value, context) => {
       queryClient.setQueryData<RecentSearchItem[] | undefined>(
         queryKey,
-        context?.previous
+        context?.previous,
       );
     },
     onSuccess: (data) => {
@@ -148,7 +159,12 @@ export function useRecentSearch({
     },
   });
 
-  const removeMutation = useMutation<RecentSearchItem[], Error, string, MutationContext>({
+  const removeMutation = useMutation<
+    RecentSearchItem[],
+    Error,
+    string,
+    MutationContext
+  >({
     mutationKey: recentSearchMutationKey(namespace, "remove"),
     onMutate: (valueRaw) => {
       const previous = queryClient.getQueryData<RecentSearchItem[]>(queryKey);
@@ -156,7 +172,7 @@ export function useRecentSearch({
       if (!normalized) return { previous };
 
       queryClient.setQueryData<RecentSearchItem[]>(queryKey, (current) =>
-        buildRemovedList(current ?? [], normalized, maxItems)
+        buildRemovedList(current ?? [], normalized, maxItems),
       );
       return { previous };
     },
@@ -177,7 +193,7 @@ export function useRecentSearch({
     onError: (_error, _value, context) => {
       queryClient.setQueryData<RecentSearchItem[] | undefined>(
         queryKey,
-        context?.previous
+        context?.previous,
       );
     },
     onSuccess: (data) => {
@@ -185,7 +201,12 @@ export function useRecentSearch({
     },
   });
 
-  const clearMutation = useMutation<RecentSearchItem[], Error, void, MutationContext>({
+  const clearMutation = useMutation<
+    RecentSearchItem[],
+    Error,
+    void,
+    MutationContext
+  >({
     mutationKey: recentSearchMutationKey(namespace, "clear"),
     onMutate: () => {
       const previous = queryClient.getQueryData<RecentSearchItem[]>(queryKey);
@@ -199,7 +220,7 @@ export function useRecentSearch({
     onError: (_error, _value, context) => {
       queryClient.setQueryData<RecentSearchItem[] | undefined>(
         queryKey,
-        context?.previous
+        context?.previous,
       );
     },
     onSuccess: (data) => {

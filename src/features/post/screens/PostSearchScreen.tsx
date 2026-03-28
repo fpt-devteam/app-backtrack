@@ -140,19 +140,19 @@ const RecentListService = {
   },
 };
 
-type SuggestRowProps = {
+type AppSearchSuggestRowProps = {
   readonly IconComponent?: React.ElementType<IconProps>;
   readonly text: string;
   readonly onPress: () => void;
   readonly onRemove?: () => void;
 };
 
-function SuggestRow({
+function AppSearchSuggestRow({
   IconComponent = ClockIcon,
   text,
   onPress,
   onRemove,
-}: SuggestRowProps) {
+}: AppSearchSuggestRowProps) {
   const handleRemove = (e: GestureResponderEvent) => {
     e.stopPropagation();
     onRemove?.();
@@ -359,7 +359,7 @@ export const PostSearchScreen = () => {
 
         {/* <LocationSearchBar /> */}
 
-        {/* Divider */}
+        {/* AppDivider */}
         <View
           className="h-[1px] mt-4"
           style={{ backgroundColor: colors.gray[100] }}
@@ -399,7 +399,7 @@ export const PostSearchScreen = () => {
                     if (displayType === "suggest") {
                       const isSearchFallback = item.startsWith('Search "');
                       return (
-                        <SuggestRow
+                        <AppSearchSuggestRow
                           IconComponent={MagnifyingGlassIcon}
                           text={item}
                           onPress={() =>
@@ -410,7 +410,7 @@ export const PostSearchScreen = () => {
                     }
 
                     return (
-                      <SuggestRow
+                      <AppSearchSuggestRow
                         IconComponent={ClockIcon}
                         text={item}
                         onPress={() => applyQueryOnly(item)}

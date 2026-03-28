@@ -8,10 +8,9 @@ import {
   EmailField,
   PasswordField,
 } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors } from "@/src/shared/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link, RelativePathString, router } from "expo-router";
+import { Link } from "expo-router";
 import {
   ArrowRightIcon,
   EnvelopeSimpleIcon,
@@ -204,7 +203,7 @@ const LoginScreen = () => {
                       </TouchableOpacity>
                     </View>
 
-                    {/* Divider */}
+                    {/* AppDivider */}
                     <View className="mt-5 flex-row items-center">
                       <View className="h-px flex-1 bg-slate-200" />
                       <Text className="mx-3 text-xs text-slate-500 font-medium">

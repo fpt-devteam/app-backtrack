@@ -87,7 +87,7 @@ export const ConversationCard = ({ conversation }: Props) => {
       hitSlop={6}
     >
       <Animated.View
-        className="w-full mb-4"
+        className="w-full py-3"
         style={{
           transform: [{ scale }],
         }}
@@ -154,7 +154,7 @@ export const ConversationCardSkeleton = () => {
   }));
 
   return (
-    <View className="w-full mb-4">
+    <View className="w-full py-3">
       <View className="flex-row items-center">
         {/* Avatar skeleton */}
         <View
