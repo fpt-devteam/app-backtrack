@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
 import { ClockIcon, ImageIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Image, Text, View } from "react-native";
+import { ActivityIndicator, Image, Text, useWindowDimensions, View } from "react-native";
 import { PostStatusBadge } from "./PostStatusBadge";
 
 type PostCardProps = {
@@ -14,6 +14,8 @@ type PostCardProps = {
 };
 
 export const PostCard = ({ item }: PostCardProps) => {
+  const { width } = useWindowDimensions();
+  const cardWidth = width * 0.47;
   const imageUrl = item.images?.[0]?.url;
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -47,7 +49,7 @@ export const PostCard = ({ item }: PostCardProps) => {
       }}
       transition={{ type: "spring", damping: 18, stiffness: 250 }}
       style={{
-        width: "47%",
+        width: cardWidth,
         borderRadius: 12,
         overflow: "hidden",
         backgroundColor: colors.card,
