@@ -4,9 +4,10 @@ import { colors } from "@/src/shared/theme";
 import { formatShortEventTime } from "@/src/shared/utils/datetime.utils";
 import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
-import { ClockIcon, MapPinIcon } from "phosphor-react-native";
-import React, { useCallback, useMemo } from "react";
+import { ClockIcon, ImageIcon, MapPinIcon } from "phosphor-react-native";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Text,
   View,
@@ -19,6 +20,7 @@ type PostCardProps = {
 
 export const PostCard = ({ item }: PostCardProps) => {
   const imageUrl = item.images?.[0]?.url;
+  const [imageLoading, setImageLoading] = useState(true);
 
   // "Jan 15 · 14:30" — date + time, more scannable than date-only
   const eventTimeLabel = useMemo(
@@ -65,23 +67,31 @@ export const PostCard = ({ item }: PostCardProps) => {
           Full-bleed, cover — identical to Tokopedia/Lazada.
           Fixed pixel height so it never fights the info section.
       ──────────────────────────────────────────────────────────── */}
-      <View
-        style={{
-          width: "100%",
-          height: 200,
-          backgroundColor: colors.slate[100],  // neutral placeholder
-        }}
-      >
-        {imageUrl && (
-          <Image
-            resizeMode="cover"
-            style={{ width: "100%", height: "100%" }}
-            source={{ uri: imageUrl }}
-          />
+      <View className="w-full bg-slate-100" style={{ aspectRatio: 4 / 3 }}>
+        {imageUrl ? (
+          <>
+            <Image
+              resizeMode="cover"
+              className="w-full h-full"
+              source={{ uri: imageUrl }}
+              onLoadStart={() => setImageLoading(true)}
+              onLoadEnd={() => setImageLoading(false)}
+            />
+            {imageLoading && (
+              <View className="absolute inset-0 items-center justify-center bg-slate-100">
+                <ActivityIndicator size="small" color={colors.slate[400]} />
+              </View>
+            )}
+          </>
+        ) : (
+          <View className="flex-1 items-center justify-center" style={{ gap: 4 }}>
+            <ImageIcon size={28} color={colors.slate[300]} weight="thin" />
+            <Text className="text-[10px] text-slate-400">No image</Text>
+          </View>
         )}
 
-        {/* Lost / Found badge — top-left corner of image, Tokopedia badge style */}
-        <View style={{ position: "absolute", top: 6, left: 6 }}>
+        {/* Status badge */}
+        <View className="absolute top-2 left-2">
           <PostStatusBadge status={item.postType} size="sm" />
         </View>
       </View>
