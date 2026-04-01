@@ -3,11 +3,11 @@ import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { formatShortEventTime } from "@/src/shared/utils/datetime.utils";
 import { router } from "expo-router";
+import { MotiPressable } from "moti/interactions";
 import { ClockIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
 import {
   Image,
-  Pressable,
   Text,
   View,
 } from "react-native";
@@ -39,20 +39,27 @@ export const PostCard = ({ item }: PostCardProps) => {
   }, [item.id]);
 
   return (
-    <Pressable
+    <MotiPressable
       onPress={handleOpenDetail}
-      style={({ pressed }) => ({
-        borderRadius: 8,                   // matches app's rounded-lg
+      animate={({ pressed }) => {
+        "worklet";
+        return {
+          scale: pressed ? 0.96 : 1,
+          opacity: pressed ? 0.92 : 1,
+        };
+      }}
+      transition={{ type: "spring", damping: 18, stiffness: 250 }}
+      style={{
+        width: "47%",
+        borderRadius: 12,
         overflow: "hidden",
-        backgroundColor: colors.card,      // white
-        // Tokopedia/Lazada-style: barely-there shadow, no border
+        backgroundColor: colors.card,
         shadowColor: colors.black,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 2,
-        opacity: pressed ? 0.88 : 1,
-      })}
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+      }}
     >
       {/* ── IMAGE ─────────────────────────────────────────────────
           Full-bleed, cover — identical to Tokopedia/Lazada.
@@ -137,6 +144,6 @@ export const PostCard = ({ item }: PostCardProps) => {
           </Text>
         </View>
       </View>
-    </Pressable>
+    </MotiPressable>
   );
 };
