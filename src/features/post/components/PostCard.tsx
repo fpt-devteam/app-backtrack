@@ -63,10 +63,7 @@ export const PostCard = ({ item }: PostCardProps) => {
         elevation: 3,
       }}
     >
-      {/* ── IMAGE ─────────────────────────────────────────────────
-          Full-bleed, cover — identical to Tokopedia/Lazada.
-          Fixed pixel height so it never fights the info section.
-      ──────────────────────────────────────────────────────────── */}
+      {/* IMAGE */}
       <View className="w-full bg-slate-100" style={{ aspectRatio: 4 / 3 }}>
         {imageUrl ? (
           <>
@@ -96,60 +93,28 @@ export const PostCard = ({ item }: PostCardProps) => {
         </View>
       </View>
 
-      {/* ── INFO STRIP ────────────────────────────────────────────
-          Mirrors ecommerce card info density:
-            • Item name  = product name  (2 lines, weight 400)
-            • Event time = price         (bold, colors.primary)
-            • Location   = "sold/rating" (muted, smallest)
-
-          colors.primary (sky-500) is used for the "price" row —
-          consistent with every other interactive element in the app.
-      ──────────────────────────────────────────────────────────── */}
-      <View
-        style={{
-          width: "100%",
-          paddingHorizontal: 8,
-          paddingTop: 7,
-          paddingBottom: 7,
-          backgroundColor: colors.card,
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Item name — 2 lines, matches Tokopedia product title styling */}
+      {/* INFO STRIP */}
+      <View className="px-2 pt-2 pb-2.5 bg-white gap-1.5">
+        {/* Title — loudest element */}
         <Text
           numberOfLines={2}
-          style={{
-            fontSize: 12,
-            fontWeight: "400",
-            color: colors.foreground,          // slate-900
-            lineHeight: 17,
-          }}
+          className="text-sm font-medium text-slate-900 leading-[18px]"
         >
           {item.itemName}
         </Text>
 
-        {/* Event time — the "price" row: bold, app primary sky-blue */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <ClockIcon size={11} color={colors.primary} weight="fill" />
-          <Text
-            numberOfLines={1}
-            style={{
-              fontSize: 13,
-              fontWeight: "700",
-              color: colors.primary,           // sky-500, consistent with app
-            }}
-          >
+        {/* Event time — secondary */}
+        <View className="flex-row items-center gap-1">
+          <ClockIcon size={11} color={colors.slate[400]} weight="bold" />
+          <Text numberOfLines={1} className="text-[11px] text-slate-500 flex-1">
             {eventTimeLabel}
           </Text>
         </View>
 
-        {/* Location — the "sold / rating" row: muted, smallest */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+        {/* Location — most muted */}
+        <View className="flex-row items-center gap-1">
           <MapPinIcon size={10} color={colors.slate[300]} weight="fill" />
-          <Text
-            numberOfLines={1}
-            style={{ flex: 1, fontSize: 10, color: colors.text.muted }}
-          >
+          <Text numberOfLines={1} className="text-[10px] text-slate-400 flex-1">
             {locationLabel}
           </Text>
         </View>
