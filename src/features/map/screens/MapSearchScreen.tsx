@@ -184,7 +184,6 @@ export const MapSearchScreen = () => {
             IconComponent={ClockIcon}
             text={item.value}
             onPress={() => handleSelectRecent(item.value)}
-            onRemove={() => void remove(item.value)}
           />
         )}
       />

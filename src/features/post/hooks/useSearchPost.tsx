@@ -1,43 +1,44 @@
-import { getFeedPostsApi } from "@/src/features/post/api";
-import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
+import { searchPost } from "@/src/features/post/api";
+import { POST_SEARCH_QUERY_KEY } from "@/src/features/post/constants";
 import type {
-  PostFilters,
-  PostsRequest,
-  PostsResponse,
+  PostSearchOptions,
+  PostSearchRequest,
+  PostSearchResponse,
 } from "@/src/features/post/types";
 import { DEFAULT_PAGED_REQUEST } from "@/src/shared/api";
+import { Nullable } from "@/src/shared/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 
-export type PostsFiltersOptions = {
-  filters: PostFilters;
+export type PostSearchOptionsProps = {
+  options: Nullable<PostSearchOptions>;
   enabled?: boolean;
 };
 
-export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
+export const useSearchPost = ({
+  options,
+  enabled = true,
+}: PostSearchOptionsProps) => {
   const pageNumberRef = useRef(1);
-  const query = useInfiniteQuery<PostsResponse>({
-    queryKey: [...POSTS_QUERY_KEY, filters],
-    enabled,
+
+  const query = useInfiniteQuery<PostSearchResponse>({
+    queryKey: [...POST_SEARCH_QUERY_KEY, options],
+    enabled: enabled && !!options,
     initialPageParam: pageNumberRef.current,
+
     queryFn: async ({ pageParam }) => {
-      const filtersRequest: PostsRequest = {
-        searchTerm: filters.searchTerm,
-        postType: filters.postType,
-        location: {
-          latitude: filters.location?.latitude,
-          longitude: filters.location?.longitude,
-        },
-        radiusInKm: filters.radiusInKm,
+      if (!options) throw new Error("Search options are required!");
+
+      const req: PostSearchRequest = {
+        ...options,
         page: Number(pageParam),
         pageSize: DEFAULT_PAGED_REQUEST.pageSize,
       };
 
-      const res = await getFeedPostsApi(filtersRequest);
-      if (!res.success || !res.data) throw new Error("Failed to fetch posts");
+      const res = await searchPost(req);
+      if (!res.success || !res.data) throw new Error("Failed to search posts");
       return res;
     },
-
     getNextPageParam: (lastPage) => {
       if (lastPage.data?.items.length === 0) return undefined;
       pageNumberRef.current += 1;

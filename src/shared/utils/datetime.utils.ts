@@ -131,6 +131,25 @@ export function formatDate(input: string): string {
   return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
+/**
+ * Format a date/string to a compact event-time label suited for cards and list items.
+ * Shows month + day + 24h time, omitting the year to save space.
+ *
+ * Usage:
+ *   import { formatShortEventTime } from "@/src/shared/utils/datetime.utils";
+ *   formatShortEventTime("2026-01-15T14:30:00Z") // → "Jan 15 · 14:30"
+ *   formatShortEventTime(new Date())              // → "Apr  1 · 09:05"
+ */
+export function formatShortEventTime(input: Date | string): string {
+  const d = toDate(typeof input === "string" ? input : input.toISOString());
+  if (!d) return "Unknown";
+  const month = MONTH_NAMES[d.getMonth()];
+  const day = d.getDate();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${month} ${day} · ${hh}:${mm}`;
+}
+
 export function formatMessageTimestamp(input: string): string {
   const d = new Date(input);
   if (isNaN(d.getTime())) return "Unknown";

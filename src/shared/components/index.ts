@@ -15,6 +15,7 @@ export { AppInlineError } from "@/src/shared/components/AppInlineError";
 export { AppLoader } from "@/src/shared/components/AppLoader";
 export { AppLogo } from "@/src/shared/components/AppLogo";
 export { AppSearchSuggestRow } from '@/src/shared/components/AppSearchSuggestRow';
+export { AppSegmentedControl } from "@/src/shared/components/AppSegmentedControl";
 export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";

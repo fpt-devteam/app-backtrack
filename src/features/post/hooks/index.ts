@@ -4,4 +4,5 @@ export { useGetAllMyPost } from './useGetAllMyPost'
 export { useGetPostById } from './useGetPostById'
 export { useMatchingPost } from './useMatchingPost'
 export { usePosts } from './usePosts'
-
+export { useGetSuggestionPosts } from './useGetSuggestionPosts'
+export { useSearchPost } from './useSearchPost'
