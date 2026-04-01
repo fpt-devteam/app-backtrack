@@ -6,12 +6,7 @@ import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
 import { ClockIcon, ImageIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Image, Text, View } from "react-native";
 import { PostStatusBadge } from "./PostStatusBadge";
 
 type PostCardProps = {
@@ -25,7 +20,7 @@ export const PostCard = ({ item }: PostCardProps) => {
   // "Jan 15 · 14:30" — date + time, more scannable than date-only
   const eventTimeLabel = useMemo(
     () => formatShortEventTime(item.eventTime),
-    [item.eventTime]
+    [item.eventTime],
   );
 
   const locationLabel = useMemo(() => {
@@ -81,7 +76,7 @@ export const PostCard = ({ item }: PostCardProps) => {
             )}
           </>
         ) : (
-          <View className="flex-1 items-center justify-center" style={{ gap: 4 }}>
+          <View className="flex-1 items-center justify-center gap-1">
             <ImageIcon size={28} color={colors.slate[300]} weight="thin" />
             <Text className="text-[10px] text-slate-400">No image</Text>
           </View>
