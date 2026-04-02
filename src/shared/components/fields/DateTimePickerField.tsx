@@ -78,17 +78,27 @@ export const DateTimePickerField = ({
     onPressClose();
   };
 
-  const onChangeDate = (event: DateTimePickerEvent, picked: Date | undefined) => {
+  const onChangeDate = (
+    event: DateTimePickerEvent,
+    picked: Date | undefined,
+  ) => {
     if (!picked) return;
 
     setTemp((prev) => {
       const next = new Date(prev);
-      next.setFullYear(picked.getFullYear(), picked.getMonth(), picked.getDate());
+      next.setFullYear(
+        picked.getFullYear(),
+        picked.getMonth(),
+        picked.getDate(),
+      );
       return next;
     });
   };
 
-  const onChangeTime = (event: DateTimePickerEvent, picked: Date | undefined) => {
+  const onChangeTime = (
+    event: DateTimePickerEvent,
+    picked: Date | undefined,
+  ) => {
     if (!picked) return;
 
     setTemp((prev) => {
@@ -103,19 +113,27 @@ export const DateTimePickerField = ({
       <Pressable
         onPress={openModal}
         disabled={disabled}
-        className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-white px-3.5 flex-row items-center gap-3"
+        className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-surface px-3.5 flex-row items-center gap-3"
       >
         <CalendarBlankIcon size={18} color="#94A3B8" />
         <Text
-          className={`text-[15px] ${value ? "text-slate-900" : "text-slate-400"}`}
+          className={`text-[15px] ${value ? "text-textPrimary" : "text-slate-400"}`}
           numberOfLines={1}
         >
           {displayText}
         </Text>
       </Pressable>
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={onPressClose}>
-        <Pressable className="flex-1 bg-[rgba(15,23,42,0.35)]" onPress={onPressClose} />
+      <Modal
+        visible={open}
+        transparent
+        animationType="fade"
+        onRequestClose={onPressClose}
+      >
+        <Pressable
+          className="flex-1 bg-[rgba(15,23,42,0.35)]"
+          onPress={onPressClose}
+        />
 
         {error && (
           <View className="absolute top-[50px] left-5 right-5 bg-red-400 p-2.5 rounded-lg z-[1000]">
@@ -123,24 +141,28 @@ export const DateTimePickerField = ({
           </View>
         )}
 
-        <View className="absolute left-3.5 right-3.5 bottom-4 rounded-[18px] bg-white border border-[rgba(15,23,42,0.10)] p-3">
+        <View className="absolute left-3.5 right-3.5 bottom-4 rounded-[18px] bg-surface border border-[rgba(15,23,42,0.10)] p-3">
           {/* Header */}
           <View className="px-1.5 pt-1 pb-2.5">
             <View className="flex-row justify-end flex-wrap">
               {/* Clear button */}
               <Pressable
                 onPress={onPressClear}
-                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-white ml-2.5 mb-2"
+                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-surface ml-2.5 mb-2"
               >
-                <Text className="text-[13px] font-bold text-slate-900">Clear</Text>
+                <Text className="text-[13px] font-bold text-textPrimary">
+                  Clear
+                </Text>
               </Pressable>
 
               {/* Cancel button */}
               <Pressable
                 onPress={onPressClose}
-                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-white ml-2.5 mb-2"
+                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-surface ml-2.5 mb-2"
               >
-                <Text className="text-[13px] font-bold text-slate-900">Cancel</Text>
+                <Text className="text-[13px] font-bold text-textPrimary">
+                  Cancel
+                </Text>
               </Pressable>
 
               {/* Done button */}
@@ -148,15 +170,19 @@ export const DateTimePickerField = ({
                 onPress={onPressDone}
                 className="px-3 py-2 rounded-xl border border-[rgba(14,165,233,0.35)] bg-sky-500 ml-2.5 mb-2"
               >
-                <Text className="text-[13px] font-extrabold text-white">Done</Text>
+                <Text className="text-[13px] font-extrabold text-white">
+                  Done
+                </Text>
               </Pressable>
             </View>
           </View>
 
           {/* Date Picker */}
           <View className="px-1.5 pb-2.5">
-            <Text className="text-[13px] font-extrabold text-slate-600 mb-1.5">Date</Text>
-            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-white">
+            <Text className="text-[13px] font-extrabold text-textSecondary mb-1.5">
+              Date
+            </Text>
+            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-surface">
               <DateTimePicker
                 value={temp}
                 mode="date"
@@ -173,8 +199,10 @@ export const DateTimePickerField = ({
 
           {/* Time Picker */}
           <View className="px-1.5 pb-2.5">
-            <Text className="text-[13px] font-extrabold text-slate-600 mb-1.5">Time</Text>
-            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-white">
+            <Text className="text-[13px] font-extrabold text-textSecondary mb-1.5">
+              Time
+            </Text>
+            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-surface">
               <DateTimePicker
                 value={temp}
                 mode="time"
@@ -192,5 +220,3 @@ export const DateTimePickerField = ({
     </View>
   );
 };
-
-

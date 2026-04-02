@@ -54,7 +54,7 @@ const PostHomeScreenHeader = () => {
 
 export const PostScreen = () => {
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface">
       <PostHomeScreenHeader />
       <View className="flex-1 p-4 px-2" style={{ marginBottom: 48 }}>
         <PostList />

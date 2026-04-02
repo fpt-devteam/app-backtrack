@@ -61,12 +61,12 @@ export const ConversationCard = ({ conversation }: Props) => {
   }, [conversation.conversationId]);
 
   const nameTextClass = isLastMessageUnread
-    ? "text-base font-bold text-slate-900"
-    : "text-base font-semibold text-slate-900";
+    ? "text-base font-bold text-textPrimary"
+    : "text-base font-semibold text-textPrimary";
 
   const subtitleTextClass = isLastMessageUnread
-    ? "text-sm font-semibold text-slate-900"
-    : "text-sm text-slate-600";
+    ? "text-sm font-semibold text-textPrimary"
+    : "text-sm text-textSecondary";
 
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -87,7 +87,7 @@ export const ConversationCard = ({ conversation }: Props) => {
       hitSlop={6}
     >
       <Animated.View
-        className="w-full mb-4"
+        className="w-full py-3"
         style={{
           transform: [{ scale }],
         }}
@@ -120,8 +120,8 @@ export const ConversationCard = ({ conversation }: Props) => {
 
               {!!displayTimeText && (
                 <View className="flex-row ml-2">
-                  <Text className="text-sm text-slate-500">{" · "}</Text>
-                  <Text className="text-sm text-slate-500" numberOfLines={1}>
+                  <Text className="text-sm text-textSecondary">{" · "}</Text>
+                  <Text className="text-sm text-textSecondary" numberOfLines={1}>
                     {displayTimeText}
                   </Text>
                 </View>
@@ -154,7 +154,7 @@ export const ConversationCardSkeleton = () => {
   }));
 
   return (
-    <View className="w-full mb-4">
+    <View className="w-full py-3">
       <View className="flex-row items-center">
         {/* Avatar skeleton */}
         <View

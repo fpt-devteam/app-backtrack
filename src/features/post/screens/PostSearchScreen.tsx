@@ -1,17 +1,17 @@
+import { PostSuggestionCard } from "@/src/features/post/components";
+import { useGetSuggestionPosts } from "@/src/features/post/hooks";
+import { TouchableIconButton } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
+import { useRecentSearch } from "@/src/shared/hooks";
 import { colors } from "@/src/shared/theme";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
-import type { IconProps } from "phosphor-react-native";
 import {
   ArrowLeftIcon,
   ClockIcon,
   MagnifyingGlassIcon,
-  XCircleIcon,
-  XIcon,
+  TrashIcon,
 } from "phosphor-react-native";
-import React, { useEffect, useRef, useState } from "react";
-import type { GestureResponderEvent } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Easing,
@@ -20,179 +20,49 @@ import {
   Pressable,
   Text,
   TextInput,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-function useDebouncedValue<T>(value: T, delayMs: number) {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delayMs);
-    return () => clearTimeout(t);
-  }, [value, delayMs]);
-  return debounced;
-}
+type DisplayMode = "recent" | "suggestions";
 
-async function fetchSuggestionsMock(q: string): Promise<string[]> {
-  const MOCK_SUGGESTIONS_POOL = [
-    "Lost wallet black leather",
-    "Lost wallet near Ben Thanh Market",
-    "Lost iPhone 13 Pro Max",
-    "Lost AirPods Pro case only",
-    "Lost student ID HCMUT",
-    "Lost passport Vietnam",
-    "Lost keys with Honda keychain",
-    "Lost ring silver with engraving",
-    "Lost umbrella at coffee shop",
-    "Lost backpack gray laptop inside",
-
-    "Found wallet with ID inside",
-    "Found iPhone near Nguyen Hue walking street",
-    "Found AirPods in gym locker room",
-    "Found keys at parking lot",
-    "Found backpack on bus 152",
-    "Found watch Apple Watch series 7",
-    "Found power bank Anker",
-    "Found glasses in cinema",
-    "Found helmet on Grab bike",
-    "Found bank card (Vietcombank)",
-
-    "Report a lost item",
-    "Report a found item",
-    "Search by location (District 1)",
-    "Search by item category (Electronics)",
-  ];
-
-  await new Promise((r) => setTimeout(r, 250));
-  const query = q.trim().toLowerCase();
-  if (!query) return [];
-  return MOCK_SUGGESTIONS_POOL.filter((x) =>
-    x.toLowerCase().includes(query),
-  ).slice(0, 8);
-}
-
-const RecentListService = {
-  mockRecentSearch: [
-    "Lost wallet near Ben Thanh",
-    "Found iPhone 13 in District 1",
-    "Lost student ID card",
-    "Found keys with Honda keychain",
-    "Lost AirPods Pro",
-    "Found backpack on bus 152",
-  ],
-
-  STORAGE_KEY: "recent_searches_v1",
-
-  normalize(term: string) {
-    return term.trim().replaceAll(/\s+/g, " ");
-  },
-
-  async load(): Promise<string[]> {
-    try {
-      const raw = await AsyncStorage.getItem(this.STORAGE_KEY);
-      if (!raw) return this.mockRecentSearch;
-
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return this.mockRecentSearch;
-      return parsed.length ? parsed : this.mockRecentSearch;
-    } catch {
-      return this.mockRecentSearch;
-    }
-  },
-
-  async save(list: string[]) {
-    try {
-      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
-    } catch {}
-  },
-
-  buildAddedList(current: string[], term: string, max = 10) {
-    const t = this.normalize(term);
-    if (!t) return current;
-    return [
-      t,
-      ...current.filter((x) => x.toLowerCase() !== t.toLowerCase()),
-    ].slice(0, max);
-  },
-
-  buildRemovedList(current: string[], term: string) {
-    const t = this.normalize(term);
-    if (!t) return current;
-    return current.filter((x) => x.toLowerCase() !== t.toLowerCase());
-  },
-
-  async addAndPersist(current: string[], term: string, max = 10) {
-    const next = this.buildAddedList(current, term, max);
-    await this.save(next);
-    return next;
-  },
-
-  async removeAndPersist(current: string[], term: string) {
-    const next = this.buildRemovedList(current, term);
-    await this.save(next);
-    return next;
-  },
-
-  async clearAndPersist() {
-    await this.save([]);
-    return [] as string[];
+const PostSearchOptions = {
+  searchBarPlaceholder: "Search for posts or topics, ...",
+  searchRecentParams: {
+    namespace: "post-search",
+    maxItems: 10,
   },
 };
 
-type SuggestRowProps = {
-  readonly IconComponent?: React.ElementType<IconProps>;
-  readonly text: string;
-  readonly onPress: () => void;
-  readonly onRemove?: () => void;
-};
-
-function SuggestRow({
-  IconComponent = ClockIcon,
-  text,
-  onPress,
-  onRemove,
-}: SuggestRowProps) {
-  const handleRemove = (e: GestureResponderEvent) => {
-    e.stopPropagation();
-    onRemove?.();
-  };
-
-  return (
-    <TouchableOpacity onPress={onPress} className="flex-row items-center p-2">
-      <IconComponent size={18} color={colors.slate[500]} />
-      <Text style={{ fontSize: 15, marginLeft: 10, flex: 1 }} numberOfLines={1}>
-        {text}
-      </Text>
-
-      {onRemove ? (
-        <TouchableOpacity onPress={handleRemove} hitSlop={10}>
-          <XIcon size={18} color={colors.slate[400]} />
-        </TouchableOpacity>
-      ) : null}
-    </TouchableOpacity>
-  );
-}
-
-type DisplayType = "recent" | "suggest";
-
-export const PostSearchScreen = () => {
+const PostSearchScreen = () => {
+  const insets = useSafeAreaInsets();
   const { initialQuery } = useLocalSearchParams<{ initialQuery?: string }>();
   const inputRef = useRef<TextInput>(null);
-
-  const [recent, setRecent] = useState<string[]>([]);
-  const [query, setQuery] = useState((initialQuery ?? "").toString());
-  const debouncedQuery = useDebouncedValue(query, 350);
-
-  const [isFocused, setIsFocused] = useState(false);
-
-  const [displayType, setDisplayType] = useState<DisplayType>("recent");
-  const [displayData, setDisplayData] = useState<string[]>([]);
-
   const fade = useRef(new Animated.Value(1)).current;
   const slide = useRef(new Animated.Value(0)).current;
 
-  const runSwapAnimation = React.useCallback(() => {
+  const [query, setQuery] = useState((initialQuery ?? "").toString());
+  const [isFocused, setIsFocused] = useState(false);
+
+  const {
+    items: recentItems,
+    add,
+    clear,
+  } = useRecentSearch(PostSearchOptions.searchRecentParams);
+
+  const { items: suggestionItems, isLoading: isSuggestionLoading } =
+    useGetSuggestionPosts();
+
+  const displayMode: DisplayMode = useMemo(
+    () => (!isFocused || query.trim().length === 0 ? "recent" : "suggestions"),
+    [isFocused, query],
+  );
+
+  useEffect(() => {
+    fade.stopAnimation();
+    slide.stopAnimation();
+
     fade.setValue(0);
     slide.setValue(8);
 
@@ -210,87 +80,13 @@ export const PostSearchScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [fade, slide]);
-
-  useEffect(() => {
-    (async () => {
-      const r = await RecentListService.load();
-      setRecent(r);
-      setDisplayType("recent");
-      setDisplayData(r);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (displayType === "recent") {
-      setDisplayData(recent);
-    }
-  }, [recent, displayType]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      const q = debouncedQuery.trim();
-      if (!isFocused || q.length === 0) {
-        if (displayType === "recent") {
-          setDisplayData(recent);
-        } else {
-          setDisplayType("recent");
-          setDisplayData(recent);
-          runSwapAnimation();
-        }
-        return;
-      }
-
-      try {
-        const res = await fetchSuggestionsMock(q);
-        if (cancelled) return;
-
-        const qNorm = RecentListService.normalize(query);
-        const next = res.length > 0 ? res : [`Search "${qNorm}"`];
-
-        setDisplayType("suggest");
-        setDisplayData(next);
-        runSwapAnimation();
-      } catch {
-        if (cancelled) return;
-
-        const qNorm = RecentListService.normalize(query);
-        setDisplayType("suggest");
-        setDisplayData([`Search "${qNorm}"`]);
-        runSwapAnimation();
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [debouncedQuery, isFocused, displayType, query, recent, runSwapAnimation]);
-
-  const clearRecent = async () => {
-    const next = await RecentListService.clearAndPersist();
-    setRecent(next);
-  };
-
-  const removeRecentItem = async (term: string) => {
-    const next = await RecentListService.removeAndPersist(recent, term);
-    setRecent(next);
-  };
-
-  const applyQueryOnly = (term: string) => {
-    const t = RecentListService.normalize(term);
-    setQuery(t);
-    setIsFocused(true);
-    inputRef.current?.focus();
-  };
+  }, [displayMode, fade, slide]);
 
   const goToResults = async (term: string) => {
-    const text = RecentListService.normalize(term);
+    const text = term.trim();
     if (!text) return;
 
-    const next = await RecentListService.addAndPersist(recent, text);
-    setRecent(next);
+    await add(text);
 
     Keyboard.dismiss();
     setIsFocused(false);
@@ -301,129 +97,156 @@ export const PostSearchScreen = () => {
     });
   };
 
+  const handleSelectRecent = (value: string) => {
+    setQuery(value);
+    setIsFocused(true);
+    inputRef.current?.focus();
+  };
+
+  const handleSubmit = () => {
+    void goToResults(query);
+  };
+
   const handlePressOutside = () => {
     Keyboard.dismiss();
     setIsFocused(false);
   };
 
-  const title = displayType === "suggest" ? "Suggestions" : "Recent";
+  const handlePressSuggestion = (term: string) => {
+    void goToResults(term);
+  };
+
+  const renderRecentList = () => {
+    if (recentItems.length === 0) {
+      return (
+        <View className="p-3">
+          <Text className="text-sm">No recent searches.</Text>
+        </View>
+      );
+    }
+
+    return (
+      <View className="flex-row flex-wrap gap-2">
+        {recentItems.slice(0, 3).map((item) => (
+          <PostRecentSearchRow
+            key={item.value}
+            text={item.value}
+            onPress={() => handleSelectRecent(item.value)}
+          />
+        ))}
+        <Pressable
+          className="self-start min-h-touch flex-row gap-2 items-center rounded-full px-3 py-2 bg-muted"
+          onPress={() => clear()}
+          style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+        >
+          <TrashIcon size={16} color={colors.primary} weight="bold" />
+        </Pressable>
+      </View>
+    );
+  };
 
   return (
-    <TouchableWithoutFeedback accessible={false} onPress={handlePressOutside}>
-      <View className="bg-white flex-1 p-4">
+    <TouchableWithoutFeedback
+      accessible={false}
+      onPress={handlePressOutside}
+      className="flex-1"
+    >
+      <View
+        className="flex-1 gap-3"
+        style={{
+          backgroundColor: colors.canvas,
+          paddingTop: insets.top,
+        }}
+      >
         {/* Top row: Back + Search bar */}
-        <View className="flex-row items-center">
-          <Pressable
+        <View className="flex-row items-center gap-4 px-4">
+          <TouchableIconButton
             onPress={() => router.back()}
-            hitSlop={10}
-            className="mr-2 h-12 w-12 items-center justify-center rounded-2xl border-2"
-            style={{ borderColor: colors.slate[200] }}
-          >
-            <ArrowLeftIcon size={20} color={colors.slate[700]} />
-          </Pressable>
+            icon={
+              <ArrowLeftIcon size={24} color={colors.primary} weight="bold" />
+            }
+          />
 
           <View
-            className="flex-1 flex-row items-center border-2 rounded-2xl px-3 h-12"
+            className="flex-1 flex-row items-center rounded-lg gap-4 overflow-hidden"
             style={{
-              borderColor: isFocused ? colors.primary : colors.slate[200],
+              borderColor: colors.primary,
+              borderWidth: 2,
             }}
           >
-            <MagnifyingGlassIcon size={20} color={colors.slate[500]} />
-
             <TextInput
               ref={inputRef}
               value={query}
               onChangeText={setQuery}
-              placeholder="Search..."
+              placeholder={PostSearchOptions.searchBarPlaceholder}
               returnKeyType="search"
               onFocus={() => setIsFocused(true)}
-              onSubmitEditing={() => goToResults(query)}
-              className="flex-1 ml-2 p-0 text-base"
+              onBlur={() => setIsFocused(false)}
+              onSubmitEditing={handleSubmit}
+              className="flex-1 text-sm px-3 py-1"
               placeholderTextColor={colors.slate[400]}
             />
-
-            {query.length > 0 ? (
-              <Pressable
-                onPress={() => {
-                  setQuery("");
-                  inputRef.current?.focus();
-                }}
-                hitSlop={10}
-              >
-                <XCircleIcon size={20} color={colors.slate[400]} />
-              </Pressable>
-            ) : null}
+            <View
+              className="px-3 py-2"
+              style={{ backgroundColor: colors.primary }}
+            >
+              <MagnifyingGlassIcon size={24} color={colors.white} />
+            </View>
           </View>
-          {/* Location Search Bar */}
         </View>
 
-        {/* <LocationSearchBar /> */}
-
-        {/* Divider */}
-        <View
-          className="h-[1px] mt-4"
-          style={{ backgroundColor: colors.gray[100] }}
-        />
-
-        {/* Header */}
-        <View className="mt-4">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-base font-semibold">{title}</Text>
-
-            {displayType === "recent" && recent.length > 0 ? (
-              <Pressable onPress={clearRecent} hitSlop={10}>
-                <Text className="text-primary font-semibold">Clear</Text>
-              </Pressable>
-            ) : null}
-          </View>
-
-          {/* Animated list */}
-          <Animated.View
-            style={{ opacity: fade, transform: [{ translateY: slide }] }}
-          >
-            <View className="mt-3">
-              {displayData.length === 0 ? (
-                <View className="p-3">
-                  <Text className="text-sm text-gray-500">
-                    {displayType === "suggest"
-                      ? "No suggestions."
-                      : "No recent searches."}
-                  </Text>
-                </View>
-              ) : (
-                <FlatList
-                  data={displayData}
-                  keyExtractor={(item) => item}
-                  keyboardShouldPersistTaps="handled"
-                  renderItem={({ item }) => {
-                    if (displayType === "suggest") {
-                      const isSearchFallback = item.startsWith('Search "');
-                      return (
-                        <SuggestRow
-                          IconComponent={MagnifyingGlassIcon}
-                          text={item}
-                          onPress={() =>
-                            goToResults(isSearchFallback ? query : item)
-                          }
-                        />
-                      );
-                    }
-
-                    return (
-                      <SuggestRow
-                        IconComponent={ClockIcon}
-                        text={item}
-                        onPress={() => applyQueryOnly(item)}
-                        onRemove={() => removeRecentItem(item)}
-                      />
-                    );
-                  }}
-                />
-              )}
-            </View>
-          </Animated.View>
+        <View className="flex-1">
+          <FlatList
+            data={isSuggestionLoading ? [] : suggestionItems}
+            keyExtractor={(_, index) => index.toString()}
+            keyboardShouldPersistTaps="handled"
+            renderItem={({ item }) => (
+              <PostSuggestionCard
+                item={item}
+                onPress={() => handlePressSuggestion(item.itemName)}
+              />
+            )}
+            numColumns={2}
+            columnWrapperStyle={{
+              justifyContent: "center",
+              gap: 12,
+              marginBottom: 12,
+            }}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <View className="flex-col gap-2 py-2">
+                <View className="px-3 gap-2">{renderRecentList()}</View>
+                <View className="h-[4] bg-divider" />
+                <Text className="px-3 text-sm font-semibold text-textPrimary">
+                  Suggestions
+                </Text>
+              </View>
+            }
+            contentContainerStyle={{ paddingBottom: insets.bottom }}
+          />
         </View>
       </View>
     </TouchableWithoutFeedback>
   );
 };
+
+const PostRecentSearchRow = ({
+  text,
+  onPress,
+}: {
+  text: string;
+  onPress: () => void;
+}) => {
+  return (
+    <Pressable
+      className="self-start min-h-touch flex-row gap-2 items-center rounded-full px-3 py-2 bg-muted"
+      onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+    >
+      <ClockIcon size={16} color={colors.primary} weight="bold" />
+      <Text className="text-sm text-textPrimary">{text}</Text>
+    </Pressable>
+  );
+};
+
+export default PostSearchScreen;

@@ -16,13 +16,13 @@ const ProfileMenuTabScreen = () => {
   return (
     <View className="flex-1 flex-row">
       {/* 1. Menu Content: flex-1 will take all REMAINING space */}
-      <View className="flex-1 bg-white shadow-2xl">
+      <View className="flex-1 bg-surface shadow-2xl">
         <SafeAreaView className="flex-1">
           {/* Header */}
-          <View className="p-4 border-b border-slate-100 flex-row justify-between items-center">
+          <View className="p-4 border-b border-divider flex-row justify-between items-center">
             <View>
-              <Text className="text-xl font-bold text-slate-900">Menu</Text>
-              <Text className="text-xs text-slate-500">
+              <Text className="text-xl font-bold text-textPrimary">Menu</Text>
+              <Text className="text-xs text-textSecondary">
                 Manage your preferences
               </Text>
             </View>
@@ -40,7 +40,7 @@ const ProfileMenuTabScreen = () => {
               <Text className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-4">
                 Quick Actions
               </Text>
-              <View className="h-20 w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 items-center justify-center">
+              <View className="h-20 w-full bg-canvas rounded-2xl border border-dashed border-divider items-center justify-center">
                 <Text className="text-slate-400">Additional Menu Items...</Text>
               </View>
             </View>

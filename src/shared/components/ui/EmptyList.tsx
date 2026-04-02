@@ -15,12 +15,12 @@ const EmptyList = ({ title, subtitle, backButton, icon }: EmptyListProps) => {
       <View className="mb-4">{icon}</View>
 
       {/* Title */}
-      <Text className="mt-2 text-lg font-extrabold text-slate-900 text-center ">
+      <Text className="mt-2 text-lg font-extrabold text-textPrimary text-center ">
         {title}
       </Text>
 
       {/* Subtitle  */}
-      <Text className="mt-4 text-base  font-normal text-slate-500 text-center ">
+      <Text className="mt-4 text-base  font-normal text-textSecondary text-center ">
         {subtitle}
       </Text>
 

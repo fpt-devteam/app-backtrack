@@ -1,5 +1,5 @@
 import { auth } from "@/src/shared/lib";
-import { mapErrorToMessage } from "@/src/shared/utils";
+import { getErrorMessage } from "@/src/shared/utils";
 import { useMutation } from "@tanstack/react-query";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useMemo } from "react";
@@ -18,7 +18,7 @@ export function useLogin() {
 
   const errorMessage = useMemo(() => {
     if (!mutation.error) return null;
-    const friendlyMessage = mapErrorToMessage(mutation.error);
+    const friendlyMessage = getErrorMessage(mutation.error);
     return friendlyMessage;
   }, [mutation.error]);
 

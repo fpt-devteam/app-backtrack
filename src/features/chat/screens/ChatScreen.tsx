@@ -69,6 +69,7 @@ export const ChatScreen = () => {
       showsVerticalScrollIndicator={false}
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.35}
+      // ItemSeparatorComponent={AppDivider}
       ListEmptyComponent={
         <EmptyList
           icon={<MailboxIcon size={96} weight="light" color={colors.primary} />}

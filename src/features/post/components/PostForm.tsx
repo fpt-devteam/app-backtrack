@@ -217,12 +217,12 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
       {/* Loading Modal */}
       <Modal visible={isAnalyzing} transparent animationType="fade">
         <View className="flex-1 bg-black/50 items-center justify-center">
-          <View className="bg-white rounded-2xl p-6 mx-8 items-center">
+          <View className="bg-surface rounded-2xl p-6 mx-8 items-center">
             <AppLoader size={40} />
             <Text className="text-slate-700 font-semibold mt-4 text-center">
               Analyzing image...
             </Text>
-            <Text className="text-slate-500 text-sm mt-2 text-center">
+            <Text className="text-textSecondary text-sm mt-2 text-center">
               AI is identifying the item
             </Text>
           </View>
@@ -236,7 +236,7 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
       >
         {/* Form Fields */}
         <ScrollView
-          className="bg-white p-4 border-t border-slate-100 flex-1"
+          className="bg-surface p-4 border-t border-divider flex-1"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -281,7 +281,7 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
               name="itemName"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-xl px-3 py-2.5 text-sm bg-slate-50 text-slate-800 ${errors.itemName ? "border-red-500" : "border-slate-300"}`}
+                  className={`border rounded-xl px-3 py-2.5 text-sm bg-canvas text-textPrimary ${errors.itemName ? "border-red-500" : "border-divider"}`}
                   placeholder="e.g. Blue Backpack, iPhone 14"
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -307,7 +307,7 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
               name="description"
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  className={`border rounded-xl px-3 py-2.5 text-sm bg-slate-50 text-slate-800 min-h-[100px] ${errors.description ? "border-red-500" : "border-slate-300"}`}
+                  className={`border rounded-xl px-3 py-2.5 text-sm bg-canvas text-textPrimary min-h-[100px] ${errors.description ? "border-red-500" : "border-divider"}`}
                   placeholder="Describe the item in detail."
                   placeholderTextColor={colors.slate[300]}
                   value={value}
@@ -403,7 +403,7 @@ const PostFormHeader = ({
           })}
         />
       }
-      className="h-12 bg-white px-4"
+      className="h-12 bg-surface px-4"
     />
   );
 };

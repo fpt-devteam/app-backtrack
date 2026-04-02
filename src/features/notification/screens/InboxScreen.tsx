@@ -17,13 +17,13 @@ type InboxRoute = {
 };
 
 const ChatScene = () => (
-  <View className="flex-1 bg-white py-2">
+  <View className="flex-1 bg-surface py-2">
     <ChatScreen />
   </View>
 );
 
 const NotificationScene = () => (
-  <View className="flex-1 bg-white py-2">
+  <View className="flex-1 bg-surface py-2">
     <NotificationScreen />
   </View>
 );
@@ -53,7 +53,9 @@ const CustomTabBar = (props: RNTabBarProps<InboxRoute>) => {
         borderBottomWidth: 0.5,
         borderBottomColor: colors.slate[500],
       }}
-      style={{ backgroundColor: "transparent" }}
+      style={{
+        backgroundColor: "transparent",
+      }}
       activeColor={colors.black}
       inactiveColor={colors.slate[400]}
       options={Object.fromEntries(
@@ -71,9 +73,7 @@ const CustomTabBar = (props: RNTabBarProps<InboxRoute>) => {
 
 const InboxScreenHeader = () => (
   <AppHeader
-    center={
-      <Text className="text-lg font-extrabold text-slate-900">Inbox</Text>
-    }
+    center={<Text className="text-lg font-bold text-textPrimary">Inbox</Text>}
   />
 );
 
@@ -87,7 +87,7 @@ const InboxScreen = () => {
   ]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
       <InboxScreenHeader />
 
       <TabView<InboxRoute>

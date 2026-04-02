@@ -28,7 +28,7 @@ export const ConversationHeader = ({ partner }: Props) => {
   };
 
   return (
-    <View className="bg-white border-b border-slate-200 px-4 py-3">
+    <View className="bg-surface border-b border-divider px-4 py-3">
       <View className="flex-row items-center gap-2">
         {/* Left: Back */}
         <TouchableIconButton
@@ -42,14 +42,14 @@ export const ConversationHeader = ({ partner }: Props) => {
 
           <View className="ml-3 flex-1 min-w-0">
             <Text
-              className="text-base font-semibold text-slate-900"
+              className="text-base font-semibold text-textPrimary"
               numberOfLines={1}
               ellipsizeMode="tail"
             >
               {displayPartnerName}
             </Text>
 
-            <Text className="text-xs text-slate-500" numberOfLines={1}>
+            <Text className="text-xs text-textSecondary" numberOfLines={1}>
               Active now
             </Text>
           </View>

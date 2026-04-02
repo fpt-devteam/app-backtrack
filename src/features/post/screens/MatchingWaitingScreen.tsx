@@ -142,7 +142,7 @@ export const MatchingWaitingScreen = ({
   };
 
   return (
-    <View className="flex-1 bg-slate-50 items-center justify-center px-6">
+    <View className="flex-1 bg-canvas items-center justify-center px-6">
       {/* Center animation */}
       <View className="items-center justify-center">
         {/* Ripples */}
@@ -164,7 +164,7 @@ export const MatchingWaitingScreen = ({
 
         {/* Magnifier bubble */}
         <Animated.View
-          className="w-20 h-20 rounded-2xl bg-white border border-slate-200 items-center justify-center shadow-sm"
+          className="w-20 h-20 rounded-2xl bg-surface border border-divider items-center justify-center shadow-sm"
           style={{
             transform: [{ scale: iconScale }, { rotate: iconRotate }],
           }}
@@ -175,11 +175,11 @@ export const MatchingWaitingScreen = ({
 
       {/* Text block */}
       <View className="mt-8 items-center">
-        <Text className="text-base font-extrabold text-slate-900">{title}</Text>
-        <Text className="mt-2 text-sm text-slate-600 text-center leading-5">
+        <Text className="text-base font-extrabold text-textPrimary">{title}</Text>
+        <Text className="mt-2 text-sm text-textSecondary text-center leading-5">
           {subtitle}
         </Text>
-        <Text className="mt-2 text-xs text-slate-500 text-center">
+        <Text className="mt-2 text-xs text-textSecondary text-center">
           {hint}
         </Text>
       </View>
@@ -188,10 +188,10 @@ export const MatchingWaitingScreen = ({
       <View className="mt-6 w-full gap-3">
         {/* Optional: secondary explanation chips */}
         <View className="flex-row justify-center gap-2">
-          <View className="px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200">
+          <View className="px-3 py-1.5 rounded-full bg-slate-100 border border-divider">
             <Text className="text-xs font-semibold text-slate-700">Near location</Text>
           </View>
-          <View className="px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200">
+          <View className="px-3 py-1.5 rounded-full bg-slate-100 border border-divider">
             <Text className="text-xs font-semibold text-slate-700">Smart match</Text>
           </View>
         </View>
@@ -199,7 +199,7 @@ export const MatchingWaitingScreen = ({
         {showCancel && (
           <Pressable
             onPress={handleCancel}
-            className="self-center px-5 py-2.5 rounded-full bg-slate-100 active:bg-slate-200 border border-slate-200"
+            className="self-center px-5 py-2.5 rounded-full bg-slate-100 active:bg-slate-200 border border-divider"
           >
             <Text className="text-sm font-semibold text-slate-700">Cancel</Text>
           </Pressable>

@@ -1,7 +1,7 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { IS_QR_FEATURE_MOCK, MOCK_QR_CODE } from "@/src/features/qr/constants";
 import { useGetMyQR } from "@/src/features/qr/hooks";
-import { AppLoader } from "@/src/shared/components/app-utils/AppLoader";
+import { AppLoader } from "@/src/shared/components/AppLoader";
 import { QR_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
@@ -46,7 +46,7 @@ export const UserQRCodePressableCard = ({
 
   if (isQRLoading || !qrCode) {
     return (
-      <View className="bg-white rounded-3xl items-center justify-center border border-slate-100 w-full">
+      <View className="bg-surface rounded-3xl items-center justify-center border border-divider w-full">
         <AppLoader size={28} gap={6} />
       </View>
     );
@@ -55,7 +55,7 @@ export const UserQRCodePressableCard = ({
   if (!isSubscripted) {
     return (
       <View
-        className="bg-white rounded-3xl border border-slate-100 w-full items-center p-6 gap-4"
+        className="bg-surface rounded-3xl border border-divider w-full items-center p-6 gap-4"
         style={{
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 4 },
@@ -74,7 +74,7 @@ export const UserQRCodePressableCard = ({
           </View>
 
           <View
-            className="absolute z-10 w-20 h-20 rounded-full bg-white items-center justify-center shadow-xl"
+            className="absolute z-10 w-20 h-20 rounded-full bg-surface items-center justify-center shadow-xl"
             style={{ borderWidth: 4, borderColor: colors.slate[50] }}
           >
             <LockKeyIcon size={36} color={colors.primary} weight="fill" />
@@ -83,9 +83,9 @@ export const UserQRCodePressableCard = ({
 
         <View className="items-center px-4">
           <View className="flex-row items-center mb-1">
-            <Text className="text-xl font-bold text-slate-800">QR Locked</Text>
+            <Text className="text-xl font-bold text-textPrimary">QR Locked</Text>
           </View>
-          <Text className="text-sm text-slate-500 text-center leading-5">
+          <Text className="text-sm text-textSecondary text-center leading-5">
             Upgrade to Backtrack Pro to create your personalized QR code
           </Text>
         </View>
@@ -99,7 +99,7 @@ export const UserQRCodePressableCard = ({
   return (
     <Pressable
       onPress={handlePreviewProfile}
-      className="bg-white rounded-3xl items-center justify-center shadow-sm border border-slate-100 p-8"
+      className="bg-surface rounded-3xl items-center justify-center shadow-sm border border-divider p-8"
     >
       <View className="items-center">
         <QRCode

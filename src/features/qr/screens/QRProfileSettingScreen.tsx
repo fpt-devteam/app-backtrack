@@ -45,15 +45,15 @@ const QRProfileSettingScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-canvas">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-3 bg-slate-50">
+      <View className="flex-row items-center px-4 py-3 bg-canvas">
         <TouchableIconButton
           onPress={handleBack}
           icon={<CaretLeftIcon size={22} color={colors.black} weight="bold" />}
         />
 
-        <Text className="flex-1 text-center text-base font-bold text-slate-900">
+        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
           Public Profile Settings
         </Text>
         {/* Spacer to balance the back button */}
@@ -117,7 +117,7 @@ const QRProfileSettingScreen = () => {
             placeholderTextColor={colors.slate[400]}
             multiline
             textAlignVertical="top"
-            className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700"
+            className="bg-canvas border border-divider rounded-xl p-3 text-sm text-slate-700"
           />
         </UserSettingSectionCard>
       </ScrollView>

@@ -1,5 +1,11 @@
 import { useRegister } from "@/src/features/auth/hooks/useRegister";
-import { AppInlineError, ConfirmPasswordField, EmailField, PasswordField } from "@/src/shared/components";
+import type { RegisterRequest } from "@/src/features/auth/types";
+import {
+  AppInlineError,
+  ConfirmPasswordField,
+  EmailField,
+  PasswordField,
+} from "@/src/shared/components";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ArrowRightIcon, GoogleLogoIcon } from "phosphor-react-native";
 import React from "react";
@@ -12,16 +18,23 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import * as yup from "yup";
-import type { RegisterRequest } from "@/src/features/auth/types";
 
 const registerFormSchema = yup
   .object({
-    email: yup.string().trim().email("Invalid email format!").required("Email is required!"),
+    email: yup
+      .string()
+      .trim()
+      .email("Invalid email format!")
+      .required("Email is required!"),
     password: yup.string().trim().required("Password is required!"),
-    confirmPassword: yup.string().trim().required("Confirm password is required!").oneOf([yup.ref("password")], "Passwords must match!"),
+    confirmPassword: yup
+      .string()
+      .trim()
+      .required("Confirm password is required!")
+      .oneOf([yup.ref("password")], "Passwords must match!"),
   })
   .required();
 
@@ -38,7 +51,7 @@ export const RegisterForm = () => {
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
     },
     resolver: yupResolver(registerFormSchema),
     mode: "onSubmit",
@@ -132,33 +145,41 @@ export const RegisterForm = () => {
                   {loading ? (
                     <View className="flex-row items-center">
                       <ActivityIndicator color="#ffffff" size="small" />
-                      <Text className="ml-2 font-medium text-base text-white">Creating Account...</Text>
+                      <Text className="ml-2 font-medium text-base text-white">
+                        Creating Account...
+                      </Text>
                     </View>
                   ) : (
                     <>
-                      <Text className="mr-2 font-medium text-base text-white">Create Account</Text>
+                      <Text className="mr-2 font-medium text-base text-white">
+                        Create Account
+                      </Text>
                       <ArrowRightIcon size={18} color="#ffffff" />
                     </>
                   )}
                 </TouchableOpacity>
               </View>
 
-              {/* Divider */}
+              {/* AppDivider */}
               <View className="mt-5 flex-row items-center">
                 <View className="h-px flex-1 bg-slate-200" />
-                <Text className="mx-3 text-xs text-slate-500 font-medium">or continue with</Text>
+                <Text className="mx-3 text-xs text-textSecondary font-medium">
+                  or continue with
+                </Text>
                 <View className="h-px flex-1 bg-slate-200" />
               </View>
 
               {/* Social Login */}
               <View className="mt-4">
                 <TouchableOpacity
-                  className="flex-row items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3"
+                  className="flex-row items-center justify-center rounded-lg border border-divider bg-surface px-4 py-3"
                   disabled={loading}
                   activeOpacity={0.8}
                 >
                   <GoogleLogoIcon size={18} color="#e5453b" />
-                  <Text className="ml-2 text-slate-700 font-medium">Google</Text>
+                  <Text className="ml-2 text-slate-700 font-medium">
+                    Google
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -167,4 +188,4 @@ export const RegisterForm = () => {
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};

@@ -1,26 +1,32 @@
-import { ensureMediaPermission } from '@/src/shared/services';
+import { ensureMediaPermission } from "@/src/shared/services";
 import { colors } from "@/src/shared/theme/colors";
-import { launchImageLibraryAsync, type ImagePickerAsset, type ImagePickerOptions, } from 'expo-image-picker';
-import { CameraIcon, PlusIcon, XIcon } from 'phosphor-react-native';
-import React from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-;
-
+import {
+  launchImageLibraryAsync,
+  type ImagePickerAsset,
+  type ImagePickerOptions,
+} from "expo-image-picker";
+import { CameraIcon, PlusIcon, XIcon } from "phosphor-react-native";
+import React from "react";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 const MAX_IMAGES = 5;
 
 type ImageFieldProps = {
   value: ImagePickerAsset[];
   onChange: (value: ImagePickerAsset[]) => void;
   disabled?: boolean;
-}
+};
 
-export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProps) => {
+export const ImageField = ({
+  value,
+  onChange,
+  disabled = false,
+}: ImageFieldProps) => {
   const handlePickImages = async () => {
     const hasPermission = await ensureMediaPermission();
     if (!hasPermission) return;
 
     const options = {
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       aspect: [4, 3],
       quality: 1,
       allowsMultipleSelection: true,
@@ -28,10 +34,13 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
 
     const result = await launchImageLibraryAsync(options);
     if (!result.canceled) {
-      const imageAssets = result.assets.map((asset) => ({
-        ...asset,
-        type: 'image'
-      } as ImagePickerAsset));
+      const imageAssets = result.assets.map(
+        (asset) =>
+          ({
+            ...asset,
+            type: "image",
+          }) as ImagePickerAsset,
+      );
 
       const newImages = [...value, ...imageAssets].slice(0, MAX_IMAGES);
       onChange(newImages);
@@ -49,7 +58,7 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
         <Text className="text-slate-700 font-bold text-sm mb-2">
           Photos of the Item
         </Text>
-        <Text className="text-slate-500 text-xs mb-3">
+        <Text className="text-textSecondary text-xs mb-3">
           Add up to {MAX_IMAGES} clear photos. The more, the better!
         </Text>
 
@@ -62,10 +71,10 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
             <CameraIcon size={32} color={colors.primary} />
           </View>
 
-          <Text className="text-slate-900 font-semibold text-base mb-1">
+          <Text className="text-textPrimary font-semibold text-base mb-1">
             Add Photos
           </Text>
-          <Text className="text-slate-500 text-sm text-center mb-4">
+          <Text className="text-textSecondary text-sm text-center mb-4">
             Select images or take a new photo.
           </Text>
 
@@ -82,7 +91,7 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
       <Text className="text-slate-700 font-medium text-sm mb-2">
         Photos of the Item ({value.length}/{MAX_IMAGES})
       </Text>
-      <Text className="text-slate-500 text-xs mb-3">
+      <Text className="text-textSecondary text-xs mb-3">
         Add up to {MAX_IMAGES} clear photos. The more, the better!
       </Text>
 
@@ -90,7 +99,13 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
         horizontal
         showsHorizontalScrollIndicator={false}
         className="flex-row"
-        contentContainerStyle={{ gap: 12, padding: 12, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12 }}
+        contentContainerStyle={{
+          gap: 12,
+          padding: 12,
+          borderWidth: 1,
+          borderColor: "#E5E7EB",
+          borderRadius: 12,
+        }}
       >
         {/* Upload More Button - First Item */}
         {value.length < MAX_IMAGES && (
@@ -109,7 +124,7 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
         {/* Image Cards */}
         {value.map((image, index) => (
           <View key={image.uri} className="relative">
-            <View className="w-32 h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+            <View className="w-32 h-32 rounded-xl overflow-hidden bg-slate-100 border border-divider">
               <Image
                 source={{ uri: image.uri }}
                 className="w-full h-full"
@@ -127,7 +142,9 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
 
             {/* Image Number Badge */}
             <View className="absolute bottom-2 left-2 bg-black/60 px-2 py-0.5 rounded">
-              <Text className="text-white text-xs font-medium">{index + 1}</Text>
+              <Text className="text-white text-xs font-medium">
+                {index + 1}
+              </Text>
             </View>
           </View>
         ))}
@@ -135,6 +152,3 @@ export const ImageField = ({ value, onChange, disabled = false }: ImageFieldProp
     </View>
   );
 };
-
-
-

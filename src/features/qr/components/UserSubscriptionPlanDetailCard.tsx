@@ -83,9 +83,9 @@ function CardBody({
 
         <Pressable
           onPress={onManageSubscription}
-          className="mt-4 h-12 rounded-full bg-white flex-row items-center justify-center gap-2 active:opacity-85"
+          className="mt-4 h-12 rounded-full bg-surface flex-row items-center justify-center gap-2 active:opacity-85"
         >
-          <Text className="text-slate-900 font-semibold text-base">
+          <Text className="text-textPrimary font-semibold text-base">
             Manage Subscription
           </Text>
           <ArrowSquareOutIcon size={20} color="#0f172a" weight="bold" />
@@ -104,16 +104,16 @@ function CardBody({
   }
 
   return (
-    <View className="rounded-3xl border border-slate-200 bg-white px-5 py-5">
+    <View className="rounded-3xl border border-divider bg-surface px-5 py-5">
       <View className="flex-row items-center gap-3">
         <View className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center">
           <LockKeyIcon size={18} color={colors.slate[500]} weight="fill" />
         </View>
         <View className="flex-1">
-          <Text className="text-sm font-semibold text-slate-800">
+          <Text className="text-sm font-semibold text-textPrimary">
             No active subscription
           </Text>
-          <Text className="text-xs text-slate-500 mt-0.5">
+          <Text className="text-xs text-textSecondary mt-0.5">
             Subscribe to unlock your QR features
           </Text>
         </View>
@@ -121,7 +121,7 @@ function CardBody({
 
       <Pressable
         onPress={onManageSubscription}
-        className="mt-4 h-11 rounded-full border border-slate-200 bg-slate-50 flex-row items-center justify-center gap-2 active:opacity-80"
+        className="mt-4 h-11 rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-2 active:opacity-80"
       >
         <Text className="text-slate-700 font-medium text-sm">View Plans</Text>
         <ArrowSquareOutIcon size={18} color={colors.slate[700]} weight="bold" />

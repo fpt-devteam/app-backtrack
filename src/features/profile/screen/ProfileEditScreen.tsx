@@ -97,7 +97,7 @@ const ProfileEditScreen = () => {
 
   if (!profile) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-50">
+      <SafeAreaView className="flex-1 bg-canvas">
         <View className="flex-1 items-center justify-center">
           <AppLoader size={30} />
         </View>
@@ -106,11 +106,11 @@ const ProfileEditScreen = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-canvas">
       <AppHeader
         left={<BackButton />}
         center={
-          <Text className="text-lg font-bold text-slate-900">Edit profile</Text>
+          <Text className="text-lg font-bold text-textPrimary">Edit profile</Text>
         }
         right={
           <TextButton
@@ -133,8 +133,8 @@ const ProfileEditScreen = () => {
         >
           <AvatarFormField />
 
-          <View className="rounded-3xl border border-slate-200 bg-white p-4 gap-4 mx-4 mb-4">
-            <Text className="text-sm font-semibold text-slate-800">
+          <View className="rounded-3xl border border-divider bg-surface p-4 gap-4 mx-4 mb-4">
+            <Text className="text-sm font-semibold text-textPrimary">
               Personal Details
             </Text>
 

@@ -4,11 +4,12 @@ import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import * as Haptics from "expo-haptics";
 import { RelativePathString, router } from "expo-router";
-import { CaretRightIcon, MapPinIcon } from "phosphor-react-native";
+import { CrosshairSimpleIcon } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 type LocationFieldProps = {
+  label?: string;
   placeholder?: string;
   value: UserLocation;
   onChange: (value: UserLocation) => void;
@@ -17,6 +18,7 @@ type LocationFieldProps = {
 export const LocationField = ({
   value,
   onChange,
+  label = "Location",
   placeholder = "Search location...",
 }: LocationFieldProps) => {
   const [pressed, setPressed] = useState(false);
@@ -27,7 +29,6 @@ export const LocationField = ({
     if (!value) return;
     reset();
     onConfirmSelection(value);
-    return () => reset();
   }, []);
 
   useEffect(() => {
@@ -38,8 +39,6 @@ export const LocationField = ({
   const handlePress = () =>
     router.push(POST_ROUTE.searchLocation as RelativePathString);
 
-  const displayText = value ? value.displayAddress : placeholder;
-
   const handlePressIn = () => {
     setPressed(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
@@ -47,22 +46,47 @@ export const LocationField = ({
     );
   };
 
+  const displayText = value?.displayAddress ?? placeholder;
+
   return (
-    <TouchableOpacity
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={() => setPressed(false)}
-      activeOpacity={0.9}
-      className={[
-        "border rounded-xl p-3 min-h-[40px] flex-row items-center bg-white shadow-sm shadow-black/10",
-        pressed ? "border-slate-300 bg-slate-50" : "border-slate-200",
-      ].join(" ")}
-    >
-      <MapPinIcon size={18} color={colors.slate[400]} />
-      <Text className="flex-1 ml-4 text-sm text-slate-400" numberOfLines={2}>
-        {displayText}
+    <View style={{ marginTop: 8 }}>
+      {/* Floating label overlapping the border */}
+      <Text
+        style={{
+          top: -9,
+          left: 12,
+          zIndex: 1,
+        }}
+        className="absolute text-xs px-2 bg-surface "
+      >
+        {label}
       </Text>
-      <CaretRightIcon size={18} color={colors.slate[400]} />
-    </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={() => setPressed(false)}
+        activeOpacity={0.9}
+        style={{
+          borderColor: pressed ? colors.primary : colors.slate[300],
+          minHeight: 44,
+          borderWidth: 1,
+        }}
+        className="flex-row gap-4 px-3 rounded-sm items-center"
+      >
+        <CrosshairSimpleIcon size={20} color={colors.primary} weight="bold" />
+
+        <Text
+          numberOfLines={1}
+          style={{
+            flex: 1,
+            color: colors.slate[500],
+          }}
+          className="text-xs"
+        >
+          {displayText}
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };
