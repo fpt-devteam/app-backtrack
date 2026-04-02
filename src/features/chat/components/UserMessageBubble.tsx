@@ -44,7 +44,7 @@ export const UserMessageBubble = ({ message }: MessageBubbleProps) => {
         >
           <Text
             className={`text-[16px] leading-5 ${
-              isOwnMessage ? "text-white" : "text-slate-900"
+              isOwnMessage ? "text-white" : "text-textPrimary"
             }`}
           >
             {message.content}
@@ -54,7 +54,7 @@ export const UserMessageBubble = ({ message }: MessageBubbleProps) => {
 
       {isFocused && (
         <View className="mt-1 mx-2">
-          <Text className="text-[11px] text-slate-500 font-medium">
+          <Text className="text-[11px] text-textSecondary font-medium">
             {messageTime}
           </Text>
         </View>

@@ -44,7 +44,7 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
   };
 
   return (
-    <View className="flex-row items-center gap-4 px-4 mb-2">
+    <View className="flex-row items-center gap-4 px-4 mb-2 bg-canvas">
       <View className="flex-row items-center gap-4  ">
         {/* Plus Button */}
         <TouchableIconButton
@@ -72,11 +72,10 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
         value={messageText}
         onChangeText={setMessageText}
         placeholder="Aa"
-        placeholderTextColor={colors.slate[500]}
+        placeholderTextColor={colors.text.secondary}
         multiline
-        className="rounded-full text-slate-900 text-base flex-1 px-4 py-3 justify-center"
+        className="min-h-touch rounded-full text-textPrimary text-base flex-1 px-4 py-3 justify-center bg-muted"
         textAlignVertical="center"
-        style={{ backgroundColor: colors.slate[100] }}
       />
 
       {/* Send Button  */}

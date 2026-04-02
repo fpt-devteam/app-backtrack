@@ -24,7 +24,7 @@ export const UserSettingToggleRow = ({
   return (
     <View className="flex-row items-center justify-between py-3">
       <View className="flex-1 pr-4">
-        <Text className="text-sm font-medium text-slate-800">{label}</Text>
+        <Text className="text-sm font-medium text-textPrimary">{label}</Text>
         {!!subtitle && (
           <Text className="text-xs text-slate-400 mt-0.5">{subtitle}</Text>
         )}

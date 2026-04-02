@@ -93,7 +93,7 @@ const PostScene = () => {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-slate-50 items-center justify-center">
+      <View className="flex-1 bg-canvas items-center justify-center">
         <ActivityIndicator color={colors.black} />
       </View>
     );
@@ -101,8 +101,8 @@ const PostScene = () => {
 
   if (error) {
     return (
-      <View className="flex-1 bg-slate-50 items-center justify-center px-8">
-        <Text className="text-slate-500 text-center">Unable to load posts</Text>
+      <View className="flex-1 bg-canvas items-center justify-center px-8">
+        <Text className="text-textSecondary text-center">Unable to load posts</Text>
         <Pressable
           onPress={() => refetch()}
           className="mt-3 px-4 py-2 bg-black rounded-full"
@@ -217,15 +217,15 @@ export function ProfileScreen() {
   }, [user?.avatarUrl]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
       <ProfileScreenHeader />
 
       <View className="flex-1">
         {/* Info Header */}
-        <View className="items-center py-8 px-4 bg-white">
+        <View className="items-center py-8 px-4 bg-surface">
           <View className="flex-col items-center gap-4">
             <AppUserAvatar size={128} avatarUrl={avatarSource} />
-            <Text className="text-lg font-extrabold text-slate-900">
+            <Text className="text-lg font-extrabold text-textPrimary">
               {displayName}
             </Text>
           </View>
@@ -271,7 +271,7 @@ const ProfileScreenHeader = () => {
         />
       }
       center={
-        <Text className="text-lg font-extrabold text-slate-900">Profile</Text>
+        <Text className="text-lg font-extrabold text-textPrimary">Profile</Text>
       }
       right={
         <View className="flex-row gap-4">

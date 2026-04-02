@@ -57,7 +57,7 @@ export const LocationField = ({
           left: 12,
           zIndex: 1,
         }}
-        className="absolute text-xs px-2 bg-white "
+        className="absolute text-xs px-2 bg-surface "
       >
         {label}
       </Text>

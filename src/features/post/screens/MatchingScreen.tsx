@@ -47,7 +47,7 @@ export const MatchingScreen = () => {
   return (
     <View
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 bg-white"
+      className="flex-1 bg-surface"
     >
       <AppHeader
         left={<BackButton />}

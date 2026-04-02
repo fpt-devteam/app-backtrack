@@ -161,7 +161,7 @@ const SignUpScreen = () => {
 
   return (
     <>
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-surface">
         {/* Top Bar: Back + Progress */}
         <View className="flex-row items-center gap-3 pr-6">
           <TouchableOpacity onPress={handleGoBack} hitSlop={12}>

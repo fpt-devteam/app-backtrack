@@ -50,7 +50,7 @@ const TipCard = () => {
       <View className="bg-primary/10 rounded-full p-2">
         <LightbulbIcon size={18} color={colors.primary} weight="fill" />
       </View>
-      <Text className="flex-1 text-xs text-slate-600 leading-5">
+      <Text className="flex-1 text-xs text-textSecondary leading-5">
         <Text className="text-xs font-semibold text-slate-700">Tip: </Text>
         Stick your QR on items for a higher chance of recovery.
       </Text>
@@ -67,7 +67,7 @@ const MyQRScreen = () => {
   }, [subscription]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface">
       <AppHeader
         left={<HeaderTitle title="My Backtrack QR" />}
         right={isSubscripted && <MyQRScreenHeader />}

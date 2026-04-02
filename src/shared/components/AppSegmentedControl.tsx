@@ -52,11 +52,11 @@ export const AppSegmentedControl = ({
   return (
     <View
       onLayout={onLayout}
-      className="flex-row items-center bg-slate-100 rounded-sm relative h-10"
+      className="flex-row items-center bg-muted rounded-full relative h-control-md"
     >
       {containerWidth > 0 && (
         <Animated.View
-          className="absolute bg-primary rounded-sm h-8"
+          className="absolute bg-primary rounded-full h-9"
           style={{
             width: tabWidth,
             transform: [{ translateX: slideAnim }],
@@ -71,11 +71,12 @@ export const AppSegmentedControl = ({
           <Pressable
             key={option.value}
             onPress={() => handlePress(option.value)}
-            className="flex-1 items-center justify-center z-10"
+            className="flex-1 min-h-touch items-center justify-center z-10"
+            style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
           >
             <Text
               className={`text-xs font-medium ${
-                isActive ? "text-white" : "text-slate-500"
+                isActive ? "text-white" : "text-textSecondary"
               }`}
             >
               {option.label}

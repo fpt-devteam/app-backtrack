@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import { TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 
 type Props = {
   onPress: () => void;
@@ -14,8 +14,17 @@ export const TouchableIconButton = ({ onPress, icon, disabled }: Props) => {
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} disabled={disabled} hitSlop={10}>
+    <Pressable
+      onPress={handlePress}
+      disabled={disabled}
+      hitSlop={8}
+      className="min-h-touch min-w-touch items-center justify-center"
+      style={({ pressed }) => ({
+        transform: [{ scale: pressed ? 0.97 : 1 }],
+        opacity: pressed ? 0.9 : 1,
+      })}
+    >
       {icon}
-    </TouchableOpacity>
+    </Pressable>
   );
 };

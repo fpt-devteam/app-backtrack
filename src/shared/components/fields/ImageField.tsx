@@ -58,7 +58,7 @@ export const ImageField = ({
         <Text className="text-slate-700 font-bold text-sm mb-2">
           Photos of the Item
         </Text>
-        <Text className="text-slate-500 text-xs mb-3">
+        <Text className="text-textSecondary text-xs mb-3">
           Add up to {MAX_IMAGES} clear photos. The more, the better!
         </Text>
 
@@ -71,10 +71,10 @@ export const ImageField = ({
             <CameraIcon size={32} color={colors.primary} />
           </View>
 
-          <Text className="text-slate-900 font-semibold text-base mb-1">
+          <Text className="text-textPrimary font-semibold text-base mb-1">
             Add Photos
           </Text>
-          <Text className="text-slate-500 text-sm text-center mb-4">
+          <Text className="text-textSecondary text-sm text-center mb-4">
             Select images or take a new photo.
           </Text>
 
@@ -91,7 +91,7 @@ export const ImageField = ({
       <Text className="text-slate-700 font-medium text-sm mb-2">
         Photos of the Item ({value.length}/{MAX_IMAGES})
       </Text>
-      <Text className="text-slate-500 text-xs mb-3">
+      <Text className="text-textSecondary text-xs mb-3">
         Add up to {MAX_IMAGES} clear photos. The more, the better!
       </Text>
 
@@ -124,7 +124,7 @@ export const ImageField = ({
         {/* Image Cards */}
         {value.map((image, index) => (
           <View key={image.uri} className="relative">
-            <View className="w-32 h-32 rounded-xl overflow-hidden bg-slate-100 border border-slate-200">
+            <View className="w-32 h-32 rounded-xl overflow-hidden bg-slate-100 border border-divider">
               <Image
                 source={{ uri: image.uri }}
                 className="w-full h-full"
