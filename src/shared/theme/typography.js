@@ -79,6 +79,25 @@ const typography = {
       fontWeight: 500,
       lineHeight: 20,
     },
+    body: 24,
+  },
+
+  presets: {
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 800,
+      lineHeight: 24,
+    },
+    body: {
+      fontSize: 16,
+      fontWeight: 400,
+      lineHeight: 24,
+    },
+    meta: {
+      fontSize: 14,
+      fontWeight: 500,
+      lineHeight: 20,
+    },
   },
 };
 
