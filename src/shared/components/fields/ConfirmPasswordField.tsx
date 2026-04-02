@@ -1,28 +1,29 @@
-import { CheckCircle, Eye, EyeSlash } from 'phosphor-react-native';
-import React, { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { CheckCircle, Eye, EyeSlash } from "phosphor-react-native";
+import React, { useState } from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 type ConfirmPasswordFieldProps = {
   value: string;
   onChange: (value: string) => void;
   error?: string;
-}
+};
 
 export const ConfirmPasswordField = ({
   value,
   onChange,
-  error
+  error,
 }: ConfirmPasswordFieldProps) => {
   const [show, setShow] = useState(false);
 
   return (
     <View>
-      <Text className="mb-2 text-base font-medium text-label">Confirm Password</Text>
-      <View className={`flex-row gap-2 items-center rounded-lg border bg-white px-3 py-3 ${error ? "border-error" : "border-slate-200"}`}>
-        <CheckCircle
-          size={20}
-          color={error ? "#dc2626" : "#70819a"}
-        />
+      <Text className="mb-2 text-base font-medium text-label">
+        Confirm Password
+      </Text>
+      <View
+        className={`flex-row gap-2 items-center rounded-lg border bg-surface px-3 py-3 ${error ? "border-error" : "border-divider"}`}
+      >
+        <CheckCircle size={20} color={error ? "#dc2626" : "#70819a"} />
 
         <TextInput
           className="flex-1 text-input"
@@ -36,10 +37,7 @@ export const ConfirmPasswordField = ({
           onChangeText={onChange}
         />
 
-        <TouchableOpacity
-          onPress={() => setShow((prev) => !prev)}
-          hitSlop={12}
-        >
+        <TouchableOpacity onPress={() => setShow((prev) => !prev)} hitSlop={12}>
           {show ? (
             <Eye size={20} color={error ? "#dc2626" : "#70819a"} />
           ) : (
@@ -54,7 +52,5 @@ export const ConfirmPasswordField = ({
         </View>
       )}
     </View>
-  )
-}
-
-
+  );
+};

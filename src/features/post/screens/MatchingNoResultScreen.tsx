@@ -19,7 +19,7 @@ export const MatchingNoResultScreen = () => {
           </View>
 
           {/* little ? badge */}
-          <View className="absolute -top-1 -right-1 h-7 w-7 items-center justify-center rounded-full bg-white border border-black/10">
+          <View className="absolute -top-1 -right-1 h-7 w-7 items-center justify-center rounded-full bg-surface border border-black/10">
             <Question size={16} color={colors.slate[500]} />
           </View>
         </View>
@@ -41,7 +41,7 @@ export const MatchingNoResultScreen = () => {
       <View className="mt-7 w-full max-w-[360px]">
         <TouchableOpacity
           onPress={handleGoToHomepage}
-          className="mt-3 h-12 w-full items-center justify-center rounded-full bg-white border border-black/10 active:opacity-90"
+          className="mt-3 h-12 w-full items-center justify-center rounded-full bg-surface border border-black/10 active:opacity-90"
         >
           <Text className="text-[14px] font-semibold text-black/80">
             Back to homepage

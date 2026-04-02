@@ -11,16 +11,7 @@ export default function PostsStackLayout() {
         headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="search/index"
-        options={{
-          headerShown: false,
-          contentStyle: {
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
-          },
-        }}
-      />
+      <Stack.Screen name="search/index" />
 
       <Stack.Screen
         name="search/location"
@@ -33,16 +24,7 @@ export default function PostsStackLayout() {
         }}
       />
 
-      <Stack.Screen
-        name="search/result"
-        options={{
-          headerShown: false,
-          contentStyle: {
-            paddingTop: insets.top,
-            paddingBottom: insets.bottom,
-          },
-        }}
-      />
+      <Stack.Screen name="search/result" />
 
       <Stack.Screen
         name="create"

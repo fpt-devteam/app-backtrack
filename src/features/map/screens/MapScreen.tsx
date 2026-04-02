@@ -183,7 +183,7 @@ export const MapScreen = () => {
         }}
         pointerEvents="box-none"
       >
-        <View className="rounded-full bg-white shadow-sm shadow-black/10 overflow-hidden">
+        <View className="rounded-full bg-surface shadow-sm shadow-black/10 overflow-hidden">
           <View className="flex-row items-center">
             {/* Back icon inside the pill */}
             <Pressable
@@ -205,7 +205,7 @@ export const MapScreen = () => {
               className="flex-1"
               style={{ paddingRight: 16, paddingVertical: 14 }}
             >
-              <Text className="text-sm text-slate-600" numberOfLines={1}>
+              <Text className="text-sm text-textSecondary" numberOfLines={1}>
                 {searchDisplayText}
               </Text>
             </Pressable>

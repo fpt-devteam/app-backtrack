@@ -4,7 +4,7 @@ import { InfoRow } from "@/src/features/post/components/PostInfoRow";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import { ImageCarousel } from "@/src/shared/components";
-import { Divider } from "@/src/shared/components/ui/Divider";
+import { AppDivider } from "@/src/shared/components";
 import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
@@ -66,7 +66,7 @@ export const PostDetailsSkeleton = () => {
   );
 
   return (
-    <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
+    <View className="mx-4 mt-4 bg-surface rounded-3xl border border-divider overflow-hidden">
       <View className="px-5 pt-5 pb-4">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 gap-2">
@@ -83,7 +83,7 @@ export const PostDetailsSkeleton = () => {
         </View>
       </View>
 
-      <Divider />
+      <AppDivider />
 
       <View className="p-5 gap-4">
         {[0, 1, 2].map((i) => (
@@ -98,7 +98,7 @@ export const PostDetailsSkeleton = () => {
       </View>
 
       <View className="px-5 pb-5">
-        <View className="rounded-2xl overflow-hidden border border-slate-200">
+        <View className="rounded-2xl overflow-hidden border border-divider">
           <S className="h-44 w-full rounded-none" />
           <View className="absolute right-3 bottom-3">
             <S className="h-11 w-11 rounded-2xl" />
@@ -154,11 +154,11 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
       contentContainerStyle={{ paddingBottom: bottom + 20 }}
     >
       <ImageCarousel data={postImageUrls} />
-      <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
+      <View className="mx-4 mt-4 bg-surface rounded-3xl border border-divider overflow-hidden">
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">
             <Text
-              className="flex-1 text-[22px] font-extrabold text-slate-900 leading-7"
+              className="flex-1 text-[22px] font-extrabold text-textPrimary leading-7"
               numberOfLines={2}
             >
               {post.itemName}
@@ -167,13 +167,13 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
           </View>
 
           {!!post.description && (
-            <Text className="mt-3 text-[13px] leading-[19px] text-slate-600">
+            <Text className="mt-3 text-[13px] leading-[19px] text-textSecondary">
               {post.description}
             </Text>
           )}
         </View>
 
-        <Divider />
+        <AppDivider />
 
         <View className="p-5 gap-4">
           <InfoRow
@@ -199,14 +199,9 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
 
       {!!similarPosts?.length && (
         <View className="mx-4 mt-6">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-[16px] font-extrabold text-slate-900">
-              Similar Posts
-            </Text>
-            <Text className="text-[12px] text-slate-500">
-              {similarPosts.length}
-            </Text>
-          </View>
+          <Text className="text-[16px] font-extrabold text-textPrimary">
+            Similar Posts
+          </Text>
 
           <View className="mt-3 gap-3">
             {similarPosts.map((p) => (

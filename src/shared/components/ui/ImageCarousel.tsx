@@ -1,5 +1,13 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { Dimensions, FlatList, Image, NativeScrollEvent, NativeSyntheticEvent, Text, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Text,
+  View,
+} from "react-native";
 
 type Props = {
   data: string[];
@@ -7,14 +15,21 @@ type Props = {
   initialIndex?: number;
 };
 
-export const ImageCarousel = ({ data, height = 480, initialIndex = 0 }: Props) => {
+export const ImageCarousel = ({
+  data,
+  height = 480,
+  initialIndex = 0,
+}: Props) => {
   const width = Dimensions.get("window").width;
   const listRef = useRef<FlatList<string>>(null);
 
   const images = useMemo(() => data?.filter(Boolean) ?? [], [data]);
   const total = images.length;
 
-  const safeInitial = Math.min(Math.max(initialIndex, 0), Math.max(total - 1, 0));
+  const safeInitial = Math.min(
+    Math.max(initialIndex, 0),
+    Math.max(total - 1, 0),
+  );
   const [index, setIndex] = useState(safeInitial);
 
   const onScrollToIndexFailed = useCallback(() => {
@@ -28,7 +43,7 @@ export const ImageCarousel = ({ data, height = 480, initialIndex = 0 }: Props) =
       const x = e.nativeEvent.contentOffset.x;
       setIndex(Math.round(x / width));
     },
-    [width]
+    [width],
   );
 
   if (total === 0) return null;
@@ -41,12 +56,16 @@ export const ImageCarousel = ({ data, height = 480, initialIndex = 0 }: Props) =
         keyExtractor={(uri, i) => `${uri}-${i}`}
         horizontal
         pagingEnabled
-        scrollEnabled={true}               
-        onMomentumScrollEnd={onMomentumScrollEnd} 
+        scrollEnabled={true}
+        onMomentumScrollEnd={onMomentumScrollEnd}
         showsHorizontalScrollIndicator={false}
         initialScrollIndex={safeInitial}
         onScrollToIndexFailed={onScrollToIndexFailed}
-        getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })} 
+        getItemLayout={(_, i) => ({
+          length: width,
+          offset: width * i,
+          index: i,
+        })}
         renderItem={({ item }) => (
           <View style={{ width, height, justifyContent: "center" }}>
             <Image
@@ -95,7 +114,9 @@ export const ImageCarousel = ({ data, height = 480, initialIndex = 0 }: Props) =
                   height: 6,
                   borderRadius: 999,
                   backgroundColor:
-                    i === index ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
+                    i === index
+                      ? "rgba(255,255,255,0.95)"
+                      : "rgba(255,255,255,0.45)",
                 }}
               />
             ))}

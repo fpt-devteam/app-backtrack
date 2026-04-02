@@ -30,7 +30,7 @@ export const PostList = ({
   }, [isHorizontal, isRefetching, refetch]);
 
   const renderItem = useCallback(
-    ({ item }: { item: Post }) => <PostCard item={item} type={direction} />,
+    ({ item }: { item: Post }) => <PostCard item={item} />,
     [isLoading, direction],
   );
 

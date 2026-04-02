@@ -42,6 +42,13 @@ app-example
 /ios
 /android
 
+
 #google services files
 google-services.json
 GoogleService-Info.plist
+
+# local worktrees
+.worktrees/
+
+# 
+.gitnexus

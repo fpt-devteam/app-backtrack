@@ -42,16 +42,16 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
 
   if (!conversationDetail || isLoadingConversation) {
     return (
-      <View className="flex-1 bg-white">
+      <View className="flex-1 bg-surface">
         <AppLoader />
       </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface">
       <KeyboardAvoidingView
-        className="flex-1 bg-white"
+        className="flex-1 bg-surface"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ConversationHeader partner={conversationDetail.partner} />

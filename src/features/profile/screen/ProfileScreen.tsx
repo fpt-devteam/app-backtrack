@@ -3,9 +3,9 @@ import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Pressable,
   Text,
+  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -20,6 +20,7 @@ import { useAppUser } from "@/src/features/auth/providers";
 import type { Post } from "@/src/features/post/types";
 import {
   AppHeader,
+  AppImage,
   AppUserAvatar,
   TouchableIconButton,
 } from "@/src/shared/components";
@@ -27,6 +28,10 @@ import { POST_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 
 import { useGetAllMyPost } from "@/src/features/post/hooks";
+import * as Haptics from "expo-haptics";
+
+import { PostStatusBadge } from "@/src/features/post/components";
+import EmptyList from "@/src/shared/components/ui/EmptyList";
 import {
   GearIcon,
   IconProps,
@@ -52,27 +57,27 @@ const ProfilePostGridItem = ({ post, size }: { post: Post; size: number }) => {
   const imageUrl = post.images?.[0]?.url;
 
   const handleOpenPost = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push(POST_ROUTE.details(post.id));
   };
 
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={handleOpenPost}
       style={{ width: size, height: size }}
-      className="bg-slate-200"
+      className="aspect-square"
     >
-      {imageUrl ? (
-        <Image
-          source={{ uri: imageUrl }}
-          style={{ width: "100%", height: "100%" }}
-          resizeMode="cover"
-        />
-      ) : (
-        <View className="flex-1 items-center justify-center bg-slate-100">
-          <PackageIcon size={24} color={colors.slate[400]} weight="light" />
-        </View>
-      )}
-    </Pressable>
+      <AppImage
+        source={{ uri: imageUrl }}
+        style={{ width: size, height: size }}
+        resizeMode="cover"
+      />
+
+      {/* Post Status Badge "Lost/Found" */}
+      <View className="absolute top-0 right-0 p-1">
+        <PostStatusBadge status={post.postType} size="sm" />
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -88,7 +93,7 @@ const PostScene = () => {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-slate-50 items-center justify-center">
+      <View className="flex-1 bg-canvas items-center justify-center">
         <ActivityIndicator color={colors.black} />
       </View>
     );
@@ -96,8 +101,8 @@ const PostScene = () => {
 
   if (error) {
     return (
-      <View className="flex-1 bg-slate-50 items-center justify-center px-8">
-        <Text className="text-slate-500 text-center">Unable to load posts</Text>
+      <View className="flex-1 bg-canvas items-center justify-center px-8">
+        <Text className="text-textSecondary text-center">Unable to load posts</Text>
         <Pressable
           onPress={() => refetch()}
           className="mt-3 px-4 py-2 bg-black rounded-full"
@@ -110,7 +115,7 @@ const PostScene = () => {
 
   return (
     <FlatList
-      data={data ?? []}
+      data={data || []}
       keyExtractor={(item) => item.id}
       numColumns={GRID_COLUMNS}
       showsVerticalScrollIndicator={false}
@@ -124,25 +129,25 @@ const PostScene = () => {
         <ProfilePostGridItem post={item} size={itemSize} />
       )}
       ListEmptyComponent={
-        <View className="flex-1 bg-slate-50 items-center justify-center py-24">
-          <PackageIcon size={48} color={colors.slate[300]} weight="light" />
-          <Text className="text-slate-400 mt-4 text-center font-medium">
-            No posts yet
-          </Text>
-        </View>
+        <EmptyList
+          icon={<PackageIcon size={96} weight="light" color={colors.primary} />}
+          title="No Posts Yet"
+          subtitle="Your posts will appear here once you create them."
+        />
       }
     />
   );
 };
 
-const QRScene = () => (
-  <View className="flex-1 bg-slate-50 items-center justify-center p-10">
-    <QrCodeIcon size={48} color={colors.slate[300]} weight="light" />
-    <Text className="text-slate-400 mt-4 text-center font-medium">
-      No QR codes yet
-    </Text>
-  </View>
-);
+const QRScene = () => {
+  return (
+    <EmptyList
+      icon={<QrCodeIcon size={96} weight="light" color={colors.primary} />}
+      title="No QR Codes Yet"
+      subtitle="Your QR codes will appear here once you create them."
+    />
+  );
+};
 
 const renderScene = SceneMap({
   posts: PostScene,
@@ -212,15 +217,15 @@ export function ProfileScreen() {
   }, [user?.avatarUrl]);
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
       <ProfileScreenHeader />
 
       <View className="flex-1">
         {/* Info Header */}
-        <View className="items-center py-8 px-4 bg-white">
+        <View className="items-center py-8 px-4 bg-surface">
           <View className="flex-col items-center gap-4">
             <AppUserAvatar size={128} avatarUrl={avatarSource} />
-            <Text className="text-lg font-extrabold text-slate-900">
+            <Text className="text-lg font-extrabold text-textPrimary">
               {displayName}
             </Text>
           </View>
@@ -266,7 +271,7 @@ const ProfileScreenHeader = () => {
         />
       }
       center={
-        <Text className="text-lg font-extrabold text-slate-900">Profile</Text>
+        <Text className="text-lg font-extrabold text-textPrimary">Profile</Text>
       }
       right={
         <View className="flex-row gap-4">

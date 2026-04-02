@@ -25,7 +25,7 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
             | RelativePathString,
         )
       }
-      className="flex-row gap-3 bg-white rounded-2xl border border-slate-200 p-3"
+      className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-3"
     >
       <Image
         source={{ uri: imgUrl }}
@@ -35,7 +35,7 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
       <View className="flex-1 min-w-0 gap-2">
         <View className="flex-row justify-between items-start">
           <Text
-            className="w-[70%] text-lg font-semibold text-slate-900"
+            className="w-[70%] text-lg font-semibold text-textPrimary"
             numberOfLines={1}
           >
             {post.itemName}
@@ -48,7 +48,7 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
           <View className="flex-row items-center gap-2">
             <MapPinIcon size={16} color="#64748B" />
             <Text
-              className="flex-1 min-w-0 text-[12px] text-slate-600"
+              className="flex-1 min-w-0 text-[12px] text-textSecondary"
               numberOfLines={1}
             >
               {post.displayAddress}
@@ -58,7 +58,7 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
           <View className="flex-row items-center gap-2">
             <ClockIcon size={16} color="#64748B" />
             <Text
-              className="flex-1 min-w-0 text-[12px] text-slate-600"
+              className="flex-1 min-w-0 text-[12px] text-textSecondary"
               numberOfLines={1}
             >
               {formatIsoDate(post.eventTime)}

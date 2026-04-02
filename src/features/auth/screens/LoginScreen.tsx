@@ -8,10 +8,9 @@ import {
   EmailField,
   PasswordField,
 } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors } from "@/src/shared/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link, RelativePathString, router } from "expo-router";
+import { Link } from "expo-router";
 import {
   ArrowRightIcon,
   EnvelopeSimpleIcon,
@@ -204,10 +203,10 @@ const LoginScreen = () => {
                       </TouchableOpacity>
                     </View>
 
-                    {/* Divider */}
+                    {/* AppDivider */}
                     <View className="mt-5 flex-row items-center">
                       <View className="h-px flex-1 bg-slate-200" />
-                      <Text className="mx-3 text-xs text-slate-500 font-medium">
+                      <Text className="mx-3 text-xs text-textSecondary font-medium">
                         or continue with
                       </Text>
                       <View className="h-px flex-1 bg-slate-200" />
@@ -216,7 +215,7 @@ const LoginScreen = () => {
                     {/* Social Login */}
                     <View className="mt-4">
                       <TouchableOpacity
-                        className="flex-row items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-3"
+                        className="flex-row items-center justify-center rounded-lg border border-divider bg-surface px-4 py-3"
                         disabled={loading}
                         activeOpacity={0.8}
                       >

@@ -9,12 +9,12 @@ type ChipProps = {
   disabled?: boolean;
 };
 
-export const ChipsRow = ({ chips }: { chips: ChipProps[] }) => {
+export const AppChipsRow = ({ chips }: { chips: ChipProps[] }) => {
   return (
     <View className="flex-row" style={{ gap: 8 }}>
-      {chips.map((chip, index) => (
+      {chips.map((chip) => (
         <Chip
-          key={index}
+          key={chip.label}
           label={chip.label}
           selected={chip.selected}
           onPress={chip.onPress}

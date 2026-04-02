@@ -7,13 +7,14 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
+import { AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { SHARED_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { RelativePathString, router } from "expo-router";
 import { BellSimpleSlashIcon } from "phosphor-react-native";
 import React from "react";
-import { ActivityIndicator, FlatList, View } from "react-native";
+import { FlatList } from "react-native";
 
 const NotificationScreen = () => {
   const { items, isLoading, hasMore, loadMore, isLoadingNextPage } =
@@ -71,11 +72,7 @@ const NotificationScreen = () => {
 
   const renderFooter = () => {
     if (!isLoadingNextPage) return null;
-    return (
-      <View className="py-4">
-        <ActivityIndicator size="small" color="#0ea5e9" />
-      </View>
-    );
+    return <AppLoader />;
   };
 
   return (
