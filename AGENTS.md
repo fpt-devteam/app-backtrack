@@ -17,12 +17,13 @@ This project is indexed by GitNexus as **app-backtrack** (1014 symbols, 2148 rel
 
 1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
 2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/app-backtrack/process/{processName}` — trace the full execution flow step by step
+3. `READ gitnexus://repo/feat-ui-global-components/process/{processName}` — trace the full execution flow step by step
 4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
 
 ## When Refactoring
 
 - **Renaming**: MUST use `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` first. Review the preview — graph edits are safe, text_search edits need manual review. Then run with `dry_run: false`.
+- **Extracting/Splitting**: MUST run `gitnexus_context({name: "target"})` to see all incoming/outgoing refs, then `gitnexus_impact({target: "target", direction: "upstream"})` to find all external callers before moving code.
 - **Extracting/Splitting**: MUST run `gitnexus_context({name: "target"})` to see all incoming/outgoing refs, then `gitnexus_impact({target: "target", direction: "upstream"})` to find all external callers before moving code.
 - After any refactor: run `gitnexus_detect_changes({scope: "all"})` to verify only expected files changed.
 
@@ -56,10 +57,10 @@ This project is indexed by GitNexus as **app-backtrack** (1014 symbols, 2148 rel
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/app-backtrack/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/app-backtrack/clusters` | All functional areas |
-| `gitnexus://repo/app-backtrack/processes` | All execution flows |
-| `gitnexus://repo/app-backtrack/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/feat-ui-global-components/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/feat-ui-global-components/clusters` | All functional areas |
+| `gitnexus://repo/feat-ui-global-components/processes` | All execution flows |
+| `gitnexus://repo/feat-ui-global-components/process/{name}` | Step-by-step execution trace |
 
 ## Self-Check Before Finishing
 
@@ -99,3 +100,4 @@ To check whether embeddings exist, inspect `.gitnexus/meta.json` — the `stats.
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+

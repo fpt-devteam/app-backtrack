@@ -17,9 +17,9 @@ import {
   Easing,
   FlatList,
   Keyboard,
+  Pressable,
   Text,
   TextInput,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -134,12 +134,13 @@ const PostSearchScreen = () => {
             onPress={() => handleSelectRecent(item.value)}
           />
         ))}
-        <TouchableOpacity
-          className="self-start flex-row gap-2 items-center rounded-full px-3 py-2 bg-slate-100"
+        <Pressable
+          className="self-start min-h-touch flex-row gap-2 items-center rounded-full px-3 py-2 bg-muted"
           onPress={() => clear()}
+          style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
         >
           <TrashIcon size={16} color={colors.primary} weight="bold" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     );
   };
@@ -153,7 +154,7 @@ const PostSearchScreen = () => {
       <View
         className="flex-1 gap-3"
         style={{
-          backgroundColor: colors.white,
+          backgroundColor: colors.canvas,
           paddingTop: insets.top,
         }}
       >
@@ -186,7 +187,7 @@ const PostSearchScreen = () => {
               placeholderTextColor={colors.slate[400]}
             />
             <View
-              className="px-3 py-1"
+              className="px-3 py-2"
               style={{ backgroundColor: colors.primary }}
             >
               <MagnifyingGlassIcon size={24} color={colors.white} />
@@ -215,8 +216,8 @@ const PostSearchScreen = () => {
             ListHeaderComponent={
               <View className="flex-col gap-2 py-2">
                 <View className="px-3 gap-2">{renderRecentList()}</View>
-                <View className="h-[4] bg-gray-100" />
-                <Text className="px-3 text-sm font-semibold text-gray-700">
+                <View className="h-[4] bg-divider" />
+                <Text className="px-3 text-sm font-semibold text-textPrimary">
                   Suggestions
                 </Text>
               </View>
@@ -237,13 +238,14 @@ const PostRecentSearchRow = ({
   onPress: () => void;
 }) => {
   return (
-    <TouchableOpacity
-      className="self-start flex-row gap-2 items-center rounded-full px-3 py-2 bg-slate-100"
+    <Pressable
+      className="self-start min-h-touch flex-row gap-2 items-center rounded-full px-3 py-2 bg-muted"
       onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
     >
       <ClockIcon size={16} color={colors.primary} weight="bold" />
-      <Text className="text-sm">{text}</Text>
-    </TouchableOpacity>
+      <Text className="text-sm text-textPrimary">{text}</Text>
+    </Pressable>
   );
 };
 

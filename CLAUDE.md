@@ -93,7 +93,7 @@ This project is indexed by GitNexus as **app-backtrack** (1014 symbols, 2148 rel
 
 1. `gitnexus_query({query: "<error or symptom>"})` — find execution flows related to the issue
 2. `gitnexus_context({name: "<suspect function>"})` — see all callers, callees, and process participation
-3. `READ gitnexus://repo/app-backtrack/process/{processName}` — trace the full execution flow step by step
+3. `READ gitnexus://repo/feat-ui-global-components/process/{processName}` — trace the full execution flow step by step
 4. For regressions: `gitnexus_detect_changes({scope: "compare", base_ref: "main"})` — see what your branch changed
 
 ## When Refactoring
@@ -132,10 +132,10 @@ This project is indexed by GitNexus as **app-backtrack** (1014 symbols, 2148 rel
 
 | Resource | Use for |
 |----------|---------|
-| `gitnexus://repo/app-backtrack/context` | Codebase overview, check index freshness |
-| `gitnexus://repo/app-backtrack/clusters` | All functional areas |
-| `gitnexus://repo/app-backtrack/processes` | All execution flows |
-| `gitnexus://repo/app-backtrack/process/{name}` | Step-by-step execution trace |
+| `gitnexus://repo/feat-ui-global-components/context` | Codebase overview, check index freshness |
+| `gitnexus://repo/feat-ui-global-components/clusters` | All functional areas |
+| `gitnexus://repo/feat-ui-global-components/processes` | All execution flows |
+| `gitnexus://repo/feat-ui-global-components/process/{name}` | Step-by-step execution trace |
 
 ## Self-Check Before Finishing
 

@@ -95,12 +95,12 @@ export const UserSubscriptionPlanPressableCard = () => {
     <View>
       <Pressable onPress={handleNavigatePlanScreen} className="gap-2">
         <View className="flex-row items-center justify-between px-1">
-          <Text className="text-base font-bold text-slate-900">
+          <Text className="text-base font-bold text-textPrimary">
             Current Plan
           </Text>
         </View>
 
-        <View className="bg-white rounded-2xl border border-slate-100 px-5 py-4">
+        <View className="bg-surface rounded-2xl border border-divider px-5 py-4">
           <CardBody
             isLoading={isLoading}
             isActive={isActiveDisplay}

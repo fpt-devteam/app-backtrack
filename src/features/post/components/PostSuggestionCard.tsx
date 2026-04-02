@@ -21,7 +21,7 @@ export const PostSuggestionCard = ({
   return (
     <Pressable
       onPress={handleOpenDetail}
-      className="p-2 rounded-lg overflow-hidden gap-2 border border-slate-300"
+      className="p-2 rounded-lg overflow-hidden gap-2 border border-divider"
       style={{
         width: dimensions.width * 0.45,
       }}
@@ -36,7 +36,7 @@ export const PostSuggestionCard = ({
 
       {/* Description section */}
       <Text
-        className="text-sm font-medium text-center text-slate-900"
+        className="text-sm font-medium text-center text-textPrimary"
         numberOfLines={2}
       >
         {item.itemName}

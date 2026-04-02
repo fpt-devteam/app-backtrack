@@ -24,13 +24,13 @@ export function SubscriptionPlanPressableCard({
     <Pressable
       onPress={handlePress}
       className={`relative rounded-2xl border px-5 py-4 ${
-        selected ? "border-primary bg-sky-50" : "border-slate-200 bg-white"
+        selected ? "border-primary bg-sky-50" : "border-divider bg-surface"
       }`}
     >
       <View className="flex-row items-start justify-between gap-3">
         <View className="flex-1 gap-0.5">
           <Text
-            className={`text-base font-extrabold ${selected ? "text-primary" : "text-slate-900"}`}
+            className={`text-base font-extrabold ${selected ? "text-primary" : "text-textPrimary"}`}
           >
             {plan.name}
           </Text>
@@ -38,10 +38,10 @@ export function SubscriptionPlanPressableCard({
 
         <View className="items-end gap-0.5">
           <Text
-            className={`text-xl font-extrabold ${selected ? "text-primary" : "text-slate-900"}`}
+            className={`text-xl font-extrabold ${selected ? "text-primary" : "text-textPrimary"}`}
           >
             {plan.price}{" "}
-            <Text className="text-sm text-slate-500 uppercase">
+            <Text className="text-sm text-textSecondary uppercase">
               {plan.currency}
             </Text>
           </Text>
@@ -56,7 +56,7 @@ export function SubscriptionPlanPressableCard({
               className="flex-row items-center gap-2"
             >
               <SealCheckIcon size={16} />
-              <Text className="flex-1 text-sm text-slate-600">{feature}</Text>
+              <Text className="flex-1 text-sm text-textSecondary">{feature}</Text>
             </View>
           ))}
         </View>
