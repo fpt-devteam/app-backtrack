@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **app-backtrack** (973 symbols, 2102 relationships, 44 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **app-backtrack** (1014 symbols, 2148 relationships, 44 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
@@ -23,7 +23,7 @@ This project is indexed by GitNexus as **app-backtrack** (973 symbols, 2102 rela
 ## When Refactoring
 
 - **Renaming**: MUST use `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` first. Review the preview — graph edits are safe, text_search edits need manual review. Then run with `dry_run: false`.
-- **Extracting/Splitting**: MUST run `gitnexus_context({name: "target"})` to see all incoming/outgoing refs, then `gitnexus_impact({targ1et: "target", direction: "upstream"})` to find all external callers before moving code.
+- **Extracting/Splitting**: MUST run `gitnexus_context({name: "target"})` to see all incoming/outgoing refs, then `gitnexus_impact({target: "target", direction: "upstream"})` to find all external callers before moving code.
 - After any refactor: run `gitnexus_detect_changes({scope: "all"})` to verify only expected files changed.
 
 ## Never Do
