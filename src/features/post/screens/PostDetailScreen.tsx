@@ -6,7 +6,6 @@ import {
   AppSplashScreen,
   BackButton,
 } from "@/src/shared/components";
-import { getRandomAvatarUrl } from "@/src/shared/mocks/avatar.mock";
 import { timeSincePast } from "@/src/shared/utils";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -53,16 +52,18 @@ const PostDetailHeader = ({
 
 export const PostDetailScreen = () => {
   const params = useLocalSearchParams<{ postId: string }>();
-  const postId = params.postId;
   const { top } = useSafeAreaInsets();
+  const postId = params.postId;
 
   const { data: post, isLoading, error } = useGetPostById({ postId });
+
   if (isLoading) return <AppSplashScreen />;
+  
   if (error || !postId || !post)
     return <AppInlineError message="Failed to load post details." />;
 
-  const authorName = post.author?.displayName?.trim() || "Anonymous";
-  const avatarUrl = post.author?.avatarUrl || getRandomAvatarUrl();
+  const authorName = post.author.displayName?.trim() || "Anonymous";
+  const avatarUrl = post.author.avatarUrl;
 
   return (
     <View className="flex-1 bg-background" style={{ paddingTop: top }}>

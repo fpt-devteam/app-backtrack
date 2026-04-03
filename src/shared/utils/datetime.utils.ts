@@ -65,7 +65,6 @@ export function formatTime<T extends Intl.DateTimeFormatOptions>(
   return d.toLocaleTimeString([], options);
 }
 
-
 /**
  * Format ISO date string (e.g. 2026-01-01T13:31:50.117+00:00) into custom pattern.
  * Supported tokens: yyyy, MM, dd, HH, mm, ss
@@ -111,7 +110,6 @@ export function formatIsoDate(
   return pattern.replace(/HH|mm|dd|MM|yyyy/g, (t) => tokens[t] ?? t);
 }
 
-
 const MONTH_NAMES = [
   "Jan",
   "Feb",
@@ -133,6 +131,25 @@ export function formatDate(input: string): string {
   return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
+/**
+ * Format a date/string to a compact event-time label suited for cards and list items.
+ * Shows month + day + 24h time, omitting the year to save space.
+ *
+ * Usage:
+ *   import { formatShortEventTime } from "@/src/shared/utils/datetime.utils";
+ *   formatShortEventTime("2026-01-15T14:30:00Z") // → "Jan 15 · 14:30"
+ *   formatShortEventTime(new Date())              // → "Apr  1 · 09:05"
+ */
+export function formatShortEventTime(input: Date | string): string {
+  const d = toDate(typeof input === "string" ? input : input.toISOString());
+  if (!d) return "Unknown";
+  const month = MONTH_NAMES[d.getMonth()];
+  const day = d.getDate();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${month} ${day} · ${hh}:${mm}`;
+}
+
 export function formatMessageTimestamp(input: string): string {
   const d = new Date(input);
   if (isNaN(d.getTime())) return "Unknown";
@@ -145,11 +162,56 @@ export function formatMessageTimestamp(input: string): string {
     d.getFullYear() === now.getFullYear();
 
   if (isToday) {
-
     const hours = d.getHours().toString().padStart(2, '0');
     const minutes = d.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;
   }
 
   return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+/**
+ * Calculate time difference between two dates
+ * @param date1 First date (Date object or ISO string)
+ * @param date2 Second date (Date object or ISO string)
+ * @returns Time difference in milliseconds
+ */
+export const calculateTimeDifference = (date1: Date | string, date2: Date | string): number => {
+  const d1 = typeof date1 === 'string' ? new Date(date1) : date1
+  const d2 = typeof date2 === 'string' ? new Date(date2) : date2
+  return Math.abs(d1.getTime() - d2.getTime())
+}
+
+/**
+ * Format time difference for display
+ * @param diffInMs Time difference in milliseconds
+ * @returns Formatted string (e.g., "2 hrs apart", "30 mins apart")
+ */
+export const formatTimeDifference = (diffInMs: number): string => {
+  const minutes = Math.floor(diffInMs / (1000 * 60))
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  if (days > 0) {
+    return `${days} day${days > 1 ? 's' : ''} apart`
+  }
+  if (hours > 0) {
+    return `${hours} hr${hours > 1 ? 's' : ''} apart`
+  }
+  if (minutes > 0) {
+    return `${minutes} min${minutes > 1 ? 's' : ''} apart`
+  }
+  return 'Same time'
+}
+/**
+ * Get time match status based on time difference
+ * @param diffInMs Time difference in milliseconds
+ * @returns Match status
+ */
+export const getTimeMatchStatus = (diffInMs: number): 'high' | 'medium' | 'low' => {
+  const hours = diffInMs / (1000 * 60 * 60)
+
+  if (hours <= 3) return 'high'
+  if (hours <= 24) return 'medium'
+  return 'low'
 }

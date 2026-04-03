@@ -4,3 +4,5 @@ export const POST_DETAIL_QUERY_KEY = ["post", "byId"] as const;
 export const POST_MATCHING_QUERY_KEY = ["matching-posts"] as const;
 export const MY_POSTS_QUERY_KEY = ["posts", "me"] as const;
 export const POST_ANALYZE_IMAGE_KEY = ["post-analyze-image"] as const;
+export const POST_SEARCH_QUERY_KEY = ["posts", "search"] as const;
+export const POST_SUGGESTIONS_QUERY_KEY = ["posts", "suggestions"] as const;

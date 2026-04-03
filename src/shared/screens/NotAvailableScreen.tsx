@@ -5,7 +5,7 @@ import { SmileySadIcon } from "phosphor-react-native";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export const NotAvailableScreen = () => {
+const NotAvailableScreen = () => {
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.back();
@@ -34,3 +34,5 @@ export const NotAvailableScreen = () => {
     </View>
   );
 };
+
+export default NotAvailableScreen;

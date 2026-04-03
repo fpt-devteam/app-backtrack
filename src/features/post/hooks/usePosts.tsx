@@ -1,4 +1,4 @@
-import { filterPostsApi } from "@/src/features/post/api";
+import { getFeedPostsApi } from "@/src/features/post/api";
 import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import type {
   PostFilters,
@@ -16,8 +16,6 @@ export type PostsFiltersOptions = {
 
 export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
   const pageNumberRef = useRef(1);
-  console.log("herer", enabled, filters);
-
   const query = useInfiniteQuery<PostsResponse>({
     queryKey: [...POSTS_QUERY_KEY, filters],
     enabled,
@@ -35,7 +33,7 @@ export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
         pageSize: DEFAULT_PAGED_REQUEST.pageSize,
       };
 
-      const res = await filterPostsApi(filtersRequest);
+      const res = await getFeedPostsApi(filtersRequest);
       if (!res.success || !res.data) throw new Error("Failed to fetch posts");
       return res;
     },

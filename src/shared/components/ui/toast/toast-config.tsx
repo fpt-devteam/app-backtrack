@@ -39,11 +39,7 @@ const IOSGlassToast = ({
   const IconComponent = config.Icon;
 
   return (
-    <BlurView
-      intensity={80}
-      tint="light"
-      style={styles.container}
-    >
+    <BlurView intensity={80} tint="light" style={styles.container}>
       <View style={styles.iconContainer}>
         <IconComponent size={26} color={config.color} weight="regular" />
       </View>
@@ -65,10 +61,18 @@ const IOSGlassToast = ({
 };
 
 export const toastConfig: ToastConfig = {
-  info: (p: BaseToastProps) => <IOSGlassToast kind="info" text1={p.text1} text2={p.text2} />,
-  warning: (p: BaseToastProps) => <IOSGlassToast kind="warning" text1={p.text1} text2={p.text2} />,
-  error: (p: BaseToastProps) => <IOSGlassToast kind="error" text1={p.text1} text2={p.text2} />,
-  success: (p: BaseToastProps) => <IOSGlassToast kind="success" text1={p.text1} text2={p.text2} />,
+  info: (p: BaseToastProps) => (
+    <IOSGlassToast kind="info" text1={p.text1} text2={p.text2} />
+  ),
+  warning: (p: BaseToastProps) => (
+    <IOSGlassToast kind="warning" text1={p.text1} text2={p.text2} />
+  ),
+  error: (p: BaseToastProps) => (
+    <IOSGlassToast kind="error" text1={p.text1} text2={p.text2} />
+  ),
+  success: (p: BaseToastProps) => (
+    <IOSGlassToast kind="success" text1={p.text1} text2={p.text2} />
+  ),
 };
 
 const styles = StyleSheet.create({
@@ -88,7 +92,8 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 5,
 
-    backgroundColor: Platform.OS === 'android' ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
+    backgroundColor:
+      Platform.OS === "android" ? "rgba(255, 255, 255, 0.9)" : "transparent",
   },
   iconContainer: {
     marginRight: 14,
