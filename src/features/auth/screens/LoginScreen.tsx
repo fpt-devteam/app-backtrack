@@ -28,7 +28,7 @@ type LoginFormSchema = yup.InferType<typeof loginFormSchema>;
 
 const LoginScreen = () => {
   const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
-  const { login, loading, error: loginError } = useLogin();
+  const { login, loading, error: loginError, reset } = useLogin();
 
   const email = Array.isArray(emailParam)
     ? (emailParam[0] ?? "")
@@ -37,22 +37,17 @@ const LoginScreen = () => {
   const {
     control: formControl,
     handleSubmit,
-    trigger,
     watch,
     formState: { errors },
-    clearErrors,
   } = useForm<LoginFormSchema>({
     defaultValues: { password: "" },
     resolver: yupResolver(loginFormSchema),
-    mode: "onSubmit",
+    mode: "onTouched",
+    reValidateMode: "onChange",
   });
 
   const passwordValue = watch("password");
   const hasPassword = passwordValue.trim().length > 0;
-
-  const handleInputChange = (field: "password") => {
-    if (errors[field]) clearErrors(field);
-  };
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
     try {
@@ -84,13 +79,12 @@ const LoginScreen = () => {
               <PasswordField
                 value={value}
                 onChange={(text) => {
-                  handleInputChange("password");
+                  if (loginError) {
+                    reset();
+                  }
                   onChange(text);
                 }}
-                onBlur={() => {
-                  onBlur();
-                  void trigger("password");
-                }}
+                onBlur={onBlur}
                 error={errors.password?.message || loginError}
               />
             )}

@@ -76,7 +76,7 @@ const passwordChecklist = [
 
 const RegisterScreen = () => {
   const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
-  const { register, loading } = useRegister();
+  const { register, loading, error: registerError, reset } = useRegister();
 
   const email = useMemo(() => {
     if (Array.isArray(emailParam)) return emailParam[0]?.trim() ?? "";
@@ -86,9 +86,7 @@ const RegisterScreen = () => {
   const {
     control,
     handleSubmit,
-    trigger,
     watch,
-    clearErrors,
     formState: { errors },
   } = useForm<RegisterFormSchema>({
     defaultValues: {
@@ -98,7 +96,8 @@ const RegisterScreen = () => {
       password: "",
     },
     resolver: yupResolver(registerFormSchema),
-    mode: "onSubmit",
+    mode: "onTouched",
+    reValidateMode: "onChange",
   });
 
   const firstNameValue = watch("firstName");
@@ -131,12 +130,6 @@ const RegisterScreen = () => {
     passwordValue,
     phoneValue,
   ]);
-
-  const handleFieldChange = (field: keyof RegisterFormSchema) => {
-    if (errors[field]) {
-      clearErrors(field);
-    }
-  };
 
   const onSubmit: SubmitHandler<RegisterFormSchema> = async (data) => {
     if (!email) return;
@@ -184,14 +177,8 @@ const RegisterScreen = () => {
                   <BaseInputField
                     label="First name"
                     value={value}
-                    onChange={(text) => {
-                      handleFieldChange("firstName");
-                      onChange(text);
-                    }}
-                    onBlur={() => {
-                      onBlur();
-                      void trigger("firstName");
-                    }}
+                    onChange={onChange}
+                    onBlur={onBlur}
                     error={errors.firstName?.message}
                     autoComplete="name"
                     textContentType="givenName"
@@ -207,14 +194,8 @@ const RegisterScreen = () => {
                   <BaseInputField
                     label="Last name"
                     value={value}
-                    onChange={(text) => {
-                      handleFieldChange("lastName");
-                      onChange(text);
-                    }}
-                    onBlur={() => {
-                      onBlur();
-                      void trigger("lastName");
-                    }}
+                    onChange={onChange}
+                    onBlur={onBlur}
                     error={errors.lastName?.message}
                     autoComplete="name"
                     textContentType="familyName"
@@ -239,14 +220,8 @@ const RegisterScreen = () => {
                   <BaseInputField
                     label="Phone number"
                     value={value}
-                    onChange={(text) => {
-                      handleFieldChange("phone");
-                      onChange(text);
-                    }}
-                    onBlur={() => {
-                      onBlur();
-                      void trigger("phone");
-                    }}
+                    onChange={onChange}
+                    onBlur={onBlur}
                     error={errors.phone?.message}
                     keyboardType="phone-pad"
                     autoComplete="tel"
@@ -270,14 +245,13 @@ const RegisterScreen = () => {
                   <PasswordField
                     value={value}
                     onChange={(text) => {
-                      handleFieldChange("password");
+                      if (registerError) {
+                        reset();
+                      }
                       onChange(text);
                     }}
-                    onBlur={() => {
-                      onBlur();
-                      void trigger("password");
-                    }}
-                    error={errors.password?.message}
+                    onBlur={onBlur}
+                    error={errors.password?.message || registerError}
                   />
                 )}
               />

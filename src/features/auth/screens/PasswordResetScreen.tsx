@@ -37,17 +37,12 @@ export default function PasswordResetScreen() {
     control: formControl,
     handleSubmit,
     formState: { errors },
-    clearErrors,
   } = useForm<PasswordResetFormSchema>({
     defaultValues: { email: "" },
     resolver: yupResolver(forgotPasswordSchema),
-    mode: "onSubmit",
+    mode: "onTouched",
+    reValidateMode: "onChange",
   });
-
-  const handleInputChange = () => {
-    if (errors.email) clearErrors("email");
-    if (forgotPasswordError) reset();
-  };
 
   const onSubmit: SubmitHandler<PasswordResetFormSchema> = async (data) => {
     try {
@@ -75,13 +70,16 @@ export default function PasswordResetScreen() {
             <Controller
               control={formControl}
               name="email"
-              render={({ field: { onChange, value } }) => (
+              render={({ field: { onBlur, onChange, value } }) => (
                 <EmailField
                   value={value}
                   onChange={(text: string) => {
-                    handleInputChange();
+                    if (forgotPasswordError) {
+                      reset();
+                    }
                     onChange(text);
                   }}
+                  onBlur={onBlur}
                   error={errors.email?.message || forgotPasswordError}
                 />
               )}

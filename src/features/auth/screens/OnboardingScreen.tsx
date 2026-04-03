@@ -43,22 +43,17 @@ const OnboardingScreen = () => {
   const {
     control: formControl,
     handleSubmit,
-    trigger,
     watch,
     formState: { errors },
-    clearErrors,
   } = useForm<LoginFormSchema>({
     defaultValues: { email: "" },
     resolver: yupResolver(loginFormSchema),
-    mode: "onSubmit",
+    mode: "onTouched",
+    reValidateMode: "onChange",
   });
 
   const emailValue = watch("email");
   const hasEmail = emailValue.trim().length > 0;
-
-  const handleInputChange = (field: "email") => {
-    if (errors[field]) clearErrors(field);
-  };
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
     try {
@@ -112,7 +107,7 @@ const OnboardingScreen = () => {
           }}
         >
           <Text className="text-center font-normal text-textPrimary text-base">
-            Log in or sign up
+            Log in or sign upasdfasdf
           </Text>
 
           <View className="absolute right-lg top-0 bottom-0 justify-center">
@@ -141,14 +136,8 @@ const OnboardingScreen = () => {
                 render={({ field: { onBlur, onChange, value } }) => (
                   <EmailField
                     value={value}
-                    onChange={(text) => {
-                      handleInputChange("email");
-                      onChange(text);
-                    }}
-                    onBlur={() => {
-                      onBlur();
-                      void trigger("email");
-                    }}
+                    onChange={onChange}
+                    onBlur={onBlur}
                     error={errors.email?.message}
                   />
                 )}
