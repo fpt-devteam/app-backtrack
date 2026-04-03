@@ -1,8 +1,37 @@
 const typography = {
   fontFamily: {
-    display: ["Manrope", "sans-serif"],
-    body: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-    mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
+    display: [
+      "system-ui",
+      "-apple-system",
+      "BlinkMacSystemFont",
+      "Segoe UI",
+      "Roboto",
+      "sans-serif",
+    ],
+    heading: [
+      "system-ui",
+      "-apple-system",
+      "BlinkMacSystemFont",
+      "Segoe UI",
+      "Roboto",
+      "sans-serif",
+    ],
+    body: [
+      "system-ui",
+      "-apple-system",
+      "BlinkMacSystemFont",
+      "Segoe UI",
+      "Roboto",
+      "sans-serif",
+    ],
+    mono: [
+      "ui-monospace",
+      "SFMono-Regular",
+      "Menlo",
+      "Monaco",
+      "Consolas",
+      "monospace",
+    ],
   },
 
   fontSize: {
@@ -31,6 +60,25 @@ const typography = {
     tight: 1.25,
     normal: 1.5,
     relaxed: 1.75,
+    body: 24,
+  },
+
+  presets: {
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 800,
+      lineHeight: 24,
+    },
+    body: {
+      fontSize: 16,
+      fontWeight: 400,
+      lineHeight: 24,
+    },
+    meta: {
+      fontSize: 14,
+      fontWeight: 500,
+      lineHeight: 20,
+    },
   },
 };
 

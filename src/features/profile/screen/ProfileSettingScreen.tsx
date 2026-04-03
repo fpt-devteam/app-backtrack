@@ -47,7 +47,7 @@ const MenuRow = ({
     <View>
       <Pressable
         onPress={handlePress}
-        className="flex-row items-center gap-4 px-4 py-4 active:bg-slate-50"
+        className="flex-row items-center gap-4 px-4 py-4 active:bg-canvas"
       >
         <View
           className="w-9 h-9 rounded-lg items-center justify-center"
@@ -57,9 +57,9 @@ const MenuRow = ({
         </View>
 
         <View className="flex-1">
-          <Text className="text-sm font-medium text-slate-800">{title}</Text>
+          <Text className="text-sm font-medium text-textPrimary">{title}</Text>
           {Boolean(subtitle) && (
-            <Text className="text-xs text-slate-500 mt-0.5">{subtitle}</Text>
+            <Text className="text-xs text-textSecondary mt-0.5">{subtitle}</Text>
           )}
         </View>
 
@@ -100,7 +100,7 @@ const ProfileSettingScreen = () => {
       <AppHeader
         left={<BackButton />}
         center={
-          <Text className="text-base font-bold text-slate-900">
+          <Text className="text-base font-bold text-textPrimary">
             Settings & Privacy
           </Text>
         }
@@ -112,7 +112,7 @@ const ProfileSettingScreen = () => {
           <Text className="mt-8 mb-2 ml-1 text-xs font-bold text-slate-400 uppercase tracking-[1px]">
             Account Settings
           </Text>
-          <View className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+          <View className="rounded-2xl border border-divider bg-surface overflow-hidden shadow-sm">
             <MenuRow
               title="Personal Information"
               subtitle="Update your name and contact info"
@@ -135,7 +135,7 @@ const ProfileSettingScreen = () => {
           <Text className="mt-8 mb-2 ml-1 text-xs font-bold text-slate-400 uppercase tracking-[1px]">
             Preferences
           </Text>
-          <View className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+          <View className="rounded-2xl border border-divider bg-surface overflow-hidden shadow-sm">
             <MenuRow
               title="Notifications"
               icon={<BellIcon size={18} color={colors.white} weight="fill" />}
@@ -152,7 +152,7 @@ const ProfileSettingScreen = () => {
           </View>
 
           {/* Group 3: Support */}
-          <View className="mt-8 rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+          <View className="mt-8 rounded-2xl border border-divider bg-surface overflow-hidden shadow-sm">
             <MenuRow
               title="Help & Support"
               icon={

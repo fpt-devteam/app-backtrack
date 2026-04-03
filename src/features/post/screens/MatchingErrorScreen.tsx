@@ -127,7 +127,7 @@ export const MatchingErrorScreen = ({
   };
 
   return (
-    <View className="flex-1 bg-slate-50 items-center justify-center px-6">
+    <View className="flex-1 bg-canvas items-center justify-center px-6">
       {/* Center animation */}
       <View className="items-center justify-center">
         {ripples.map((r) => (
@@ -146,7 +146,7 @@ export const MatchingErrorScreen = ({
         />
 
         <Animated.View
-          className="w-20 h-20 rounded-2xl bg-white border border-slate-200 items-center justify-center shadow-sm"
+          className="w-20 h-20 rounded-2xl bg-surface border border-divider items-center justify-center shadow-sm"
           style={{ transform: [{ scale: iconScale }] }}
         >
           <WarningCircleIcon size={36} color={colors.slate[900]} weight="fill" />
@@ -155,15 +155,15 @@ export const MatchingErrorScreen = ({
 
       {/* Text block */}
       <View className="mt-8 items-center">
-        <Text className="text-base font-extrabold text-slate-900">{title}</Text>
-        <Text className="mt-2 text-sm text-slate-600 text-center leading-5">
+        <Text className="text-base font-extrabold text-textPrimary">{title}</Text>
+        <Text className="mt-2 text-sm text-textSecondary text-center leading-5">
           {subtitle}
         </Text>
-        <Text className="mt-2 text-xs text-slate-500 text-center">{hint}</Text>
+        <Text className="mt-2 text-xs text-textSecondary text-center">{hint}</Text>
 
         {!!errorMessage && (
-          <View className="mt-3 px-3 py-2 rounded-xl bg-white border border-slate-200">
-            <Text className="text-[11px] text-slate-600 text-center">
+          <View className="mt-3 px-3 py-2 rounded-xl bg-surface border border-divider">
+            <Text className="text-[11px] text-textSecondary text-center">
               {errorMessage}
             </Text>
           </View>
@@ -183,7 +183,7 @@ export const MatchingErrorScreen = ({
         {showCancel && (
           <Pressable
             onPress={handleCancel}
-            className="self-center px-5 py-2.5 rounded-full bg-slate-100 active:bg-slate-200 border border-slate-200"
+            className="self-center px-5 py-2.5 rounded-full bg-slate-100 active:bg-slate-200 border border-divider"
           >
             <Text className="text-sm font-semibold text-slate-700">
               {cancelText}

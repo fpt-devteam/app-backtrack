@@ -91,11 +91,11 @@ export const PostCard = ({ item }: PostCardProps) => {
       </View>
 
       {/* INFO STRIP */}
-      <View className="px-2 pt-2 pb-2.5 bg-white gap-1.5">
+      <View className="px-2 pt-2 pb-2.5 bg-surface gap-1.5">
         {/* Title — loudest element */}
         <Text
           numberOfLines={2}
-          className="text-sm font-medium text-slate-900 leading-[18px]"
+          className="text-sm font-medium text-textPrimary leading-[18px]"
         >
           {item.itemName}
         </Text>
@@ -103,7 +103,7 @@ export const PostCard = ({ item }: PostCardProps) => {
         {/* Event time — secondary */}
         <View className="flex-row items-center gap-1">
           <ClockIcon size={11} color={colors.slate[400]} weight="bold" />
-          <Text numberOfLines={1} className="text-[11px] text-slate-500 flex-1">
+          <Text numberOfLines={1} className="text-[11px] text-textSecondary flex-1">
             {eventTimeLabel}
           </Text>
         </View>
