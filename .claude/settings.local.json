@@ -18,7 +18,12 @@
       "Bash(node --version:*)",
       "Bash(cat:*)",
       "Bash(npm run:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "mcp__refero__refero_search_screens",
+      "mcp__refero__refero_get_flow",
+      "mcp__refero__refero_get_screen",
+      "mcp__refero__refero_search_flows",
+      "Bash(node:*)"
     ]
   },
   "enabledPlugins": {

@@ -30,14 +30,19 @@ export default function RootLayout() {
             <AppUserProvider>
               <BottomSheetModalProvider>
                 <StatusBar style="auto" />
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                  }}
-                >
-                  <Stack.Screen name="(protected)" />
-                  <Stack.Screen name="(public)" />
+
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{
+                      presentation: "modal",
+                      animation: "slide_from_bottom",
+                    }}
+                  />
+                  <Stack.Screen name="(shared)" />
                 </Stack>
+
                 <Toast config={toastConfig} position="top" topOffset={56} />
               </BottomSheetModalProvider>
             </AppUserProvider>

@@ -1,5 +1,5 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, Post, PostCreateRequest, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostsRequest, PostsResponse } from "@/src/features/post/types";
-import { type ApiResponse, privateClient } from "@/src/shared/api";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostsRequest, PostsResponse } from "@/src/features/post/types";
+import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
   create: "/api/core/posts",
@@ -13,21 +13,17 @@ export const POST_API = {
 } as const;
 
 export async function getFeedPostsApi(params: PostsRequest) {
-  const response = await privateClient.post(POST_API.getFeed, params);
-  return response.data as PostsResponse;
+  const response = await publicClient.post<PostsResponse>(POST_API.getFeed, params);
+  return response.data;
 }
 
 export const createPost = async (req: PostCreateRequest) => {
-  const response = await privateClient.post(POST_API.create, req, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  return response.data as ApiResponse<Post>;
+  const response = await privateClient.post<PostCreateResponse>(POST_API.create, req);
+  return response.data;
 };
 
 export async function getPostByIdApi(postId: string) {
-  const response = await privateClient.get<ApiResponse<Post>>(POST_API.detail(postId));
+  const response = await privateClient.get<PostGetByIdResponse>(POST_API.detail(postId));
   return response.data;
 }
 
@@ -37,11 +33,7 @@ export async function matchingPostsApi(req: MatchingPostsRequest) {
 }
 
 export async function analyzeImageApi(req: AnalyzeImageRequest) {
-  const response = await privateClient.post<AnalyzeImageResponse>(POST_API.analyzeImage, req, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  const response = await privateClient.post<AnalyzeImageResponse>(POST_API.analyzeImage, req);
   return response.data;
 }
 

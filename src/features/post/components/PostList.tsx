@@ -19,7 +19,15 @@ export const PostList = ({
 
   const { items, loadMore, isLoading, refetch, isRefetching } = usePosts({
     enabled: !!confirmedSelection,
-    filters: { ...filters, location: confirmedSelection?.location! },
+    filters: {
+      postType: filters?.postType,
+      searchTerm: filters?.searchTerm,
+      radiusInKm: confirmedSelection?.radiusInKm,
+      location: {
+        latitude: confirmedSelection?.location.latitude!,
+        longitude: confirmedSelection?.location.longitude!,
+      },
+    },
   });
 
   const isHorizontal = direction === "horizontal";

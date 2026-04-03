@@ -18,7 +18,7 @@ import { Pressable, View } from "react-native";
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
 const TAB_ICONS: Record<string, TabIcon> = {
-  posts: { Icon: HouseIcon, label: "Home" },
+  post: { Icon: HouseIcon, label: "Home" },
   qr: { Icon: QrCodeIcon, label: "QRs" },
   chat: { Icon: BellIcon, label: "Inbox" },
   profile: { Icon: AppUserAvatarIcon, label: "You" },
@@ -26,13 +26,8 @@ const TAB_ICONS: Record<string, TabIcon> = {
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   const [isCreateOptionsVisible, setIsCreateOptionsVisible] = useState(false);
-
-  const visibleRoutes = state.routes.filter(
-    (route) => route.name !== "notification",
-  );
-
-  const leadingRoutes = visibleRoutes.slice(0, 2); // -> posts, qr
-  const trailingRoutes = visibleRoutes.slice(2); // -> inbox, profile
+  const leadingRoutes = state.routes.slice(0, 2); // -> post, qr
+  const trailingRoutes = state.routes.slice(2); // -> inbox, profile
 
   const renderTabButton = (route: (typeof state.routes)[number]) => {
     const index = state.routes.findIndex((item) => item.key === route.key);

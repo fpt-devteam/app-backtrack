@@ -60,12 +60,12 @@ export const MapScreen = () => {
   }, [getUserLocation, onChangeSelection]);
 
   const postParams = useMemo(() => {
-    if (!selection?.location || !selection?.radiusKm)
+    if (!selection?.location || !selection?.radiusInKm)
       return { enabled: false } as PostsFiltersOptions;
 
     const nextFilter: PostFilters = {
       location: selection?.location,
-      radiusInKm: selection?.radiusKm,
+      radiusInKm: selection?.radiusInKm,
     };
     return {
       filters: nextFilter,
@@ -138,7 +138,7 @@ export const MapScreen = () => {
             <UserPlaceMarker
               coordinate={selection.location}
               disabled={false}
-              radiusKm={selection.radiusKm}
+              radiusKm={selection.radiusInKm}
               onPress={() => {
                 handleOpenSheet();
                 bottomSheetElement.current = (

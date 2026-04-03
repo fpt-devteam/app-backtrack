@@ -9,22 +9,16 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import type {
   TabBarProps as RNTabBarProps,
   Route,
 } from "react-native-tab-view";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
-import { useAppUser } from "@/src/features/auth/providers";
+import { useAppUser, useAuth } from "@/src/features/auth/providers";
 import type { Post } from "@/src/features/post/types";
-import {
-  AppHeader,
-  AppImage,
-  AppUserAvatar,
-  TouchableIconButton,
-} from "@/src/shared/components";
-import { POST_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
+import { AppImage, AppUserAvatar } from "@/src/shared/components";
+import { AUTH_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 
 import { useGetAllMyPost } from "@/src/features/post/hooks";
@@ -33,12 +27,10 @@ import * as Haptics from "expo-haptics";
 import { PostStatusBadge } from "@/src/features/post/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import {
-  GearIcon,
   IconProps,
-  ListIcon,
   PackageIcon,
-  PencilSimpleIcon,
   QrCodeIcon,
+  UserCircleIcon,
 } from "phosphor-react-native";
 
 type RouteProps = {
@@ -102,7 +94,9 @@ const PostScene = () => {
   if (error) {
     return (
       <View className="flex-1 bg-canvas items-center justify-center px-8">
-        <Text className="text-textSecondary text-center">Unable to load posts</Text>
+        <Text className="text-textSecondary text-center">
+          Unable to load posts
+        </Text>
         <Pressable
           onPress={() => refetch()}
           className="mt-3 px-4 py-2 bg-black rounded-full"
@@ -202,6 +196,9 @@ export function ProfileScreen() {
   const { user } = useAppUser();
   const [index, setIndex] = useState(0);
 
+  const { isAppReady, isLoggedIn } = useAuth();
+  const isAuthReady = isAppReady && isLoggedIn;
+
   const [routes] = useState<RouteProps[]>([
     { key: "posts", title: "Post", tabIcon: PackageIcon },
     { key: "qr", title: "QR Code", tabIcon: QrCodeIcon },
@@ -216,76 +213,64 @@ export function ProfileScreen() {
     return user?.avatarUrl;
   }, [user?.avatarUrl]);
 
-  return (
-    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
-      <ProfileScreenHeader />
-
-      <View className="flex-1">
-        {/* Info Header */}
-        <View className="items-center py-8 px-4 bg-surface">
-          <View className="flex-col items-center gap-4">
-            <AppUserAvatar size={128} avatarUrl={avatarSource} />
-            <Text className="text-lg font-extrabold text-textPrimary">
-              {displayName}
-            </Text>
-          </View>
+  if (!isAuthReady) {
+    return (
+      <View
+        className="flex-1 bg-surface px-10 gap-10 pt-20"
+        style={{ paddingTop: layout.height * 0.15 }}
+      >
+        <View className="flex-row justify-center">
+          <UserCircleIcon size={128} color={colors.primary} />
         </View>
 
-        {/* TabView Area */}
-        <TabView<RouteProps>
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width: layout.width }}
-          renderTabBar={CustomTabBar}
-          swipeEnabled={true}
-          commonOptions={{
-            icon: renderTabIcon,
-            label: () => null,
-          }}
-        />
+        <View className="gap-y-2">
+          <Text className="text-xl font-normal text-textPrimary text-center">
+            Log in to view your profile
+          </Text>
+
+          <Text className="text-base font-thin text-textSecondary text-center leading-6">
+            Once you log in, you will find all your conversations here.
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+          onPress={() => router.push(AUTH_ROUTE.onboarding)}
+          activeOpacity={0.8}
+        >
+          <Text className="text-base font-normal text-white text-center">
+            Log in or Sign up
+          </Text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-surface">
+      {/* Info Header */}
+      <View className="items-center py-8 px-4 bg-surface">
+        <View className="flex-col items-center gap-4">
+          <AppUserAvatar size={128} avatarUrl={avatarSource} />
+          <Text className="text-lg font-extrabold text-textPrimary">
+            {displayName}
+          </Text>
+        </View>
+      </View>
+
+      {/* TabView Area */}
+      <TabView<RouteProps>
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        initialLayout={{ width: layout.width }}
+        renderTabBar={CustomTabBar}
+        swipeEnabled={true}
+        commonOptions={{
+          icon: renderTabIcon,
+          label: () => null,
+        }}
+      />
+    </View>
   );
 }
-
-const ProfileScreenHeader = () => {
-  const handleNavigateSettingScreen = () => {
-    router.push(PROFILE_ROUTE.setting);
-  };
-
-  const handleNavigateEditProfileScreen = () => {
-    router.push(PROFILE_ROUTE.edit);
-  };
-
-  const handleNavigateMenuTabScreen = () => {
-    router.push(PROFILE_ROUTE.menuTab);
-  };
-
-  return (
-    <AppHeader
-      left={
-        <TouchableIconButton
-          onPress={handleNavigateMenuTabScreen}
-          icon={<ListIcon size={28} color={colors.black} />}
-        />
-      }
-      center={
-        <Text className="text-lg font-extrabold text-textPrimary">Profile</Text>
-      }
-      right={
-        <View className="flex-row gap-4">
-          <TouchableIconButton
-            onPress={handleNavigateEditProfileScreen}
-            icon={<PencilSimpleIcon size={28} color={colors.black} />}
-          />
-
-          <TouchableIconButton
-            onPress={handleNavigateSettingScreen}
-            icon={<GearIcon size={28} color={colors.black} />}
-          />
-        </View>
-      }
-    />
-  );
-};

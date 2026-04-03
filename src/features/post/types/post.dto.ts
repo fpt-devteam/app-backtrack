@@ -6,13 +6,13 @@ import type {
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
+import { PostMatchingStatus, PostType } from "./post.enum";
 import type {
   Post,
   PostSearchOptions,
   PostSuggestion,
   SimilarPost
 } from "./post.type";
-import { PostMatchingStatus, PostType } from "./post.enum";
 
 export type PostsRequest = {
   postType?: PostType;

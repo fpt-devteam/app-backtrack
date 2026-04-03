@@ -11,10 +11,9 @@ export const BottomTabBar = () => {
       }}
       tabBar={(props) => <TabBarContent {...props} />}
     >
-      <Tabs.Screen name="posts" />
+      <Tabs.Screen name="post" />
       <Tabs.Screen name="qr" />
       <Tabs.Screen name="chat" />
-      <Tabs.Screen name="notification" options={{ animation: "shift" }} />
       <Tabs.Screen name="profile" />
     </Tabs>
   );

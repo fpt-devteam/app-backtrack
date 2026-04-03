@@ -1,8 +1,8 @@
-import { colors } from "@/src/shared/theme";
+import { colors, metrics, typography } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
-import { EnvelopeIcon } from "phosphor-react-native";
-import React, { useState } from "react";
-import { Text, TextInput, View } from "react-native";
+import { WarningCircleIcon } from "phosphor-react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Text, TextInput, View } from "react-native";
 
 type EmailFieldProps = {
   value: string;
@@ -18,6 +18,17 @@ export const EmailField = ({
   error,
 }: EmailFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
+  const isActive = isFocused || value.length > 0;
+
+  const labelAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(labelAnim, {
+      toValue: isActive ? 1 : 0,
+      duration: metrics.motion.duration.normal,
+      useNativeDriver: false,
+    }).start();
+  }, [isActive]);
 
   const handleFocus = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -29,57 +40,90 @@ export const EmailField = ({
     onBlur?.();
   };
 
-  const getColor = () => {
-    if (error) return colors.text.error;
-    if (isFocused) return colors.primary;
-    return colors.slate[400];
-  };
+  const borderColor = error
+    ? colors.status.error
+    : isFocused
+      ? colors.border.strong
+      : colors.border.DEFAULT;
+
+  const labelColor = error ? colors.status.error : colors.text.muted;
+
+  const labelTop = labelAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [16, 6],
+  });
+
+  const labelFontSize = labelAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [typography.fontSize.base, typography.fontSize.xs],
+  });
+
+  const inputPaddingTop = labelAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 22],
+  });
 
   return (
     <View>
-      {/* Field Label */}
-      <Text
-        className="mb-2 text-base font-medium"
-        style={{
-          color: colors.text.main,
-        }}
-      >
-        Email
-      </Text>
-
-      {/* Field */}
+      {/* Field — 52px tall, 1px border, 8px radius */}
       <View
-        className={`flex-row gap-2 items-center rounded-lg border p-3`}
-        style={{
-          borderWidth: 1,
-          borderColor: getColor(),
-        }}
+        className="relative h-control-xl rounded-sm bg-surface pb-2"
+        style={{ borderWidth: isFocused ? 2 : 1, borderColor }}
       >
-        {/* Email Icon */}
-        <EnvelopeIcon size={20} color={getColor()} />
+        {/* Floating label */}
+        <Animated.Text
+          style={{
+            position: "absolute",
+            left: metrics.spacing.md2,
+            top: labelTop,
+            fontSize: labelFontSize,
+            fontWeight: `${typography.fontWeight.thin}` as "400",
+            color: labelColor,
+          }}
+          numberOfLines={1}
+        >
+          Email
+        </Animated.Text>
 
-        {/* Email Text */}
-        <TextInput
-          className="flex-1"
-          style={{ color: colors.text.main }}
-          placeholder="user@example.com"
-          placeholderTextColor={colors.slate[400]}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
-          value={value}
-          onChangeText={onChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
+        {/* Input wrapper — shifts down via paddingTop to clear the floated label */}
+        <Animated.View style={{ flex: 1, paddingTop: inputPaddingTop }}>
+          <TextInput
+            className="flex-1 px-md2"
+            style={{
+              color: colors.text.primary,
+              fontSize: typography.fontSize.base,
+              fontWeight: `${typography.fontWeight.thin}` as "400",
+            }}
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            autoComplete="email"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="next"
+            value={value}
+            onChangeText={onChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            cursorColor={colors.black}
+            selectionColor={colors.black}
+          />
+        </Animated.View>
       </View>
 
-      {/* Text Error */}
+      {/* Error message */}
       {error && (
-        <View className="flex-row items-center mt-1.5 px-1">
+        <View className="flex-row items-center mt-1.5 gap-2">
+          <WarningCircleIcon
+            size={16}
+            weight="fill"
+            color={colors.status.error}
+          />
           <Text
-            className="text-sm text-error"
-            style={{ color: colors.text.error }}
+            style={{
+              fontSize: typography.fontSize.xs,
+              fontWeight: `${typography.fontWeight.thin}` as "400",
+              color: colors.status.error,
+            }}
           >
             {error}
           </Text>
