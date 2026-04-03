@@ -86,14 +86,3 @@ export type PostSearchResponse = ApiResponse<PagedResponse<Post>>;
 
 // Post Suggestion
 export type PostsSuggestionResponse = ApiResponse<PostSuggestion[]>;
-
-
-/*
- * Post Search Request and Response
-*/
-export type PostSearchRequest = PostSearchOptions & PagedRequest
-
-export type PostSearchResponse = ApiResponse<PagedResponse<Post>>;
-
-// Post Suggestion
-export type PostsSuggestionResponse = ApiResponse<PostSuggestion[]>;
