@@ -17,6 +17,7 @@ import {
   Easing,
   FlatList,
   Keyboard,
+  Pressable,
   Text,
   TextInput,
   TouchableWithoutFeedback,
