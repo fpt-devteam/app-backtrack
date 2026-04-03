@@ -116,6 +116,7 @@ export const ChatScreen = () => {
       showsVerticalScrollIndicator={false}
       onEndReached={onLoadMore}
       onEndReachedThreshold={0.35}
+      // ItemSeparatorComponent={AppDivider}
       ListEmptyComponent={
         <EmptyList
           icon={<ChatCenteredTextIcon size={128} color={colors.primary} />}

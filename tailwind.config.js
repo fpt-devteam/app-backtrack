@@ -259,3 +259,4 @@ module.exports = {
   /** Project has no additional Tailwind plugins at this time. */
   plugins: [],
 };
+

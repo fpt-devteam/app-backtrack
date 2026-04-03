@@ -57,6 +57,7 @@ const TipCard = () => {
         <LightbulbIcon size={18} color={colors.primary} weight="fill" />
       </View>
       <Text className="flex-1 text-xs text-textSecondary leading-5">
+      <Text className="flex-1 text-xs text-textSecondary leading-5">
         <Text className="text-xs font-semibold text-slate-700">Tip: </Text>
         Stick your QR on items for a higher chance of recovery.
       </Text>

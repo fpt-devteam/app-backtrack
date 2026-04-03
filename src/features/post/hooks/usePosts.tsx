@@ -1,4 +1,5 @@
 import { getFeedPostsApi } from "@/src/features/post/api";
+import { getFeedPostsApi } from "@/src/features/post/api";
 import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import type {
   PostFilters,
