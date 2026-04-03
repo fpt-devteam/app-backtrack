@@ -6,8 +6,13 @@ import {
 } from "@/src/features/chat/constants";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-export const useConversations = () => {
+type UseConversationsProps = {
+  enabled?: boolean;
+};
+
+export const useConversations = ({ enabled = true }: UseConversationsProps) => {
   const query = useInfiniteQuery({
+    enabled,
     queryKey: CHAT_QUERY_KEY.conversations,
     queryFn: async ({ pageParam }) => {
       const params = {

@@ -1,3 +1,4 @@
+import { useAuth } from "@/src/features/auth/providers";
 import { NotificationRow } from "@/src/features/notification/components";
 import {
   useNotifications,
@@ -9,17 +10,61 @@ import {
 } from "@/src/features/notification/types";
 import { AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
-import { SHARED_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { RelativePathString, router } from "expo-router";
-import { BellSimpleSlashIcon } from "phosphor-react-native";
+import { BellRingingIcon, BellSimpleSlashIcon } from "phosphor-react-native";
 import React from "react";
-import { FlatList } from "react-native";
+import {
+  FlatList,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 const NotificationScreen = () => {
+  const { isAppReady, isLoggedIn } = useAuth();
+  const isAuthReady = isAppReady && isLoggedIn;
+  const { height } = useWindowDimensions();
+
   const { items, isLoading, hasMore, loadMore, isLoadingNextPage } =
-    useNotifications();
+    useNotifications({ enabled: isAuthReady });
+
   const { updateStatus } = useUpdateNotificationStatus();
+
+  if (!isAuthReady) {
+    return (
+      <View
+        className="flex-1 bg-surface px-10 gap-10 pt-20"
+        style={{ paddingTop: height * 0.15 }}
+      >
+        <View className="flex-row justify-center">
+          <BellRingingIcon size={128} color={colors.primary} />
+        </View>
+
+        <View className="gap-y-2">
+          <Text className="text-xl font-normal text-textPrimary text-center">
+            Log in to see notifications
+          </Text>
+
+          <Text className="text-base font-thin text-textSecondary text-center leading-6">
+            Once you log in, you will find all your notifications here.
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+          onPress={() => router.push(AUTH_ROUTE.onboarding)}
+          activeOpacity={0.8}
+        >
+          <Text className="text-base font-normal text-white text-center">
+            Log in or Sign up
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const handlePress = async (notification: UserNotification) => {
     try {
@@ -43,9 +88,7 @@ const NotificationScreen = () => {
   };
 
   const handleEndReached = () => {
-    if (hasMore && !isLoadingNextPage) {
-      loadMore();
-    }
+    if (hasMore && !isLoadingNextPage) loadMore();
   };
 
   const renderItem = ({ item }: { item: UserNotification }) => (
@@ -63,8 +106,8 @@ const NotificationScreen = () => {
             color={colors.primary}
           />
         }
-        title="You don't have any notifications yet."
-        subtitle="Once you receive notifications, they will appear here."
+        title="You don't have any notifications."
+        subtitle="When you receive a new notification, it will appear here."
         backButton={null}
       />
     );

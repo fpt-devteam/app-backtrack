@@ -54,7 +54,7 @@ export const PasswordField = ({
 
       {/* Field */}
       <View
-        className={`flex-row gap-2 items-center rounded-lg border p-3`}
+        className={`flex-row gap-2 items-center rounded-sm border p-3`}
         style={{
           borderWidth: 1,
           borderColor: getColor(),

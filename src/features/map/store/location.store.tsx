@@ -18,15 +18,18 @@ type UserLocationContextValue = {
   onConfirmSelection: (data: UserLocation) => void;
 };
 
-const LocationSelectionContext = createContext<UserLocationContextValue | null>(
-  null,
-);
+const LocationSelectionContext =
+  createContext<Nullable<UserLocationContextValue>>(null);
 
 const MOCK_LOCATION: UserLocation = {
   displayAddress:
     "702 Võ Nguyên Giáp, Hiệp Phú, Tăng Nhơn Phú, Hồ Chí Minh 70000, Việt Nam",
   externalPlaceId: "ChIJm0qMwQkndTERc5s0xiK131M",
-  location: { latitude: 10.84308399341188, longitude: 106.77177212981283 },
+  location: {
+    latitude: 10.84308399341188,
+    longitude: 106.77177212981283,
+  },
+  radiusInKm: 20,
 };
 
 export const LocationSelectionProvider = ({

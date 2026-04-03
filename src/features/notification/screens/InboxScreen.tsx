@@ -1,10 +1,8 @@
 import { ChatScreen } from "@/src/features/chat/screens";
 import NotificationScreen from "@/src/features/notification/screens/NotificationScreen";
-import { AppHeader } from "@/src/shared/components";
 import { colors } from "@/src/shared/theme";
 import React, { useState } from "react";
-import { Text, View, useWindowDimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, useWindowDimensions } from "react-native";
 import type {
   TabBarProps as RNTabBarProps,
   Route,
@@ -17,13 +15,13 @@ type InboxRoute = {
 };
 
 const ChatScene = () => (
-  <View className="flex-1 bg-surface py-2">
+  <View className="flex-1 bg-surface">
     <ChatScreen />
   </View>
 );
 
 const NotificationScene = () => (
-  <View className="flex-1 bg-surface py-2">
+  <View className="flex-1 bg-surface">
     <NotificationScreen />
   </View>
 );
@@ -34,48 +32,32 @@ const renderScene = SceneMap({
 });
 
 const CustomTabBar = (props: RNTabBarProps<InboxRoute>) => {
-  const layout = useWindowDimensions();
-
-  const TAB_COUNT = props.navigationState.routes.length;
-  const TAB_WIDTH = layout.width / TAB_COUNT;
-  const INDICATOR_WIDTH = 24;
-  const INDICATOR_MARGIN = (TAB_WIDTH - INDICATOR_WIDTH) / 2;
-
   return (
     <TabBar
       {...props}
-      indicatorStyle={{
-        backgroundColor: colors.black,
-        width: INDICATOR_WIDTH,
-        marginLeft: INDICATOR_MARGIN,
-      }}
+      indicatorStyle={{ backgroundColor: colors.black }}
       indicatorContainerStyle={{
         borderBottomWidth: 0.5,
-        borderBottomColor: colors.slate[500],
+        borderBottomColor: colors.hof[500],
       }}
       style={{
         backgroundColor: "transparent",
       }}
       activeColor={colors.black}
-      inactiveColor={colors.slate[400]}
+      inactiveColor={colors.hof[400]}
       options={Object.fromEntries(
         props.navigationState.routes.map((route) => [
           route.key,
           {
             labelText: route.title,
-            labelStyle: { fontWeight: "700" },
+            labelStyle: { fontWeight: "500" },
+            fontSize: 14,
           },
         ]),
       )}
     />
   );
 };
-
-const InboxScreenHeader = () => (
-  <AppHeader
-    center={<Text className="text-lg font-bold text-textPrimary">Inbox</Text>}
-  />
-);
 
 const InboxScreen = () => {
   const layout = useWindowDimensions();
@@ -87,9 +69,7 @@ const InboxScreen = () => {
   ]);
 
   return (
-    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
-      <InboxScreenHeader />
-
+    <View className="flex-1 bg-surface">
       <TabView<InboxRoute>
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -99,7 +79,7 @@ const InboxScreen = () => {
         renderTabBar={CustomTabBar}
         swipeEnabled={true}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

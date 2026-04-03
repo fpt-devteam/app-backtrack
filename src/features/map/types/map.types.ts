@@ -30,7 +30,7 @@ export type UserLocation = {
   location: LatLng;
   displayAddress?: string | null;
   externalPlaceId?: string | null;
-  radiusKm?: number;
+  radiusInKm?: number;
 };
 
 export type PlusCode = {

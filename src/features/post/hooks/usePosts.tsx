@@ -33,6 +33,8 @@ export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
         pageSize: DEFAULT_PAGED_REQUEST.pageSize,
       };
 
+      console.log("filtersRequest: ", filtersRequest);
+
       const res = await getFeedPostsApi(filtersRequest);
       if (!res.success || !res.data) throw new Error("Failed to fetch posts");
       return res;
