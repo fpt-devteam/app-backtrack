@@ -28,8 +28,8 @@ const SafetyBanner = ({ onDismiss }: { onDismiss: () => void }) => (
       style={{ marginTop: 1 }}
     />
     <View className="flex-1">
-      <Text className="text-sm font-bold text-slate-800">Safety First</Text>
-      <Text className="text-sm text-slate-500 leading-5 mt-0.5">
+      <Text className="text-sm font-bold text-textPrimary">Safety First</Text>
+      <Text className="text-sm text-textSecondary leading-5 mt-0.5">
         Please meet in public places or use safe drop-off points when returning
         items.
       </Text>
@@ -65,13 +65,13 @@ const QRProfileScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-surface">
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <XIcon size={22} color={colors.black} weight="bold" />
         </Pressable>
-        <Text className="flex-1 text-center text-base font-bold text-slate-900">
+        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
           Owner Profile
         </Text>
         {/* Spacer to balance the close button */}
@@ -108,14 +108,14 @@ const QRProfileScreen = () => {
                 </Text>
               </View>
             )}
-            <View className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+            <View className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5">
               <SealCheckIcon size={24} color={colors.primary} weight="fill" />
             </View>
           </View>
 
           {/* Name & member since */}
           <View className="items-center gap-1 mt-2">
-            <Text className="text-xl font-bold text-slate-900">
+            <Text className="text-xl font-bold text-textPrimary">
               {user?.displayName ?? "Unknown"}
             </Text>
             <Text className="text-sm text-slate-400">
@@ -136,7 +136,7 @@ const QRProfileScreen = () => {
           </View>
 
           {/* Contact info */}
-          <View className="w-full mt-2 bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+          <View className="w-full mt-2 bg-canvas rounded-2xl border border-divider overflow-hidden">
             <View className="flex-row items-center gap-3 px-4 py-3">
               <View className="w-8 h-8 rounded-full bg-sky-100 items-center justify-center">
                 <EnvelopeSimpleIcon
@@ -168,7 +168,7 @@ const QRProfileScreen = () => {
         </View>
 
         {/* Owner's Note Card */}
-        <View className="bg-white rounded-2xl border border-slate-100 flex-row overflow-hidden">
+        <View className="bg-surface rounded-2xl border border-divider flex-row overflow-hidden">
           {/* Left accent bar */}
           <View className="w-1 bg-primary" />
           <View className="flex-1 px-4 py-4 gap-3">
@@ -179,18 +179,18 @@ const QRProfileScreen = () => {
                 color={colors.primary}
                 weight="fill"
               />
-              <Text className="text-sm font-bold text-slate-800">
+              <Text className="text-sm font-bold text-textPrimary">
                 Owner&apos;s Note
               </Text>
             </View>
             {/* Note text */}
-            <Text className="text-sm text-slate-600 leading-6">
+            <Text className="text-sm text-textSecondary leading-6">
               {ownerNote}
             </Text>
             {/* Drop-off location chip */}
             <View className="self-start flex-row items-center gap-1.5 bg-slate-100 rounded-full px-3 py-1.5">
               <MapPinIcon size={13} color={colors.slate[500]} weight="fill" />
-              <Text className="text-xs font-medium text-slate-600">
+              <Text className="text-xs font-medium text-textSecondary">
                 {dropOffLocation}
               </Text>
             </View>

@@ -18,6 +18,13 @@ module.exports = {
         // Load the entire original palette (enables classes like bg-slate-500, text-red-600)
         ...colors,
 
+        // Super-app semantic layers
+        canvas: colors.canvas,
+        surface: colors.surface,
+        divider: colors.divider,
+        textPrimary: colors.text.primary,
+        textSecondary: colors.text.secondary,
+
         // MAPPING FOR BNA UI (Semantic Grouping)
         primary: {
           DEFAULT: colors.primary,
@@ -106,6 +113,10 @@ module.exports = {
         'control-lg': metrics.layout.controlHeight.lg,
         'control-xl': metrics.layout.controlHeight.xl,
         ...metrics.spacing, // Inherit standard spacing for height
+      },
+
+      minHeight: {
+        touch: `${metrics.touchTarget.min}px`,
       },
 
       transitionDuration: {

@@ -77,8 +77,8 @@ const SectionCard = ({
   subtitle?: string;
   children: React.ReactNode;
 }) => (
-  <View className="bg-white rounded-2xl border border-slate-100 px-4 py-4">
-    <Text className="text-sm font-bold text-slate-800">{title}</Text>
+  <View className="bg-surface rounded-2xl border border-divider px-4 py-4">
+    <Text className="text-sm font-bold text-textPrimary">{title}</Text>
     {!!subtitle && (
       <Text className="text-xs text-slate-400 mt-1 mb-3">{subtitle}</Text>
     )}
@@ -154,12 +154,12 @@ const QRCustomizeScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
-      <View className="flex-row items-center px-4 py-3 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-canvas">
+      <View className="flex-row items-center px-4 py-3 bg-canvas">
         <Pressable onPress={() => router.back()} hitSlop={10}>
           <CaretLeftIcon size={22} color={colors.black} weight="bold" />
         </Pressable>
-        <Text className="flex-1 text-center text-base font-bold text-slate-900">
+        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
           Customize QR
         </Text>
 
@@ -188,7 +188,7 @@ const QRCustomizeScreen = () => {
         {!!designError && <AppInlineError message={designError.message} />}
         {!!updateError && <AppInlineError message={updateError.message} />}
 
-        <View className="rounded-3xl overflow-hidden border border-slate-100">
+        <View className="rounded-3xl overflow-hidden border border-divider">
           <View className="items-center py-8">
             <View
               style={{
@@ -221,7 +221,7 @@ const QRCustomizeScreen = () => {
           title="QR Colors"
           subtitle="Choose module and background colors"
         >
-          <Text className="text-sm font-bold text-slate-800">QR Color</Text>
+          <Text className="text-sm font-bold text-textPrimary">QR Color</Text>
           <ColorSwatches
             selectedColor={form.color ?? ""}
             onSelectColor={(color) =>
@@ -232,7 +232,7 @@ const QRCustomizeScreen = () => {
             }
           />
 
-          <Text className="text-sm font-bold text-slate-800">
+          <Text className="text-sm font-bold text-textPrimary">
             Background Color
           </Text>
           <ColorSwatches

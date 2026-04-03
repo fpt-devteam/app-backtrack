@@ -25,7 +25,7 @@ export const UserPlaceButton = ({
   };
 
   return (
-    <View className="h-12 w-12 bg-white rounded-lg">
+    <View className="h-12 w-12 bg-surface rounded-lg">
       <TouchableOpacity
         onPress={handleOnPress}
         disabled={disabled || loading}

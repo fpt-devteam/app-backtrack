@@ -17,7 +17,7 @@ export const AppImage = ({ source, className, ...rest }: AppImageProps) => {
   })();
 
   return (
-    <View className={`relative overflow-hidden bg-slate-50 ${className}`}>
+    <View className={`relative overflow-hidden bg-canvas ${className}`}>
       {hasSource && (
         <Image
           source={source}

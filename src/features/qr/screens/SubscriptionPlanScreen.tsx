@@ -46,7 +46,7 @@ const SubscriptionPlanScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <SafeAreaView className="flex-1 bg-canvas">
       <AppHeader
         left={<BackButton />}
         center={<HeaderTitle title="Subscription Plans" />}
@@ -65,7 +65,7 @@ const SubscriptionPlanScreen = () => {
         </View>
 
         <View className="flex-row items-center justify-between">
-          <Text className="text-base font-bold text-slate-900">
+          <Text className="text-base font-bold text-textPrimary">
             Available Plans
           </Text>
         </View>
@@ -85,7 +85,7 @@ const SubscriptionPlanScreen = () => {
               </Text>
               <Pressable
                 onPress={() => refetchPlans()}
-                className="rounded-xl border border-slate-200 px-4 py-2"
+                className="rounded-xl border border-divider px-4 py-2"
               >
                 <Text className="text-sm font-semibold text-slate-700">
                   Try again
@@ -95,7 +95,7 @@ const SubscriptionPlanScreen = () => {
           )}
 
           {!isPlansLoading && !plansError && !subscriptionPlans?.length && (
-            <Text className="text-sm text-slate-500">No plans available.</Text>
+            <Text className="text-sm text-textSecondary">No plans available.</Text>
           )}
 
           {!isPlansLoading &&

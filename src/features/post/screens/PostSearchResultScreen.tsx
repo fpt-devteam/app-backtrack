@@ -182,7 +182,7 @@ export default function PostSearchResultScreen() {
   }
 
   return (
-    <View className="bg-white flex-1" style={{ paddingTop: 2 * insets.top }}>
+    <View className="bg-surface flex-1" style={{ paddingTop: 2 * insets.top }}>
       <View
         className="absolute inset-0"
         style={{ paddingTop: insets.top, zIndex: 10 }}
@@ -190,7 +190,7 @@ export default function PostSearchResultScreen() {
       >
         {/* Top row: Back + Search bar */}
         <View
-          className="flex-row items-center gap-4 px-4 pb-2 bg-white"
+          className="flex-row items-center gap-4 px-4 pb-2 bg-surface"
           style={{
             borderBottomColor: colors.gray[100],
             borderBottomWidth: 4,
@@ -243,7 +243,7 @@ export default function PostSearchResultScreen() {
           transition={{ type: "timing", duration: 200 }}
         >
           <MotiView
-            className="bg-white px-4 pt-3 pb-4 gap-4 border-b"
+            className="bg-surface px-4 pt-3 pb-4 gap-4 border-b"
             animate={{
               opacity: showOptions ? 1 : 0,
               translateY: showOptions ? 0 : -16,
@@ -331,7 +331,7 @@ export default function PostSearchResultScreen() {
 
       {/* Tab Bar Container */}
       <View
-        className="flex-row w-full bg-white"
+        className="flex-row w-full bg-surface"
         style={{
           borderBottomWidth: 1,
           borderBottomColor: colors.gray[200],

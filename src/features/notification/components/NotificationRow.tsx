@@ -80,7 +80,8 @@ export const NotificationRow = ({
               const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
               Linking.openURL(url);
             }}
-            className="bg-blue-50 px-3 py-1.5 rounded-full"
+            className="bg-muted min-h-touch px-3 py-2 rounded-full items-center justify-center"
+            style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
           >
             <Text className="text-primary text-xs font-medium">View Map</Text>
           </Pressable>
@@ -94,7 +95,7 @@ export const NotificationRow = ({
   return (
     <Pressable
       onPress={handlePress}
-      className="flex-row items-start gap-3 p-4 bg-white border-b border-slate-100"
+      className="flex-row items-start gap-3 p-4 bg-surface border-b border-divider"
       style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
     >
       {/* Left: Avatar + overlays  */}
@@ -110,8 +111,8 @@ export const NotificationRow = ({
             className={cn(
               "flex-1 text-base leading-5",
               isUnread
-                ? "font-semibold text-slate-900"
-                : "font-normal text-slate-800",
+                ? "font-semibold text-textPrimary"
+                : "font-normal text-textPrimary",
             )}
             numberOfLines={1}
           >
@@ -122,8 +123,8 @@ export const NotificationRow = ({
             className={cn(
               "text-sm leading-5",
               isUnread
-                ? "font-semibold text-slate-900"
-                : "font-normal text-slate-500",
+                ? "font-semibold text-textPrimary"
+                : "font-normal text-textSecondary",
             )}
           >
             {formatTime(notification.sentAt)}
@@ -135,8 +136,8 @@ export const NotificationRow = ({
           className={cn(
             "mt-0.5 text-[13px] leading-5",
             isUnread
-              ? "font-medium text-slate-800"
-              : "font-normal text-slate-500",
+              ? "font-medium text-textPrimary"
+              : "font-normal text-textSecondary",
           )}
           numberOfLines={1}
         >

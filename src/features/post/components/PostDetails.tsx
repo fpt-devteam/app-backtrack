@@ -66,7 +66,7 @@ export const PostDetailsSkeleton = () => {
   );
 
   return (
-    <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
+    <View className="mx-4 mt-4 bg-surface rounded-3xl border border-divider overflow-hidden">
       <View className="px-5 pt-5 pb-4">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 gap-2">
@@ -98,7 +98,7 @@ export const PostDetailsSkeleton = () => {
       </View>
 
       <View className="px-5 pb-5">
-        <View className="rounded-2xl overflow-hidden border border-slate-200">
+        <View className="rounded-2xl overflow-hidden border border-divider">
           <S className="h-44 w-full rounded-none" />
           <View className="absolute right-3 bottom-3">
             <S className="h-11 w-11 rounded-2xl" />
@@ -154,11 +154,11 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
       contentContainerStyle={{ paddingBottom: bottom + 20 }}
     >
       <ImageCarousel data={postImageUrls} />
-      <View className="mx-4 mt-4 bg-white rounded-3xl border border-slate-200 overflow-hidden">
+      <View className="mx-4 mt-4 bg-surface rounded-3xl border border-divider overflow-hidden">
         <View className="px-5 pt-5 pb-4">
           <View className="flex-row items-start justify-between gap-3">
             <Text
-              className="flex-1 text-[22px] font-extrabold text-slate-900 leading-7"
+              className="flex-1 text-[22px] font-extrabold text-textPrimary leading-7"
               numberOfLines={2}
             >
               {post.itemName}
@@ -167,7 +167,7 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
           </View>
 
           {!!post.description && (
-            <Text className="mt-3 text-[13px] leading-[19px] text-slate-600">
+            <Text className="mt-3 text-[13px] leading-[19px] text-textSecondary">
               {post.description}
             </Text>
           )}
@@ -199,7 +199,7 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
 
       {!!similarPosts?.length && (
         <View className="mx-4 mt-6">
-          <Text className="text-[16px] font-extrabold text-slate-900">
+          <Text className="text-[16px] font-extrabold text-textPrimary">
             Similar Posts
           </Text>
 

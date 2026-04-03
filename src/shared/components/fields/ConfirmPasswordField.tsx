@@ -21,7 +21,7 @@ export const ConfirmPasswordField = ({
         Confirm Password
       </Text>
       <View
-        className={`flex-row gap-2 items-center rounded-lg border bg-white px-3 py-3 ${error ? "border-error" : "border-slate-200"}`}
+        className={`flex-row gap-2 items-center rounded-lg border bg-surface px-3 py-3 ${error ? "border-error" : "border-divider"}`}
       >
         <CheckCircle size={20} color={error ? "#dc2626" : "#70819a"} />
 

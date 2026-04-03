@@ -16,8 +16,8 @@ type SimilarPostCardProps = {
 
 export const SimilarPostCardSkeleton = () => {
   return (
-    <View className="flex-row gap-3 bg-white rounded-2xl border border-slate-100 p-3 shadow-sm">
-      <View className="w-20 h-20 rounded-xl bg-slate-200 animate-pulse border border-slate-100 shadow-sm" />
+    <View className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-3 shadow-sm">
+      <View className="w-20 h-20 rounded-xl bg-slate-200 animate-pulse border border-divider shadow-sm" />
 
       <View className="flex-1 justify-between py-0.5">
         <View className="flex-row items-start justify-between gap-2">
@@ -54,11 +54,11 @@ export const SimilarPostCard = ({
   return (
     <Pressable
       onPress={handleNavigateToMatch}
-      className="flex-row gap-3 bg-white rounded-2xl border border-slate-100 p-3 shadow-sm active:opacity-70"
+      className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-3 shadow-sm active:opacity-70"
     >
       <AppImage
         source={{ uri: imgUrl }}
-        className="w-20 h-20 rounded-xl border border-slate-100 shadow-sm active:opacity-70"
+        className="w-20 h-20 rounded-xl border border-divider shadow-sm active:opacity-70"
         resizeMode="cover"
       />
 

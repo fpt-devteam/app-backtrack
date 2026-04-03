@@ -1,7 +1,11 @@
 const metrics = {
+  baseline: 8,
+
   spacing: {
+    xxs: 2,
     xs: 4,
     sm: 8,
+    md2: 12,
     md: 16,
     lg: 24,
     xl: 32,
@@ -10,22 +14,27 @@ const metrics = {
 
   borderRadius: {
     none: 0,
-    sm: 4,
-    primary: 6,
-    md: 8,
-    lg: 12,
-    xl: 16,
+    sm: 8,
+    primary: 16,
+    md: 12,
+    lg: 16,
+    xl: 20,
     "2xl": 24,
     full: 9999,
   },
 
+  touchTarget: {
+    min: 44,
+    defaultHitSlop: 8,
+  },
+
   layout: {
     controlHeight: {
-      xs: 16,
+      xs: 24,
       sm: 24,
-      md: 32,
-      lg: 40,
-      xl: 48,
+      md: 44,
+      lg: 52,
+      xl: 56,
     },
 
     container: {
@@ -62,6 +71,30 @@ const metrics = {
   },
 
   shadows: {
+    level1: {
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 1,
+      },
+    },
+
+    level2: {
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 8,
+      },
+    },
+
     sm: {
       ios: {
         shadowColor: "#000",
@@ -70,10 +103,21 @@ const metrics = {
         shadowRadius: 2,
       },
       android: {
-        elevation: 2,
+        elevation: 1,
       },
     },
     md: {
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+    },
+    lg: {
       ios: {
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -84,23 +128,13 @@ const metrics = {
         elevation: 4,
       },
     },
-    lg: {
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    },
+
     tabBar: {
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: -1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 3,
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
       },
       android: {
         elevation: 8,

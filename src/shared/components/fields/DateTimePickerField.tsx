@@ -113,11 +113,11 @@ export const DateTimePickerField = ({
       <Pressable
         onPress={openModal}
         disabled={disabled}
-        className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-white px-3.5 flex-row items-center gap-3"
+        className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-surface px-3.5 flex-row items-center gap-3"
       >
         <CalendarBlankIcon size={18} color="#94A3B8" />
         <Text
-          className={`text-[15px] ${value ? "text-slate-900" : "text-slate-400"}`}
+          className={`text-[15px] ${value ? "text-textPrimary" : "text-slate-400"}`}
           numberOfLines={1}
         >
           {displayText}
@@ -141,16 +141,16 @@ export const DateTimePickerField = ({
           </View>
         )}
 
-        <View className="absolute left-3.5 right-3.5 bottom-4 rounded-[18px] bg-white border border-[rgba(15,23,42,0.10)] p-3">
+        <View className="absolute left-3.5 right-3.5 bottom-4 rounded-[18px] bg-surface border border-[rgba(15,23,42,0.10)] p-3">
           {/* Header */}
           <View className="px-1.5 pt-1 pb-2.5">
             <View className="flex-row justify-end flex-wrap">
               {/* Clear button */}
               <Pressable
                 onPress={onPressClear}
-                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-white ml-2.5 mb-2"
+                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-surface ml-2.5 mb-2"
               >
-                <Text className="text-[13px] font-bold text-slate-900">
+                <Text className="text-[13px] font-bold text-textPrimary">
                   Clear
                 </Text>
               </Pressable>
@@ -158,9 +158,9 @@ export const DateTimePickerField = ({
               {/* Cancel button */}
               <Pressable
                 onPress={onPressClose}
-                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-white ml-2.5 mb-2"
+                className="px-3 py-2 rounded-xl border border-[rgba(15,23,42,0.10)] bg-surface ml-2.5 mb-2"
               >
-                <Text className="text-[13px] font-bold text-slate-900">
+                <Text className="text-[13px] font-bold text-textPrimary">
                   Cancel
                 </Text>
               </Pressable>
@@ -179,10 +179,10 @@ export const DateTimePickerField = ({
 
           {/* Date Picker */}
           <View className="px-1.5 pb-2.5">
-            <Text className="text-[13px] font-extrabold text-slate-600 mb-1.5">
+            <Text className="text-[13px] font-extrabold text-textSecondary mb-1.5">
               Date
             </Text>
-            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-white">
+            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-surface">
               <DateTimePicker
                 value={temp}
                 mode="date"
@@ -199,10 +199,10 @@ export const DateTimePickerField = ({
 
           {/* Time Picker */}
           <View className="px-1.5 pb-2.5">
-            <Text className="text-[13px] font-extrabold text-slate-600 mb-1.5">
+            <Text className="text-[13px] font-extrabold text-textSecondary mb-1.5">
               Time
             </Text>
-            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-white">
+            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-surface">
               <DateTimePicker
                 value={temp}
                 mode="time"
