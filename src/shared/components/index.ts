@@ -19,17 +19,18 @@ export { AppSegmentedControl } from "@/src/shared/components/AppSegmentedControl
 export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
+export { BaseInputField } from "@/src/shared/components/fields/BaseInputField";
 export { ConfirmPasswordField } from "@/src/shared/components/fields/ConfirmPasswordField";
 export { DateTimePickerField } from "@/src/shared/components/fields/DateTimePickerField";
 export { EmailField } from "@/src/shared/components/fields/EmailField";
 export { ImageField } from "@/src/shared/components/fields/ImageField";
 export { PasswordField } from "@/src/shared/components/fields/PasswordField";
-export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
 export { AppButton } from '@/src/shared/components/ui/AppButton';
 export {
   AppCard,
-  AppPressableCard,
+  AppPressableCard
 } from '@/src/shared/components/ui/AppCard';
+export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
 export { ImageCarousel } from '@/src/shared/components/ui/ImageCarousel';
 export { MenuBottomSheet } from '@/src/shared/components/ui/MenuBottomSheet';
 export type { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';

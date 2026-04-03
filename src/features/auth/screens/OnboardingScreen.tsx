@@ -1,7 +1,12 @@
 import { useCheckEmailStatus } from "@/src/features/auth/hooks";
 import { EMAIL_STATUS } from "@/src/features/auth/types";
-import { EmailField, TouchableIconButton } from "@/src/shared/components";
+import {
+  AppButton,
+  EmailField,
+  TouchableIconButton,
+} from "@/src/shared/components";
 import { AppGoogleLogo } from "@/src/shared/components/AppGoogleLogo";
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
@@ -10,7 +15,6 @@ import React from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -60,14 +64,31 @@ const OnboardingScreen = () => {
     try {
       const emailStatusResponse = await checkEmailStatus({ email: data.email });
       const { status } = emailStatusResponse;
-      if (status === EMAIL_STATUS.NOT_VERIFIED) return;
-      if (status === EMAIL_STATUS.NOT_FOUND) router.push("/register");
+
+      if (status === EMAIL_STATUS.NOT_VERIFIED) {
+        router.push({
+          pathname: AUTH_ROUTE.verifyEmail,
+          params: { email: data.email },
+        });
+        return;
+      }
+
+      if (status === EMAIL_STATUS.NOT_FOUND) {
+        router.push({
+          pathname: AUTH_ROUTE.register,
+          params: { email: data.email },
+        });
+        return;
+      }
+
+      router.push({
+        pathname: AUTH_ROUTE.login,
+        params: { email: data.email },
+      });
     } catch (err) {
       console.log("Check email status error:", err);
     }
   };
-
-  const isCtaActive = hasEmail && !loading;
 
   return (
     <KeyboardAvoidingView
@@ -134,27 +155,13 @@ const OnboardingScreen = () => {
               />
 
               {/* ── Continue button ─────────────────────────── */}
-              <TouchableOpacity
-                className={`mt-md h-control-lg rounded-sm items-center justify-center ${
-                  isCtaActive ? "bg-primary" : "bg-hof-200"
-                }`}
+              <AppButton
+                title="Continue"
                 onPress={handleSubmit(onSubmit)}
-                disabled={loading || !hasEmail}
-                activeOpacity={0.85}
-              >
-                {loading ? (
-                  <View className="flex-row items-center gap-xs">
-                    <ActivityIndicator color={colors.hof[500]} size="small" />
-                    <Text className="text-base font-medium text-hof-500">
-                      Signing in…
-                    </Text>
-                  </View>
-                ) : (
-                  <Text className="text-base font-medium text-white tracking-label">
-                    Continue
-                  </Text>
-                )}
-              </TouchableOpacity>
+                loading={loading}
+                disabled={!hasEmail}
+                className="mt-md"
+              />
 
               {/* ── "or" divider ────────────────────────────── */}
               <View className="flex-row items-center my-xl gap-md2">

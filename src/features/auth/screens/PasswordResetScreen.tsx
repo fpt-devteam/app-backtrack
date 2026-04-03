@@ -1,18 +1,14 @@
 import { useForgotPassword } from "@/src/features/auth/hooks";
 import type { ForgotPasswordRequest } from "@/src/features/auth/types";
-import { AppInlineError, EmailField } from "@/src/shared/components";
+import { AppButton, EmailField } from "@/src/shared/components";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link, router } from "expo-router";
-import { EnvelopeSimple } from "phosphor-react-native";
 import React from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import * as yup from "yup";
@@ -30,7 +26,12 @@ const forgotPasswordSchema = yup
 type PasswordResetFormSchema = yup.InferType<typeof forgotPasswordSchema>;
 
 export default function PasswordResetScreen() {
-  const { forgotPassword, loading, error, reset } = useForgotPassword();
+  const {
+    forgotPassword,
+    loading,
+    error: forgotPasswordError,
+    reset,
+  } = useForgotPassword();
 
   const {
     control: formControl,
@@ -44,23 +45,16 @@ export default function PasswordResetScreen() {
   });
 
   const handleInputChange = () => {
-    if (errors.email) {
-      clearErrors("email");
-    }
-    if (error) {
-      reset();
-    }
+    if (errors.email) clearErrors("email");
+    if (forgotPasswordError) reset();
   };
 
   const onSubmit: SubmitHandler<PasswordResetFormSchema> = async (data) => {
     try {
       const req: ForgotPasswordRequest = { email: data.email };
       await forgotPassword(req);
-
-      // Navigate to check email screen
-      router.push(`/check-email?email=${encodeURIComponent(data.email)}`);
-    } catch {
-      // Error handled by hook
+    } catch (error) {
+      console.log("Err", error);
     }
   };
 
@@ -71,80 +65,43 @@ export default function PasswordResetScreen() {
     >
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        contentContainerClassName="flex-grow"
+        contentContainerClassName="flex-grow bg-surface p-6 "
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View className="w-full px-6 pt-16 pb-8">
-          <Text className="text-3xl font-bold text-slate-900 mb-3">
-            Reset password
-          </Text>
-          <Text className="text-base text-slate-600 leading-6">
-            Enter your email address and we&apos;ll send you instructions to
-            reset your password if an account exists.
-          </Text>
-        </View>
-
         {/* Form */}
-        <View className="flex-1 px-6">
-          <View className="w-full max-w-[420px] self-center">
-            {/* App Inline Error */}
-            {error && <AppInlineError message={error} />}
+        <View className="w-full max-w-[420px] self-center">
+          {/* Form fields */}
+          <View className="pb-6 gap-sm">
+            <Controller
+              control={formControl}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <EmailField
+                  value={value}
+                  onChange={(text: string) => {
+                    handleInputChange();
+                    onChange(text);
+                  }}
+                  error={errors.email?.message || forgotPasswordError}
+                />
+              )}
+            />
 
-            {/* Form fields */}
-            <View className="mb-6">
-              <Controller
-                control={formControl}
-                name="email"
-                render={({ field: { onChange, value } }) => (
-                  <EmailField
-                    value={value}
-                    onChange={(text: string) => {
-                      handleInputChange();
-                      onChange(text);
-                    }}
-                    error={errors.email?.message}
-                  />
-                )}
-              />
-            </View>
+            <Text className="text-xs font-normal text-textMuted">
+              Enter your email address and we&apos;ll send you instructions to
+              reset your password if an account exists.
+            </Text>
+          </View>
 
-            {/* Submit Button */}
-            <View className="mb-6">
-              <TouchableOpacity
-                className={`flex-row items-center justify-center rounded-lg bg-primary px-4 py-3.5 ${loading ? "opacity-70" : ""}`}
-                onPress={handleSubmit(onSubmit)}
-                disabled={loading}
-                activeOpacity={0.8}
-              >
-                {loading ? (
-                  <View className="flex-row items-center">
-                    <ActivityIndicator color="#ffffff" size="small" />
-                    <Text className="ml-2 font-medium text-base text-white">
-                      Sending...
-                    </Text>
-                  </View>
-                ) : (
-                  <>
-                    <Text className="mr-2 font-medium text-base text-white">
-                      Send reset link
-                    </Text>
-                    <EnvelopeSimple size={18} color="#ffffff" />
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
-
-            {/* Back to Login */}
-            <View className="items-center">
-              <Link href="/login" className="text-sm text-primary font-medium">
-                Back to login
-              </Link>
-            </View>
+          {/* Submit Button */}
+          <View className="mb-6">
+            <AppButton
+              title="Send Password Reset Instructions"
+              onPress={handleSubmit(onSubmit)}
+              loading={loading}
+            />
           </View>
         </View>
-
-        <View className="flex-1" />
       </ScrollView>
     </KeyboardAvoidingView>
   );

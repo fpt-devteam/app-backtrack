@@ -19,6 +19,7 @@ export function useLogin() {
   const errorMessage = useMemo(() => {
     if (!mutation.error) return null;
     const friendlyMessage = getErrorMessage(mutation.error);
+    console.log("Erroasfasdr: ", friendlyMessage);
     return friendlyMessage;
   }, [mutation.error]);
 

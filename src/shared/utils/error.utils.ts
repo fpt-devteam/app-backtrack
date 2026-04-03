@@ -12,7 +12,7 @@ const FIREBASE_AUTH_ERRORS: ErrorMapping = {
     "No account found with this email. Please check your email or sign up.",
   "auth/wrong-password":
     "Incorrect password. Please try again or reset your password.",
-  "auth/invalid-credential": "Invalid email or password.",
+  "auth/invalid-credential": "Invalid credentials. Please check again.",
   "auth/invalid-login-credentials":
     "Invalid email or password. Please check your credentials.",
 
@@ -99,6 +99,7 @@ const API_ERRORS: ErrorMapping = {
   TIMEOUT_ERROR: "Request timeout. Please try again.",
   CONNECTION_ERROR: "Connection error. Please check your internet connection.",
 };
+
 const APP_ERRORS: ErrorMapping = {
   VALIDATION_ERROR: "Please check your input and try again.",
   PERMISSION_DENIED: "You don't have permission to perform this action.",
@@ -107,11 +108,121 @@ const APP_ERRORS: ErrorMapping = {
   INVALID_INPUT: "Invalid input. Please check and try again.",
   OPERATION_FAILED: "Operation failed. Please try again.",
   UNKNOWN_ERROR: "An unexpected error occurred. Please try again.",
-  NoActiveSubscription: "You don't have an active subscription",
+  NoActiveSubscription: "You don't have an active subscription. Please subscribe to continue.",
   SubscriptionAlreadySubscribed: "You are already subscribed to a plan",
 };
 
 const DEFAULT_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
+
+type ErrorShape = {
+  code?: unknown;
+  message?: unknown;
+  error?: {
+    code?: unknown;
+    message?: unknown;
+  };
+  response?: {
+    status?: unknown;
+    data?: {
+      code?: unknown;
+      message?: unknown;
+      error?: {
+        code?: unknown;
+        message?: unknown;
+      };
+    };
+  };
+};
+
+const ERROR_MAPPINGS: ErrorMapping[] = [
+  FIREBASE_AUTH_ERRORS,
+  APP_ERRORS,
+  API_ERRORS,
+];
+const AUTH_CODE_REGEX = /auth\/[a-z-]+/i;
+
+const toNonEmptyString = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : null;
+};
+
+const toStatusCodeString = (value: unknown): string | null => {
+  if (typeof value === "number") return String(value);
+
+  if (typeof value === "string") {
+    const normalized = value.trim();
+    return /^\d+$/.test(normalized) ? normalized : null;
+  }
+
+  return null;
+};
+
+const mapByCode = (code: string): string | null => {
+  for (const mapping of ERROR_MAPPINGS) {
+    if (mapping[code]) {
+      return mapping[code];
+    }
+  }
+
+  return null;
+};
+
+const extractAuthCode = (message: string): string | null => {
+  const match = AUTH_CODE_REGEX.exec(message);
+  if (!match) return null;
+  return match[0].toLowerCase();
+};
+
+const extractCandidates = (error: ErrorShape): string[] => {
+  const candidates = [
+    toNonEmptyString(error.response?.data?.error?.code),
+    toNonEmptyString(error.response?.data?.code),
+    toNonEmptyString(error.error?.code),
+    toNonEmptyString(error.code),
+    toStatusCodeString(error.response?.status),
+  ];
+
+  return Array.from(new Set(candidates.filter((item): item is string => !!item)));
+};
+
+const extractRawMessage = (error: ErrorShape): string | null => {
+  return (
+    toNonEmptyString(error.response?.data?.error?.message) ||
+    toNonEmptyString(error.response?.data?.message) ||
+    toNonEmptyString(error.error?.message) ||
+    toNonEmptyString(error.message)
+  );
+};
+
+/**
+ * Maps an unknown error to a user-friendly message using known error-code maps.
+ */
+export function mapError(error: unknown, fallback = DEFAULT_ERROR_MESSAGE): string {
+  const normalizedError = (error ?? {}) as ErrorShape;
+
+  for (const candidate of extractCandidates(normalizedError)) {
+    const mapped = mapByCode(candidate);
+    if (mapped) return mapped;
+  }
+
+  const rawMessage = extractRawMessage(normalizedError);
+
+  if (rawMessage) {
+    const directMapped = mapByCode(rawMessage);
+    if (directMapped) return directMapped;
+
+    const authCode = extractAuthCode(rawMessage);
+    if (authCode) {
+      const mappedAuthMessage = mapByCode(authCode);
+      if (mappedAuthMessage) return mappedAuthMessage;
+    }
+
+    return rawMessage;
+  }
+
+  return fallback;
+}
 
 /**
  * Extracts error message from various error structures
@@ -120,14 +231,5 @@ export function getErrorMessage(
   error: unknown,
   fallback = DEFAULT_ERROR_MESSAGE
 ): string {
-
-  return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (error as any)?.response?.data?.error?.message ||
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (error as any)?.error?.message ||
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (error as any)?.message ||
-    fallback
-  );
+  return mapError(error, fallback);
 }

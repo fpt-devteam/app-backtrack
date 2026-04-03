@@ -1,134 +1,27 @@
-import { colors, metrics, typography } from "@/src/shared/theme";
-import * as Haptics from "expo-haptics";
-import { WarningCircleIcon } from "phosphor-react-native";
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Text, TextInput, View } from "react-native";
+import { BaseInputField } from "@/src/shared/components/fields/BaseInputField";
+import React from "react";
 
 type EmailFieldProps = {
   value: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  error?: string;
+  error?: string | null;
 };
 
-export const EmailField = ({
-  value,
-  onChange,
-  onBlur,
-  error,
-}: EmailFieldProps) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const isActive = isFocused || value.length > 0;
-
-  const labelAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
-
-  useEffect(() => {
-    Animated.timing(labelAnim, {
-      toValue: isActive ? 1 : 0,
-      duration: metrics.motion.duration.normal,
-      useNativeDriver: false,
-    }).start();
-  }, [isActive]);
-
-  const handleFocus = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-    onBlur?.();
-  };
-
-  const borderColor = error
-    ? colors.status.error
-    : isFocused
-      ? colors.border.strong
-      : colors.border.DEFAULT;
-
-  const labelColor = error ? colors.status.error : colors.text.muted;
-
-  const labelTop = labelAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [16, 6],
-  });
-
-  const labelFontSize = labelAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [typography.fontSize.base, typography.fontSize.xs],
-  });
-
-  const inputPaddingTop = labelAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 22],
-  });
-
+export const EmailField = ({ value, onChange, onBlur, error }: EmailFieldProps) => {
   return (
-    <View>
-      {/* Field — 52px tall, 1px border, 8px radius */}
-      <View
-        className="relative h-control-xl rounded-sm bg-surface pb-2"
-        style={{ borderWidth: isFocused ? 2 : 1, borderColor }}
-      >
-        {/* Floating label */}
-        <Animated.Text
-          style={{
-            position: "absolute",
-            left: metrics.spacing.md2,
-            top: labelTop,
-            fontSize: labelFontSize,
-            fontWeight: `${typography.fontWeight.thin}` as "400",
-            color: labelColor,
-          }}
-          numberOfLines={1}
-        >
-          Email
-        </Animated.Text>
-
-        {/* Input wrapper — shifts down via paddingTop to clear the floated label */}
-        <Animated.View style={{ flex: 1, paddingTop: inputPaddingTop }}>
-          <TextInput
-            className="flex-1 px-md2"
-            style={{
-              color: colors.text.primary,
-              fontSize: typography.fontSize.base,
-              fontWeight: `${typography.fontWeight.thin}` as "400",
-            }}
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            autoComplete="email"
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="next"
-            value={value}
-            onChangeText={onChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            cursorColor={colors.black}
-            selectionColor={colors.black}
-          />
-        </Animated.View>
-      </View>
-
-      {/* Error message */}
-      {error && (
-        <View className="flex-row items-center mt-1.5 gap-2">
-          <WarningCircleIcon
-            size={16}
-            weight="fill"
-            color={colors.status.error}
-          />
-          <Text
-            style={{
-              fontSize: typography.fontSize.xs,
-              fontWeight: `${typography.fontWeight.thin}` as "400",
-              color: colors.status.error,
-            }}
-          >
-            {error}
-          </Text>
-        </View>
-      )}
-    </View>
+    <BaseInputField
+      label="Email"
+      value={value}
+      onChange={onChange}
+      onBlur={onBlur}
+      error={error}
+      keyboardType="email-address"
+      textContentType="emailAddress"
+      autoComplete="email"
+      autoCapitalize="none"
+      autoCorrect={false}
+      returnKeyType="next"
+    />
   );
 };

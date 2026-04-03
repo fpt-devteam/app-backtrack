@@ -1,68 +1,60 @@
-import { Link, useLocalSearchParams } from "expo-router";
-import { ArrowLeftIcon, EnvelopeSimpleIcon } from "phosphor-react-native";
+import { colors } from "@/src/shared/theme";
+import { useLocalSearchParams } from "expo-router";
+import { EnvelopeIcon } from "phosphor-react-native";
 import React from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
+  TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 
 const EmailVerifyScreen = () => {
   const { email } = useLocalSearchParams<{ email: string }>();
+  const { height } = useWindowDimensions();
+
+  const handleResendVerificationEmail = () => {
+    // TODO: Implement resend verification email functionality
+  };
 
   return (
     <KeyboardAvoidingView
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerClassName="flex-grow justify-center"
-        showsVerticalScrollIndicator={false}
+      <View
+        className="flex-1 bg-surface px-10 gap-10"
+        style={{
+          paddingTop: height * 0.15,
+          paddingBottom: height * 0.1,
+        }}
       >
-        <View className="px-6">
-          <View className="w-full max-w-[420px] self-center text-center">
-            {/* Icon */}
-            <View className="items-center mb-8">
-              <View className="w-20 h-20 bg-primary/10 rounded-full items-center justify-center mb-4">
-                <EnvelopeSimpleIcon size={40} color="#137fec" />
-              </View>
-            </View>
-
-            {/* Title */}
-            <Text className="text-3xl font-bold text-slate-900 mb-4 text-center">
-              Check your email
-            </Text>
-
-            {/* Message */}
-            <Text className="text-base text-slate-600 leading-6 text-center mb-2">
-              If an account exists for{" "}
-              <Text className="font-medium text-slate-900">{email}</Text>,
-              you&apos;ll receive a reset link shortly.
-            </Text>
-
-            <Text className="text-sm text-slate-500 text-center mb-8">
-              Be sure to check your spam folder if you don&apos;t see it in your
-              inbox.
-            </Text>
-
-            {/* Back to Login Button */}
-            <View className="items-center">
-              <Link
-                href="/login"
-                className="flex-row items-center justify-center rounded-lg bg-primary px-6 py-3.5"
-              >
-                <ArrowLeftIcon size={18} color="#ffffff" />
-                <Text className="ml-2 font-medium text-base text-white">
-                  Back to login
-                </Text>
-              </Link>
-            </View>
-          </View>
+        <View className="flex-row justify-center">
+          <EnvelopeIcon size={128} color={colors.primary} />
         </View>
-      </ScrollView>
+
+        <View className="gap-y-2">
+          <Text className="text-xl font-normal text-textPrimary text-center">
+            Verify Your Email
+          </Text>
+
+          <Text className="text-base font-thin text-textSecondary text-center leading-6">
+            We&apos;ve sent a verification link to your email address {email}.
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+          onPress={handleResendVerificationEmail}
+          activeOpacity={0.8}
+        >
+          <Text className="text-base font-normal text-white text-center">
+            Resend Verification Email
+          </Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 };

@@ -1,87 +1,74 @@
 import { cn } from "@/src/shared/utils/cn";
-import { colors, metrics, typography } from "@/src/shared/theme";
+import { MotiView } from "moti";
 import React from "react";
-import {
-  Pressable,
-  PressableProps,
-  Text,
-  type TextStyle,
-  type ViewStyle,
-} from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
-type AppButtonVariant = "primary" | "secondary" | "ghost";
-type AppButtonShape = "pill" | "rounded";
+type AppButtonVariant = "primary" | "secondary";
 
-const variantStyleMap: Record<AppButtonVariant, ViewStyle> = {
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  secondary: {
-    backgroundColor: colors.surface,
-  },
-  ghost: {
-    backgroundColor: "transparent",
-  },
-};
-
-const variantTextMap: Record<AppButtonVariant, TextStyle> = {
-  primary: {
-    color: colors.primaryForeground,
-  },
-  secondary: {
-    color: colors.text.primary,
-  },
-  ghost: {
-    color: colors.primary,
-  },
-};
-
-const shapeMap: Record<AppButtonShape, ViewStyle> = {
-  pill: { borderRadius: metrics.borderRadius.full },
-  rounded: { borderRadius: metrics.borderRadius.lg },
-};
-
-type AppButtonProps = PressableProps & {
-  label: string;
+type AppButtonProps = {
+  title: string;
+  onPress: () => void;
+  loading?: boolean;
+  disabled?: boolean;
   variant?: AppButtonVariant;
-  shape?: AppButtonShape;
+  className?: string;
 };
+
+const BUTTON_VARIANT_CLASS: Record<AppButtonVariant, string> = {
+  primary: "bg-primary",
+  secondary: "bg-secondary",
+};
+
+const DOT_DELAYS = [0, 150, 300];
 
 export const AppButton = ({
-  label,
+  title,
+  onPress,
+  loading = false,
+  disabled = false,
   variant = "primary",
-  shape = "pill",
   className,
-  style,
-  ...props
 }: AppButtonProps) => {
+  const isDisabled = disabled || loading;
+
   return (
-    <Pressable
-      {...props}
-      hitSlop={metrics.touchTarget.defaultHitSlop}
-      className={cn("min-h-touch items-center justify-center px-4", className)}
-      style={({ pressed }) => [
-        variantStyleMap[variant],
-        shapeMap[shape],
-        {
-          transform: [{ scale: pressed ? 0.97 : 1 }],
-          opacity: pressed ? 0.92 : 1,
-        },
-        typeof style === "function" ? style({ pressed }) : style,
-      ]}
+    <TouchableOpacity
+      className={cn(
+        "w-full h-control-lg rounded-sm items-center justify-center",
+        BUTTON_VARIANT_CLASS[variant],
+        isDisabled && "opacity-50",
+        className,
+      )}
+      onPress={onPress}
+      disabled={isDisabled}
+      activeOpacity={0.88}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
-      <Text
-        style={[
-          variantTextMap[variant],
-          {
-            fontSize: typography.fontSize.base,
-            lineHeight: 24,
-            fontWeight: "600",
-          },
-        ]}
-      >
-        {label}
-      </Text>
-    </Pressable>
+      {loading ? (
+        <View className="flex-row items-center gap-1.5">
+          {DOT_DELAYS.map((delay, index) => (
+            <MotiView
+              key={`loading-dot-${index}`}
+              from={{ translateY: 0, opacity: 0.65 }}
+              animate={{ translateY: -6, opacity: 1 }}
+              transition={{
+                type: "timing",
+                duration: 360,
+                delay,
+                loop: true,
+                repeatReverse: true,
+              }}
+              className="h-1.5 w-1.5 rounded-full bg-white"
+            />
+          ))}
+        </View>
+      ) : (
+        <Text className="text-base font-semibold text-white tracking-label">
+          {title}
+        </Text>
+      )}
+    </TouchableOpacity>
   );
 };
