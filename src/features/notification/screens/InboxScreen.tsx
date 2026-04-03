@@ -53,7 +53,9 @@ const CustomTabBar = (props: RNTabBarProps<InboxRoute>) => {
         borderBottomWidth: 0.5,
         borderBottomColor: colors.slate[500],
       }}
-      style={{ backgroundColor: "transparent" }}
+      style={{
+        backgroundColor: "transparent",
+      }}
       activeColor={colors.black}
       inactiveColor={colors.slate[400]}
       options={Object.fromEntries(
@@ -71,9 +73,7 @@ const CustomTabBar = (props: RNTabBarProps<InboxRoute>) => {
 
 const InboxScreenHeader = () => (
   <AppHeader
-    center={
-      <Text className="text-lg font-extrabold text-slate-900">Inbox</Text>
-    }
+    center={<Text className="text-lg font-bold text-slate-900">Inbox</Text>}
   />
 );
 

@@ -1,43 +1,35 @@
 import type { Post } from "@/src/features/post/types";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import { formatDate } from "@/src/shared/utils";
+import { formatShortEventTime } from "@/src/shared/utils/datetime.utils";
 import { router } from "expo-router";
-import { ClockIcon, MapPinIcon } from "phosphor-react-native";
-import React, { useCallback, useMemo } from "react";
-import {
-  Image,
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { MotiPressable } from "moti/interactions";
+import { ClockIcon, ImageIcon, MapPinIcon } from "phosphor-react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { ActivityIndicator, Image, Text, useWindowDimensions, View } from "react-native";
 import { PostStatusBadge } from "./PostStatusBadge";
-
-type CardType = "vertical" | "horizontal";
 
 type PostCardProps = {
   item: Post;
-  type?: CardType;
 };
 
-export const PostCard = ({ item, type = "vertical" }: PostCardProps) => {
+export const PostCard = ({ item }: PostCardProps) => {
+  const { width } = useWindowDimensions();
+  const cardWidth = width * 0.47;
   const imageUrl = item.images?.[0]?.url;
-  const dimensions = useWindowDimensions();
+  const [imageLoading, setImageLoading] = useState(true);
 
-  const eventTimeLabel = useMemo(() => {
-    return formatDate(item.eventTime.toString());
-  }, [item.eventTime]);
+  // "Jan 15 · 14:30" — date + time, more scannable than date-only
+  const eventTimeLabel = useMemo(
+    () => formatShortEventTime(item.eventTime),
+    [item.eventTime],
+  );
 
   const locationLabel = useMemo(() => {
-    if (item.displayAddress?.trim()) {
-      return item.displayAddress;
-    }
-
+    if (item.displayAddress?.trim()) return item.displayAddress;
     if (item.location?.latitude != null && item.location?.longitude != null) {
-      return `${item.location.latitude.toFixed(5)}, ${item.location.longitude.toFixed(5)}`;
+      return `${item.location.latitude.toFixed(4)}, ${item.location.longitude.toFixed(4)}`;
     }
-
     return "Unknown location";
   }, [item.displayAddress, item.location?.latitude, item.location?.longitude]);
 
@@ -46,63 +38,84 @@ export const PostCard = ({ item, type = "vertical" }: PostCardProps) => {
   }, [item.id]);
 
   return (
-    <Pressable
+    <MotiPressable
       onPress={handleOpenDetail}
-      className="p-2 rounded-lg overflow-hidden bg-slate-100 gap-1  border border-slate-300 "
+      animate={({ pressed }) => {
+        "worklet";
+        return {
+          scale: pressed ? 0.96 : 1,
+          opacity: pressed ? 0.92 : 1,
+        };
+      }}
+      transition={{ type: "spring", damping: 18, stiffness: 250 }}
       style={{
-        width: dimensions.width * 0.47,
-        height: dimensions.height * 0.3,
+        width: cardWidth,
+        borderRadius: 12,
+        overflow: "hidden",
+        backgroundColor: colors.card,
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
       }}
     >
-      {/* Image area */}
-      <View className="flex-1">
-        <Image
-          resizeMode="center"
-          style={{ width: "100%", height: "100%" }}
-          className="rounded-lg"
-          source={imageUrl ? { uri: imageUrl } : undefined}
-        />
+      {/* IMAGE */}
+      <View className="w-full bg-slate-100" style={{ aspectRatio: 4 / 3 }}>
+        {imageUrl ? (
+          <>
+            <Image
+              resizeMode="cover"
+              className="w-full h-full"
+              source={{ uri: imageUrl }}
+              onLoadStart={() => setImageLoading(true)}
+              onLoadEnd={() => setImageLoading(false)}
+            />
+            {imageLoading && (
+              <View className="absolute inset-0 items-center justify-center bg-slate-100">
+                <ActivityIndicator size="small" color={colors.slate[400]} />
+              </View>
+            )}
+          </>
+        ) : (
+          <View className="flex-1 items-center justify-center gap-1">
+            <ImageIcon size={28} color={colors.slate[300]} weight="thin" />
+            <Text className="text-[10px] text-slate-400">No image</Text>
+          </View>
+        )}
 
-        {/* Badge like "Lost/Found" */}
-        <View className="absolute top-0 right-0 p-1">
+        {/* Status badge */}
+        <View className="absolute top-2 left-2">
           <PostStatusBadge status={item.postType} size="sm" />
         </View>
       </View>
 
-      {/* Description section */}
-      <View className="flex-col">
+      {/* INFO STRIP */}
+      <View className="px-2 pt-2 pb-2.5 bg-white gap-1.5">
+        {/* Title — loudest element */}
         <Text
-          className="font-semibold text-slate-900"
-          style={{ fontSize: 13 }}
-          numberOfLines={1}
+          numberOfLines={2}
+          className="text-sm font-medium text-slate-900 leading-[18px]"
         >
           {item.itemName}
         </Text>
 
-        {/* Event Time */}
+        {/* Event time — secondary */}
         <View className="flex-row items-center gap-1">
-          <ClockIcon size={16} color={colors.primary} weight="regular" />
-          <Text
-            className="flex-1 text-slate-700"
-            style={{ fontSize: 12 }}
-            numberOfLines={1}
-          >
+          <ClockIcon size={11} color={colors.slate[400]} weight="bold" />
+          <Text numberOfLines={1} className="text-[11px] text-slate-500 flex-1">
             {eventTimeLabel}
           </Text>
         </View>
 
-        {/* Location */}
+        {/* Location — most muted */}
         <View className="flex-row items-center gap-1">
-          <MapPinIcon size={16} color={colors.primary} weight="regular" />
-          <Text
-            className="flex-1 text-slate-700"
-            style={{ fontSize: 12 }}
-            numberOfLines={1}
-          >
+          <MapPinIcon size={10} color={colors.slate[300]} weight="fill" />
+          <Text numberOfLines={1} className="text-[10px] text-slate-400 flex-1">
             {locationLabel}
           </Text>
         </View>
       </View>
-    </Pressable>
+    </MotiPressable>
   );
 };

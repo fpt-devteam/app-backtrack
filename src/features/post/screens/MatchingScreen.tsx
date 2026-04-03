@@ -5,8 +5,8 @@ import {
   AppHeader,
   BackButton,
   HeaderTitle,
-} from "@/src/shared/components/app-utils/AppHeader";
-import { AppSplashScreen } from "@/src/shared/components/app-utils/AppSplashScreen";
+} from "@/src/shared/components/AppHeader";
+import { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 import { getErrorMessage } from "@/src/shared/utils";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";

@@ -4,7 +4,7 @@ import {
 } from "@/src/features/map/hooks";
 import { useLocationSelectionStore } from "@/src/features/map/store";
 import type { PlacePrediction } from "@/src/features/map/types";
-import { SuggestRow } from "@/src/shared/components";
+import { AppSearchSuggestRow } from "@/src/shared/components";
 import { MAP_ROUTE } from "@/src/shared/constants";
 import { useRecentSearch } from "@/src/shared/hooks";
 import { colors } from "@/src/shared/theme";
@@ -163,7 +163,7 @@ export const MapSearchScreen = () => {
         keyExtractor={(item) => item.placeId}
         keyboardShouldPersistTaps="handled"
         renderItem={({ item }) => (
-          <SuggestRow
+          <AppSearchSuggestRow
             IconComponent={MapPinIcon}
             text={item.formattedAddress}
             onPress={() => handleSelectPlace(item)}
@@ -180,11 +180,10 @@ export const MapSearchScreen = () => {
         keyExtractor={(item) => item.value}
         keyboardShouldPersistTaps="handled"
         renderItem={({ item }) => (
-          <SuggestRow
+          <AppSearchSuggestRow
             IconComponent={ClockIcon}
             text={item.value}
             onPress={() => handleSelectRecent(item.value)}
-            onRemove={() => void remove(item.value)}
           />
         )}
       />

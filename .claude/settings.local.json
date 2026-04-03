@@ -15,7 +15,11 @@
       "Bash(if exist \"node_modules\\\\.cache\" rd /s /q \"node_modules\\\\.cache\")",
       "Bash(find:*)",
       "Bash(ls:*)",
-      "Bash(node --version:*)"
+      "Bash(node --version:*)",
+      "Bash(cat:*)"
     ]
+  },
+  "enabledPlugins": {
+    "autofix-bot@claude-plugins-official": true
   }
 }

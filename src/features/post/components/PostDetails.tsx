@@ -4,7 +4,7 @@ import { InfoRow } from "@/src/features/post/components/PostInfoRow";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import { ImageCarousel } from "@/src/shared/components";
-import { Divider } from "@/src/shared/components/ui/Divider";
+import { AppDivider } from "@/src/shared/components";
 import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
@@ -83,7 +83,7 @@ export const PostDetailsSkeleton = () => {
         </View>
       </View>
 
-      <Divider />
+      <AppDivider />
 
       <View className="p-5 gap-4">
         {[0, 1, 2].map((i) => (
@@ -173,7 +173,7 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
           )}
         </View>
 
-        <Divider />
+        <AppDivider />
 
         <View className="p-5 gap-4">
           <InfoRow
@@ -199,14 +199,9 @@ export const PostDetails = ({ postId }: PostDetailsProps) => {
 
       {!!similarPosts?.length && (
         <View className="mx-4 mt-6">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-[16px] font-extrabold text-slate-900">
-              Similar Posts
-            </Text>
-            <Text className="text-[12px] text-slate-500">
-              {similarPosts.length}
-            </Text>
-          </View>
+          <Text className="text-[16px] font-extrabold text-slate-900">
+            Similar Posts
+          </Text>
 
           <View className="mt-3 gap-3">
             {similarPosts.map((p) => (

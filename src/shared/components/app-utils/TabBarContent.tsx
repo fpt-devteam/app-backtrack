@@ -1,5 +1,5 @@
-import { PostCreateOptionsBottomSheet } from "@/src/features/post/components";
-import { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
+import PostCreateOptionsBottomSheet from "@/src/features/post/components/PostCreateOptionsBottomSheet";
+import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";

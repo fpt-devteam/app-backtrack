@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Image, View } from "react-native";
+import { View } from "react-native";
+import { AppImage } from "./AppImage";
 
 type Props = {
   avatarUrl: string | undefined | null;
@@ -19,7 +20,7 @@ export const AppUserAvatar = ({ avatarUrl = FALLBACK, size = 56 }: Props) => {
       className="relative overflow-hidden border-2 rounded-full border-primary"
       style={{ width: size, height: size }}
     >
-      <Image
+      <AppImage
         source={{ uri: displayAvatarUri }}
         resizeMode="contain"
         style={{ width: size, height: size }}

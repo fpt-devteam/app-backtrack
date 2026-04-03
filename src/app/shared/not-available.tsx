@@ -1,1 +1,1 @@
-export { NotAvailableScreen as default } from "@/src/shared/screens/NotAvailableScreen";
+export { NotAvailableScreen as default } from "@/src/shared/screens";

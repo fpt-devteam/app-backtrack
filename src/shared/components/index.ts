@@ -1,3 +1,7 @@
+export { BottomTabBar } from "@/src/shared/components/app-utils/BottomTabBar";
+export { AppAccordion } from "@/src/shared/components/AppAccordion";
+export { AppChipsRow } from '@/src/shared/components/AppChipsRow';
+export { AppDivider } from "@/src/shared/components/AppDivider";
 export {
   AppHeader,
   BackButton,
@@ -5,29 +9,24 @@ export {
   DotsThreeButton,
   HeaderTitle,
   TextButton
-} from "@/src/shared/components/app-utils/AppHeader";
-export { AppInlineError } from "@/src/shared/components/app-utils/AppInlineError";
-export { AppListFooter } from "@/src/shared/components/app-utils/AppListFooter";
-export { AppLoader } from "@/src/shared/components/app-utils/AppLoader";
-export { AppLogo } from "@/src/shared/components/app-utils/AppLogo";
-export { AppSlogan } from "@/src/shared/components/app-utils/AppSlogan";
-export { AppSplashScreen } from "@/src/shared/components/app-utils/AppSplashScreen";
-export { AppUserAvatarIcon } from "@/src/shared/components/app-utils/AppUserAvatarIcon";
-export { BottomTabBar } from "@/src/shared/components/app-utils/BottomTabBar";
+} from "@/src/shared/components/AppHeader";
+export { AppImage } from "@/src/shared/components/AppImage";
+export { AppInlineError } from "@/src/shared/components/AppInlineError";
+export { AppLoader } from "@/src/shared/components/AppLoader";
+export { AppLogo } from "@/src/shared/components/AppLogo";
+export { AppSearchSuggestRow } from '@/src/shared/components/AppSearchSuggestRow';
+export { AppSegmentedControl } from "@/src/shared/components/AppSegmentedControl";
+export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
+export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
+export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 export { ConfirmPasswordField } from "@/src/shared/components/fields/ConfirmPasswordField";
 export { DateTimePickerField } from "@/src/shared/components/fields/DateTimePickerField";
 export { EmailField } from "@/src/shared/components/fields/EmailField";
 export { ImageField } from "@/src/shared/components/fields/ImageField";
 export { PasswordField } from "@/src/shared/components/fields/PasswordField";
-export { AppUserAvatar } from "@/src/shared/components/ui/AppUserAvatar";
-export { ParallaxScrollView } from '@/src/shared/components/ui/bna/ParallaxScrollview';
 export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
-export { ChipsRow } from '@/src/shared/components/ui/ChipsRow';
-export { FAB } from '@/src/shared/components/ui/FAB';
-export { FormSubmitButton } from '@/src/shared/components/ui/FormSubmitButton';
 export { ImageCarousel } from '@/src/shared/components/ui/ImageCarousel';
 export { MenuBottomSheet } from '@/src/shared/components/ui/MenuBottomSheet';
 export type { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
-export { SuggestRow } from '@/src/shared/components/ui/SuggestRow';
 export { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 

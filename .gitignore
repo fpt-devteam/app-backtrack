@@ -45,3 +45,4 @@ app-example
 #google services files
 google-services.json
 GoogleService-Info.plist
+.gitnexus

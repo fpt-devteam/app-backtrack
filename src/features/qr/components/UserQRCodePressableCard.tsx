@@ -1,7 +1,7 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { IS_QR_FEATURE_MOCK, MOCK_QR_CODE } from "@/src/features/qr/constants";
 import { useGetMyQR } from "@/src/features/qr/hooks";
-import { AppLoader } from "@/src/shared/components/app-utils/AppLoader";
+import { AppLoader } from "@/src/shared/components/AppLoader";
 import { QR_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";

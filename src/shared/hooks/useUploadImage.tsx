@@ -1,7 +1,3 @@
-import type { Nullable } from "@/src/shared/types";
-import { useMutation } from "@tanstack/react-query";
-import type { ImagePickerAsset } from "expo-image-picker";
-import { useState } from "react";
 import {
   MAX_IMAGE_UPLOAD,
   MIN_IMAGE_UPLOAD,
@@ -10,55 +6,62 @@ import {
 } from "@/src/shared/constants";
 import { auth } from "@/src/shared/lib";
 import { uploadImageToStorage } from "@/src/shared/services";
+import type { Nullable } from "@/src/shared/types";
 import type {
   ImageUploadRequest,
-  ImageUploadResponse
+  ImageUploadResponse,
 } from "@/src/shared/types/firebase.type";
+import { useMutation } from "@tanstack/react-query";
+import type { ImagePickerAsset } from "expo-image-picker";
+import { useState } from "react";
 
 export function useUploadImage() {
   const [progress, setProgress] = useState(0);
 
-  const mutation = useMutation<Nullable<ImageUploadResponse[]>, Error, ImagePickerAsset[]>(
-    {
-      mutationKey: [UPLOAD_IMAGE_QUERY_KEY],
-      onMutate: () => setProgress(0),
-      mutationFn: async (imageAssets) => {
-        const user = auth.currentUser;
-        if (!user) throw new Error("Not authenticated");
+  const mutation = useMutation<
+    Nullable<ImageUploadResponse[]>,
+    Error,
+    ImagePickerAsset[]
+  >({
+    mutationKey: [UPLOAD_IMAGE_QUERY_KEY],
+    onMutate: () => setProgress(0),
+    mutationFn: async (imageAssets) => {
+      const user = auth.currentUser;
+      if (!user) throw new Error("Not authenticated");
 
-        const total = imageAssets.length;
-        const isValidSize = total >= MIN_IMAGE_UPLOAD && total <= MAX_IMAGE_UPLOAD;
-        if (!isValidSize) throw new Error("Invalid image count");
+      const total = imageAssets.length;
+      const isValidSize =
+        total >= MIN_IMAGE_UPLOAD && total <= MAX_IMAGE_UPLOAD;
+      if (!isValidSize) throw new Error("Invalid image count");
 
-        const uid = user.uid;
-        const results = [] as ImageUploadResponse[];
+      const uid = user.uid;
+      const results = [] as ImageUploadResponse[];
 
-        for (let i = 0; i < total; i++) {
-          const img = imageAssets[i];
-          if (!img?.uri) continue;
+      for (let i = 0; i < total; i++) {
+        const img = imageAssets[i];
+        if (!img?.uri) continue;
 
-          const fileName = `img_${Date.now()}_${i}`;
-          const response = await fetch(img.uri);
-          const blob = await response.blob();
+        const fileName = `img_${Date.now()}_${i}`;
+        const response = await fetch(img.uri);
+        const blob = await response.blob();
 
-          const req: ImageUploadRequest = {
-            filename: fileName,
-            firebaseUid: uid,
-            uri: img.uri,
-            blob,
-            path: `${UPLOAD_IMAGE_API}/${uid}/${fileName}`,
-          };
+        const req: ImageUploadRequest = {
+          filename: fileName,
+          firebaseUid: uid,
+          uri: img.uri,
+          blob,
+          path: `${UPLOAD_IMAGE_API}/${uid}/${fileName}`,
+        };
 
-          const res = await uploadImageToStorage(req);
-          results.push(res);
+        const res = await uploadImageToStorage(req);
+        results.push(res);
 
-          setProgress((i + 1) / total);
-        }
+        setProgress((i + 1) / total);
+      }
 
-        return results;
-      },
-    }
-  );
+      return results;
+    },
+  });
 
   return {
     isUploadingImages: mutation.isPending,
