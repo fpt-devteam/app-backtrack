@@ -7,23 +7,36 @@ import type {
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
 import { PostMatchingStatus, PostType } from "./post.enum";
-import type {
-  Post,
-  PostSearchOptions,
-  PostSuggestion,
-  SimilarPost
+import {
+  ITEM_CATEGORIES,
+  type Post,
+  type PostSearchOptions,
+  type PostSuggestion,
+  type SimilarPost
 } from "./post.type";
 
-export type PostsRequest = {
+/**
+ * PostFeedRequest - This type defines the filters that can be applied when fetching posts.
+ * It includes the post type, location, search term, radius in kilometers, and author ID. 
+ */
+export type PostFeedRequest = {
   postType?: PostType;
   searchTerm?: string;
   radiusInKm?: number;
   authorId?: string;
   location: Nullable<LatLng>;
-} & PagedRequest;
+};
 
-export type PostsResponse = ApiResponse<PagedResponse<Post>>;
+type PostFeedResult = {
+  [key in (typeof ITEM_CATEGORIES)[keyof typeof ITEM_CATEGORIES]]: Post[];
+};
 
+export type PostFeedResponse = ApiResponse<PostFeedResult>;
+
+/**
+ *  PostCreateRequest - This type defines the structure of the request body when creating a new post.
+ *  It includes the post type, item name, description, image URLs, distinctive marks, event time, and location details (latitude and longitude).
+ */
 export type PostCreateRequest = {
   postType: PostType;
   itemName: string;

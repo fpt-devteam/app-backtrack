@@ -17,7 +17,7 @@ export const PostList = ({
 }: PostListProps) => {
   const { confirmedSelection } = useLocationSelectionStore();
 
-  const { items, loadMore, isLoading, refetch, isRefetching } = usePosts({
+  const { items, isLoading, refetch, isRefetching } = usePosts({
     enabled: !!confirmedSelection,
     filters: {
       postType: filters?.postType,
@@ -39,7 +39,7 @@ export const PostList = ({
 
   const renderItem = useCallback(
     ({ item }: { item: Post }) => <PostCard item={item} />,
-    [isLoading, direction],
+    [],
   );
 
   const renderSeparator = useCallback(
@@ -59,8 +59,6 @@ export const PostList = ({
       renderItem={renderItem}
       ItemSeparatorComponent={renderSeparator}
       ListFooterComponent={renderFooter}
-      onEndReachedThreshold={0.1}
-      onEndReached={loadMore}
       scrollEventThrottle={16}
       bounces
       horizontal={isHorizontal}

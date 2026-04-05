@@ -2,15 +2,16 @@ import { useCheckEmailStatus } from "@/src/features/auth/hooks";
 import { EMAIL_STATUS } from "@/src/features/auth/types";
 import {
   AppButton,
-  EmailField,
+  AppLogo,
+  BaseInputField,
   TouchableIconButton,
 } from "@/src/shared/components";
 import { AppGoogleLogo } from "@/src/shared/components/AppGoogleLogo";
 import { AUTH_ROUTE } from "@/src/shared/constants";
-import { colors, metrics } from "@/src/shared/theme";
+import { colors } from "@/src/shared/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
-import { PhoneIcon, XIcon } from "phosphor-react-native";
+import { PhoneIcon } from "phosphor-react-native";
 import React from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -18,8 +19,8 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -87,112 +88,120 @@ const OnboardingScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      className="w-full flex-1"
-      style={{ backgroundColor: "transparent" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      className="flex-1 bg-white"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View
-        className="flex-1 w-full bg-surface"
-        style={{
-          borderTopLeftRadius: metrics.borderRadius.lg,
-          borderTopRightRadius: metrics.borderRadius.lg,
-        }}
-      >
-        {/* ── Header ── */}
-        <View
-          className="relative w-full px-lg py-md flex-row items-center justify-center"
-          style={{
-            borderBottomWidth: 1,
-            borderBottomColor: colors.divider,
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: 16,
+            paddingBottom: 24,
           }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text className="text-center font-normal text-textPrimary text-base">
-            Log in or sign upasdfasdf
-          </Text>
+          <View className="flex-1 bg-surface px-lg items-center justify-center">
+            {/* Group Header (Logo) */}
+            <View className="items-center gap-6 mb-10">
+              <AppLogo height={40} />
 
-          <View className="absolute right-lg top-0 bottom-0 justify-center">
-            <TouchableIconButton
-              icon={
-                <XIcon size={18} color={colors.text.primary} weight="bold" />
-              }
-              onPress={() => router.back()}
-            />
-          </View>
-        </View>
+              <Text className="text-2xl text-textPrimary font-normal text-center">
+                Login or sign up
+              </Text>
+            </View>
 
-        {/* Body */}
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View
-            style={{
-              flexGrow: 1,
-              paddingBottom: metrics.spacing.xl,
-            }}
-          >
-            <View className="px-lg pt-xl">
-              {/* ── Email field ─────────────────────────────── */}
-              <Controller
-                control={formControl}
-                name="email"
-                render={({ field: { onBlur, onChange, value } }) => (
-                  <EmailField
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    error={errors.email?.message}
-                  />
-                )}
-              />
+            {/* Group Content (Form + Social) */}
+            <View className="w-full">
+              {/* Email Form */}
+              <View className="w-full">
+                <Controller
+                  control={formControl}
+                  name="email"
+                  render={({ field: { onBlur, onChange, value } }) => (
+                    <BaseInputField
+                      label="Email"
+                      value={value}
+                      onChange={onChange}
+                      onBlur={onBlur}
+                      error={errors.email?.message}
+                      keyboardType="email-address"
+                      textContentType="emailAddress"
+                      autoComplete="email"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                    />
+                  )}
+                />
 
-              {/* ── Continue button ─────────────────────────── */}
-              <AppButton
-                title="Continue"
-                onPress={handleSubmit(onSubmit)}
-                loading={loading}
-                disabled={!hasEmail}
-                className="mt-md"
-              />
-
-              {/* ── "or" divider ────────────────────────────── */}
-              <View className="flex-row items-center my-xl gap-md2">
-                <View className="flex-1 h-px bg-divider" />
-                <Text className="text-xs text-textMuted font-medium">or</Text>
-                <View className="flex-1 h-px bg-divider" />
+                <AppButton
+                  title="Continue"
+                  onPress={handleSubmit(onSubmit)}
+                  loading={loading}
+                  disabled={!hasEmail}
+                  className="mt-md"
+                />
               </View>
 
-              {/* ── Social login buttons ─────────────────────── */}
-              <View className="gap-md2 pb-xl">
-                {/* Google */}
-                <TouchableOpacity
-                  className="relative h-control-lg rounded-sm border border-hof-900 items-center justify-center bg-surface"
-                  disabled={loading}
-                  activeOpacity={0.8}
-                >
-                  <View className="absolute left-md top-0 bottom-0 justify-center">
-                    <AppGoogleLogo />
-                  </View>
-                  <Text className="text-sm font-normal text-textPrimary">
-                    Continue with Google
-                  </Text>
-                </TouchableOpacity>
+              {/* Divider */}
+              <View className="flex-row items-center my-10 gap-md2">
+                <View
+                  className="flex-1 h-px "
+                  style={{
+                    backgroundColor: colors.divider,
+                  }}
+                />
+                <Text className="text-xs text-textMuted font-medium">or</Text>
+                <View
+                  className="flex-1 h-px "
+                  style={{
+                    backgroundColor: colors.divider,
+                  }}
+                />
+              </View>
 
-                {/* Phone */}
-                <TouchableOpacity
-                  className="relative h-control-lg rounded-sm border border-hof-900 items-center justify-center bg-surface"
+              {/* Social Buttons */}
+              <View className="gap-md2 flex-row justify-center">
+                <TouchableIconButton
+                  icon={
+                    <View
+                      className="p-md items-center justify-center rounded-sm bg-surface"
+                      style={{
+                        borderWidth: 1,
+                        borderColor: colors.border.DEFAULT,
+                      }}
+                    >
+                      <AppGoogleLogo />
+                    </View>
+                  }
+                  onPress={() => {}}
                   disabled={loading}
-                  activeOpacity={0.8}
-                >
-                  <View className="absolute left-md top-0 bottom-0 justify-center">
-                    <PhoneIcon size={20} color={colors.text.primary} />
-                  </View>
-                  <Text className="text-sm font-normal text-textPrimary">
-                    Continue with Phone
-                  </Text>
-                </TouchableOpacity>
+                />
+
+                <TouchableIconButton
+                  icon={
+                    <View
+                      className="p-md items-center justify-center rounded-sm bg-surface"
+                      style={{
+                        borderWidth: 1,
+                        borderColor: colors.border.DEFAULT,
+                      }}
+                    >
+                      <PhoneIcon
+                        size={20}
+                        color={colors.text.primary}
+                        weight="fill"
+                      />
+                    </View>
+                  }
+                  onPress={() => {}}
+                  disabled={loading}
+                />
               </View>
             </View>
           </View>
-        </TouchableWithoutFeedback>
-      </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };

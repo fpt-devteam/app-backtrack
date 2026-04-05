@@ -1,8 +1,16 @@
-import { colors, metrics } from "@/src/shared/theme";
+import { colors, metrics, typography } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
 import type { IconProps } from "phosphor-react-native";
 import React from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+} from "react-native";
+
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -36,7 +44,7 @@ export const TabBarButton = ({
 
     pressOpacity.value = withSequence(
       withTiming(0.6, { duration: metrics.motion.duration.fast }),
-      withTiming(1, { duration: metrics.motion.duration.slower })
+      withTiming(1, { duration: metrics.motion.duration.slower }),
     );
 
     onPress();
@@ -57,9 +65,8 @@ export const TabBarButton = ({
     >
       <View style={styles.iconContainer}>
         <Icon
-          weight="fill"
           size={metrics.tabBar.iconSize}
-          color={isFocused ? colors.primary : colors.gray[400]}
+          color={isFocused ? colors.primary : colors.gray[500]}
         />
         {badge !== undefined && badge > 0 && (
           <View style={styles.badge}>
@@ -69,12 +76,12 @@ export const TabBarButton = ({
       </View>
 
       <Text
-        className={isFocused ? "text-primary" : "text-gray-400"}
         style={[
           styles.label,
           {
             fontSize: metrics.tabBar.labelSize,
-            fontWeight: isFocused ? "800" : "600",
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+            color: isFocused ? colors.primary : colors.gray[500],
           },
         ]}
         numberOfLines={1}
@@ -89,7 +96,6 @@ const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center",
     paddingTop: metrics.tabBar.padding.top,
     paddingBottom: metrics.tabBar.padding.bottom,
     position: "relative",

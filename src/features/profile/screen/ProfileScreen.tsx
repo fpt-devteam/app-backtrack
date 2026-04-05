@@ -46,7 +46,7 @@ const GRID_PADDING = 8;
 const GridSeparator = () => <View style={{ height: GRID_GAP }} />;
 
 const ProfilePostGridItem = ({ post, size }: { post: Post; size: number }) => {
-  const imageUrl = post.images?.[0]?.url;
+  const imageUrl = post.imageUrls?.[0]?.url;
 
   const handleOpenPost = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

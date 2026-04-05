@@ -1,5 +1,6 @@
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { EnvelopeIcon } from "phosphor-react-native";
 import React from "react";
 import {
@@ -17,6 +18,10 @@ const EmailVerifyScreen = () => {
 
   const handleResendVerificationEmail = () => {
     // TODO: Implement resend verification email functionality
+  };
+
+  const handleGoBackToLogin = () => {
+    router.replace(AUTH_ROUTE.onboarding);
   };
 
   return (
@@ -52,6 +57,16 @@ const EmailVerifyScreen = () => {
         >
           <Text className="text-base font-normal text-white text-center">
             Resend Verification Email
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="w-full py-5 items-center justify-center"
+          onPress={handleGoBackToLogin}
+          activeOpacity={0.8}
+        >
+          <Text className="text-base font-normal text-secondary text-center underline">
+            Back to Login
           </Text>
         </TouchableOpacity>
       </View>

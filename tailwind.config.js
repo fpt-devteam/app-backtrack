@@ -28,10 +28,7 @@ module.exports = {
    * Keep this list aligned with app folder structure so generated utilities stay
    * complete and unused CSS does not accumulate.
    */
-  content: [
-    "./app/**/*.{js,jsx,ts,tsx}",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./src/**/*.{js,jsx,ts,tsx}"],
   /** NativeWind preset enables React Native-compatible Tailwind behavior. */
   presets: [require("nativewind/preset")],
   /** Dark mode strategy; class-based to allow explicit theme toggling when needed. */
@@ -177,15 +174,16 @@ module.exports = {
        * Keeps type scale synchronized between JS theme usage and utility classes.
        */
       fontSize: {
-        'xs':  `${typography.fontSize.xs}px`,
-        'sm':  `${typography.fontSize.sm}px`,
-        'base': `${typography.fontSize.base}px`,
-        'lg':  `${typography.fontSize.lg}px`,
-        'xl':  `${typography.fontSize.xl}px`,
-        '2xl': `${typography.fontSize['2xl']}px`,
-        '3xl': `${typography.fontSize['3xl']}px`,
-        '4xl': `${typography.fontSize['4xl']}px`,
-        '5xl': `${typography.fontSize['5xl']}px`,
+        mini: `${typography.fontSize.mini}px`,
+        xs: `${typography.fontSize.xs}px`,
+        sm: `${typography.fontSize.sm}px`,
+        base: `${typography.fontSize.base}px`,
+        lg: `${typography.fontSize.lg}px`,
+        xl: `${typography.fontSize.xl}px`,
+        "2xl": `${typography.fontSize["2xl"]}px`,
+        "3xl": `${typography.fontSize["3xl"]}px`,
+        "4xl": `${typography.fontSize["4xl"]}px`,
+        "5xl": `${typography.fontSize["5xl"]}px`,
       },
 
       /**
@@ -195,10 +193,10 @@ module.exports = {
       letterSpacing: {
         display: `${typography.letterSpacing.display}px`,
         heading: `${typography.letterSpacing.heading}px`,
-        body:    `${typography.letterSpacing.body}px`,
-        label:   `${typography.letterSpacing.label}px`,
+        body: `${typography.letterSpacing.body}px`,
+        label: `${typography.letterSpacing.label}px`,
         caption: `${typography.letterSpacing.caption}px`,
-        caps:    `${typography.letterSpacing.caps}px`,
+        caps: `${typography.letterSpacing.caps}px`,
       },
 
       /**
@@ -222,11 +220,11 @@ module.exports = {
        * `h-control-*` should be preferred for buttons/inputs to keep tap ergonomics consistent.
        */
       height: {
-        'control-xs': metrics.layout.controlHeight.xs,
-        'control-sm': metrics.layout.controlHeight.sm,
-        'control-md': metrics.layout.controlHeight.md,
-        'control-lg': metrics.layout.controlHeight.lg,
-        'control-xl': metrics.layout.controlHeight.xl,
+        "control-xs": metrics.layout.controlHeight.xs,
+        "control-sm": metrics.layout.controlHeight.sm,
+        "control-md": metrics.layout.controlHeight.md,
+        "control-lg": metrics.layout.controlHeight.lg,
+        "control-xl": metrics.layout.controlHeight.xl,
         /** Optional spacing-based height helpers (e.g., `h-md`, `h-xl`). */
         ...metrics.spacing,
       },
@@ -238,10 +236,10 @@ module.exports = {
 
       /** Transition duration utilities (`duration-fast`..`duration-slower`). */
       transitionDuration: {
-        'slower': `${metrics.motion.duration.slower}ms`,
-        'slow': `${metrics.motion.duration.slow}ms`,
-        'normal': `${metrics.motion.duration.normal}ms`,
-        'fast': `${metrics.motion.duration.fast}ms`,
+        slower: `${metrics.motion.duration.slower}ms`,
+        slow: `${metrics.motion.duration.slow}ms`,
+        normal: `${metrics.motion.duration.normal}ms`,
+        fast: `${metrics.motion.duration.fast}ms`,
       },
 
       /**
@@ -249,14 +247,13 @@ module.exports = {
        * Use `max-w-screen-*` tokens to keep tablet/web layouts aligned with design breakpoints.
        */
       maxWidth: {
-        'screen-sm': `${metrics.layout.container.sm}px`,
-        'screen-md': `${metrics.layout.container.md}px`,
-        'screen-lg': `${metrics.layout.container.lg}px`,
-        'screen-xl': `${metrics.layout.container.xl}px`,
-      }
+        "screen-sm": `${metrics.layout.container.sm}px`,
+        "screen-md": `${metrics.layout.container.md}px`,
+        "screen-lg": `${metrics.layout.container.lg}px`,
+        "screen-xl": `${metrics.layout.container.xl}px`,
+      },
     },
   },
   /** Project has no additional Tailwind plugins at this time. */
   plugins: [],
 };
-

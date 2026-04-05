@@ -1,13 +1,18 @@
-import type { Post } from "@/src/features/post/types";
+import { type Post } from "@/src/features/post/types";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import { formatShortEventTime } from "@/src/shared/utils/datetime.utils";
+import {
+  calculateTimeDifference,
+  formatTimeDifference,
+} from "@/src/shared/utils/datetime.utils";
 import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
-import { ClockIcon, ImageIcon, MapPinIcon } from "phosphor-react-native";
-import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Image, Text, useWindowDimensions, View } from "react-native";
+import { MapPinIcon } from "phosphor-react-native";
+import React, { useCallback, useMemo } from "react";
+import { Text, useWindowDimensions, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { PostStatusBadge } from "./PostStatusBadge";
+import { AppImage } from "@/src/shared/components/AppImage";
 
 type PostCardProps = {
   item: Post;
@@ -15,14 +20,19 @@ type PostCardProps = {
 
 export const PostCard = ({ item }: PostCardProps) => {
   const { width } = useWindowDimensions();
-  const cardWidth = width * 0.47;
-  const imageUrl = item.images?.[0]?.url;
-  const [imageLoading, setImageLoading] = useState(true);
 
-  // "Jan 15 · 14:30" — date + time, more scannable than date-only
-  const eventTimeLabel = useMemo(
-    () => formatShortEventTime(item.eventTime),
-    [item.eventTime],
+  const cardWidth = width * 0.43;
+  const imageUrl = item.imageUrls[0];
+
+  const eventTimeLabel = useMemo(() => {
+    const tickDiff = calculateTimeDifference(item.eventTime, new Date());
+    const formattedTime = formatTimeDifference(tickDiff);
+    return formattedTime;
+  }, [item.eventTime]);
+
+  const itemNameLabel = useMemo(
+    () => item.item?.itemName || "Untitled item",
+    [item.item?.itemName],
   );
 
   const locationLabel = useMemo(() => {
@@ -50,68 +60,50 @@ export const PostCard = ({ item }: PostCardProps) => {
       transition={{ type: "spring", damping: 18, stiffness: 250 }}
       style={{
         width: cardWidth,
-        borderRadius: 12,
-        overflow: "hidden",
-        backgroundColor: colors.card,
-        shadowColor: colors.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
+        gap: 8,
       }}
     >
       {/* IMAGE */}
-      <View className="w-full bg-slate-100" style={{ aspectRatio: 4 / 3 }}>
-        {imageUrl ? (
-          <>
-            <Image
-              resizeMode="cover"
-              className="w-full h-full"
-              source={{ uri: imageUrl }}
-              onLoadStart={() => setImageLoading(true)}
-              onLoadEnd={() => setImageLoading(false)}
-            />
-            {imageLoading && (
-              <View className="absolute inset-0 items-center justify-center bg-slate-100">
-                <ActivityIndicator size="small" color={colors.slate[400]} />
-              </View>
-            )}
-          </>
-        ) : (
-          <View className="flex-1 items-center justify-center gap-1">
-            <ImageIcon size={28} color={colors.slate[300]} weight="thin" />
-            <Text className="text-[10px] text-slate-400">No image</Text>
-          </View>
-        )}
+      <View
+        className="w-full overflow-hidden rounded-2xl"
+        style={{ aspectRatio: 1.18 }}
+      >
+        <AppImage
+          resizeMode="cover"
+          className="w-full h-full"
+          source={{ uri: imageUrl }}
+        />
 
         {/* Status badge */}
         <View className="absolute top-2 left-2">
-          <PostStatusBadge status={item.postType} size="sm" />
+          <View className="p-2 rounded-full bg-white bg-opacity-60 items-center justify-center shadow-xs">
+            <Text className="text-xs font-medium text-textPrimary">
+              {eventTimeLabel}
+            </Text>
+          </View>
+        </View>
+
+        {/* Post Type badge */}
+        <View className="absolute top-2 right-2">
+          <PostStatusBadge status={item.postType} />
         </View>
       </View>
 
       {/* INFO STRIP */}
-      <View className="px-2 pt-2 pb-2.5 bg-surface gap-1.5">
-        {/* Title — loudest element */}
+      <View className="bg-surface px-3 pt-1 pb-0.5 gap-0.5">
         <Text
           numberOfLines={2}
-          className="text-sm font-medium text-textPrimary leading-[18px]"
+          className="text-sm font-normal text-textPrimary"
         >
-          {item.itemName}
+          {itemNameLabel}
         </Text>
 
-        {/* Event time — secondary */}
-        <View className="flex-row items-center gap-1">
-          <ClockIcon size={11} color={colors.slate[400]} weight="bold" />
-          <Text numberOfLines={1} className="text-[11px] text-textSecondary flex-1">
-            {eventTimeLabel}
-          </Text>
-        </View>
-
-        {/* Location — most muted */}
-        <View className="flex-row items-center gap-1">
-          <MapPinIcon size={10} color={colors.slate[300]} weight="fill" />
-          <Text numberOfLines={1} className="text-[10px] text-slate-400 flex-1">
+        <View className="flex-row items-center gap-1.5 pr-2">
+          <MapPinIcon size={10} color={colors.primary} weight="fill" />
+          <Text
+            numberOfLines={1}
+            className="text-xs leading-5 font-normal text-textMuted"
+          >
             {locationLabel}
           </Text>
         </View>

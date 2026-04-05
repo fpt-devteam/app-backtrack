@@ -13,7 +13,7 @@ type MinimalPostCardProps = {
 };
 
 export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
-  const imgUrl = post.images?.[0];
+  const imgUrl = post.imageUrls?.[0];
 
   return (
     <TouchableOpacity

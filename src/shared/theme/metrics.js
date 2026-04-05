@@ -132,6 +132,7 @@ const metrics = {
      * filter chip pills, guest count selectors.
      * Airbnb uses this extensively for all interactive chip elements.
      */
+    "4xl": 40,
     full: 9999,
   },
 

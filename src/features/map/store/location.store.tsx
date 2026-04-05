@@ -83,6 +83,8 @@ export const LocationSelectionProvider = ({
     ],
   );
 
+  console.log("Location Selection Context Value:", contextValue);
+
   return (
     <LocationSelectionContext.Provider value={contextValue}>
       {children}

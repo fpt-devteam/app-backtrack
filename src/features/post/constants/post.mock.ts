@@ -14,7 +14,7 @@ export const POST_MOCK: Post[] = [
     postType: "Lost" as PostType,
     itemName: "Black Samsung Super Fast Charging wall adapter",
     description: "- Category: Electronics\n- Color: Black\n- Brand: Samsung\n- Type: Wall charger, USB-C\n- Material: Plastic\n- Condition: New\n- Distinctive marks: 'Super Fast Charging' embossed text on body",
-    images: [
+    imageUrls: [
       {
         id: "7d8a073b-946e-42bc-b2a3-cd1a836e9b5d",
         url: "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2FDQFfRZq2eKaTumrr4VuWlStW3142%2Fimg_1773658959051_0?alt=media&token=64f37abe-b128-4bbb-a584-fd475dcb57c1",

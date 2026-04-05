@@ -193,13 +193,13 @@ export const formatTimeDifference = (diffInMs: number): string => {
   const days = Math.floor(hours / 24)
 
   if (days > 0) {
-    return `${days} day${days > 1 ? 's' : ''} apart`
+    return `${days} day${days > 1 ? 's' : ''} ago`
   }
   if (hours > 0) {
-    return `${hours} hr${hours > 1 ? 's' : ''} apart`
+    return `${hours} hr${hours > 1 ? 's' : ''} ago`
   }
   if (minutes > 0) {
-    return `${minutes} min${minutes > 1 ? 's' : ''} apart`
+    return `${minutes} min${minutes > 1 ? 's' : ''} ago`
   }
   return 'Same time'
 }

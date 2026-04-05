@@ -84,6 +84,9 @@ const palette = {
    */
   babu: {
     100: "#E6F4EA",
+    200: "#A8D5A3",
+    300: "#66BB6A",
+    400: "#2E8B57",
     500: "#008A05",
     600: "#006E02",
   },
@@ -264,9 +267,9 @@ const semantic = {
     /** Inline error message copy. */
     error: palette.error[500],
     // Legacy aliases — prefer primary/secondary/muted above
-    /** @deprecated — use text.primary */
+    /** — use text.primary */
     main: palette.hof[900],
-    /** @deprecated — use text.muted */
+    /** — use text.muted */
     sub: palette.hof[500],
   },
 
@@ -276,7 +279,7 @@ const semantic = {
    * Hairline dividers between sections and list rows.
    * Airbnb uses #EBEBEB — barely visible, non-intrusive.
    */
-  divider: palette.hof[200],
+  divider: palette.hof[400],
 
   /**
    * Control and card border tokens.
@@ -294,11 +297,12 @@ const semantic = {
      * Airbnb uses ~#D3D3D3 (hof[300]) for form input outlines at rest.
      * Kept separate from DEFAULT so cards/chips can use a different weight.
      */
-    input:  palette.hof[300],
+    input: palette.hof[300],
     /** Focus-visible border for active inputs. */
     focus: palette.rausch[500],
     /** Selected state border for chips/filters. */
     strong: palette.hof[900],
+    muted: palette.hof[200],
   },
 
   // ── Feedback/status tokens ──────────────────────────────────────
@@ -313,7 +317,7 @@ const semantic = {
    *   info    — neutral informational (#1565C0)
    */
   status: {
-    success: palette.babu[500],
+    success: palette.babu[400],
     error: palette.error[500],
     warning: palette.kazan[500],
     info: palette.info[500],
@@ -356,7 +360,7 @@ const semantic = {
  * semantic tokens (e.g., `colors.muted`, `colors.status.warning`) and
  * then remove this block.
  *
- * @deprecated — use semantic tokens or new palette names instead.
+ * — use semantic tokens or new palette names instead.
  *   slate.*   → colors.hof.*
  *   gray.*    → colors.hof.* (slightly different scale)
  *   emerald.* → colors.babu.* or colors.primary
@@ -367,7 +371,7 @@ const semantic = {
  *   cyan.*    → colors.info.*
  */
 const compat = {
-  /** @deprecated Use hof scale or semantic surface/muted tokens. */
+  /** Use hof scale or semantic surface/muted tokens. */
   slate: {
     50: palette.hof[50],
     100: palette.hof[100],
@@ -380,7 +384,7 @@ const compat = {
     800: palette.hof[800],
     900: palette.hof[900],
   },
-  /** @deprecated Use hof scale or text.* semantic tokens. */
+  /** Use hof scale or text.* semantic tokens. */
   gray: {
     100: palette.hof[100],
     200: palette.hof[200],
@@ -391,37 +395,37 @@ const compat = {
     800: palette.hof[800],
     900: palette.hof[900],
   },
-  /** @deprecated Use babu scale or status.success / primary. */
+  /** Use babu scale or status.success / primary. */
   emerald: {
     100: palette.babu[100],
     500: palette.babu[500],
     600: palette.babu[500],
     700: palette.babu[600],
   },
-  /** @deprecated Use kazan scale or status.warning. */
+  /** Use kazan scale or status.warning. */
   amber: {
     500: palette.kazan[500],
   },
-  /** @deprecated Use error scale or status.error / destructive. */
+  /** Use error scale or status.error / destructive. */
   red: {
     400: palette.error[500],
     500: palette.error[500],
     600: palette.error[600],
   },
-  /** @deprecated Use info scale or status.info. */
+  /** Use info scale or status.info. */
   sky: {
     50: palette.info[100],
     100: palette.info[100],
     500: palette.info[500],
     600: palette.info[600],
   },
-  /** @deprecated Use info scale. */
+  /** Use info scale. */
   blue: {
     500: palette.info[500],
     600: palette.info[600],
     highlight: palette.info[500],
   },
-  /** @deprecated Use info scale or status.info. */
+  /** Use info scale or status.info. */
   cyan: {
     500: palette.info[500],
   },

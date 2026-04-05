@@ -17,7 +17,7 @@ export const AppUserAvatar = ({ avatarUrl = FALLBACK, size = 56 }: Props) => {
 
   return (
     <View
-      className="relative overflow-hidden border-2 rounded-full border-primary"
+      className="relative overflow-hidden rounded-full"
       style={{ width: size, height: size }}
     >
       <AppImage

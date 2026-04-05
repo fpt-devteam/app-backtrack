@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostsRequest, PostsResponse } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -12,8 +12,8 @@ export const POST_API = {
   getAllMyPost: "/api/core/posts/me"
 } as const;
 
-export async function getFeedPostsApi(params: PostsRequest) {
-  const response = await publicClient.post<PostsResponse>(POST_API.getFeed, params);
+export async function getFeedPostsApi(params: PostFeedRequest) {
+  const response = await publicClient.post<PostFeedResponse>(POST_API.getFeed, params);
   return response.data;
 }
 

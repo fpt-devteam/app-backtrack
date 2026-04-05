@@ -14,5 +14,6 @@ export {
 
 export { PostCard } from "@/src/features/post/components/PostCard";
 export { default as PostCreateOptionsBottomSheet } from "@/src/features/post/components/PostCreateOptionsBottomSheet";
+export { PostInfoRow } from "@/src/features/post/components/PostInfoRow";
 export { PostSuggestionCard } from "@/src/features/post/components/PostSuggestionCard";
 

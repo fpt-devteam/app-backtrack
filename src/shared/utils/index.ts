@@ -3,4 +3,5 @@ export * from "@/src/shared/utils/distance.utils";
 export * from "@/src/shared/utils/error.utils";
 export * from "@/src/shared/utils/image.utils";
 export * from "@/src/shared/utils/location.utils";
+export * from "@/src/shared/utils/string.utils";
 

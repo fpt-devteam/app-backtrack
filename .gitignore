@@ -42,8 +42,6 @@ app-example
 /ios
 /android
 
-
-
 #google services files
 google-services.json
 GoogleService-Info.plist
@@ -55,4 +53,7 @@ GoogleService-Info.plist
 .gitnexus
 
 # agents data 
-.agents-data/
+.agents/
+
+# opencode config
+opencode.json

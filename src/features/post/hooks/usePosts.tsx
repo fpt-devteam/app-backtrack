@@ -1,65 +1,86 @@
 import { getFeedPostsApi } from "@/src/features/post/api";
 import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import type {
+  ItemCategory,
+  Post,
+  PostFeedRequest,
+  PostFeedResponse,
   PostFilters,
-  PostsRequest,
-  PostsResponse,
 } from "@/src/features/post/types";
-import { DEFAULT_PAGED_REQUEST } from "@/src/shared/api";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 export type PostsFiltersOptions = {
   filters: PostFilters;
   enabled?: boolean;
 };
 
+export type PostFeedSection = {
+  key: ItemCategory;
+  items: Post[];
+};
+
+const SECTION_ORDER: ItemCategory[] = [
+  "electronics",
+  "clothing",
+  "accessories",
+  "documents",
+  "wallet",
+  "suitcase",
+  "bags",
+  "keys",
+  "other",
+];
+
 export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
-  const pageNumberRef = useRef(1);
-  const query = useInfiniteQuery<PostsResponse>({
+  const query = useQuery<PostFeedResponse>({
     queryKey: [...POSTS_QUERY_KEY, filters],
     enabled,
-    initialPageParam: pageNumberRef.current,
-    queryFn: async ({ pageParam }) => {
-      const filtersRequest: PostsRequest = {
+    queryFn: async () => {
+      const filtersRequest: PostFeedRequest = {
         searchTerm: filters.searchTerm,
         postType: filters.postType,
+        authorId: filters.authorId,
         location: {
           latitude: filters.location?.latitude,
           longitude: filters.location?.longitude,
         },
         radiusInKm: filters.radiusInKm,
-        page: Number(pageParam),
-        pageSize: DEFAULT_PAGED_REQUEST.pageSize,
       };
-
-      console.log("filtersRequest: ", filtersRequest);
 
       const res = await getFeedPostsApi(filtersRequest);
       if (!res.success || !res.data) throw new Error("Failed to fetch posts");
       return res;
     },
-
-    getNextPageParam: (lastPage) => {
-      if (lastPage.data?.items.length === 0) return undefined;
-      pageNumberRef.current += 1;
-      return pageNumberRef.current;
-    },
   });
 
-  const items = query.data?.pages.flatMap((p) => p.data?.items ?? []) ?? [];
+  const sections = useMemo(() => {
+    const feedData = query.data?.data;
+    if (!feedData) return [] as PostFeedSection[];
 
-  const handleLoadMore = () => {
-    if (!query.hasNextPage || query.isFetchingNextPage) return;
-    query.fetchNextPage();
-  };
+    return SECTION_ORDER.map((category) => ({
+      key: category,
+      title: category,
+      items: feedData[category] ?? [],
+    })).filter((section) => section.items.length > 0);
+  }, [query.data?.data]);
+
+  const items = useMemo(
+    () => sections.flatMap((section) => section.items),
+    [sections],
+  );
+
+  const error = useMemo(() => {
+    if (!query.error) return null;
+    if (query.error instanceof Error) return query.error;
+    return new Error("Failed to fetch posts");
+  }, [query.error]);
 
   return {
+    error,
+    sections,
     items,
-    hasMore: query.hasNextPage,
-    loadMore: handleLoadMore,
-    isLoading: query.isLoading || query.isFetching,
-    isFetchingNextPage: query.isFetchingNextPage,
+    isLoading: query.isLoading,
     isRefetching: query.isRefetching,
     refetch: query.refetch,
   };

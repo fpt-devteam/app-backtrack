@@ -4,11 +4,10 @@ import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
-import { BlurView } from "expo-blur";
 import type { IconProps } from "phosphor-react-native";
 import {
   BellIcon,
-  HouseIcon,
+  MagnifyingGlassIcon,
   PlusIcon,
   QrCodeIcon,
 } from "phosphor-react-native";
@@ -18,7 +17,7 @@ import { Pressable, View } from "react-native";
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
 const TAB_ICONS: Record<string, TabIcon> = {
-  post: { Icon: HouseIcon, label: "Home" },
+  post: { Icon: MagnifyingGlassIcon, label: "Explore" },
   qr: { Icon: QrCodeIcon, label: "QRs" },
   chat: { Icon: BellIcon, label: "Inbox" },
   profile: { Icon: AppUserAvatarIcon, label: "You" },
@@ -87,30 +86,22 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   return (
     <>
       <View
-        className="absolute left-0 right-0 bottom-0"
-        style={{ height: metrics.tabBar.height }}
+        className="absolute left-0 right-0 bottom-0 bg-surface border-t flex-1 flex-row"
+        style={{ borderColor: colors.muted, height: metrics.tabBar.height }}
       >
-        <BlurView
-          intensity={55}
-          tint="systemUltraThinMaterialLight"
-          className="absolute inset-0"
-        />
+        {leadingRoutes.map((route) => renderTabButton(route))}
 
-        <View className="flex-1 flex-row items-center justify-around">
-          {leadingRoutes.map((route) => renderTabButton(route))}
-
-          {/* Add Button */}
-          <View className="w-[72px] items-center justify-center">
-            <Pressable
-              onPress={handleAddPress}
-              className="w-14 h-14 rounded-full bg-primary items-center justify-center -translate-y-[16px]"
-            >
-              <PlusIcon size={24} color={colors.white} weight="bold" />
-            </Pressable>
-          </View>
-
-          {trailingRoutes.map((route) => renderTabButton(route))}
+        {/* Add Button */}
+        <View className="w-[72px] items-center justify-center">
+          <Pressable
+            onPress={handleAddPress}
+            className="w-14 h-14 rounded-full bg-primary items-center justify-center -translate-y-[16px]"
+          >
+            <PlusIcon size={24} color={colors.white} weight="bold" />
+          </Pressable>
         </View>
+
+        {trailingRoutes.map((route) => renderTabButton(route))}
       </View>
 
       <PostCreateOptionsBottomSheet

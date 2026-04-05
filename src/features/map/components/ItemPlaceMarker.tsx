@@ -17,7 +17,7 @@ export const ItemPlaceMarker = ({
   disabled,
   onPress,
 }: ItemPlaceMarkerProps) => {
-  const imgUrl = useMemo(() => item.images[0], [item.images]);
+  const imgUrl = useMemo(() => item.imageUrls[0], [item.imageUrls]);
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(

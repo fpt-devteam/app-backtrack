@@ -103,7 +103,7 @@ const typography = {
    *
    * USAGE MAP:
    *   xs   (12) → captions, timestamps, legal copy, badge labels
-   *   sm   (14) → meta rows, helper text, filter labels, list sub-items
+   *   sm   (12) → meta rows, helper text, filter labels, list sub-items
    *   base (16) → default body, form inputs, card descriptions
    *   lg   (18) → emphasized body, section sub-headings, price lines
    *   xl   (20) → card/screen secondary titles
@@ -116,10 +116,11 @@ const typography = {
    *         property title ~18pt, meta ~13pt, tab labels ~10pt
    */
   fontSize: {
+    mini: 8,
     /** Tab bar labels, badge counts, compact legal text. */
-    xs: 12,
+    xs: 10,
     /** Dates, ratings text, helper labels, filter chips. */
-    sm: 14,
+    sm: 12,
     /** Default body — descriptions, form fields, review text. */
     base: 16,
     /** Emphasized body, price figures, section sub-titles. */

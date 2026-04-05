@@ -31,7 +31,7 @@ import {
   TagIcon,
 } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ComparePostsScreenProps {
@@ -408,7 +408,7 @@ export const ComparePostsScreen = ({
           <View className="relative mb-2">
             <View className="flex-row gap-2">
               <HeroImage
-                imageUrl={post1.images[0]?.url}
+                imageUrl={post1.imageUrls[0]?.url}
                 postType={post1.postType}
               />
               <HeroImage

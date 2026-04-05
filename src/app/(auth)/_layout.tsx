@@ -16,7 +16,15 @@ function PublicLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          headerRight: () => <AppBackButton type="xIcon" />,
+          headerTransparent: true,
+          headerTitle: "",
+        }}
+      />
 
       <Stack.Screen
         name="login"

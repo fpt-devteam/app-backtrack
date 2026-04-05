@@ -13,7 +13,7 @@ export const useMatchingPost = (postId: string) => {
 
   const query = useQuery<MatchingPostsResponse>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
-    enabled: !isMatching,
+    enabled: !isMatching && !!postId,
     queryFn: async () => {
       const request: MatchingPostsRequest = { postId };
       const response = await matchingPostsApi(request);

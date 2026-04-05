@@ -13,6 +13,15 @@ export default function PostsStackLayout() {
           headerShown: false,
         }}
       >
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen name="[postId]/index" />
+
         <Stack.Screen name="search/index" />
 
         <Stack.Screen
