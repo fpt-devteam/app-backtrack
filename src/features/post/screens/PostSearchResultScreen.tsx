@@ -3,6 +3,7 @@ import { useLocationSelectionStore } from "@/src/features/map/store";
 import type { UserLocation } from "@/src/features/map/types";
 import { PostCard } from "@/src/features/post/components";
 import { useSearchPost } from "@/src/features/post/hooks";
+import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
 import { PostType } from "@/src/features/post/types";
 import {
   POST_SEARCH_MODE,
@@ -12,9 +13,10 @@ import {
   AppSegmentedControl,
   TouchableIconButton,
 } from "@/src/shared/components";
+import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { Nullable } from "@/src/shared/types";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { MotiView } from "moti";
 
 import {
@@ -22,7 +24,13 @@ import {
   FunnelSimpleIcon,
   MagnifyingGlassIcon,
 } from "phosphor-react-native";
-import React, { useCallback, useMemo, useReducer, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import {
   FlatList,
   Pressable,
@@ -121,28 +129,40 @@ function buildSearchOptions(
 
 export default function PostSearchResultScreen() {
   const insets = useSafeAreaInsets();
-  const { termSearch } = useLocalSearchParams<{ termSearch: string }>();
   const { confirmedSelection } = useLocationSelectionStore();
+  const itemQuery = usePostSearchStore((state) => state.itemQuery);
+  const location = usePostSearchStore((state) => state.location);
+  const radiusInKm = usePostSearchStore((state) => state.radiusInKm);
 
   const [tab, setTab] = useState<PostSearchTab>(TABS[0].key);
   const [showOptions, setShowOptions] = useState<boolean>(false);
+  const normalizedSearchTerm = itemQuery.trim();
 
-  const initialFilter: FilterDraft = {
-    location:
-      confirmedSelection ??
-      ({ location: { latitude: 0, longitude: 0 } } as UserLocation),
-    postType: POST_TYPE_OPTION.ALL,
-    radius: RADIUS_OPTIONS[0].value,
-  };
+  const initialFilter = useMemo<FilterDraft>(
+    () => ({
+      location:
+        location ??
+        confirmedSelection ??
+        ({ location: { latitude: 0, longitude: 0 } } as UserLocation),
+      postType: POST_TYPE_OPTION.ALL,
+      radius: String(radiusInKm),
+    }),
+    [confirmedSelection, location, radiusInKm],
+  );
 
   const [filterDraft, dispatch] = useReducer(filterReducer, initialFilter);
   const [appliedFilter, setAppliedFilter] =
     useState<FilterDraft>(initialFilter);
 
+  useEffect(() => {
+    dispatch({ type: "RESET", payload: initialFilter });
+    setAppliedFilter(initialFilter);
+  }, [initialFilter]);
+
   const searchOptions = useMemo<Nullable<PostSearchOptions>>(() => {
-    if (!termSearch || !appliedFilter.location.location) return null;
-    return buildSearchOptions(termSearch, tab, appliedFilter);
-  }, [tab, appliedFilter, termSearch]);
+    if (!normalizedSearchTerm || !appliedFilter.location.location) return null;
+    return buildSearchOptions(normalizedSearchTerm, tab, appliedFilter);
+  }, [appliedFilter, normalizedSearchTerm, tab]);
 
   const { items } = useSearchPost({ options: searchOptions });
 
@@ -177,7 +197,12 @@ export default function PostSearchResultScreen() {
     dispatch({ type: "SET_RADIUS", payload: val });
   }, []);
 
-  if (!confirmedSelection?.location || !termSearch) {
+  useEffect(() => {
+    if (normalizedSearchTerm && location?.location) return;
+    router.replace(POST_ROUTE.search);
+  }, [location, normalizedSearchTerm]);
+
+  if (!normalizedSearchTerm || !location?.location) {
     return null;
   }
 
@@ -209,7 +234,7 @@ export default function PostSearchResultScreen() {
             style={{ borderColor: colors.primary, borderWidth: 2 }}
           >
             <TextInput
-              value={termSearch}
+              value={itemQuery}
               returnKeyType="search"
               onFocus={() => router.back()}
               className="flex-1 text-sm px-3 py-1"

@@ -11,18 +11,21 @@ export default function PostsStackLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
+          presentation: "transparentModal",
+          contentStyle: { backgroundColor: "transparent" },
         }}
       >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="[postId]/index" />
         <Stack.Screen
-          name="index"
+          name="search/index"
           options={{
             headerShown: false,
+            headerTransparent: true,
+            contentStyle: { backgroundColor: "transparent" },
+            animation: "fade_from_bottom",
           }}
         />
-
-        <Stack.Screen name="[postId]/index" />
-
-        <Stack.Screen name="search/index" />
 
         <Stack.Screen
           name="search/location"

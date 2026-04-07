@@ -1,5 +1,6 @@
 export { BottomTabBar } from "@/src/shared/components/app-utils/BottomTabBar";
 export { AppAccordion } from "@/src/shared/components/AppAccordion";
+export { AppBackButton } from "@/src/shared/components/AppBackButton";
 export { AppChipsRow } from '@/src/shared/components/AppChipsRow';
 export { AppDivider } from "@/src/shared/components/AppDivider";
 export {
@@ -12,9 +13,10 @@ export {
 } from "@/src/shared/components/AppHeader";
 export { AppImage } from "@/src/shared/components/AppImage";
 export { AppInlineError } from "@/src/shared/components/AppInlineError";
+export { AppLink } from '@/src/shared/components/AppLink';
 export { AppLoader } from "@/src/shared/components/AppLoader";
 export { AppLogo } from "@/src/shared/components/AppLogo";
-export { AppSearchSuggestRow } from '@/src/shared/components/AppSearchSuggestRow';
+export { AppSearchRow } from '@/src/shared/components/AppSearchRow';
 export { AppSegmentedControl } from "@/src/shared/components/AppSegmentedControl";
 export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";

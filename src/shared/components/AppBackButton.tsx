@@ -7,9 +7,15 @@ import { TouchableIconButton } from "./ui/TouchableIconButton";
 
 type Prop = {
   type?: "xIcon" | "CaretLeftIcon" | "arrowLeftIcon";
+  size?: number;
+  showBackground?: boolean;
 };
 
-const AppBackButton = ({ type = "CaretLeftIcon" }: Prop) => {
+export const AppBackButton = ({
+  type = "CaretLeftIcon",
+  size = 20,
+  showBackground = true,
+}: Prop) => {
   const handleBackPress = () => {
     router.back();
   };
@@ -17,10 +23,14 @@ const AppBackButton = ({ type = "CaretLeftIcon" }: Prop) => {
   if (type === "arrowLeftIcon") {
     return (
       <TouchableOpacity
-        className="p-sm rounded-full bg-slate-100 bg-opacity-10"
+        className={
+          showBackground
+            ? "p-sm rounded-full bg-slate-100 bg-opacity-10"
+            : "p-sm"
+        }
         onPress={handleBackPress}
       >
-        <ArrowLeftIcon size={16} color={colors.secondary} weight="bold" />
+        <ArrowLeftIcon size={size} color={colors.secondary} weight="bold" />
       </TouchableOpacity>
     );
   }
@@ -29,14 +39,12 @@ const AppBackButton = ({ type = "CaretLeftIcon" }: Prop) => {
     <TouchableIconButton
       icon={
         type === "xIcon" ? (
-          <XIcon size={20} color={colors.secondary} weight="bold" />
+          <XIcon size={size} color={colors.secondary} weight="bold" />
         ) : (
-          <CaretLeftIcon size={20} color={colors.secondary} weight="bold" />
+          <CaretLeftIcon size={size} color={colors.secondary} weight="bold" />
         )
       }
       onPress={handleBackPress}
     />
   );
 };
-
-export default AppBackButton;

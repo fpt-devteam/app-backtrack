@@ -121,6 +121,7 @@ const typography = {
     xs: 10,
     /** Dates, ratings text, helper labels, filter chips. */
     sm: 12,
+    md: 14,
     /** Default body — descriptions, form fields, review text. */
     base: 16,
     /** Emphasized body, price figures, section sub-titles. */

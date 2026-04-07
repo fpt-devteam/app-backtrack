@@ -1,5 +1,7 @@
 import { ApiResponse } from "@/src/shared/api";
 import type { LatLng } from "react-native-maps";
+import * as yup from "yup";
+import { userLocationSchema } from "../../post/schemas";
 
 /**
  * Status codes returned by the Google Places Autocomplete API.
@@ -26,12 +28,8 @@ export type GoogleMapResponseStatus =
   | "INVALID_REQUEST"
   | "UNKNOWN_ERROR";
 
-export type UserLocation = {
-  location: LatLng;
-  displayAddress?: string | null;
-  externalPlaceId?: string | null;
-  radiusInKm?: number;
-};
+export type UserLocation = yup.InferType<typeof userLocationSchema>;
+
 
 export type PlusCode = {
   compoundCode: string;

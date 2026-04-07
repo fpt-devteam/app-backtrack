@@ -11,7 +11,7 @@ import { PostType } from "@/src/features/post/types";
 import { AppLoader } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import { MotiView } from "moti";
 import {
   ArrowRightIcon,
@@ -23,10 +23,7 @@ import {
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, Text, TextStyle, View } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ExploreTabValue = "all" | PostType;
 
@@ -71,83 +68,99 @@ const ExploreHeader = ({
   selectedTab: ExploreTabValue;
   onChangeTab: (value: ExploreTabValue) => void;
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View>
-      <View className="bg-surface px-md">
-        <Pressable
-          onPress={() => router.push(POST_ROUTE.search)}
-          className="w-full py-sm h-control-lg rounded-full bg-white flex-row items-center justify-center gap-2 shadow-md"
-          style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
-        >
-          <MagnifyingGlassIcon
-            size={14}
-            color={colors.text.primary}
-            weight="bold"
-          />
-
-          <Text className="text-md font-md2 text-textPrimary">
-            Start your search
-          </Text>
-        </Pressable>
-      </View>
-
-      {/* Tabs */}
-      <View className="flex-row items-center justify-evenly pt-md px-lg border-b border-slate-100">
-        {EXPLORE_TABS.map(({ key, label, Icon }) => {
-          const active = selectedTab === key;
-
-          return (
-            <Pressable
-              key={key}
-              onPress={() => onChangeTab(key)}
-              className="items-center justify-center"
-              style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
-            >
-              <MotiView
-                className="items-center w-full gap-2"
-                animate={{
-                  opacity: active ? 1 : 0.72,
-                  scale: active ? 1.03 : 1,
-                  translateY: active ? -1 : 0,
-                }}
-                transition={{ type: "timing", duration: 180 }}
+    <Stack.Screen
+      options={{
+        headerShown: true,
+        header: () => (
+          <View
+            className="gap-md bg-surface"
+            style={{ paddingTop: insets.top }}
+          >
+            <View className="px-md">
+              <Pressable
+                onPress={() => router.push(POST_ROUTE.search)}
+                className="w-full py-sm h-control-lg rounded-full bg-white flex-row items-center justify-center gap-2 shadow-md"
+                style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
               >
-                <View className="flex-row items-center gap-xs">
-                  <Icon
-                    size={14}
-                    color={active ? colors.text.primary : colors.text.muted}
-                    weight={active ? "bold" : "regular"}
-                  />
-
-                  <Text
-                    style={{
-                      color: active ? colors.text.primary : colors.text.muted,
-                      fontSize: typography.fontSize.sm,
-                      fontWeight: active
-                        ? (typography.fontWeight
-                            .normal as TextStyle["fontWeight"])
-                        : (typography.fontWeight
-                            .thin as TextStyle["fontWeight"]),
-                    }}
-                  >
-                    {label}
-                  </Text>
-                </View>
-
-                <MotiView
-                  animate={{
-                    opacity: active ? 1 : 0,
-                    scaleX: active ? 1 : 0.4,
-                  }}
-                  transition={{ type: "timing", duration: 200 }}
-                  className="rounded-full bg-textPrimary w-full h-0.5"
+                <MagnifyingGlassIcon
+                  size={14}
+                  color={colors.text.primary}
+                  weight="bold"
                 />
-              </MotiView>
-            </Pressable>
-          );
-        })}
-      </View>
-    </View>
+
+                <Text className="text-md font-md2 text-textPrimary">
+                  Start your search
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Tabs */}
+            <View className="flex-row items-center justify-evenly px-lg border-b border-muted">
+              {EXPLORE_TABS.map(({ key, label, Icon }) => {
+                const active = selectedTab === key;
+
+                return (
+                  <Pressable
+                    key={key}
+                    onPress={() => onChangeTab(key)}
+                    className="items-center justify-center"
+                    style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+                  >
+                    <MotiView
+                      className="items-center w-full gap-2"
+                      animate={{
+                        opacity: active ? 1 : 0.72,
+                        scale: active ? 1.03 : 1,
+                        translateY: active ? -1 : 0,
+                      }}
+                      transition={{ type: "timing", duration: 180 }}
+                    >
+                      <View className="flex-row items-center gap-xs">
+                        <Icon
+                          size={14}
+                          color={
+                            active ? colors.text.primary : colors.text.muted
+                          }
+                          weight={active ? "bold" : "regular"}
+                        />
+
+                        <Text
+                          style={{
+                            color: active
+                              ? colors.text.primary
+                              : colors.text.muted,
+                            fontSize: typography.fontSize.sm,
+                            fontWeight: active
+                              ? (typography.fontWeight
+                                  .normal as TextStyle["fontWeight"])
+                              : (typography.fontWeight
+                                  .thin as TextStyle["fontWeight"]),
+                          }}
+                        >
+                          {label}
+                        </Text>
+                      </View>
+
+                      <MotiView
+                        animate={{
+                          opacity: active ? 1 : 0,
+                          scaleX: active ? 1 : 0.4,
+                        }}
+                        transition={{ type: "timing", duration: 200 }}
+                        className="rounded-full bg-textPrimary w-full h-0.5"
+                      />
+                    </MotiView>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        ),
+      }}
+    />
   );
 };
 
@@ -244,21 +257,23 @@ export const PostScreen = () => {
   }, [error, isLoading, refetch]);
 
   return (
-    <SafeAreaView className="flex-1 bg-surface">
+    <>
       <ExploreHeader selectedTab={selectedTab} onChangeTab={setSelectedTab} />
 
-      <FlatList
-        data={sections}
-        keyExtractor={(item) => item.key}
-        renderItem={renderSection}
-        ListEmptyComponent={listEmpty}
-        contentContainerStyle={{
-          paddingTop: metrics.spacing.md,
-          paddingBottom: insets.bottom + metrics.spacing["2xl"],
-          gap: metrics.spacing.lg,
-        }}
-        showsVerticalScrollIndicator={false}
-      />
-    </SafeAreaView>
+      <View className="flex-1 bg-surface">
+        <FlatList
+          data={sections}
+          keyExtractor={(item) => item.key}
+          renderItem={renderSection}
+          ListEmptyComponent={listEmpty}
+          contentContainerStyle={{
+            paddingTop: metrics.spacing.md,
+            paddingBottom: insets.bottom + metrics.spacing["2xl"],
+            gap: metrics.spacing.lg,
+          }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+    </>
   );
 };

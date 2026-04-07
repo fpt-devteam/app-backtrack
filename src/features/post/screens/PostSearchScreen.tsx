@@ -1,251 +1,322 @@
-import { PostSuggestionCard } from "@/src/features/post/components";
-import { useGetSuggestionPosts } from "@/src/features/post/hooks";
-import { TouchableIconButton } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
-import { useRecentSearch } from "@/src/shared/hooks";
+import { useLocationSelectionStore } from "@/src/features/map/store";
+import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
+import PostEventTimeSearchScreen from "@/src/features/post/screens/PostEventTimeSearchScreen";
+import PostLocationSearchScreen from "@/src/features/post/screens/PostLocationSearchScreen";
+import PostTermSearchScreen from "@/src/features/post/screens/PostTermSearchScreen";
+import {
+  POST_SEARCH_MODE,
+  type PostSearchOptions,
+} from "@/src/features/post/types";
+import { AppBackButton, AppLink } from "@/src/shared/components";
 import { colors } from "@/src/shared/theme";
-import { router, useLocalSearchParams } from "expo-router";
+import { BlurView } from "expo-blur";
+import * as Haptics from "expo-haptics";
+import { MotiView } from "moti";
 import {
-  ArrowLeftIcon,
-  ClockIcon,
   MagnifyingGlassIcon,
-  TrashIcon,
+  PackageIcon,
+  UsersThreeIcon,
+  type IconProps,
 } from "phosphor-react-native";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Animated,
-  Easing,
-  FlatList,
-  Keyboard,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
+  ScrollView,
   Text,
-  TextInput,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { postOptionSchema } from "../schemas";
 
-type DisplayMode = "recent" | "suggestions";
+type SearchTabValue = "posts" | "people";
+type FilterSectionVariant = "location" | "item" | "event";
 
-const PostSearchOptions = {
-  searchBarPlaceholder: "Search for posts or topics, ...",
-  searchRecentParams: {
-    namespace: "post-search",
-    maxItems: 10,
+const SEARCH_TYPE_TABS: {
+  key: SearchTabValue;
+  label: string;
+  Icon: React.ComponentType<IconProps>;
+}[] = [
+  {
+    key: "posts",
+    label: "Post",
+    Icon: PackageIcon,
   },
+  {
+    key: "people",
+    label: "People",
+    Icon: UsersThreeIcon,
+  },
+];
+
+const DEFAULT_EXPANDED_SECTION: FilterSectionVariant = "item";
+const DEFAULT_BLUR_INTENSITY = 80;
+
+type SearchTabSelectorProps = {
+  selectedTab: SearchTabValue;
+  onChangeTab: (value: SearchTabValue) => void;
+};
+
+const SearchTabSelector = ({
+  selectedTab,
+  onChangeTab,
+}: SearchTabSelectorProps) => {
+  return (
+    <View className="flex-1 flex-row items-center justify-evenly px-lg">
+      {SEARCH_TYPE_TABS.map(({ key, label, Icon }) => {
+        const active = selectedTab === key;
+
+        return (
+          <Pressable
+            key={key}
+            onPress={() => onChangeTab(key)}
+            className="items-center justify-center"
+            style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+          >
+            <MotiView
+              className="items-center w-full gap-xs"
+              animate={{
+                opacity: active ? 1 : 0.72,
+                scale: active ? 1.03 : 1,
+                translateY: active ? -1 : 0,
+              }}
+              transition={{ type: "timing", duration: 180 }}
+            >
+              <Icon
+                size={30}
+                color={active ? colors.black : colors.secondary}
+                weight={active ? "regular" : "thin"}
+              />
+
+              <Text
+                className={`text-xs ${active ? "text-black font-normal" : "text-secondary font-thin"}`}
+              >
+                {label}
+              </Text>
+
+              <MotiView
+                animate={{
+                  opacity: active ? 1 : 0,
+                  scaleX: active ? 1 : 0.4,
+                }}
+                transition={{ type: "timing", duration: 200 }}
+                className="rounded-full bg-textPrimary w-full h-0.5"
+              />
+            </MotiView>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
 };
 
 const PostSearchScreen = () => {
   const insets = useSafeAreaInsets();
-  const { initialQuery } = useLocalSearchParams<{ initialQuery?: string }>();
-  const inputRef = useRef<TextInput>(null);
-  const fade = useRef(new Animated.Value(1)).current;
-  const slide = useRef(new Animated.Value(0)).current;
 
-  const [query, setQuery] = useState((initialQuery ?? "").toString());
-  const [isFocused, setIsFocused] = useState(false);
+  const { confirmedSelection } = useLocationSelectionStore();
 
-  const {
-    items: recentItems,
-    add,
-    clear,
-  } = useRecentSearch(PostSearchOptions.searchRecentParams);
-
-  const { items: suggestionItems, isLoading: isSuggestionLoading } =
-    useGetSuggestionPosts();
-
-  const displayMode: DisplayMode = useMemo(
-    () => (!isFocused || query.trim().length === 0 ? "recent" : "suggestions"),
-    [isFocused, query],
+  const [selectedTab, setSelectedTab] = useState<SearchTabValue>("posts");
+  const [expandedSection, setExpandedSection] = useState<FilterSectionVariant>(
+    DEFAULT_EXPANDED_SECTION,
   );
 
+  const hasHydrated = usePostSearchStore.persist.hasHydrated();
+  const resetAll = usePostSearchStore((state) => state.resetAll);
+  const itemSearch = usePostSearchStore((state) => state.itemSearch);
+  const locationSearch = usePostSearchStore((state) => state.locationSearch);
+
+  const addItemRecent = usePostSearchStore((state) => state.addItemRecent);
+  const addLocationRecent = usePostSearchStore(
+    (state) => state.addLocationRecent,
+  );
+
+  const setLocationOptions = usePostSearchStore(
+    (state) => state.setLocationOptions,
+  );
+
+  // Initialize filter options when available
   useEffect(() => {
-    fade.stopAnimation();
-    slide.stopAnimation();
+    if (!confirmedSelection) return;
+    setLocationOptions(confirmedSelection);
+  }, [confirmedSelection, setLocationOptions]);
 
-    fade.setValue(0);
-    slide.setValue(8);
+  const onChangeTab = useCallback(
+    (value: SearchTabValue) => {
+      if (value === selectedTab) return;
 
-    Animated.parallel([
-      Animated.timing(fade, {
-        toValue: 1,
-        duration: 180,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(slide, {
-        toValue: 0,
-        duration: 180,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [displayMode, fade, slide]);
-
-  const goToResults = async (term: string) => {
-    const text = term.trim();
-    if (!text) return;
-
-    await add(text);
-
-    Keyboard.dismiss();
-    setIsFocused(false);
-
-    router.push({
-      pathname: POST_ROUTE.searchResult,
-      params: { termSearch: text },
-    });
-  };
-
-  const handleSelectRecent = (value: string) => {
-    setQuery(value);
-    setIsFocused(true);
-    inputRef.current?.focus();
-  };
-
-  const handleSubmit = () => {
-    void goToResults(query);
-  };
-
-  const handlePressOutside = () => {
-    Keyboard.dismiss();
-    setIsFocused(false);
-  };
-
-  const handlePressSuggestion = (term: string) => {
-    void goToResults(term);
-  };
-
-  const renderRecentList = () => {
-    if (recentItems.length === 0) {
-      return (
-        <View className="p-3">
-          <Text className="text-sm">No recent searches.</Text>
-        </View>
-      );
-    }
-
-    return (
-      <View className="flex-row flex-wrap gap-2">
-        {recentItems.slice(0, 3).map((item) => (
-          <PostRecentSearchRow
-            key={item.value}
-            text={item.value}
-            onPress={() => handleSelectRecent(item.value)}
-          />
-        ))}
-        <Pressable
-          className="self-start min-h-touch flex-row gap-2 items-center rounded-full px-3 py-2 bg-muted"
-          onPress={() => clear()}
-          style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
-        >
-          <TrashIcon size={16} color={colors.primary} weight="bold" />
-        </Pressable>
-      </View>
-    );
-  };
-
-  return (
-    <TouchableWithoutFeedback
-      accessible={false}
-      onPress={handlePressOutside}
-      className="flex-1"
-    >
-      <View
-        className="flex-1 gap-3"
-        style={{
-          backgroundColor: colors.canvas,
-          paddingTop: insets.top,
-        }}
-      >
-        {/* Top row: Back + Search bar */}
-        <View className="flex-row items-center gap-4 px-4">
-          <TouchableIconButton
-            onPress={() => router.back()}
-            icon={
-              <ArrowLeftIcon size={24} color={colors.primary} weight="bold" />
-            }
-          />
-
-          <View
-            className="flex-1 flex-row items-center rounded-lg gap-4 overflow-hidden"
-            style={{
-              borderColor: colors.primary,
-              borderWidth: 2,
-            }}
-          >
-            <TextInput
-              ref={inputRef}
-              value={query}
-              onChangeText={setQuery}
-              placeholder={PostSearchOptions.searchBarPlaceholder}
-              returnKeyType="search"
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              onSubmitEditing={handleSubmit}
-              className="flex-1 text-sm px-3 py-1"
-              placeholderTextColor={colors.slate[400]}
-            />
-            <View
-              className="px-3 py-2"
-              style={{ backgroundColor: colors.primary }}
-            >
-              <MagnifyingGlassIcon size={24} color={colors.white} />
-            </View>
-          </View>
-        </View>
-
-        <View className="flex-1">
-          <FlatList
-            data={isSuggestionLoading ? [] : suggestionItems}
-            keyExtractor={(_, index) => index.toString()}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => (
-              <PostSuggestionCard
-                item={item}
-                onPress={() => handlePressSuggestion(item.itemName)}
-              />
-            )}
-            numColumns={2}
-            columnWrapperStyle={{
-              justifyContent: "center",
-              gap: 12,
-              marginBottom: 12,
-            }}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={
-              <View className="flex-col gap-2 py-2">
-                <View className="px-3 gap-2">{renderRecentList()}</View>
-                <View className="h-[4] bg-divider" />
-                <Text className="px-3 text-sm font-semibold text-textPrimary">
-                  Suggestions
-                </Text>
-              </View>
-            }
-            contentContainerStyle={{ paddingBottom: insets.bottom }}
-          />
-        </View>
-      </View>
-    </TouchableWithoutFeedback>
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setSelectedTab(value);
+      setExpandedSection(DEFAULT_EXPANDED_SECTION);
+    },
+    [selectedTab, setSelectedTab],
   );
-};
 
-const PostRecentSearchRow = ({
-  text,
-  onPress,
-}: {
-  text: string;
-  onPress: () => void;
-}) => {
+  const handleToggleSection = useCallback(
+    (section: FilterSectionVariant) => {
+      if (expandedSection === section) return;
+
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setExpandedSection(section);
+    },
+    [expandedSection],
+  );
+
+  const handleClearFilter = useCallback(() => {
+    setExpandedSection(DEFAULT_EXPANDED_SECTION);
+    resetAll();
+  }, [resetAll]);
+
+  const handleSubmitSearch = useCallback(async () => {
+    if (selectedTab !== "posts") return;
+
+    addItemRecent(itemSearch.query);
+    addLocationRecent(locationSearch.query);
+
+    if (!locationSearch.options) return;
+
+    const req: PostSearchOptions = {
+      query: itemSearch.query,
+      mode: POST_SEARCH_MODE.KEYWORD,
+      filters: {
+        location: locationSearch.options.location,
+        radiusInKm: locationSearch.options.radiusInKm || 10,
+      },
+      // eventDate: eventSearch.options,
+    };
+    console.log("Req: ", req);
+
+    // router.push({
+    //   pathname: POST_ROUTE.searchResult,
+    // });
+  }, [
+    selectedTab,
+    itemSearch.query,
+    locationSearch.options,
+    addItemRecent,
+    addLocationRecent,
+  ]);
+
+  const canSearch = postOptionSchema.isValidSync({
+    query: itemSearch.query,
+    location: locationSearch.options?.location,
+    radiusInKm: locationSearch.options?.radiusInKm,
+    // eventDate: eventSearch.options,
+  });
+
+  if (!hasHydrated) {
+    return <ActivityIndicator color={colors.primary} />;
+  }
+
   return (
-    <Pressable
-      className="self-start min-h-touch flex-row gap-2 items-center rounded-full px-3 py-2 bg-muted"
-      onPress={onPress}
-      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
-    >
-      <ClockIcon size={16} color={colors.primary} weight="bold" />
-      <Text className="text-sm text-textPrimary">{text}</Text>
-    </Pressable>
+    <>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <BlurView
+          className="flex-1"
+          intensity={DEFAULT_BLUR_INTENSITY}
+          tint="light"
+        >
+          <View className="flex-1">
+            <View
+              className="flex-row items-center px-md"
+              style={{ paddingTop: insets.top }}
+            >
+              <AppBackButton
+                type="arrowLeftIcon"
+                size={20}
+                showBackground={false}
+              />
+
+              <SearchTabSelector
+                selectedTab={selectedTab}
+                onChangeTab={onChangeTab}
+              />
+
+              <AppBackButton type="xIcon" size={20} showBackground={false} />
+            </View>
+
+            <ScrollView
+              className="flex-1 px-md pt-md"
+              contentContainerStyle={{
+                paddingBottom: Math.max(insets.bottom + 88, 108),
+              }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+            >
+              {selectedTab === "posts" ? (
+                <View className="gap-md2">
+                  {/* Item Search */}
+                  <PostTermSearchScreen
+                    onToggle={() => handleToggleSection("item")}
+                    isExpanded={expandedSection === "item"}
+                  />
+
+                  {/* Location Search */}
+                  <PostLocationSearchScreen
+                    onToggle={() => handleToggleSection("location")}
+                    isExpanded={expandedSection === "location"}
+                  />
+
+                  {/* Event Time Search */}
+                  <PostEventTimeSearchScreen
+                    onToggle={() => handleToggleSection("event")}
+                    isExpanded={expandedSection === "event"}
+                  />
+                </View>
+              ) : (
+                // Placeholder content for People search tab until the feature is implemented.
+                <MotiView
+                  from={{ opacity: 0, translateY: 12 }}
+                  animate={{ opacity: 1, translateY: 0 }}
+                  transition={{ type: "timing", duration: 220 }}
+                  className="rounded-2xl border bg-white/90 p-lg"
+                  style={{ borderColor: colors.slate[200] }}
+                >
+                  <Text className="text-base font-semibold text-textPrimary">
+                    People search is coming soon
+                  </Text>
+                  <Text className="mt-xs text-sm text-textMuted">
+                    Switch back to Posts to search lost and found items.
+                  </Text>
+                </MotiView>
+              )}
+            </ScrollView>
+          </View>
+        </BlurView>
+      </KeyboardAvoidingView>
+
+      {/* Search Button */}
+      <BlurView intensity={DEFAULT_BLUR_INTENSITY} tint="light">
+        <View
+          className="flex-row items-center justify-between px-md pt-sm"
+          style={{ paddingBottom: insets.bottom }}
+        >
+          <AppLink title="Clear all" onPress={handleClearFilter} />
+
+          <TouchableOpacity
+            className="h-control-lg flex-row items-center justify-center gap-xs rounded-sm px-md bg-primary"
+            onPress={() => {
+              void handleSubmitSearch();
+            }}
+            activeOpacity={0.88}
+            accessibilityRole="button"
+            disabled={!canSearch}
+            style={{ opacity: canSearch ? 1 : 0.6 }}
+          >
+            <MagnifyingGlassIcon size={20} color={colors.white} weight="bold" />
+
+            <Text className="text-md font-normal tracking-label text-white">
+              Search
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </BlurView>
+    </>
   );
 };
 

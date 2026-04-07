@@ -115,6 +115,7 @@ const palette = {
    * Info blue — neutral informational badges, "NEW" labels.
    */
   info: {
+    50: "#F0F9FF",
     100: "#E3F2FD",
     500: "#1565C0",
     600: "#0D47A1",

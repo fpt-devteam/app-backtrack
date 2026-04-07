@@ -1,5 +1,5 @@
 import { useAuth } from "@/src/features/auth/providers";
-import AppBackButton from "@/src/shared/components/AppBackButtonIcon";
+import { AppBackButton } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, typography } from "@/src/shared/theme";
 import { Redirect, RelativePathString, Stack } from "expo-router";
