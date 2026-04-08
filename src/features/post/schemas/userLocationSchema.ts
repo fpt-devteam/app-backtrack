@@ -33,5 +33,5 @@ export const userLocationSchema = yup.object({
     .typeError("Radius must be a number.")
     .min(MIN_RADIUS_KM, `Radius must be at least ${MIN_RADIUS_KM} km.`)
     .max(MAX_RADIUS_KM, `Radius cannot exceed ${MAX_RADIUS_KM} km.`)
-    .nullable(),
+    .required("Radius is required."),
 });

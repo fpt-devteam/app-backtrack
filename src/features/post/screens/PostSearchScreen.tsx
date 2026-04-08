@@ -1,16 +1,14 @@
-import { useLocationSelectionStore } from "@/src/features/map/store";
 import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
+import { postOptionSchema } from "@/src/features/post/schemas";
 import PostEventTimeSearchScreen from "@/src/features/post/screens/PostEventTimeSearchScreen";
-import PostLocationSearchScreen from "@/src/features/post/screens/PostLocationSearchScreen";
 import PostTermSearchScreen from "@/src/features/post/screens/PostTermSearchScreen";
-import {
-  POST_SEARCH_MODE,
-  type PostSearchOptions,
-} from "@/src/features/post/types";
+import { POST_SEARCH_MODE, PostSearchOptions } from "@/src/features/post/types";
 import { AppBackButton, AppLink } from "@/src/shared/components";
+import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import { MotiView } from "moti";
 import {
   MagnifyingGlassIcon,
@@ -18,7 +16,7 @@ import {
   UsersThreeIcon,
   type IconProps,
 } from "phosphor-react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -30,7 +28,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { postOptionSchema } from "../schemas";
+import PostLocationSearchScreen from "./PostLocationSearchScreen";
 
 type SearchTabValue = "posts" | "people";
 type FilterSectionVariant = "location" | "item" | "event";
@@ -115,33 +113,57 @@ const SearchTabSelector = ({
 
 const PostSearchScreen = () => {
   const insets = useSafeAreaInsets();
-
-  const { confirmedSelection } = useLocationSelectionStore();
-
   const [selectedTab, setSelectedTab] = useState<SearchTabValue>("posts");
   const [expandedSection, setExpandedSection] = useState<FilterSectionVariant>(
     DEFAULT_EXPANDED_SECTION,
   );
 
   const hasHydrated = usePostSearchStore.persist.hasHydrated();
-  const resetAll = usePostSearchStore((state) => state.resetAll);
-  const itemSearch = usePostSearchStore((state) => state.itemSearch);
-  const locationSearch = usePostSearchStore((state) => state.locationSearch);
+  const resetFilters = usePostSearchStore((state) => state.resetFilters);
 
-  const addItemRecent = usePostSearchStore((state) => state.addItemRecent);
-  const addLocationRecent = usePostSearchStore(
-    (state) => state.addLocationRecent,
+  const keywordSearch = usePostSearchStore((state) => state.keyword);
+  const locationSearch = usePostSearchStore((state) => state.location);
+  const eventDateSearch = usePostSearchStore((state) => state.temporal.date);
+
+  const addToKeywordHistory = usePostSearchStore(
+    (state) => state.addToKeywordHistory,
+  );
+  const addToLocationHistory = usePostSearchStore(
+    (state) => state.addToLocationHistory,
   );
 
-  const setLocationOptions = usePostSearchStore(
-    (state) => state.setLocationOptions,
-  );
-
-  // Initialize filter options when available
   useEffect(() => {
-    if (!confirmedSelection) return;
-    setLocationOptions(confirmedSelection);
-  }, [confirmedSelection, setLocationOptions]);
+    resetFilters();
+  }, [resetFilters]);
+
+  const validSearchRequest = useMemo<PostSearchOptions | null>(() => {
+    if (selectedTab !== "posts") return null;
+
+    try {
+      const castedRequest = postOptionSchema.cast({
+        query: keywordSearch.value,
+        mode: POST_SEARCH_MODE.KEYWORD,
+        filters: {
+          location: locationSearch.coords,
+          radiusInKm: locationSearch.radius,
+          eventTime: eventDateSearch,
+        },
+      }) as PostSearchOptions;
+
+      postOptionSchema.validateSync(castedRequest, { abortEarly: true });
+      return castedRequest;
+    } catch (_error) {
+      return null;
+    }
+  }, [
+    eventDateSearch,
+    keywordSearch.value,
+    locationSearch.coords,
+    locationSearch.radius,
+    selectedTab,
+  ]);
+
+  const cannotSubmitSearch = !validSearchRequest;
 
   const onChangeTab = useCallback(
     (value: SearchTabValue) => {
@@ -166,49 +188,24 @@ const PostSearchScreen = () => {
 
   const handleClearFilter = useCallback(() => {
     setExpandedSection(DEFAULT_EXPANDED_SECTION);
-    resetAll();
-  }, [resetAll]);
+    resetFilters();
+  }, [resetFilters]);
 
-  const handleSubmitSearch = useCallback(async () => {
-    if (selectedTab !== "posts") return;
+  const handleSubmitSearch = useCallback(() => {
+    if (!validSearchRequest) return;
 
-    addItemRecent(itemSearch.query);
-    addLocationRecent(locationSearch.query);
+    addToKeywordHistory(validSearchRequest.query);
+    addToLocationHistory(locationSearch.address);
 
-    if (!locationSearch.options) return;
-
-    const req: PostSearchOptions = {
-      query: itemSearch.query,
-      mode: POST_SEARCH_MODE.KEYWORD,
-      filters: {
-        location: locationSearch.options.location,
-        radiusInKm: locationSearch.options.radiusInKm || 10,
-      },
-      // eventDate: eventSearch.options,
-    };
-    console.log("Req: ", req);
-
-    // router.push({
-    //   pathname: POST_ROUTE.searchResult,
-    // });
+    router.push(POST_ROUTE.searchResult);
   }, [
-    selectedTab,
-    itemSearch.query,
-    locationSearch.options,
-    addItemRecent,
-    addLocationRecent,
+    validSearchRequest,
+    locationSearch.address,
+    addToKeywordHistory,
+    addToLocationHistory,
   ]);
 
-  const canSearch = postOptionSchema.isValidSync({
-    query: itemSearch.query,
-    location: locationSearch.options?.location,
-    radiusInKm: locationSearch.options?.radiusInKm,
-    // eventDate: eventSearch.options,
-  });
-
-  if (!hasHydrated) {
-    return <ActivityIndicator color={colors.primary} />;
-  }
+  if (!hasHydrated) return <ActivityIndicator color={colors.primary} />;
 
   return (
     <>
@@ -300,13 +297,13 @@ const PostSearchScreen = () => {
 
           <TouchableOpacity
             className="h-control-lg flex-row items-center justify-center gap-xs rounded-sm px-md bg-primary"
-            onPress={() => {
-              void handleSubmitSearch();
-            }}
+            onPress={() => void handleSubmitSearch()}
+            disabled={cannotSubmitSearch}
             activeOpacity={0.88}
+            style={{
+              opacity: cannotSubmitSearch ? 0.6 : 1,
+            }}
             accessibilityRole="button"
-            disabled={!canSearch}
-            style={{ opacity: canSearch ? 1 : 0.6 }}
           >
             <MagnifyingGlassIcon size={20} color={colors.white} weight="bold" />
 

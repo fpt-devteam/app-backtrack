@@ -1,16 +1,16 @@
 import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
+import { eventTimeSchema } from "@/src/features/post/schemas";
 import { AppInlineError } from "@/src/shared/components";
 import { colors } from "@/src/shared/theme";
-import { Nullable } from "@/src/shared/types";
+import { Optional } from "@/src/shared/types";
 import { getErrorMessage } from "@/src/shared/utils";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { MotiView } from "moti";
 import { LightbulbIcon } from "phosphor-react-native";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
-import { eventTimeSchema } from "../schemas";
 
 type PostEventTimeSearchScreenProps = {
   isExpanded: boolean;
@@ -21,39 +21,38 @@ const PostEventTimeSearchScreen = ({
   isExpanded,
   onToggle,
 }: PostEventTimeSearchScreenProps) => {
-  const [error, setError] = useState<Nullable<string>>(null);
+  const eventDate = usePostSearchStore((state) => state.temporal.date);
+  const setEventDate = usePostSearchStore((state) => state.updateEventDate);
 
-  const eventDate = usePostSearchStore((state) => state.eventSearch.options);
-  const setEventDate = usePostSearchStore((state) => state.setEventDate);
+  const safeEventDate = useMemo(() => {
+    if (!eventDate) return new Date();
+    return eventDate;
+  }, [eventDate]);
+
+  const eventTimeError = useMemo(() => {
+    if (!eventDate) return null;
+
+    try {
+      eventTimeSchema.validateSync(eventDate, { abortEarly: true });
+      return null;
+    } catch (err) {
+      const messageError = getErrorMessage(err);
+      return messageError;
+    }
+  }, [eventDate]);
 
   const onChangeDate = useCallback(
-    (_event: DateTimePickerEvent, value: Date | undefined) => {
-      try {
-        eventTimeSchema.validateSync(value, { abortEarly: true });
-        setError(null);
-
-        const nextDate = eventTimeSchema.cast(value);
-        setEventDate(nextDate);
-      } catch (err) {
-        const messageError = getErrorMessage(err);
-        setError(messageError);
-      }
+    (_event: DateTimePickerEvent, value: Optional<Date>) => {
+      if (!value) return;
+      setEventDate(value);
     },
     [setEventDate],
   );
 
   const onChangeTime = useCallback(
-    (_event: DateTimePickerEvent, value: Date | undefined) => {
-      try {
-        eventTimeSchema.validateSync(value, { abortEarly: true });
-        setError(null);
-
-        const nextDate = eventTimeSchema.cast(value);
-        setEventDate(nextDate);
-      } catch (err) {
-        const messageError = getErrorMessage(err);
-        setError(messageError);
-      }
+    (_event: DateTimePickerEvent, value: Optional<Date>) => {
+      if (!value) return;
+      setEventDate(value);
     },
     [setEventDate],
   );
@@ -69,7 +68,7 @@ const PostEventTimeSearchScreen = ({
   }, [isExpanded]);
 
   const displayEventDate = useMemo(() => {
-    if (!eventDate) return "Select event date and time";
+    if (!eventDate) return "Any time";
 
     const formattedDate = eventDate.toLocaleDateString("en-US", {
       hour: "numeric",
@@ -80,7 +79,7 @@ const PostEventTimeSearchScreen = ({
     });
 
     return formattedDate;
-  }, [eventDate, isExpanded]);
+  }, [eventDate]);
 
   const labels = useMemo(
     () => ({
@@ -97,18 +96,18 @@ const PostEventTimeSearchScreen = ({
     <View className="rounded-md border border-slate-200 bg-surface">
       <Pressable
         onPress={onToggle}
-        className="px-md py-md flex-row items-center justify-between"
+        className="p-md gap-md flex-row justify-between items-center"
       >
         <Text className={displayTitleClassname} numberOfLines={1}>
           {displayTitle}
         </Text>
 
-        {!error ? (
+        {!eventTimeError ? (
           <Text className="text-sm text-textMuted" numberOfLines={1}>
             {displayEventDate}
           </Text>
         ) : (
-          <AppInlineError message={error} />
+          <AppInlineError message={eventTimeError} />
         )}
       </Pressable>
 
@@ -132,7 +131,7 @@ const PostEventTimeSearchScreen = ({
               </View>
 
               <DateTimePicker
-                value={eventDate}
+                value={safeEventDate}
                 mode="time"
                 display="compact"
                 onChange={onChangeTime}
@@ -152,7 +151,7 @@ const PostEventTimeSearchScreen = ({
               </View>
 
               <DateTimePicker
-                value={eventDate}
+                value={safeEventDate}
                 onChange={onChangeDate}
                 mode="date"
                 display="compact"

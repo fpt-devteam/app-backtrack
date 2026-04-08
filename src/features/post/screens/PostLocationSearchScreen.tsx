@@ -1,6 +1,7 @@
 import {
   usePlaceAutocomplete,
   usePlaceDetails,
+  useUserCoordinates,
 } from "@/src/features/map/hooks";
 import type { PlacePrediction } from "@/src/features/map/types";
 import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
@@ -19,6 +20,7 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, Text, TextInput, View } from "react-native";
 
 const DEFAULT_RADIUS_IN_KM = 5;
+const RADIUS_CYCLE_VALUES = [1, 5, 10, 20] as const;
 
 type DisplayMode = "recent" | "suggestions";
 
@@ -33,69 +35,48 @@ const PostLocationSearchScreen = ({
 }: PostLocationSearchScreenProps) => {
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [isNearbyActive, setIsNearbyActive] = useState(false);
   const { getPlaceDetails } = usePlaceDetails();
+  const { getUserCoordinates, loading: isGettingUserCoordinates } =
+    useUserCoordinates();
 
-  const locationQuery = usePostSearchStore(
-    (state) => state.locationSearch.query,
+  const locationQuery = usePostSearchStore((state) => state.location.address);
+
+  const updateLocationAddress = usePostSearchStore(
+    (state) => state.updateLocationAddress,
   );
 
-  const setLocationQuery = usePostSearchStore(
-    (state) => state.setLocationQuery,
+  const locationRadius = usePostSearchStore((state) => state.location.radius);
+
+  const updateLocationCoords = usePostSearchStore(
+    (state) => state.updateLocationCoords,
   );
 
-  const locationOptions = usePostSearchStore(
-    (state) => state.locationSearch.options,
-  );
+  const updateRadius = usePostSearchStore((state) => state.updateRadius);
 
-  const setLocationOptions = usePostSearchStore(
-    (state) => state.setLocationOptions,
-  );
+  const recents = usePostSearchStore((state) => state.location.history);
 
-  const recents = usePostSearchStore(
-    (state) => state.locationSearch.recentQuery ?? [],
-  );
+  const safeLocationQuery = useMemo(() => locationQuery ?? "", [locationQuery]);
 
-  const addLocationRecent = usePostSearchStore(
-    (state) => state.addLocationRecent,
-  );
+  const displayMode: DisplayMode = useMemo(() => {
+    const hasQuery = !!locationQuery?.trim();
+    if (isFocused && hasQuery) return "suggestions";
+    return "recent";
+  }, [isFocused, locationQuery]);
 
-  const slicedRecents = useMemo(() => recents.slice(0, 3), [recents]);
-
-  const setRadiusInKm = useCallback(
-    (value: number) => {
-      if (!locationOptions) return;
-
-      setLocationOptions({
-        ...locationOptions,
-        radiusInKm: value,
-      });
-    },
-    [locationOptions, setLocationOptions],
-  );
+  const { predictions } = usePlaceAutocomplete({
+    searchQuery: safeLocationQuery,
+    enabled: displayMode === "suggestions",
+  });
 
   const selectRecent = useCallback(
-    (value: string) => {
-      setLocationQuery(value);
-    },
-    [setLocationQuery],
+    (value: string) => updateLocationAddress(value),
+    [updateLocationAddress],
   );
 
   const clearQuery = useCallback(() => {
-    setLocationQuery("");
-  }, [setLocationQuery]);
-
-  const displayMode: DisplayMode = useMemo(
-    () =>
-      !isFocused || locationQuery.trim().length === 0
-        ? "recent"
-        : "suggestions",
-    [isFocused, locationQuery],
-  );
-
-  const { predictions } = usePlaceAutocomplete({
-    searchQuery: locationQuery,
-    enabled: displayMode === "suggestions",
-  });
+    updateLocationAddress("");
+  }, [updateLocationAddress]);
 
   const handleFocus = useCallback(() => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -106,31 +87,70 @@ const PostLocationSearchScreen = ({
     setIsFocused(false);
   }, []);
 
+  const handleCycleRadius = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const currentRadius =
+      typeof locationRadius === "number"
+        ? locationRadius
+        : RADIUS_CYCLE_VALUES[0];
+
+    const currentIndex = RADIUS_CYCLE_VALUES.findIndex(
+      (radius) => radius === currentRadius,
+    );
+
+    const nextRadius =
+      currentIndex === -1
+        ? RADIUS_CYCLE_VALUES[0]
+        : RADIUS_CYCLE_VALUES[(currentIndex + 1) % RADIUS_CYCLE_VALUES.length];
+
+    updateRadius(nextRadius);
+  }, [locationRadius, updateRadius]);
+
+  const handleToggleNearby = useCallback(async () => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    if (isNearbyActive) {
+      setIsNearbyActive(false);
+      return;
+    }
+
+    const coordinates = await getUserCoordinates();
+    if (!coordinates) return;
+
+    updateLocationCoords(coordinates);
+
+    if (!locationRadius) {
+      updateRadius(DEFAULT_RADIUS_IN_KM);
+    }
+
+    setIsNearbyActive(true);
+    setIsFocused(false);
+    inputRef.current?.blur();
+    Keyboard.dismiss();
+  }, [
+    getUserCoordinates,
+    isNearbyActive,
+    locationRadius,
+    updateLocationCoords,
+    updateRadius,
+  ]);
+
   const handleSelectSuggestion = useCallback(
     async (prediction: PlacePrediction) => {
       try {
-        const place = await getPlaceDetails({ placeId: prediction.placeId });
-        if (!place) return;
+        const res = await getPlaceDetails({ placeId: prediction.placeId });
 
-        const label =
-          place.formattedAddress ||
-          prediction.formattedAddress ||
-          locationQuery;
+        setIsNearbyActive(false);
+        const label = res.formattedAddress;
+        updateLocationAddress(label);
+        updateLocationCoords(res.location);
 
-        setLocationQuery(label);
-        addLocationRecent(label);
-
-        setLocationOptions({
-          location: place.location,
-          displayAddress: label,
-          externalPlaceId: place.id,
-          radiusInKm: locationOptions?.radiusInKm ?? DEFAULT_RADIUS_IN_KM,
-        });
+        if (!locationRadius) {
+          updateRadius(DEFAULT_RADIUS_IN_KM);
+        }
       } catch (error) {
-        console.log(
-          "[PostLocationSearchScreen] handleSelectSuggestion:",
-          error,
-        );
+        console.error("Error fetching place details:", error);
       } finally {
         setIsFocused(false);
         inputRef.current?.blur();
@@ -139,15 +159,16 @@ const PostLocationSearchScreen = ({
     },
     [
       getPlaceDetails,
-      locationOptions?.radiusInKm,
-      locationQuery,
-      setLocationOptions,
-      setLocationQuery,
+      locationRadius,
+      updateLocationAddress,
+      updateLocationCoords,
+      updateRadius,
     ],
   );
 
   const handleSelectRecent = useCallback(
     (value: string) => {
+      setIsNearbyActive(false);
       selectRecent(value);
       setIsFocused(true);
       inputRef.current?.focus();
@@ -157,10 +178,15 @@ const PostLocationSearchScreen = ({
 
   const onChangeQuery = useCallback(
     (value: string) => {
-      setLocationQuery(value);
+      setIsNearbyActive(false);
+      updateLocationAddress(value);
     },
-    [setLocationQuery],
+    [updateLocationAddress],
   );
+
+  const displayRecentQueries = useMemo(() => {
+    return recents.filter((item): item is string => !!item?.trim());
+  }, [recents]);
 
   const displayedSuggestions = useMemo(
     () => predictions.slice(0, 3),
@@ -182,8 +208,10 @@ const PostLocationSearchScreen = ({
 
   const displayLocationQuery = useMemo(() => {
     if (isExpanded) return "";
-    return locationQuery.trim() || "Search area or landmark";
-  }, [isExpanded, locationQuery]);
+    if (isNearbyActive) return "Nearby";
+    if (locationQuery) return locationQuery;
+    return "Nearby";
+  }, [isExpanded, isNearbyActive, locationQuery]);
 
   const displayTitle = useMemo(() => {
     if (!isExpanded) return "Where";
@@ -210,7 +238,7 @@ const PostLocationSearchScreen = ({
   }, [displayMode]);
 
   const displayRadiusLabels = useMemo(() => {
-    if (!locationOptions) {
+    if (!locationRadius) {
       return {
         title: "Radius",
         sub: "Select radius",
@@ -218,20 +246,34 @@ const PostLocationSearchScreen = ({
     }
 
     return {
-      title: `Radius: ${locationOptions.radiusInKm} km`,
-      sub: "Change radius",
+      title: `Radius: ${locationRadius} km`,
+      sub: "Tap to change",
     };
-  }, [locationOptions]);
+  }, [locationRadius]);
 
   const displayNearbyLabels = useMemo(() => {
+    if (isGettingUserCoordinates) {
+      return {
+        title: "Nearby",
+        sub: "Detecting your location...",
+      };
+    }
+
+    if (isNearbyActive) {
+      return {
+        title: "Nearby",
+        sub: "Using current location",
+      };
+    }
+
     return {
       title: `Nearby`,
       sub: "Find around you",
     };
-  }, []);
+  }, [isGettingUserCoordinates, isNearbyActive]);
 
   const displayRecentList = useCallback(() => {
-    if (recents.length === 0) {
+    if (displayRecentQueries.length === 0) {
       return (
         <Text className="text-sm text-textMuted">No recent searches.</Text>
       );
@@ -239,9 +281,9 @@ const PostLocationSearchScreen = ({
 
     return (
       <View className="flex-col gap-sm mb-sm">
-        {recents.map((item) => (
+        {displayRecentQueries.map((item, index) => (
           <AppSearchRow
-            key={`location-recent-${item}`}
+            key={`location-recent-${item}-${index}`}
             IconComponent={ClockClockwiseIcon}
             text={item}
             onPress={() => handleSelectRecent(item)}
@@ -249,7 +291,7 @@ const PostLocationSearchScreen = ({
         ))}
       </View>
     );
-  }, [handleSelectRecent, recents]);
+  }, [handleSelectRecent, displayRecentQueries]);
 
   const displaySuggestionList = useCallback(() => {
     if (displayedSuggestions.length === 0) {
@@ -284,7 +326,11 @@ const PostLocationSearchScreen = ({
           {displayTitle}
         </Text>
 
-        <Text className="flex-1 text-sm text-textMuted" numberOfLines={1}>
+        <Text
+          className="flex-1 text-sm text-textMuted "
+          style={{ textAlign: "right" }}
+          numberOfLines={1}
+        >
           {displayLocationQuery}
         </Text>
       </Pressable>
@@ -303,7 +349,7 @@ const PostLocationSearchScreen = ({
 
             <TextInput
               ref={inputRef}
-              value={locationQuery}
+              value={safeLocationQuery}
               onChangeText={onChangeQuery}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -315,7 +361,7 @@ const PostLocationSearchScreen = ({
               selectionColor={colors.black}
             />
 
-            {locationQuery.length > 0 && (
+            {safeLocationQuery.length > 0 && (
               <Pressable
                 onPress={() => {
                   clearQuery();
@@ -331,7 +377,22 @@ const PostLocationSearchScreen = ({
           {/* Action Buttons */}
           <View className="flex-row items-center gap-sm">
             {/* Nearby Location Selector */}
-            <View className="flex-1 rounded-sm border border-dashed border-slate-200 bg-surface p-xs active:bg-slate-50">
+            <Pressable
+              onPress={() => void handleToggleNearby()}
+              disabled={isGettingUserCoordinates}
+              className="flex-1 rounded-sm border border-dashed border-slate-200 bg-surface p-xs active:bg-slate-50"
+              accessibilityRole="button"
+              accessibilityLabel="Toggle nearby location"
+              style={{
+                opacity: isGettingUserCoordinates ? 0.7 : 1,
+                borderColor: isNearbyActive
+                  ? colors.primary
+                  : colors.slate[200],
+                backgroundColor: isNearbyActive
+                  ? colors.primary + "10"
+                  : undefined,
+              }}
+            >
               <View className="flex-row gap-xs items-center">
                 <View className="p-xs items-center justify-center">
                   <GpsFixIcon
@@ -350,10 +411,15 @@ const PostLocationSearchScreen = ({
                   </Text>
                 </View>
               </View>
-            </View>
+            </Pressable>
 
             {/* Radius Selector */}
-            <View className="flex-1 rounded-sm border border-dashed border-slate-200 bg-surface p-xs active:bg-slate-50">
+            <Pressable
+              onPress={handleCycleRadius}
+              className="flex-1 rounded-sm border border-dashed border-slate-200 bg-surface p-xs active:bg-slate-50"
+              accessibilityRole="button"
+              accessibilityLabel="Cycle search radius"
+            >
               <View className="flex-row gap-xs items-center">
                 <View className="p-xs items-center justify-center">
                   <TargetIcon
@@ -372,7 +438,7 @@ const PostLocationSearchScreen = ({
                   </Text>
                 </View>
               </View>
-            </View>
+            </Pressable>
           </View>
 
           {/* Recent/Suggestion Locations */}

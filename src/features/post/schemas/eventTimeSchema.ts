@@ -20,9 +20,8 @@ export const MIN_DATE_EVENT_TIME = CONSTANTS.MIN_DATE;
 export const eventTimeSchema = yup
   .date()
   .typeError(ERROR.EVENT_TIME_INVALID)
-  .required(ERROR.EVENT_TIME_REQUIRED)
   .test("not-in-future", ERROR.EVENT_TIME_IN_FUTURE, (value) => {
-    if (!value) return false;
+    if (!value) return true;
     const FUTURE_TOLERANCE_MS = 1000;
     return value.getTime() <= Date.now() + FUTURE_TOLERANCE_MS;
   })
@@ -30,9 +29,11 @@ export const eventTimeSchema = yup
     "not-before-min-date",
     ERROR.EVENT_TIME_BEFORE_MIN_DATE,
     (value) => {
-      if (!value) return false;
+      if (!value) return true;
       return value.getTime() >= MIN_DATE_EVENT_TIME.getTime();
     },
-  );
+  )
+  .required()
+  .default(() => new Date());
 
 export type EventTime = yup.InferType<typeof eventTimeSchema>;

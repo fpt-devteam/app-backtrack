@@ -130,24 +130,46 @@ function buildSearchOptions(
 export default function PostSearchResultScreen() {
   const insets = useSafeAreaInsets();
   const { confirmedSelection } = useLocationSelectionStore();
-  const itemQuery = usePostSearchStore((state) => state.itemQuery);
-  const location = usePostSearchStore((state) => state.location);
-  const radiusInKm = usePostSearchStore((state) => state.radiusInKm);
+  const keyword = usePostSearchStore((state) => state.keyword.value);
+  const locationAddress = usePostSearchStore((state) => state.location.address);
+  const locationCoords = usePostSearchStore((state) => state.location.coords);
+  const radiusInKm = usePostSearchStore((state) => state.location.radius);
 
   const [tab, setTab] = useState<PostSearchTab>(TABS[0].key);
   const [showOptions, setShowOptions] = useState<boolean>(false);
-  const normalizedSearchTerm = itemQuery.trim();
+  const normalizedSearchTerm = (keyword ?? "").trim();
+  const safeRadiusInKm = radiusInKm ?? 20;
+
+  const storedLocation = useMemo<UserLocation | null>(() => {
+    if (!locationCoords) return null;
+
+    return {
+      location: locationCoords,
+      displayAddress: locationAddress ?? null,
+      externalPlaceId: null,
+      radiusInKm: safeRadiusInKm,
+    };
+  }, [locationAddress, locationCoords, safeRadiusInKm]);
+
+  const resolvedLocation = useMemo<UserLocation | null>(
+    () => storedLocation ?? confirmedSelection ?? null,
+    [confirmedSelection, storedLocation],
+  );
 
   const initialFilter = useMemo<FilterDraft>(
     () => ({
       location:
-        location ??
-        confirmedSelection ??
-        ({ location: { latitude: 0, longitude: 0 } } as UserLocation),
+        resolvedLocation ??
+        ({
+          location: { latitude: 0, longitude: 0 },
+          displayAddress: null,
+          externalPlaceId: null,
+          radiusInKm: safeRadiusInKm,
+        } as UserLocation),
       postType: POST_TYPE_OPTION.ALL,
-      radius: String(radiusInKm),
+      radius: String(safeRadiusInKm),
     }),
-    [confirmedSelection, location, radiusInKm],
+    [resolvedLocation, safeRadiusInKm],
   );
 
   const [filterDraft, dispatch] = useReducer(filterReducer, initialFilter);
@@ -198,11 +220,11 @@ export default function PostSearchResultScreen() {
   }, []);
 
   useEffect(() => {
-    if (normalizedSearchTerm && location?.location) return;
+    if (normalizedSearchTerm && resolvedLocation?.location) return;
     router.replace(POST_ROUTE.search);
-  }, [location, normalizedSearchTerm]);
+  }, [normalizedSearchTerm, resolvedLocation]);
 
-  if (!normalizedSearchTerm || !location?.location) {
+  if (!normalizedSearchTerm || !resolvedLocation?.location) {
     return null;
   }
 
@@ -234,7 +256,7 @@ export default function PostSearchResultScreen() {
             style={{ borderColor: colors.primary, borderWidth: 2 }}
           >
             <TextInput
-              value={itemQuery}
+              value={keyword ?? ""}
               returnKeyType="search"
               onFocus={() => router.back()}
               className="flex-1 text-sm px-3 py-1"

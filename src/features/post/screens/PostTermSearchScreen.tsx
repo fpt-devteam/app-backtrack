@@ -3,7 +3,10 @@ import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
 
-import { AppSearchRow } from "@/src/shared/components";
+import { useAnalyzeImage } from "@/src/features/post/hooks";
+import { TextSearch, textSearchSchema } from "@/src/features/post/schemas";
+import { AppInlineError, AppSearchRow } from "@/src/shared/components";
+import { getErrorMessage } from "@/src/shared/utils";
 import { AnimatePresence, MotiView } from "moti";
 import {
   CameraIcon,
@@ -14,7 +17,6 @@ import {
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
-import { useAnalyzeImage } from "../hooks";
 
 type PostTermSearchScreenProps = {
   isExpanded: boolean;
@@ -28,26 +30,38 @@ const PostTermSearchScreen = ({
   const inputRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
 
-  const itemQuery = usePostSearchStore((state) => state.itemSearch.query);
-  const recents = usePostSearchStore((state) => state.itemSearch.recentQuery);
-  const setItemQuery = usePostSearchStore((state) => state.setItemQuery);
+  const itemQuery = usePostSearchStore((state) => state.keyword.value);
+  const updateKeyword = usePostSearchStore((state) => state.updateKeyword);
+  const resetKeyword = usePostSearchStore((state) => state.resetKeyword);
+  const recents = usePostSearchStore((state) => state.keyword.history);
 
-  const { analyzeImage, isAnalyzing } = useAnalyzeImage({
-    onSuccess: (data) => {
-      setItemQuery(data.itemName);
-      toast.success("Image analyzed successfully!");
-    },
-    onError: (error) => {
-      toast.error("Failed to analyze image. Please try again.");
-    },
-  });
+  const { analyzeImage: _analyzeImage, isAnalyzing: _isAnalyzing } =
+    useAnalyzeImage({
+      onSuccess: (data) => {
+        updateKeyword(data.itemName);
+        toast.success("Image analyzed successfully!");
+      },
+      onError: (_error) => {
+        toast.error("Failed to analyze image. Please try again.");
+      },
+    });
 
   const selectRecent = useCallback(
-    (value: string) => setItemQuery(value),
-    [setItemQuery],
+    (value: TextSearch) => updateKeyword(value),
+    [updateKeyword],
   );
 
-  const clearQuery = useCallback(() => setItemQuery(""), [setItemQuery]);
+  const safeItemQuery = useMemo(() => itemQuery ?? "", [itemQuery]);
+
+  const searchTermError = useMemo(() => {
+    try {
+      textSearchSchema.validateSync(itemQuery, { abortEarly: true });
+      return null;
+    } catch (err) {
+      const messageError = getErrorMessage(err);
+      return messageError;
+    }
+  }, [itemQuery]);
 
   const displayRecents = useMemo(() => recents.slice(0, 3), [recents]);
 
@@ -62,9 +76,11 @@ const PostTermSearchScreen = ({
   }, [isExpanded]);
 
   const displayItemQuery = useMemo(() => {
+    if (searchTermError) return searchTermError;
     if (isExpanded) return "";
-    return "Search for items, e.g., wallet, backpack";
-  }, [isExpanded]);
+    if (itemQuery) return itemQuery;
+    return "Anything";
+  }, [isExpanded, itemQuery, searchTermError]);
 
   const displayLabels = useMemo(() => {
     return {
@@ -265,7 +281,7 @@ const PostTermSearchScreen = ({
       {/* Header Section */}
       <Pressable
         onPress={onToggle}
-        className="px-md py-md flex-row items-center justify-between gap-lg"
+        className="p-md gap-md flex-row justify-between items-center"
       >
         <MotiView
           animate={headerTitleAnimate}
@@ -277,20 +293,22 @@ const PostTermSearchScreen = ({
         </MotiView>
 
         <AnimatePresence>
-          {!isExpanded && (
-            <MotiView
-              key="item-query-subtitle"
-              className="flex-1"
-              from={headerSubtitleFrom}
-              animate={headerSubtitleAnimate}
-              exit={headerSubtitleExit}
-              transition={headerSubtitleTransition}
-            >
+          <MotiView
+            key="item-query-subtitle"
+            className="flex-1 items-end"
+            from={headerSubtitleFrom}
+            animate={headerSubtitleAnimate}
+            exit={headerSubtitleExit}
+            transition={headerSubtitleTransition}
+          >
+            {searchTermError ? (
+              <AppInlineError message={searchTermError} />
+            ) : (
               <Text className="text-sm text-textMuted" numberOfLines={1}>
                 {displayItemQuery}
               </Text>
-            </MotiView>
-          )}
+            )}
+          </MotiView>
         </AnimatePresence>
       </Pressable>
 
@@ -328,8 +346,8 @@ const PostTermSearchScreen = ({
                   <TextInput
                     ref={inputRef}
                     className="flex-1 font-md text-textPrimary"
-                    value={itemQuery}
-                    onChangeText={setItemQuery}
+                    value={safeItemQuery}
+                    onChangeText={updateKeyword}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     placeholder="Wallet, backpack, laptop,..."
@@ -338,8 +356,8 @@ const PostTermSearchScreen = ({
                     selectionColor={colors.black}
                   />
 
-                  {itemQuery.length > 0 && (
-                    <Pressable onPress={clearQuery} hitSlop={8}>
+                  {safeItemQuery && safeItemQuery.length > 0 && (
+                    <Pressable onPress={resetKeyword} hitSlop={8}>
                       <XCircleIcon
                         size={20}
                         weight="bold"
@@ -408,22 +426,24 @@ const PostTermSearchScreen = ({
                     </Text>
                   </View>
 
-                  {displayRecents.length === 0 ? (
-                    <Text className="text-sm text-textMuted">
-                      No recent searches.
-                    </Text>
-                  ) : (
-                    <View className="flex-col gap-sm mb-sm">
-                      {displayRecents.map((item) => (
-                        <AppSearchRow
-                          key={`location-recent-${item}`}
-                          IconComponent={ClockClockwiseIcon}
-                          text={item}
-                          onPress={() => selectRecent(item)}
-                        />
-                      ))}
-                    </View>
-                  )}
+                  <View className="mb-sm">
+                    {displayRecents.length === 0 ? (
+                      <Text className="text-xs text-textMuted">
+                        No recent searches.
+                      </Text>
+                    ) : (
+                      <View className="flex-col gap-sm">
+                        {displayRecents.map((item) => (
+                          <AppSearchRow
+                            key={`location-recent-${item}`}
+                            IconComponent={ClockClockwiseIcon}
+                            text={item ?? ""}
+                            onPress={() => selectRecent(item)}
+                          />
+                        ))}
+                      </View>
+                    )}
+                  </View>
                 </View>
               </MotiView>
             </View>

@@ -1,49 +1,79 @@
-import type { UserLocation } from "@/src/features/map/types";
-import { Nullable } from "@/src/shared/types";
+import {
+  EventTime,
+  eventTimeSchema,
+  LocationSearch,
+  locationSearchSchema,
+  RadiusSearch,
+  radiusSearchSchema,
+  TextSearch,
+  textSearchSchema,
+} from "@/src/features/post/schemas";
+import { Optional } from "@/src/shared/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 type PostSearchStoreState = {
-  itemSearch: {
-    query: string;
-    recentQuery: string[];
+  keyword: {
+    value: TextSearch;
+    history: TextSearch[];
   };
-  locationSearch: {
-    query: string;
-    options: Nullable<UserLocation>;
-    recentQuery: string[];
+
+  location: {
+    address: TextSearch;
+    coords: LocationSearch;
+    radius: RadiusSearch;
+    history: TextSearch[];
   };
-  eventSearch: {
-    options: Date;
+
+  temporal: {
+    date: EventTime;
   };
 };
 
 type PersistedPostSearchState = {
+  keyword?: {
+    history?: Optional<TextSearch[]>;
+  };
+  location?: {
+    history?: Optional<TextSearch[]>;
+  };
+
+  // Legacy persisted keys for migration compatibility.
   itemSearch?: {
-    recentQuery?: string[];
+    recentQueries?: Optional<TextSearch[]>;
   };
   locationSearch?: {
-    recentQuery?: string[];
+    recentQueries?: Optional<TextSearch[]>;
   };
 };
 
 type PostSearchActions = {
-  // Item Actions
-  setItemQuery: (query: string) => void;
-  addItemRecent: (query: string) => void;
+  // Keyword Actions
+  updateKeyword: (value: TextSearch) => void;
+  resetKeyword: () => void;
+  addToKeywordHistory: (value: TextSearch) => void;
 
   // Location Actions
-  setLocationQuery: (query: string) => void;
-  setLocationOptions: (options: Nullable<UserLocation>) => void;
-  addLocationRecent: (query: string) => void;
+  updateLocationAddress: (address: TextSearch) => void;
+  updateLocationCoords: (coords: LocationSearch) => void;
+  updateRadius: (radius: RadiusSearch) => void;
+  addToLocationHistory: (address: TextSearch) => void;
 
-  // Event Actions
-  setEventDate: (date: Date) => void;
+  // Temporal Actions
+  updateEventDate: (date: EventTime) => void;
 
   // Global Actions
-  resetAll: () => void;
+  resetFilters: () => void;
+};
+
+const sanitizeHistory = (
+  value: Optional<TextSearch[]>,
+): Optional<TextSearch[]> => {
+  if (!Array.isArray(value)) return undefined;
+
+  return value.filter((item): item is string => typeof item === "string");
 };
 
 export const usePostSearchStore = create<
@@ -51,102 +81,114 @@ export const usePostSearchStore = create<
 >()(
   persist(
     immer((set) => ({
-      // --- Initial State ---
-      itemSearch: {
-        query: "",
-        recentQuery: [],
+      keyword: {
+        value: textSearchSchema.getDefault(),
+        history: [],
       },
 
-      locationSearch: {
-        query: "",
-        options: null,
-        recentQuery: [],
+      location: {
+        address: textSearchSchema.getDefault(),
+        coords: locationSearchSchema.getDefault(),
+        radius: radiusSearchSchema.getDefault(),
+        history: [],
       },
 
-      // Event
-      eventSearch: {
-        options: new Date(),
+      temporal: {
+        date: eventTimeSchema.getDefault(),
       },
 
-      setEventDate: (date) => {
+      updateKeyword: (value) => {
         set((state) => {
-          state.eventSearch.options = date;
+          state.keyword.value = value;
         });
       },
-      //
 
-      setItemQuery: (query) =>
+      resetKeyword: () =>
         set((state) => {
-          state.itemSearch.query = query;
+          state.keyword.value = textSearchSchema.getDefault();
         }),
 
-      addItemRecent: (query) =>
+      addToKeywordHistory: (value) =>
         set((state) => {
-          const filtered = state.itemSearch.recentQuery.filter(
-            (q: string) => q !== query,
+          if (!value?.trim()) return;
+
+          const filtered = state.keyword.history.filter(
+            (item: TextSearch) => item !== value,
           );
-          state.itemSearch.recentQuery = [query, ...filtered].slice(0, 10);
+
+          state.keyword.history = [value, ...filtered].slice(0, 10);
         }),
 
-      setLocationQuery: (query) =>
+      updateLocationAddress: (address) =>
         set((state) => {
-          state.locationSearch.query = query;
+          state.location.address = address;
         }),
 
-      setLocationOptions: (options) =>
+      updateLocationCoords: (coords) =>
         set((state) => {
-          state.locationSearch.options = options;
+          state.location.coords = coords;
         }),
 
-      addLocationRecent: (query) =>
+      updateRadius: (radius) => {
         set((state) => {
-          const filtered = state.locationSearch.recentQuery.filter(
-            (q: string) => q !== query,
+          state.location.radius = radius;
+        });
+      },
+
+      addToLocationHistory: (address) =>
+        set((state) => {
+          if (!address?.trim()) return;
+
+          const filtered = state.location.history.filter(
+            (item: TextSearch) => item !== address,
           );
-          state.locationSearch.recentQuery = [query, ...filtered].slice(0, 10);
+
+          state.location.history = [address, ...filtered].slice(0, 10);
         }),
 
-      resetAll: () =>
+      updateEventDate: (date) => {
         set((state) => {
-          state.itemSearch.query = "";
-          state.locationSearch.query = "";
-          state.locationSearch.options = null;
-          state.eventSearch.options = new Date();
+          state.temporal.date = date;
+        });
+      },
+
+      resetFilters: () =>
+        set((state) => {
+          state.keyword.value = textSearchSchema.getDefault();
+          state.location.address = textSearchSchema.getDefault();
+          state.location.coords = locationSearchSchema.getDefault();
+          state.location.radius = radiusSearchSchema.getDefault();
+          state.temporal.date = eventTimeSchema.getDefault();
         }),
     })),
     {
       name: "post-search-storage",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
-        itemSearch: { recentQuery: state.itemSearch.recentQuery },
-        locationSearch: { recentQuery: state.locationSearch.recentQuery },
+        keyword: { history: state.keyword.history },
+        location: { history: state.location.history },
       }),
       merge: (persistedState, currentState) => {
         const persisted = (persistedState ?? {}) as PersistedPostSearchState;
 
-        const itemRecentQuery = Array.isArray(persisted.itemSearch?.recentQuery)
-          ? persisted.itemSearch.recentQuery.filter(
-              (query): query is string => typeof query === "string",
-            )
-          : currentState.itemSearch.recentQuery;
+        const keywordHistory = sanitizeHistory(
+          persisted.keyword?.history ?? persisted.itemSearch?.recentQueries,
+        );
 
-        const locationRecentQuery = Array.isArray(
-          persisted.locationSearch?.recentQuery,
-        )
-          ? persisted.locationSearch.recentQuery.filter(
-              (query): query is string => typeof query === "string",
-            )
-          : currentState.locationSearch.recentQuery;
+        const locationHistory = sanitizeHistory(
+          persisted.location?.history ??
+            persisted.locationSearch?.recentQueries,
+        );
 
         return {
           ...currentState,
-          itemSearch: {
-            ...currentState.itemSearch,
-            recentQuery: itemRecentQuery,
+          keyword: {
+            ...currentState.keyword,
+            history: keywordHistory ?? currentState.keyword.history,
           },
-          locationSearch: {
-            ...currentState.locationSearch,
-            recentQuery: locationRecentQuery,
+          location: {
+            ...currentState.location,
+            history: locationHistory ?? currentState.location.history,
           },
         };
       },

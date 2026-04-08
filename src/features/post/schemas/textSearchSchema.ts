@@ -19,8 +19,11 @@ const ERROR = {
 export const textSearchSchema = yup
   .string()
   .trim()
+  .transform((value) => (value === "" ? null : value))
+  .nullable()
+  .notRequired()
   .min(CONSTANTS.MIN_LENGTH, ERROR.TEXT_SEARCH_TOO_SHORT)
   .max(CONSTANTS.MAX_LENGTH, ERROR.TEXT_SEARCH_TOO_LONG)
-  .nullable();
+  .default(undefined);
 
 export type TextSearch = yup.InferType<typeof textSearchSchema>;
