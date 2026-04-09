@@ -17,7 +17,7 @@
  *   - Section gap (vertical):     32px (4 × 8)
  *   - Card internal padding:      16px (2 × 8)
  *   - List row gap:               12px (1.5 × 8)
- *   - Card corner radius:         12px (clean, modern — not too bubbly)
+ *   - Card corner radius:         14px (clean, modern — not too bubbly)
  *   - Search bar radius:          full pill (9999)
  *   - Primary CTA radius:         8px (large button — slightly rounded)
  *   - Tab bar height:             ~83px including safe area
@@ -63,9 +63,9 @@ const metrics = {
     /** Compact list row gap, inner chip padding — 8px. */
     sm: 8,
     /** Card image-to-text gap, list item vertical gap — 12px. */
-    md2: 14,
+    md2: 12,
     /** Card internal padding, input field inset — 16px. */
-    md: 16,
+    md: 18,
     /**
      * Screen horizontal edge padding — 24px.
      * Airbnb's standard screen-left/right inset for all main content.
@@ -92,13 +92,13 @@ const metrics = {
    *   none (0)   → strict alignment elements, underline indicators
    *   xs   (4)   → inline badges, compact tag chips, image thumbnails
    *   sm   (8)   → primary CTA buttons (Airbnb "Reserve", "Next", "Show homes")
-   *   md   (12)  → listing cards, modal panels, bottom sheets, filter cards
+   *   md   (14)  → listing cards, modal panels, bottom sheets, filter cards
    *   lg   (16)  → bottom sheet top corners, overlapping panels
    *   xl   (20)  → featured/hero cards with prominent imagery
    *   2xl  (24)  → extra-featured visual cards
    *   full (9999)→ pill buttons (search bar, guest-count pills, price tags)
    *
-   * Source: Airbnb screenshot analysis — listing cards ~12px, search bar
+   * Source: Airbnb screenshot analysis — listing cards ~14px, search bar
    * full pill, "Reserve" button ~8px, filter chips full pill.
    */
   borderRadius: {
@@ -115,9 +115,9 @@ const metrics = {
      * Card radius — Airbnb listing cards, modal bottoms, filter panels.
      * The standard container radius throughout the app.
      */
-    md: 12,
+    md: 14,
     /** Alias for md — preferred name for card/panel contexts. */
-    primary: 12,
+    primary: 14,
     /**
      * Sheet/overlay top corners — bottom sheets, filter overlays.
      * Slightly larger than cards to emphasize the overlay hierarchy.

@@ -8,7 +8,7 @@ import type {
 import { DEFAULT_PAGED_REQUEST } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
 export type PostSearchOptionsProps = {
   options: Nullable<PostSearchOptions>;
@@ -48,12 +48,19 @@ export const useSearchPost = ({
 
   const items = query.data?.pages.flatMap((p) => p.data?.items ?? []) ?? [];
 
+  const error = useMemo(() => {
+    if (!query.error) return null;
+    if (query.error instanceof Error) return query.error;
+    return new Error("Failed to search posts");
+  }, [query.error]);
+
   const handleLoadMore = () => {
     if (!query.hasNextPage || query.isFetchingNextPage) return;
     query.fetchNextPage();
   };
 
   return {
+    error,
     items,
     hasMore: query.hasNextPage,
     loadMore: handleLoadMore,

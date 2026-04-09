@@ -33,7 +33,9 @@ export const AppSearchRow = ({
           <Text className="text-sm font-thin text-textPrimary">{text}</Text>
         </View>
 
-        <ArrowUpRightIcon size={20} color={colors.info[500]} weight="thin" />
+        <View className="p-sm">
+          <ArrowUpRightIcon size={24} color={colors.info[500]} weight="thin" />
+        </View>
       </View>
     </Pressable>
   );

@@ -8,180 +8,172 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { MotiView } from "moti";
-import { LightbulbIcon } from "phosphor-react-native";
-import React, { useCallback, useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import { LayoutChangeEvent, Pressable, Text, View } from "react-native";
 
-type PostEventTimeSearchScreenProps = {
+type PostTemporalFilterProps = {
   isExpanded: boolean;
   onToggle: () => void;
 };
 
-const PostEventTimeSearchScreen = ({
+const PostTemporalFilter = ({
   isExpanded,
   onToggle,
-}: PostEventTimeSearchScreenProps) => {
-  const eventDate = usePostSearchStore((state) => state.temporal.date);
-  const setEventDate = usePostSearchStore((state) => state.updateEventDate);
+}: PostTemporalFilterProps) => {
+  const occurrenceDate = usePostSearchStore((state) => state.temporal.date);
+  const updateOccurrenceDate = usePostSearchStore(
+    (state) => state.updateEventDate,
+  );
 
-  const safeEventDate = useMemo(() => {
-    if (!eventDate) return new Date();
-    return eventDate;
-  }, [eventDate]);
+  const [measuredHeight, setMeasuredHeight] = useState(0);
 
-  const eventTimeError = useMemo(() => {
-    if (!eventDate) return null;
+  const handleLayoutMeasure = useCallback(
+    (event: LayoutChangeEvent) => {
+      const { height } = event.nativeEvent.layout;
+      const nextHeight = Math.ceil(height);
+      if (nextHeight > 0 && nextHeight !== measuredHeight)
+        setMeasuredHeight(nextHeight);
+    },
+    [measuredHeight],
+  );
 
+  const safeDate = useMemo(
+    () => occurrenceDate ?? new Date(),
+    [occurrenceDate],
+  );
+
+  // --- Validation ---
+  const validationError = useMemo(() => {
+    if (!occurrenceDate) return null;
     try {
-      eventTimeSchema.validateSync(eventDate, { abortEarly: true });
+      eventTimeSchema.validateSync(occurrenceDate, { abortEarly: true });
       return null;
     } catch (err) {
-      const messageError = getErrorMessage(err);
-      return messageError;
+      return getErrorMessage(err);
     }
-  }, [eventDate]);
+  }, [occurrenceDate]);
 
-  const onChangeDate = useCallback(
+  const onDateValueChange = useCallback(
     (_event: DateTimePickerEvent, value: Optional<Date>) => {
-      if (!value) return;
-      setEventDate(value);
+      if (value) updateOccurrenceDate(value);
     },
-    [setEventDate],
+    [updateOccurrenceDate],
   );
 
-  const onChangeTime = useCallback(
-    (_event: DateTimePickerEvent, value: Optional<Date>) => {
-      if (!value) return;
-      setEventDate(value);
-    },
-    [setEventDate],
-  );
+  const renderHeaderTitle = useMemo(() => {
+    const title = isExpanded ? "When?" : "When";
+    const textStyle = isExpanded
+      ? "text-xl font-medium text-textPrimary"
+      : "text-md font-normal text-textMuted";
 
-  const displayTitle = useMemo(() => {
-    if (!isExpanded) return "When";
-    else return "When?";
+    return (
+      <Text className={textStyle} numberOfLines={1}>
+        {title}
+      </Text>
+    );
   }, [isExpanded]);
 
-  const displayTitleClassname = useMemo(() => {
-    if (!isExpanded) return "text-md font-medium text-textPrimary";
-    else return "text-xl font-medium text-textPrimary";
-  }, [isExpanded]);
+  const dateSummary = useMemo(() => {
+    if (!occurrenceDate) return "Anytime";
 
-  const displayEventDate = useMemo(() => {
-    if (!eventDate) return "Any time";
-
-    const formattedDate = eventDate.toLocaleDateString("en-US", {
+    return occurrenceDate.toLocaleDateString("en-US", {
       hour: "numeric",
       minute: "numeric",
       weekday: "long",
       month: "short",
       day: "numeric",
     });
+  }, [occurrenceDate]);
 
-    return formattedDate;
-  }, [eventDate]);
+  const renderHeaderSummary = useMemo(() => {
+    if (validationError) return <AppInlineError message={validationError} />;
 
-  const labels = useMemo(
-    () => ({
-      time: "Last seen at",
-      date: "Occurrence date",
-      timeSub: "Specify the hour to narrow the search",
-      dateSub: "When did you notice it was gone?",
-      tip: "The more precise the time, the faster we find it.",
-    }),
-    [],
+    return (
+      <Text className="text-sm text-textMuted text-right" numberOfLines={1}>
+        {dateSummary}
+      </Text>
+    );
+  }, [validationError, dateSummary]);
+
+  const renderTimePickers = useMemo(
+    () => (
+      <View className="gap-md">
+        {/* Section: Time Row */}
+        <View className="flex-row items-center justify-between">
+          <View className="flex-1 mr-4">
+            <Text className="text-base font-thin text-textPrimary">Time</Text>
+            <Text className="text-sm font-thin text-textMuted italic">
+              When was it last seen?
+            </Text>
+          </View>
+          <DateTimePicker
+            value={safeDate}
+            mode="time"
+            display="compact"
+            onChange={onDateValueChange}
+            accentColor={colors.secondary}
+          />
+        </View>
+
+        <View className="border-t border-slate-200" />
+
+        {/* Section: Date Row */}
+        <View className="flex-row items-center justify-between">
+          <View className="flex-1 mr-4">
+            <Text className="text-base font-thin text-textPrimary">Date</Text>
+            <Text className="text-sm font-thin text-textMuted italic">
+              The day it went missing
+            </Text>
+          </View>
+          <DateTimePicker
+            value={safeDate}
+            onChange={onDateValueChange}
+            mode="date"
+            display="compact"
+            themeVariant="light"
+            accentColor={colors.secondary}
+          />
+        </View>
+      </View>
+    ),
+    [safeDate, onDateValueChange],
   );
 
   return (
-    <View className="rounded-md border border-slate-200 bg-surface">
+    <View className="rounded-md border-[0.5] border-muted bg-surface overflow-hidden shadow-sm">
+      {/* Measure Mirror (Hidden) */}
+      <View
+        style={{ position: "absolute", opacity: 0, left: 0, right: 0 }}
+        onLayout={handleLayoutMeasure}
+        pointerEvents="none"
+      >
+        <View className="p-md">{renderTimePickers}</View>
+      </View>
+
+      {/* Interactable Header */}
       <Pressable
         onPress={onToggle}
-        className="p-md gap-md flex-row justify-between items-center"
+        className="p-md gap-md flex-row justify-between items-center active:bg-slate-50"
       >
-        <Text className={displayTitleClassname} numberOfLines={1}>
-          {displayTitle}
-        </Text>
-
-        {!eventTimeError ? (
-          <Text className="text-sm text-textMuted" numberOfLines={1}>
-            {displayEventDate}
-          </Text>
-        ) : (
-          <AppInlineError message={eventTimeError} />
-        )}
+        <View>{renderHeaderTitle}</View>
+        <View className="flex-1 ml-2">{renderHeaderSummary}</View>
       </Pressable>
 
-      {isExpanded && (
-        <MotiView
-          from={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          transition={{ type: "timing", duration: 1000 }}
-          className="px-4 flex-col gap-sm py-sm"
-        >
-          <View className="gap-sm">
-            {/* Section: Time Picker  */}
-            <View className="flex-row items-center justify-between px-2 mb-6">
-              <View>
-                <Text className="text-md font-normal text-textPrimary">
-                  {labels.time}
-                </Text>
-                <Text className="text-xs text-textMuted italic">
-                  {labels.timeSub}
-                </Text>
-              </View>
-
-              <DateTimePicker
-                value={safeEventDate}
-                mode="time"
-                display="compact"
-                onChange={onChangeTime}
-                accentColor={colors.primary}
-              />
-            </View>
-
-            {/* Section: Date Picker  */}
-            <View className="flex-row items-center justify-between px-2">
-              <View>
-                <Text className="text-md font-normal text-textPrimary">
-                  {labels.date}
-                </Text>
-                <Text className="text-xs text-textMuted italic">
-                  {labels.dateSub}
-                </Text>
-              </View>
-
-              <DateTimePicker
-                value={safeEventDate}
-                onChange={onChangeDate}
-                mode="date"
-                display="compact"
-                className="w-full self-center"
-                themeVariant="light"
-                accentColor={colors.primary}
-              />
-            </View>
-          </View>
-
-          {/* Tips Section */}
-          <View className="px-2">
-            <View className="flex-row items-center justify-center rounded-2xl py-4 px-6 gap-2 ">
-              <View
-                style={{
-                  transform: [{ rotate: "-15deg" }],
-                }}
-              >
-                <LightbulbIcon size={16} color={colors.amber[500]} />
-              </View>
-
-              <Text className="text-center text-xs text-textMuted italic">
-                {labels.tip}
-              </Text>
-            </View>
-          </View>
-        </MotiView>
-      )}
+      {/* Collapsible Content */}
+      <MotiView
+        animate={{
+          height: isExpanded ? measuredHeight : 0,
+          opacity: isExpanded ? 1 : 0,
+        }}
+        transition={{ type: "timing", duration: 300 }}
+        className="overflow-hidden"
+      >
+        {measuredHeight > 0 && (
+          <View className="p-md">{renderTimePickers}</View>
+        )}
+      </MotiView>
     </View>
   );
 };
 
-export default PostEventTimeSearchScreen;
+export default PostTemporalFilter;

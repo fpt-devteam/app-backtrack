@@ -11,7 +11,7 @@
  *   - Generous x-height for legibility at small sizes
  *
  * FONT STACK STRATEGY:
- *   "system-ui" → picks the native platform sans-serif:
+ *   Prefer Airbnb Cereal/Circular when available, then "system-ui":
  *     iOS:     SF Pro (similar humanist warmth to Cereal)
  *     Android: Roboto / Noto Sans
  *   This gives native-feeling text without loading custom fonts.
@@ -47,6 +47,10 @@ const typography = {
      * Airbnb uses Cereal Bold/ExtraBold here.
      */
     display: [
+      "Airbnb Cereal App",
+      "Airbnb Cereal",
+      "Circular Std",
+      "Circular",
       "system-ui",
       "-apple-system",
       "BlinkMacSystemFont",
@@ -60,6 +64,10 @@ const typography = {
      * Airbnb uses Cereal Bold (700) for H1-H3 level text.
      */
     heading: [
+      "Airbnb Cereal App",
+      "Airbnb Cereal",
+      "Circular Std",
+      "Circular",
       "system-ui",
       "-apple-system",
       "BlinkMacSystemFont",
@@ -73,6 +81,10 @@ const typography = {
      * Airbnb uses Cereal Book (400) and Medium (500).
      */
     body: [
+      "Airbnb Cereal App",
+      "Airbnb Cereal",
+      "Circular Std",
+      "Circular",
       "system-ui",
       "-apple-system",
       "BlinkMacSystemFont",
@@ -221,11 +233,11 @@ const typography = {
     /** Display/hero — tightened for bold authority. */
     display: -0.5,
     /** Large headings — slightly tightened. */
-    heading: -0.3,
+    heading: -0.2,
     /** Body — no tracking; natural spacing. */
     body: 0,
     /** Labels/buttons — slight positive for touchability. */
-    label: 0.3,
+    label: 0.2,
     /** Small captions — positive for legibility. */
     caption: 0.2,
     /** ALL CAPS — wide tracking mandatory. */
@@ -259,8 +271,10 @@ const typography = {
      * Airbnb uses ~24-26pt bold, left-aligned.
      */
     screenTitle: {
-      fontSize: 24,
-      fontWeight: 500,
+      fontSize: 26,
+      fontWeight: 700,
+      lineHeight: 32,
+      letterSpacing: -0.2,
     },
 
     /**

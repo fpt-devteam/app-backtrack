@@ -117,6 +117,7 @@ const palette = {
   info: {
     50: "#F0F9FF",
     100: "#E3F2FD",
+    300: "#90CAF9",
     500: "#1565C0",
     600: "#0D47A1",
   },
@@ -260,7 +261,7 @@ const semantic = {
     /** Main headings and high-emphasis content. */
     primary: palette.hof[900],
     /** Supporting and descriptive content. */
-    secondary: palette.hof[800],
+    secondary: palette.hof[600],
     /** Placeholder, helper, disabled text. */
     muted: palette.hof[500],
     /** Text on dark/brand-colored surfaces. */
@@ -280,7 +281,7 @@ const semantic = {
    * Hairline dividers between sections and list rows.
    * Airbnb uses #EBEBEB — barely visible, non-intrusive.
    */
-  divider: palette.hof[400],
+  divider: palette.hof[200],
 
   /**
    * Control and card border tokens.
@@ -292,17 +293,17 @@ const semantic = {
    */
   border: {
     /** Default resting border. */
-    DEFAULT: palette.hof[500],
+    DEFAULT: palette.hof[300],
     /**
      * Input field resting border — lighter than DEFAULT.
-     * Airbnb uses ~#D3D3D3 (hof[300]) for form input outlines at rest.
+     * Airbnb uses ultra-light separators for passive fields/chips (~#EBEBEB).
      * Kept separate from DEFAULT so cards/chips can use a different weight.
      */
-    input: palette.hof[300],
+    input: palette.hof[200],
     /** Focus-visible border for active inputs. */
     focus: palette.rausch[500],
     /** Selected state border for chips/filters. */
-    strong: palette.hof[900],
+    strong: palette.hof[800],
     muted: palette.hof[200],
   },
 
@@ -318,7 +319,7 @@ const semantic = {
    *   info    — neutral informational (#1565C0)
    */
   status: {
-    success: palette.babu[400],
+    success: palette.babu[500],
     error: palette.error[500],
     warning: palette.kazan[500],
     info: palette.info[500],

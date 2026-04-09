@@ -1,8 +1,6 @@
 import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
-import { postOptionSchema } from "@/src/features/post/schemas";
 import PostEventTimeSearchScreen from "@/src/features/post/screens/PostEventTimeSearchScreen";
 import PostTermSearchScreen from "@/src/features/post/screens/PostTermSearchScreen";
-import { POST_SEARCH_MODE, PostSearchOptions } from "@/src/features/post/types";
 import { AppBackButton, AppLink } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
@@ -28,6 +26,11 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  eventTimeSchema,
+  locationSearchSchema,
+  textSearchSchema,
+} from "../schemas";
 import PostLocationSearchScreen from "./PostLocationSearchScreen";
 
 type SearchTabValue = "posts" | "people";
@@ -123,47 +126,26 @@ const PostSearchScreen = () => {
 
   const keywordSearch = usePostSearchStore((state) => state.keyword);
   const locationSearch = usePostSearchStore((state) => state.location);
-  const eventDateSearch = usePostSearchStore((state) => state.temporal.date);
+  const eventTimeSearch = usePostSearchStore((state) => state.temporal);
 
   const addToKeywordHistory = usePostSearchStore(
     (state) => state.addToKeywordHistory,
   );
+
   const addToLocationHistory = usePostSearchStore(
     (state) => state.addToLocationHistory,
   );
 
+  const canSearch = useMemo(() => {
+    const isKeywordValid = textSearchSchema.isValidSync(keywordSearch.value);
+    const isLocationValid = locationSearchSchema.isValidSync(locationSearch);
+    const isEventTimeValid = eventTimeSchema.isValidSync(eventTimeSearch.date);
+    return isKeywordValid && isLocationValid && isEventTimeValid;
+  }, [keywordSearch, locationSearch, eventTimeSearch]);
+
   useEffect(() => {
     resetFilters();
   }, [resetFilters]);
-
-  const validSearchRequest = useMemo<PostSearchOptions | null>(() => {
-    if (selectedTab !== "posts") return null;
-
-    try {
-      const castedRequest = postOptionSchema.cast({
-        query: keywordSearch.value,
-        mode: POST_SEARCH_MODE.KEYWORD,
-        filters: {
-          location: locationSearch.coords,
-          radiusInKm: locationSearch.radius,
-          eventTime: eventDateSearch,
-        },
-      }) as PostSearchOptions;
-
-      postOptionSchema.validateSync(castedRequest, { abortEarly: true });
-      return castedRequest;
-    } catch (_error) {
-      return null;
-    }
-  }, [
-    eventDateSearch,
-    keywordSearch.value,
-    locationSearch.coords,
-    locationSearch.radius,
-    selectedTab,
-  ]);
-
-  const cannotSubmitSearch = !validSearchRequest;
 
   const onChangeTab = useCallback(
     (value: SearchTabValue) => {
@@ -179,7 +161,6 @@ const PostSearchScreen = () => {
   const handleToggleSection = useCallback(
     (section: FilterSectionVariant) => {
       if (expandedSection === section) return;
-
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setExpandedSection(section);
     },
@@ -192,31 +173,24 @@ const PostSearchScreen = () => {
   }, [resetFilters]);
 
   const handleSubmitSearch = useCallback(() => {
-    if (!validSearchRequest) return;
-
-    addToKeywordHistory(validSearchRequest.query);
+    addToKeywordHistory(keywordSearch.value);
     addToLocationHistory(locationSearch.address);
 
     router.push(POST_ROUTE.searchResult);
-  }, [
-    validSearchRequest,
-    locationSearch.address,
-    addToKeywordHistory,
-    addToLocationHistory,
-  ]);
+  }, [locationSearch, addToKeywordHistory, addToLocationHistory]);
 
   if (!hasHydrated) return <ActivityIndicator color={colors.primary} />;
 
   return (
     <>
-      <KeyboardAvoidingView
+      <BlurView
         className="flex-1"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        intensity={DEFAULT_BLUR_INTENSITY}
+        tint="light"
       >
-        <BlurView
+        <KeyboardAvoidingView
           className="flex-1"
-          intensity={DEFAULT_BLUR_INTENSITY}
-          tint="light"
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View className="flex-1">
             <View
@@ -239,9 +213,6 @@ const PostSearchScreen = () => {
 
             <ScrollView
               className="flex-1 px-md pt-md"
-              contentContainerStyle={{
-                paddingBottom: Math.max(insets.bottom + 88, 108),
-              }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled"
             >
@@ -284,11 +255,9 @@ const PostSearchScreen = () => {
               )}
             </ScrollView>
           </View>
-        </BlurView>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
 
-      {/* Search Button */}
-      <BlurView intensity={DEFAULT_BLUR_INTENSITY} tint="light">
+        {/* Search Button */}
         <View
           className="flex-row items-center justify-between px-md pt-sm"
           style={{ paddingBottom: insets.bottom }}
@@ -298,12 +267,10 @@ const PostSearchScreen = () => {
           <TouchableOpacity
             className="h-control-lg flex-row items-center justify-center gap-xs rounded-sm px-md bg-primary"
             onPress={() => void handleSubmitSearch()}
-            disabled={cannotSubmitSearch}
             activeOpacity={0.88}
-            style={{
-              opacity: cannotSubmitSearch ? 0.6 : 1,
-            }}
             accessibilityRole="button"
+            disabled={!canSearch}
+            style={{ opacity: canSearch ? 1 : 0.6 }}
           >
             <MagnifyingGlassIcon size={20} color={colors.white} weight="bold" />
 

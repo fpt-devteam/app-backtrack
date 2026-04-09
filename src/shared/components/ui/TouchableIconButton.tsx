@@ -22,7 +22,6 @@ export const TouchableIconButton = ({
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    console.log("Press");
     onPress();
   };
 

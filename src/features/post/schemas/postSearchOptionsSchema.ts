@@ -1,6 +1,8 @@
-import type { LatLng } from "react-native-maps"
 import * as yup from "yup"
 import { POST_SEARCH_MODE, PostSearchMode, PostType } from "../types"
+import { locationSearchSchema } from "./locationSearchSchema"
+import { radiusSearchSchema } from "./radiusSearchSchema"
+import { textSearchSchema } from "./textSearchSchema"
 
 /**
  * SearchPostOptions - This type defines the options for searching posts. It includes:
@@ -10,22 +12,15 @@ import { POST_SEARCH_MODE, PostSearchMode, PostType } from "../types"
  */
 export const postOptionSchema = yup
   .object({
-    query: yup
-      .string()
-      .trim()
-      .required("Query is required!"),
+    query: textSearchSchema,
     mode: yup
       .mixed<PostSearchMode>()
       .oneOf(Object.values(POST_SEARCH_MODE), "Invalid search mode!")
       .required("Search mode is required!"),
     filters: yup
       .object({
-        location: yup.mixed<LatLng>().required("Location lat lng is required"),
-        radiusInKm: yup
-          .number()
-          .min(1, "Radius must be at least 1 km!")
-          .max(20, "Radius cannot exceed 20 km!")
-          .required("Radius is required!"),
+        location: locationSearchSchema,
+        radiusInKm: radiusSearchSchema,
         postType: yup
           .mixed<PostType>()
           .oneOf(Object.values(PostType), "Invalid post type!"),

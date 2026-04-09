@@ -16,7 +16,9 @@ export default function PostsStackLayout() {
         }}
       >
         <Stack.Screen name="index" />
+
         <Stack.Screen name="[postId]/index" />
+
         <Stack.Screen
           name="search/index"
           options={{
@@ -26,6 +28,8 @@ export default function PostsStackLayout() {
             animation: "fade_from_bottom",
           }}
         />
+
+        <Stack.Screen name="search/result" />
 
         <Stack.Screen
           name="search/location"
@@ -37,8 +41,6 @@ export default function PostsStackLayout() {
             },
           }}
         />
-
-        <Stack.Screen name="search/result" />
 
         <Stack.Screen
           name="create"
