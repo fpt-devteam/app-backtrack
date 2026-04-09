@@ -7,13 +7,7 @@ import {
   View,
 } from "react-native";
 
-const OPTIONS = [
-  { label: "All", value: "All" },
-  { label: "Found", value: "Found" },
-  { label: "Lost", value: "Lost" },
-];
-
-type PostTypeSelectorProps = {
+type SegmentedControlProps = {
   value: string;
   onChange: (value: string) => void;
   options: { label: string; value: string }[];
@@ -22,8 +16,8 @@ type PostTypeSelectorProps = {
 export const AppSegmentedControl = ({
   value,
   onChange,
-  options = OPTIONS,
-}: PostTypeSelectorProps) => {
+  options,
+}: SegmentedControlProps) => {
   const [containerWidth, setContainerWidth] = useState(0);
   const slideAnim = useRef(new Animated.Value(0)).current;
 
@@ -38,7 +32,7 @@ export const AppSegmentedControl = ({
         bounciness: 5,
       }).start();
     }
-  }, [activeIndex, containerWidth]);
+  }, [activeIndex, containerWidth, tabWidth]);
 
   const onLayout = (event: LayoutChangeEvent) => {
     setContainerWidth(event.nativeEvent.layout.width - 8);
@@ -52,11 +46,11 @@ export const AppSegmentedControl = ({
   return (
     <View
       onLayout={onLayout}
-      className="flex-row items-center bg-muted rounded-full relative h-control-md"
+      className="flex-row items-center bg-surface rounded-md relative border border-border p-xs"
     >
       {containerWidth > 0 && (
         <Animated.View
-          className="absolute bg-primary rounded-full h-9"
+          className="absolute bg-secondary/5 rounded-sm border-2 h-12"
           style={{
             width: tabWidth,
             transform: [{ translateX: slideAnim }],
@@ -65,23 +59,30 @@ export const AppSegmentedControl = ({
         />
       )}
 
-      {options.map((option) => {
-        const isActive = value === option.value;
+      {options.map((option, index) => {
+        const showDivider =
+          index < options.length - 1 &&
+          activeIndex !== index &&
+          activeIndex !== index + 1;
+
         return (
-          <Pressable
-            key={option.value}
-            onPress={() => handlePress(option.value)}
-            className="flex-1 min-h-touch items-center justify-center z-10"
-            style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
-          >
-            <Text
-              className={`text-xs font-medium ${
-                isActive ? "text-white" : "text-textSecondary"
-              }`}
+          <React.Fragment key={option.value}>
+            <Pressable
+              onPress={() => handlePress(option.value)}
+              className="flex-1 min-h-touch items-center justify-center z-10"
             >
-              {option.label}
-            </Text>
-          </Pressable>
+              <Text className="text-md font-normal text-textPrimary">
+                {option.label}
+              </Text>
+            </Pressable>
+
+            {index < options.length - 1 && (
+              <View
+                style={{ opacity: showDivider ? 1 : 0 }}
+                className="h-md border-r border-border"
+              />
+            )}
+          </React.Fragment>
         );
       })}
     </View>

@@ -25,6 +25,7 @@ export const POST_ROUTE = {
   detailMatch: (postId: string, otherPostId: string) =>
     `/(tabs)/post/${postId}/compare/${otherPostId}` as ExternalPathString | RelativePathString,
   search: "/(tabs)/post/search" as ExternalPathString | RelativePathString,
+  searchFilter: "/(tabs)/post/search/filter" as ExternalPathString | RelativePathString,
   searchLocationInput: "/(tabs)/post/search/location-search" as ExternalPathString | RelativePathString,
   searchLocation: "/(tabs)/post/search/location" as ExternalPathString | RelativePathString,
   searchResult: "/(tabs)/post/search/result" as ExternalPathString | RelativePathString,

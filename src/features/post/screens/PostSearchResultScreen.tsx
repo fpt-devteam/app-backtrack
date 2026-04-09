@@ -11,7 +11,11 @@ import {
   type Post,
   type PostSearchOptions,
 } from "@/src/features/post/types";
-import { AppBackButton, TouchableIconButton } from "@/src/shared/components";
+import {
+  AppBackButton,
+  AppLoader,
+  TouchableIconButton,
+} from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
 import BottomSheetPrimitive, {
@@ -22,8 +26,8 @@ import BottomSheetPrimitive, {
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { router, Stack } from "expo-router";
-import { MotiView } from "moti";
-import { FadersIcon, ListBulletsIcon } from "phosphor-react-native";
+import { AnimatePresence, MotiView } from "moti";
+import { FadersIcon, ListBulletsIcon, XIcon } from "phosphor-react-native";
 import React, {
   useCallback,
   useEffect,
@@ -31,7 +35,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import MapView, {
   Circle,
   Marker,
@@ -40,17 +44,13 @@ import MapView, {
 } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const FALLBACK_COORDINATE: LatLng = {
-  latitude: 10.7769,
-  longitude: 106.7009,
-};
-
 const KM_PER_LAT_DEGREE = 111;
 const MIN_MAP_DELTA = 0.01;
-const LIST_SNAP_POINTS: (string | number)[] = ["34%", "60%", "90%"];
+const LIST_SNAP_POINTS: (string | number)[] = ["40%", "80%"];
 
 const buildRegionByRadius = (center: LatLng, radiusInKm: number): Region => {
   const safeRadiusKm = Math.max(radiusInKm, 1);
+
   const latitudeDelta = Math.max(
     (safeRadiusKm / KM_PER_LAT_DEGREE) * 2.6,
     MIN_MAP_DELTA,
@@ -76,7 +76,9 @@ const PostSearchResultScreen = () => {
   const mapRef = useRef<MapView>(null);
 
   const sheetRef = useRef<BottomSheetPrimitive>(null);
-  const [sheetIndex, setSheetIndex] = useState(-1);
+  const [sheetIndex, setSheetIndex] = useState(0);
+
+  const [chosenPost, setChosenPost] = useState<Post | null>(null);
 
   const hasHydrated = usePostSearchStore.persist.hasHydrated();
   const keyword = usePostSearchStore((state) => state.keyword.value);
@@ -85,9 +87,16 @@ const PostSearchResultScreen = () => {
   const locationRadius = usePostSearchStore((state) => state.location.radius);
   const eventDate = usePostSearchStore((state) => state.temporal.date);
 
+  const selectedPostType = usePostSearchStore(
+    (state) => state.advanced.postType,
+  );
+
+  const selectedCategories = usePostSearchStore(
+    (state) => state.advanced.categories,
+  );
+
   const safeCoords = useMemo(() => {
     if (!locationCoords || !locationSearchSchema.isValidSync(locationCoords)) {
-      console.log("Error at coords");
       return locationSearchSchema.getDefault();
     }
     return locationCoords;
@@ -95,37 +104,22 @@ const PostSearchResultScreen = () => {
 
   const safeRadius = useMemo(() => {
     if (!locationRadius || !radiusSearchSchema.isValidSync(locationRadius)) {
-      console.log("Error at radius");
       return radiusSearchSchema.getDefault();
     }
 
     return locationRadius;
   }, [locationRadius]);
 
-  const safeEventDate = useMemo(() => {
-    if (!eventDate || !postOptionSchema.isValidSync({ eventTime: eventDate }) ) {
-      console.log("Error at event date");
-      return null;
-    }
-
-    const date = new Date(eventDate);
-    if (isNaN(date.getTime())) {
-      console.log("Error at event date");
-      return null;
-    }
-
-    return date;
-  }, [eventDate]);
-
   const validSearchOptions = useMemo<PostSearchOptions | null>(() => {
     try {
       const castedOptions = postOptionSchema.cast({
-        query: keyword,
+        query: "wallet",
         mode: POST_SEARCH_MODE.KEYWORD,
         filters: {
           location: safeCoords,
           radiusInKm: safeRadius,
-          eventTime: safeEventDate,
+          postType: selectedPostType,
+          eventTime: eventDate,
         },
       }) as PostSearchOptions;
 
@@ -134,33 +128,32 @@ const PostSearchResultScreen = () => {
     } catch (_error) {
       return null;
     }
-  }, [eventDate, keyword, locationCoords, locationRadius]);
+  }, [eventDate, safeCoords, safeRadius, selectedPostType]);
 
   const mapRegion = useMemo(
     () => buildRegionByRadius(safeCoords, safeRadius),
     [safeCoords, safeRadius],
   );
 
-  const {
-    error,
-    items,
-    hasMore,
-    loadMore,
-    isLoading,
-    isFetchingNextPage,
-    refetch,
-  } = useSearchPost({
+  const { error, items, isLoading, refetch } = useSearchPost({
     options: validSearchOptions,
     enabled: hasHydrated && !!validSearchOptions,
   });
 
+  const filteredItems = useMemo(() => {
+    if (selectedCategories.length === 0) return items;
+    return items.filter((item) =>
+      selectedCategories.includes(item.item.category),
+    );
+  }, [items, selectedCategories]);
+
   const markerItems = useMemo(
     () =>
-      items.filter(
+      filteredItems.filter(
         (item) =>
           item.location?.latitude != null && item.location?.longitude != null,
       ),
-    [items],
+    [filteredItems],
   );
 
   const keywordSummary = useMemo(() => {
@@ -174,11 +167,6 @@ const PostSearchResultScreen = () => {
     return "Nearby";
   }, [locationAddress]);
 
-  const radiusSummary = useMemo(
-    () => `${Math.round(safeRadius)} km`,
-    [safeRadius],
-  );
-
   const timeSummary = useMemo(() => {
     if (!eventDate) return "Any time";
 
@@ -188,36 +176,19 @@ const PostSearchResultScreen = () => {
     });
   }, [eventDate]);
 
-  const searchSummary = useMemo(
-    () =>
-      `${keywordSummary} • ${addressSummary} • ${radiusSummary} • ${timeSummary}`,
-    [addressSummary, keywordSummary, radiusSummary, timeSummary],
-  );
-
-  const searchSegments = useMemo(() => {
-    return [
-      { label: keywordSummary || "Anything", isBold: true },
-      { label: addressSummary || "Anywhere", isBold: false },
-      {
-        label: `${timeSummary}${radiusSummary ? ` • ${radiusSummary}` : ""}`,
-        isBold: false,
-      },
-    ].filter((s) => !!s.label);
-  }, [keywordSummary, addressSummary, timeSummary, radiusSummary]);
-
   const resultCountLabel = useMemo(() => {
-    const count = items.length;
+    const count = filteredItems.length;
     return `${count} result${count === 1 ? "" : "s"}`;
-  }, [items.length]);
+  }, [filteredItems.length]);
 
   const isSheetVisible = sheetIndex >= 0;
   const isInvalidSearch = hasHydrated && !validSearchOptions;
-  const isInitialLoading = isLoading && items.length === 0;
-  const hasError = !!error && items.length === 0;
+  const isInitialLoading = isLoading && filteredItems.length === 0;
+  const hasError = !!error && filteredItems.length === 0;
   const isEmpty =
     !isInitialLoading &&
     !hasError &&
-    items.length === 0 &&
+    filteredItems.length === 0 &&
     !!validSearchOptions;
 
   const openListSheet = useCallback((withHaptics = true) => {
@@ -234,7 +205,11 @@ const PostSearchResultScreen = () => {
   }, []);
 
   const handleOpenRefine = useCallback(() => {
-    router.push(POST_ROUTE.search);
+    router.back();
+  }, []);
+
+  const handleOpenFilter = useCallback(() => {
+    router.push(POST_ROUTE.searchFilter);
   }, []);
 
   const handleRetry = useCallback(() => {
@@ -256,11 +231,6 @@ const PostSearchResultScreen = () => {
     );
   }, []);
 
-  const handleLoadMore = useCallback(() => {
-    if (!hasMore || isFetchingNextPage) return;
-    loadMore();
-  }, [hasMore, isFetchingNextPage, loadMore]);
-
   const handleMarkerPress = useCallback(
     (item: Post) => {
       const coordinate = item.location;
@@ -268,7 +238,7 @@ const PostSearchResultScreen = () => {
 
       const markerRegion = buildRegionByRadius(coordinate, safeRadius);
       mapRef.current?.animateToRegion(markerRegion, 280);
-      openListSheet(false);
+      setChosenPost(item);
     },
     [safeRadius, openListSheet],
   );
@@ -297,21 +267,16 @@ const PostSearchResultScreen = () => {
           delay: (index + 1) * 100,
         }}
       >
-        <PostCard item={item} />
+        <PostCard item={item} size="md" />
       </MotiView>
     ),
     [],
   );
 
-  const renderListFooter = useCallback(() => {
-    if (!isFetchingNextPage) return <View style={{ height: 12 }} />;
-
-    return (
-      <View className="py-md items-center justify-center">
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
-  }, [isFetchingNextPage]);
+  const renderListFooter = useCallback(
+    () => <View style={{ height: 12 }} />,
+    [],
+  );
 
   const renderListEmpty = useCallback(() => {
     if (isInitialLoading) return null;
@@ -351,15 +316,6 @@ const PostSearchResultScreen = () => {
       };
     }
 
-    if (isEmpty) {
-      return {
-        title: "No posts found",
-        description: "Try widening your radius or changing keywords.",
-        actionLabel: "Refine search",
-        onPress: handleOpenRefine,
-      };
-    }
-
     return null;
   }, [
     handleOpenRefine,
@@ -368,6 +324,7 @@ const PostSearchResultScreen = () => {
     isEmpty,
     isInitialLoading,
     isInvalidSearch,
+    selectedCategories.length,
   ]);
 
   useEffect(() => {
@@ -378,7 +335,7 @@ const PostSearchResultScreen = () => {
   if (!hasHydrated) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color={colors.primary} />
+        <AppLoader />
       </View>
     );
   }
@@ -396,6 +353,7 @@ const PostSearchResultScreen = () => {
                 className="flex-row gap-md items-center px-md"
                 style={{ paddingTop: insets.top }}
               >
+                {/* Back Button */}
                 <View className="rounded-full items-center justify-center shadow-sm overflow-hidden">
                   <BlurView intensity={90} tint="light">
                     <AppBackButton
@@ -407,17 +365,26 @@ const PostSearchResultScreen = () => {
                 </View>
 
                 {/* Search Input */}
-                <Pressable
-                  onPress={handleOpenRefine}
-                  className="flex-1 p-md rounded-full bg-white flex-row items-center justify-center shadow-sm"
-                >
-                  <Text
-                    className="flex-1 text-sm font-md2 text-textPrimary"
-                    numberOfLines={1}
+                <View className="flex-1">
+                  <Pressable
+                    onPress={handleOpenRefine}
+                    className="px-lg py-sm rounded-full bg-surface flex-col items-center justify-center shadow-md"
                   >
-                    {searchSummary}
-                  </Text>
-                </Pressable>
+                    <Text
+                      className="flex-1 text-sm font-normal text-textPrimary text-center"
+                      numberOfLines={1}
+                    >
+                      {keywordSummary}
+                    </Text>
+
+                    <Text
+                      className="flex-1 text-sm font-normal text-textMuted text-center"
+                      numberOfLines={1}
+                    >
+                      {`${addressSummary} • ${timeSummary}`}
+                    </Text>
+                  </Pressable>
+                </View>
 
                 {/* Filter Button */}
                 <TouchableIconButton
@@ -430,7 +397,7 @@ const PostSearchResultScreen = () => {
                       </BlurView>
                     </View>
                   }
-                  onPress={() => {}}
+                  onPress={handleOpenFilter}
                 />
               </View>
             ),
@@ -505,23 +472,47 @@ const PostSearchResultScreen = () => {
             }}
             pointerEvents="box-none"
           >
-            <View className="w-full max-w-md rounded-2xl bg-white/95 p-lg shadow-sm border border-slate-100">
-              <Text className="text-base font-semibold text-textPrimary">
-                {feedbackState.title}
-              </Text>
+            <Text>{feedbackState.title}</Text>
 
-              <Text className="mt-xs text-sm text-textMuted">
-                {feedbackState.description}
-              </Text>
-
-              {isInitialLoading ? (
-                <View className="mt-md">
-                  <ActivityIndicator color={colors.primary} />
-                </View>
-              ) : null}
-            </View>
+            <AppLoader />
           </View>
         )}
+
+        {/* Fading Post Card */}
+        <AnimatePresence>
+          {chosenPost && (
+            <MotiView
+              from={{ opacity: 0, translateY: 100, scale: 0.9 }}
+              animate={{ opacity: 1, translateY: 0, scale: 1 }}
+              exit={{ opacity: 0, translateY: 100, scale: 0.9 }}
+              transition={{ type: "spring", damping: 18, stiffness: 150 }}
+              className="absolute items-center px-lg"
+              style={{
+                bottom: insets.bottom + 16,
+                left: 0,
+                right: 0,
+                zIndex: 50,
+              }}
+              pointerEvents="box-none"
+            >
+              {/* XIcon */}
+              <View className="absolute top-4 right-12 z-[60]">
+                <Pressable
+                  onPress={() => setChosenPost(null)}
+                  hitSlop={15}
+                  className="bg-white rounded-full w-8 h-8 items-center justify-center shadow-md border border-slate-100 active:bg-slate-50"
+                >
+                  <XIcon size={16} color={colors.slate[600]} weight="bold" />
+                </Pressable>
+              </View>
+
+              {/* Post Card */}
+              <View className="bg-surface rounded-2xl shadow-lg border border-slate-100">
+                <PostCard item={chosenPost} size="md" />
+              </View>
+            </MotiView>
+          )}
+        </AnimatePresence>
 
         <BottomSheetPrimitive
           ref={sheetRef}
@@ -539,37 +530,27 @@ const PostSearchResultScreen = () => {
           }}
           animationConfigs={{ duration: 120 }}
         >
-          <View className="px-md pb-sm pt-sm border-b border-slate-100 flex-row items-center justify-between">
-            <Text className="text-sm font-semibold text-textPrimary">
+          <View className="py-md flex-row items-center justify-between">
+            <Text className="text-base font-normal text-textPrimary text-center flex-1">
               {resultCountLabel}
             </Text>
-
-            <Pressable onPress={handleOpenRefine}>
-              <Text className="text-sm font-medium text-primary">
-                Edit search
-              </Text>
-            </Pressable>
           </View>
 
           <BottomSheetFlatList<Post>
-            data={items}
+            data={filteredItems}
             keyExtractor={(item: Post) => item.id}
             renderItem={renderPostItem}
-            numColumns={2}
-            columnWrapperStyle={{
-              justifyContent: "space-between",
-              marginBottom: 12,
-            }}
             contentContainerStyle={{
-              paddingHorizontal: 16,
-              paddingTop: 12,
-              paddingBottom: insets.bottom + 24,
+              flexGrow: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingBottom: insets.bottom,
             }}
-            onEndReached={handleLoadMore}
-            onEndReachedThreshold={0.35}
+            ItemSeparatorComponent={() => <View className="h-4" />}
             ListFooterComponent={renderListFooter}
             ListEmptyComponent={renderListEmpty}
             showsVerticalScrollIndicator={false}
+            overScrollMode="never"
           />
         </BottomSheetPrimitive>
       </View>

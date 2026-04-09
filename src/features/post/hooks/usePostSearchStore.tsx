@@ -8,6 +8,7 @@ import {
   TextSearch,
   textSearchSchema,
 } from "@/src/features/post/schemas";
+import { type ItemCategory, type PostType } from "@/src/features/post/types";
 import { Optional } from "@/src/shared/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
@@ -29,6 +30,11 @@ type PostSearchStoreState = {
 
   temporal: {
     date: EventTime;
+  };
+
+  advanced: {
+    postType: Optional<PostType>;
+    categories: ItemCategory[];
   };
 };
 
@@ -64,6 +70,10 @@ type PostSearchActions = {
   // Temporal Actions
   updateEventDate: (date: EventTime) => void;
 
+  // Advanced Actions
+  updatePostType: (postType: Optional<PostType>) => void;
+  updateCategories: (categories: ItemCategory[]) => void;
+
   // Global Actions
   resetFilters: () => void;
 };
@@ -95,6 +105,11 @@ export const usePostSearchStore = create<
 
       temporal: {
         date: eventTimeSchema.getDefault(),
+      },
+
+      advanced: {
+        postType: undefined,
+        categories: [],
       },
 
       updateKeyword: (value) => {
@@ -152,6 +167,18 @@ export const usePostSearchStore = create<
         });
       },
 
+      updatePostType: (postType) => {
+        set((state) => {
+          state.advanced.postType = postType;
+        });
+      },
+
+      updateCategories: (categories) => {
+        set((state) => {
+          state.advanced.categories = categories;
+        });
+      },
+
       resetFilters: () =>
         set((state) => {
           state.keyword.value = textSearchSchema.getDefault();
@@ -159,6 +186,8 @@ export const usePostSearchStore = create<
           state.location.coords = locationSearchSchema.getDefault();
           state.location.radius = radiusSearchSchema.getDefault();
           state.temporal.date = eventTimeSchema.getDefault();
+          state.advanced.postType = undefined;
+          state.advanced.categories = [];
         }),
     })),
     {

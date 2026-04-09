@@ -14,7 +14,7 @@ import {
   UsersThreeIcon,
   type IconProps,
 } from "phosphor-react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -142,10 +142,6 @@ const PostSearchScreen = () => {
     const isEventTimeValid = eventTimeSchema.isValidSync(eventTimeSearch.date);
     return isKeywordValid && isLocationValid && isEventTimeValid;
   }, [keywordSearch, locationSearch, eventTimeSearch]);
-
-  useEffect(() => {
-    resetFilters();
-  }, [resetFilters]);
 
   const onChangeTab = useCallback(
     (value: SearchTabValue) => {

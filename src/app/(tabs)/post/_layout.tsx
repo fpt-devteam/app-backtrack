@@ -1,6 +1,9 @@
 import { LocationSelectionProvider } from "@/src/features/map/store/location.store";
+import { AppBackButton } from "@/src/shared/components";
+import { typography } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
 import { Stack } from "expo-router";
+import { TextStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PostsStackLayout() {
@@ -26,6 +29,22 @@ export default function PostsStackLayout() {
             headerTransparent: true,
             contentStyle: { backgroundColor: "transparent" },
             animation: "fade_from_bottom",
+          }}
+        />
+
+        <Stack.Screen
+          name="search/filter"
+          options={{
+            headerShown: true,
+            headerTitle: "Filters",
+            headerTitleStyle: {
+              fontSize: typography.fontSize["2xl"],
+              fontWeight: typography.fontWeight
+                .normal as TextStyle["fontWeight"],
+            },
+            headerRight: () => <AppBackButton type="xIcon" />,
+            presentation: "modal",
+            animation: "slide_from_bottom",
           }}
         />
 

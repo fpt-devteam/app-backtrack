@@ -1,6 +1,7 @@
 import { type Post } from "@/src/features/post/types";
+import { AppImage } from "@/src/shared/components/AppImage";
 import { POST_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
+import { colors, metrics } from "@/src/shared/theme";
 import {
   calculateTimeDifference,
   formatTimeDifference,
@@ -10,18 +11,17 @@ import { MotiPressable } from "moti/interactions";
 import { MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
-import Animated from "react-native-reanimated";
 import { PostStatusBadge } from "./PostStatusBadge";
-import { AppImage } from "@/src/shared/components/AppImage";
 
 type PostCardProps = {
   item: Post;
+  size?: "sm" | "md";
 };
 
-export const PostCard = ({ item }: PostCardProps) => {
+export const PostCard = ({ item, size = "sm" }: PostCardProps) => {
   const { width } = useWindowDimensions();
 
-  const cardWidth = width * 0.43;
+  const cardWidth = width * (size === "sm" ? 0.43 : 0.9);
   const imageUrl = item.imageUrls[0];
 
   const eventTimeLabel = useMemo(() => {
@@ -60,14 +60,18 @@ export const PostCard = ({ item }: PostCardProps) => {
       transition={{ type: "spring", damping: 18, stiffness: 250 }}
       style={{
         width: cardWidth,
+        backgroundColor: colors.surface,
+        borderRadius: metrics.borderRadius.lg,
+        overflow: "hidden",
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 2 },
         gap: 8,
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
       }}
     >
       {/* IMAGE */}
-      <View
-        className="w-full overflow-hidden rounded-2xl"
-        style={{ aspectRatio: 1.18 }}
-      >
+      <View className="w-full overflow-hidden" style={{ aspectRatio: 1.18 }}>
         <AppImage
           resizeMode="cover"
           className="w-full h-full"
@@ -90,7 +94,7 @@ export const PostCard = ({ item }: PostCardProps) => {
       </View>
 
       {/* INFO STRIP */}
-      <View className="bg-surface px-3 pt-1 pb-0.5 gap-0.5">
+      <View className="bg-surface px-3 pt-1 pb-0.5 gap-0.5 ">
         <Text
           numberOfLines={2}
           className="text-sm font-normal text-textPrimary"

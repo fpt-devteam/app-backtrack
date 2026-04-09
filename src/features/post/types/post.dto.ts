@@ -1,8 +1,6 @@
 import type { UserLocation } from "@/src/features/map/types";
 import type {
-  ApiResponse,
-  PagedRequest,
-  PagedResponse,
+  ApiResponse
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
@@ -93,9 +91,9 @@ export type PostMatchingStatusCheckResponse = ApiResponse<{
 /*
  * Post Search Request and Response
 */
-export type PostSearchRequest = PostSearchOptions & PagedRequest
+export type PostSearchRequest = PostSearchOptions;
 
-export type PostSearchResponse = ApiResponse<PagedResponse<Post>>;
+export type PostSearchResponse = ApiResponse<Post[]>;
 
 // Post Suggestion
 export type PostsSuggestionResponse = ApiResponse<PostSuggestion[]>;
