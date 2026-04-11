@@ -1,5 +1,6 @@
 import { checkPostMatchingStatusApi } from "@/src/features/post/api";
 import { POST_MATCHING_QUERY_KEY } from "@/src/features/post/constants";
+import { IS_MATCHING_POST_MOCK } from "@/src/features/post/constants/post.mock";
 import type {
   PostMatchingStatusCheckRequest,
   PostMatchingStatusCheckResponse,
@@ -17,6 +18,7 @@ export const useCheckPostMatchingStatus = (postId: string) => {
 
   const query = useQuery<PostMatchingStatusCheckResponse>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "status", postId],
+    enabled: !IS_MATCHING_POST_MOCK,
     queryFn: async () => {
       const request: PostMatchingStatusCheckRequest = { postId };
       const response = await checkPostMatchingStatusApi(request);
@@ -32,6 +34,8 @@ export const useCheckPostMatchingStatus = (postId: string) => {
   });
 
   return {
-    isMatching: !isPostMatchingCompleted(query?.data?.data?.matchingStatus),
+    isMatching: IS_MATCHING_POST_MOCK
+      ? false
+      : !isPostMatchingCompleted(query?.data?.data?.matchingStatus),
   };
 };

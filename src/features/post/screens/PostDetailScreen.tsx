@@ -1,13 +1,12 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
 import { UserPlaceMarker } from "@/src/features/map/components";
-import { PostInfoRow, PostStatusBadge } from "@/src/features/post/components";
-import { useGetPostById } from "@/src/features/post/hooks";
-import { PostItem, PostType } from "@/src/features/post/types";
 import {
-  AppButton,
-  AppInlineError,
-  AppUserAvatar,
-} from "@/src/shared/components";
+  PostStatusBadge,
+  SimilarPostCard,
+} from "@/src/features/post/components";
+import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import { PostItem, PostType } from "@/src/features/post/types";
+import { AppInlineError, AppUserAvatar } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors, typography } from "@/src/shared/theme";
@@ -18,11 +17,17 @@ import { BlurView } from "expo-blur";
 import { router, Stack } from "expo-router";
 import {
   ArrowLeftIcon,
-  CalendarIcon,
+  ClockIcon,
+  EnvelopeIcon,
   ExportIcon,
+  IconProps,
   MapPinIcon,
+  PhoneIcon,
+  SparkleIcon,
+  TagIcon,
+  UserIcon,
 } from "phosphor-react-native";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { ComponentType, useCallback, useMemo, useState } from "react";
 import {
   ImageBackground,
   StyleSheet,
@@ -73,9 +78,18 @@ export const generateRandomDescription = (data: PostItem): string => {
   return templates[randomIndex]();
 };
 
-const SectionTitle = ({ title }: { title: string }) => {
+const SectionTitle = ({
+  title,
+  icon: Icon,
+}: {
+  title: string;
+  icon: React.ComponentType<any>;
+}) => {
   return (
-    <Text className="text-xs text-textPrimary font-semibold">{title}</Text>
+    <View className="flex-row items-center">
+      <Icon size={24} color={colors.secondary} weight="regular" />
+      <Text className="text-xl text-textPrimary font-normal ml-2">{title}</Text>
+    </View>
   );
 };
 
@@ -158,12 +172,13 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   });
 
   const { isLoading, data: post } = useGetPostById({ postId });
-  // const { similarPosts } = useMatchingPost(postId);
+  const { similarPosts } = useMatchingPost(postId);
 
   const { create: createConversation, isCreating } =
     useCreateDirectConversation();
 
   const [isDismissing, setIsDismissing] = useState(false);
+  const [isItemInfoExpanded, setIsItemInfoExpanded] = useState(false);
 
   const handleStartChat = useCallback(async () => {
     if (!post?.author?.id) return;
@@ -195,6 +210,9 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     displayName,
     displayEventTime,
     itemDetailRows,
+    displayRole,
+    hasEmail,
+    hasPhone,
   } = useMemo(() => {
     if (!post) {
       return {
@@ -203,17 +221,23 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         displayAddress: "Location not specified",
         displayName: "Anonymous",
         displayEventTime: "Event time not specified",
+        displayRole: "Unknown",
         itemDetailRows: [] as { label: string; value: string }[],
+        hasEmail: false,
+        hasPhone: false,
       };
     }
 
-    const { item } = post;
+    const { item, author } = post;
 
     return {
       postImageUrls: post.imageUrls ?? [],
       displayDescription: generateRandomDescription(item),
-      displayAddress: post.displayAddress || "Location not specified",
-      displayName: post.author?.displayName || "Anonymous",
+      displayAddress: toTitleCase(
+        post.displayAddress || "Location not specified",
+      ),
+      displayName: author?.displayName || "Anonymous",
+      displayRole: post.postType === PostType.Found ? "Finder" : "Owner",
       displayEventTime:
         formatIsoDate(post.eventTime) || "Event time not specified",
       itemDetailRows: [
@@ -224,6 +248,8 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         { label: "Material", value: getSafeText(item.material) },
         { label: "Size", value: getSafeText(item.size) },
       ],
+      hasEmail: !!author?.showEmail && !!author?.email,
+      hasPhone: !!author?.showPhone && !!author?.phone,
     };
   }, [post]);
 
@@ -304,7 +330,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
 
         {/* Post Details */}
         <View
-          className="flex-1 bg-surface rounded-t-4xl z-10 px-xl"
+          className="flex-1 bg-surface rounded-t-4xl z-10 px-xl gap-md"
           style={{ marginTop: -insets.top }}
         >
           {/* Title Details */}
@@ -338,79 +364,43 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           </View>
 
           {/* Divider */}
-          <View className="border-t border-muted my-4" />
+          <View className="border-t border-muted" />
 
-          {/* Avatar rows */}
-          <View className="gap-sm">
-            <SectionTitle title="Posted by" />
-
-            <PostInfoRow
-              icon={
-                <AppUserAvatar avatarUrl={post.author?.avatarUrl} size={40} />
-              }
-              title={displayName}
-              subTitle={formatIsoDate(post.createdAt)}
-            />
-          </View>
-
-          {/* Divider */}
-          <View className="border-t border-muted my-4" />
-
-          {/* Post Info rows */}
+          {/* Post Info Table  */}
           <View className="gap-md">
-            <SectionTitle title="Time & Place" />
+            <SectionTitle title="General Info" icon={TagIcon} />
 
-            <PostInfoRow
-              icon={
-                <CalendarIcon
-                  size={36}
-                  color={colors.secondary}
-                  weight="thin"
-                />
-              }
-              title="Event time"
-              subTitle={displayEventTime}
-            />
-
-            <PostInfoRow
-              icon={
-                <MapPinIcon size={36} color={colors.secondary} weight="thin" />
-              }
-              title="Location"
-              subTitle={displayAddress}
-            />
-          </View>
-
-          {/* Divider */}
-          <View className="border-t border-muted my-4" />
-
-          {/* Post Info Table */}
-          <View className="gap-4">
-            <View className="flex-row flex-wrap">
-              {itemDetailRows.map((row) => (
-                <View key={row.label} className="w-1/2 mb-4 pr-4">
-                  <Text className="text-normal font-normal text-textPrimary mb-1">
-                    {row.label}
-                  </Text>
-
-                  <Text className="text-sm font-normal text-textMuted">
-                    {row.value}
-                  </Text>
-
-                  {/* <View className="h-[0.5px] bg-divider mt-3 w-full opacity-50" /> */}
-                </View>
+            <View className="overflow-hidden bg-canvas">
+              {itemDetailRows.map((row, index) => (
+                <React.Fragment key={row.label}>
+                  <View className="flex-row items-center px-md py-sm">
+                    <Text className="flex-1 text-sm font-medium text-textPrimary">
+                      {row.label}
+                    </Text>
+                    <Text className="text-sm text-textSecondary">
+                      {row.value}
+                    </Text>
+                  </View>
+                  {index < itemDetailRows.length - 1 && (
+                    <View className="mx-md h-px bg-divider" />
+                  )}
+                </React.Fragment>
               ))}
             </View>
           </View>
 
           {/* Divider */}
-          <View className="border-t border-muted my-4" />
+          <View className="border-t border-muted" />
 
           {/* Location Info Section */}
-          <View className="gap-sm">
-            <SectionTitle
-              title={`Where ${post.item.itemName} ${post.postType === PostType.Found ? "found" : "lost"}`}
-            />
+          <View className="gap-md">
+            <SectionTitle title="Last known location" icon={MapPinIcon} />
+
+            <View className="flex-row items-start gap-2">
+              <Text className="flex-1 text-sm font-normal text-textMuted">
+                {displayAddress}
+              </Text>
+            </View>
 
             <View
               className="overflow-hidden rounded-2xl"
@@ -425,6 +415,8 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                   longitudeDelta: 0.01,
                 }}
                 provider="google"
+                scrollEnabled={false}
+                zoomEnabled={false}
               >
                 <UserPlaceMarker
                   coordinate={post.location}
@@ -435,10 +427,64 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
             </View>
           </View>
 
+          {/* Divider */}
+          <View className="border-t border-muted" />
+
+          {/* Meet your host section*/}
+          <View className="gap-md">
+            <SectionTitle title="Meet your host" icon={UserIcon} />
+
+            {/* Host Info Card */}
+            <View
+              className="items-center rounded-2xl bg-surface px-md py-md"
+              style={{
+                shadowColor: colors.black,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.12,
+                shadowRadius: 12,
+                elevation: 4,
+              }}
+            >
+              {/* Avatar */}
+              <AppUserAvatar avatarUrl={post.author?.avatarUrl} size={80} />
+
+              {/* Name + Role */}
+              <Text className="text-lg font-bold text-textPrimary mt-md">
+                {displayName}
+              </Text>
+              <Text className="text-sm text-textSecondary mt-xs">
+                {displayRole}
+              </Text>
+            </View>
+
+            {/* Contact Info */}
+            <View className="w-full gap-sm">
+              <HostInfoRow
+                icon={EnvelopeIcon}
+                label={post.author?.email ?? "No email provided"}
+              />
+              <HostInfoRow
+                icon={PhoneIcon}
+                label={post.author?.phone ?? "No phone provided"}
+              />
+            </View>
+
+            <View className="w-full">
+              <TouchableOpacity
+                onPress={handleStartChat}
+                className="flex-row items-center justify-center py-3 rounded-lg bg-canvas"
+              >
+                <Text className="text-sm font-normal text-secondary">
+                  Message Host
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           {/* Similar Posts */}
-          {/* {!!similarPosts?.length && (
+          {!!similarPosts?.length && (
             <View className="pt-sm gap-sm">
-              <SectionTitle title="Suggestions" />
+              <SectionTitle title="Suggestions" icon={SparkleIcon} />
 
               <Text className="text-base font-extrabold text-textPrimary">
                 Some similar posts you might want to check out
@@ -449,22 +495,56 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                 ))}
               </View>
             </View>
-          )} */}
+          )}
         </View>
       </Animated.ScrollView>
 
       {/* Footer */}
       <View
-        className="flex-row items-center justify-between bg-surface px-md border-t border-muted"
+        className="flex-row items-center justify-between bg-surface p-md border-t border-muted"
         style={{ paddingBottom: insets.bottom }}
       >
-        <AppButton
-          title="Start Chat"
-          variant="secondary"
-          onPress={handleStartChat}
-          loading={isCreating}
-        />
+        <View className="flex-col items-center flex-1 pr-md">
+          <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
+            <ClockIcon size={16} color={colors.secondary} weight="regular" />
+            <Text
+              className="flex-1 text-sm font-normal text-textPrimary"
+              numberOfLines={1}
+            >
+              {displayEventTime}
+            </Text>
+          </View>
+
+          <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
+            <MapPinIcon size={16} color={colors.secondary} weight="regular" />
+            <Text
+              className="flex-1 text-sm font-normal text-textPrimary"
+              numberOfLines={1}
+            >
+              {displayAddress}
+            </Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="px-md py-md2 rounded-full bg-primary"
+        >
+          <Text className="text-sm font-normal text-white">Handover</Text>
+        </TouchableOpacity>
       </View>
     </>
   );
 };
+
+type HostInfoRowProps = {
+  icon: ComponentType<IconProps>;
+  label: string;
+};
+
+const HostInfoRow = ({ icon: Icon, label }: HostInfoRowProps) => (
+  <View className="flex-row items-center gap-md">
+    <Icon size={24} color={colors.black} />
+    <Text className="flex-1 text-base font-thin text-textPrimary">{label}</Text>
+  </View>
+);
