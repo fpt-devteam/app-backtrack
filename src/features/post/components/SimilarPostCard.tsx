@@ -1,12 +1,12 @@
 import type { SimilarPost } from "@/src/features/post/types";
 import { AppImage } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
+import { colors, metrics } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils";
 import { router } from "expo-router";
 import { ClockIcon, MapPinIcon } from "phosphor-react-native";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Platform, Pressable, Text, View } from "react-native";
 import PostMatchingScoreBadge from "./PostMatchingScoreBadge";
 
 type SimilarPostCardProps = {
@@ -16,24 +16,15 @@ type SimilarPostCardProps = {
 
 export const SimilarPostCardSkeleton = () => {
   return (
-    <View className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-3 shadow-sm">
-      <View className="w-20 h-20 rounded-xl bg-slate-200 animate-pulse border border-divider shadow-sm" />
-
-      <View className="flex-1 justify-between py-0.5">
-        <View className="flex-row items-start justify-between gap-2">
-          <View className="h-4 flex-1 rounded-md bg-slate-200 animate-pulse mt-0.5" />
-          <View className="h-6 w-20 rounded-full bg-slate-200 animate-pulse shrink-0" />
-        </View>
-
-        <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
-          <View className="w-3.5 h-3.5 bg-slate-200 rounded-full animate-pulse shrink-0" />
-          <View className="h-3 w-3/4 rounded-md bg-slate-200 animate-pulse" />
-        </View>
-
-        <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
-          <View className="w-3.5 h-3.5 bg-slate-200 rounded-full animate-pulse shrink-0" />
-          <View className="h-3 w-3/4 rounded-md bg-slate-200 animate-pulse" />
-        </View>
+    <View
+      className="bg-surface border border-divider overflow-hidden"
+      style={{ borderRadius: metrics.borderRadius.primary }}
+    >
+      <View className="w-full bg-muted animate-pulse" style={{ height: 160 }} />
+      <View style={{ padding: 10, gap: 6 }}>
+        <View className="h-3.5 w-3/4 rounded-md bg-muted animate-pulse" />
+        <View className="h-3 w-1/2 rounded-md bg-muted animate-pulse" />
+        <View className="h-3 w-2/5 rounded-md bg-muted animate-pulse" />
       </View>
     </View>
   );
@@ -54,45 +45,52 @@ export const SimilarPostCard = ({
   return (
     <Pressable
       onPress={handleNavigateToMatch}
-      className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-3 shadow-sm active:opacity-70"
+      className="bg-surface border border-divider overflow-hidden active:opacity-70"
+      style={[
+        { borderRadius: metrics.borderRadius.primary },
+        Platform.OS === "ios"
+          ? metrics.shadows.level1.ios
+          : metrics.shadows.level1.android,
+      ]}
     >
-      <AppImage
-        source={{ uri: imgUrl }}
-        className="w-20 h-20 rounded-xl border border-divider shadow-sm active:opacity-70"
-        resizeMode="cover"
-      />
-
-      <View className="flex-1 justify-between py-0.5">
-        <View className="flex-row items-start justify-between gap-2">
-          <Text
-            className="flex-1 text-sm font-bold"
-            style={{ color: colors.slate[900] }}
-            numberOfLines={1}
-          >
-            {matchPost.itemName}
-          </Text>
-
-          <View className="shrink-0">
-            <PostMatchingScoreBadge score={matchPost.matchScore} />
-          </View>
+      {/* Image with badge overlay */}
+      <View style={{ position: "relative" }}>
+        <AppImage
+          source={{ uri: imgUrl }}
+          style={{ width: "100%", height: 160 }}
+          resizeMode="cover"
+        />
+        <View style={{ position: "absolute", top: 6, right: 6 }}>
+          <PostMatchingScoreBadge score={matchPost.matchScore} />
         </View>
+      </View>
 
-        <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
+      {/* Text content */}
+      <View style={{ padding: 10, gap: 6 }}>
+        <Text
+          className="text-base font-bold"
+          style={{ color: colors.hof[900] }}
+          numberOfLines={1}
+        >
+          {matchPost.itemName}
+        </Text>
+
+        <View className="flex-row items-center" style={{ gap: 4 }}>
           <MapPinIcon size={14} color={colors.primary} weight="regular" />
           <Text
-            className="flex-1 text-xs font-medium"
-            style={{ color: colors.slate[500] }}
+            className="flex-1 text-sm"
+            style={{ color: colors.hof[500] }}
             numberOfLines={1}
           >
             {matchPost.displayAddress}
           </Text>
         </View>
 
-        <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
+        <View className="flex-row items-center" style={{ gap: 4 }}>
           <ClockIcon size={14} color={colors.primary} weight="regular" />
           <Text
-            className="flex-1 text-xs font-medium"
-            style={{ color: colors.slate[500] }}
+            className="flex-1 text-sm"
+            style={{ color: colors.hof[400] }}
             numberOfLines={1}
           >
             {formatIsoDate(matchPost.eventTime)}

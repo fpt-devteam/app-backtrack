@@ -5,31 +5,43 @@ import {
   SimilarPostCard,
 } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import { CATEGORY_REGISTRY } from "@/src/features/post/constants";
 import { PostItem, PostType } from "@/src/features/post/types";
 import { AppInlineError, AppUserAvatar } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE } from "@/src/shared/constants";
-import { colors, typography } from "@/src/shared/theme";
+import { colors, metrics, typography } from "@/src/shared/theme";
 import { Nullable } from "@/src/shared/types";
 import { formatIsoDate, getSafeText, toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { BlurView } from "expo-blur";
 import { router, Stack } from "expo-router";
+import { MotiView } from "moti";
 import {
   ArrowLeftIcon,
+  ChatTeardropDotsIcon,
   ClockIcon,
+  CubeIcon,
+  DotsThreeCircleIcon,
   EnvelopeIcon,
   ExportIcon,
   IconProps,
   MapPinIcon,
+  PackageIcon,
+  PaletteIcon,
   PhoneIcon,
-  SparkleIcon,
+  RulerIcon,
+  SealCheckIcon,
+  ShoppingBagIcon,
   TagIcon,
-  UserIcon,
 } from "phosphor-react-native";
 import React, { ComponentType, useCallback, useMemo, useState } from "react";
 import {
-  ImageBackground,
+  FlatList,
+  Image,
+  Linking,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -78,26 +90,11 @@ export const generateRandomDescription = (data: PostItem): string => {
   return templates[randomIndex]();
 };
 
-const SectionTitle = ({
-  title,
-  icon: Icon,
-}: {
-  title: string;
-  icon: React.ComponentType<any>;
-}) => {
-  return (
-    <View className="flex-row items-center">
-      <Icon size={24} color={colors.secondary} weight="regular" />
-      <Text className="text-xl text-textPrimary font-normal ml-2">{title}</Text>
-    </View>
-  );
-};
-
 const AirbnbHeaderIcon = ({
   icon: Icon,
   onPress,
 }: {
-  icon: React.ComponentType<any>;
+  icon: ComponentType<IconProps>;
   onPress: () => void;
 }) => {
   return (
@@ -129,7 +126,7 @@ type PostDetailScreenProps = {
 
 export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
   const headerHeight = useHeaderHeight();
 
   const IMAGE_HEIGHT = height * 0.5;
@@ -178,7 +175,8 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     useCreateDirectConversation();
 
   const [isDismissing, setIsDismissing] = useState(false);
-  const [isItemInfoExpanded, setIsItemInfoExpanded] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [descriptionIsTruncatable, setDescriptionIsTruncatable] = useState(false);
 
   const handleStartChat = useCallback(async () => {
     if (!post?.author?.id) return;
@@ -206,11 +204,11 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   const {
     postImageUrls,
     displayDescription,
+    displaySubtitle,
     displayAddress,
     displayName,
     displayEventTime,
     itemDetailRows,
-    displayRole,
     hasEmail,
     hasPhone,
   } = useMemo(() => {
@@ -218,10 +216,10 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
       return {
         postImageUrls: [] as string[],
         displayDescription: "",
+        displaySubtitle: "",
         displayAddress: "Location not specified",
         displayName: "Anonymous",
         displayEventTime: "Event time not specified",
-        displayRole: "Unknown",
         itemDetailRows: [] as { label: string; value: string }[],
         hasEmail: false,
         hasPhone: false,
@@ -233,11 +231,18 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     return {
       postImageUrls: post.imageUrls ?? [],
       displayDescription: generateRandomDescription(item),
+      displaySubtitle: [
+        toTitleCase(item.category),
+        getSafeText(item.condition) !== "—"
+          ? getSafeText(item.condition)
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
       displayAddress: toTitleCase(
         post.displayAddress || "Location not specified",
       ),
       displayName: author?.displayName || "Anonymous",
-      displayRole: post.postType === PostType.Found ? "Finder" : "Owner",
       displayEventTime:
         formatIsoDate(post.eventTime) || "Event time not specified",
       itemDetailRows: [
@@ -252,6 +257,18 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
       hasPhone: !!author?.showPhone && !!author?.phone,
     };
   }, [post]);
+
+  const handleOpenMaps = useCallback(() => {
+    if (!post?.location) return;
+    const { latitude, longitude } = post.location;
+    const label = encodeURIComponent(displayAddress);
+    const url = `maps://?q=${label}&ll=${latitude},${longitude}`;
+    Linking.openURL(url).catch(() => {
+      Linking.openURL(
+        `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`,
+      );
+    });
+  }, [post?.location, displayAddress]);
 
   if (!postId) return <AppInlineError message="Failed to load post details." />;
 
@@ -314,188 +331,379 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View
-          style={[
-            {
-              height: IMAGE_HEIGHT,
-            },
-            imgBgAnimationStyle,
-          ]}
-        >
-          <ImageBackground
-            source={{ uri: postImageUrls[0] }}
-            className="w-full h-full"
-          />
+        <Animated.View style={[{ height: IMAGE_HEIGHT }, imgBgAnimationStyle]}>
+          <PhotoCarousel imageUrls={postImageUrls} height={IMAGE_HEIGHT} />
         </Animated.View>
 
         {/* Post Details */}
         <View
-          className="flex-1 bg-surface rounded-t-4xl z-10 px-xl gap-md"
+          className="flex-1 bg-surface rounded-t-4xl z-10 px-lg gap-xl"
           style={{ marginTop: -insets.top }}
         >
-          {/* Title Details */}
-          <View className="pt-xl gap-sm">
-            <View>
+          {/* Title Block */}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 280, delay: 80 }}
+          >
+            <View className="pt-xl gap-xs">
               <Text
-                className="text-textPrimary text-center font-normal text-2xl"
-                style={{
-                  lineHeight: typography.lineHeight["2xl"],
-                  letterSpacing: typography.letterSpacing.heading,
-                }}
+                className="text-textPrimary font-bold text-2xl"
+                style={{ letterSpacing: -0.3 }}
               >
                 {post.item.itemName}
               </Text>
 
+              {displaySubtitle ? (
+                <Text className="text-base text-textSecondary">
+                  {displaySubtitle}
+                </Text>
+              ) : null}
+
+              {/* Vibe Tags */}
+              <View className="mt-xs">
+                <VibeTagsRow
+                  postType={post.postType}
+                  category={post.item.category}
+                  status={post.postType}
+                />
+              </View>
+            </View>
+          </MotiView>
+
+          {/* Divider */}
+          <View className="border-t border-muted" />
+
+          {/* About this item */}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 240, delay: 140 }}
+          >
+            <View className="gap-sm">
+              <Text className="text-xl font-semibold text-textPrimary">
+                About this item
+              </Text>
+
+              {/* Hidden measurer — same styles, no line cap — detects true line count */}
+              <View
+                pointerEvents="none"
+                style={{ position: "absolute", width: "100%", opacity: 0 }}
+              >
+                <Text
+                  className="text-base text-textPrimary leading-6"
+                  onTextLayout={(e) =>
+                    setDescriptionIsTruncatable(
+                      e.nativeEvent.lines.length > 3,
+                    )
+                  }
+                >
+                  {displayDescription}
+                </Text>
+              </View>
+
               <Text
-                className="text-textSecondary text-center font-thin text-md leading-6"
-                style={{
-                  lineHeight: typography.lineHeight["body"],
-                  letterSpacing: typography.letterSpacing.heading,
-                }}
+                className="text-base text-textPrimary leading-6"
+                numberOfLines={isDescriptionExpanded ? undefined : 3}
               >
                 {displayDescription}
               </Text>
-            </View>
 
-            {/* Badge Container  */}
-            <View className="flex-row items-center justify-center mt-sm">
-              <PostStatusBadge status={post.postType} size={"md"} />
+              {descriptionIsTruncatable && (
+                <TouchableOpacity
+                  onPress={() => setIsDescriptionExpanded((v) => !v)}
+                  className="self-start rounded-sm px-sm py-xs bg-canvas"
+                >
+                  <Text className="text-base text-textPrimary font-medium">
+                    {isDescriptionExpanded ? "Show less" : "Show more"}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
-          </View>
+          </MotiView>
 
           {/* Divider */}
           <View className="border-t border-muted" />
 
-          {/* Post Info Table  */}
-          <View className="gap-md">
-            <SectionTitle title="General Info" icon={TagIcon} />
-
-            <View className="overflow-hidden bg-canvas">
-              {itemDetailRows.map((row, index) => (
-                <React.Fragment key={row.label}>
-                  <View className="flex-row items-center px-md py-sm">
-                    <Text className="flex-1 text-sm font-medium text-textPrimary">
-                      {row.label}
-                    </Text>
-                    <Text className="text-sm text-textSecondary">
-                      {row.value}
-                    </Text>
-                  </View>
-                  {index < itemDetailRows.length - 1 && (
-                    <View className="mx-md h-px bg-divider" />
-                  )}
-                </React.Fragment>
-              ))}
-            </View>
-          </View>
-
-          {/* Divider */}
-          <View className="border-t border-muted" />
-
-          {/* Location Info Section */}
-          <View className="gap-md">
-            <SectionTitle title="Last known location" icon={MapPinIcon} />
-
-            <View className="flex-row items-start gap-2">
-              <Text className="flex-1 text-sm font-normal text-textMuted">
-                {displayAddress}
+          {/* Item Details */}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 240, delay: 200 }}
+          >
+            <View className="gap-sm">
+              <Text className="text-xl font-semibold text-textPrimary">
+                Item Details
               </Text>
-            </View>
 
-            <View
-              className="overflow-hidden rounded-2xl"
-              style={{ height: height * 0.5 }}
-            >
-              <MapView
-                style={{ flex: 1 }}
-                initialRegion={{
-                  latitude: post.location?.latitude,
-                  longitude: post.location?.longitude,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-                provider="google"
-                scrollEnabled={false}
-                zoomEnabled={false}
-              >
-                <UserPlaceMarker
-                  coordinate={post.location}
-                  disabled={false}
-                  onPress={() => {}}
-                />
-              </MapView>
-            </View>
-          </View>
-
-          {/* Divider */}
-          <View className="border-t border-muted" />
-
-          {/* Meet your host section*/}
-          <View className="gap-md">
-            <SectionTitle title="Meet your host" icon={UserIcon} />
-
-            {/* Host Info Card */}
-            <View
-              className="items-center rounded-2xl bg-surface px-md py-md"
-              style={{
-                shadowColor: colors.black,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.12,
-                shadowRadius: 12,
-                elevation: 4,
-              }}
-            >
-              {/* Avatar */}
-              <AppUserAvatar avatarUrl={post.author?.avatarUrl} size={80} />
-
-              {/* Name + Role */}
-              <Text className="text-lg font-bold text-textPrimary mt-md">
-                {displayName}
-              </Text>
-              <Text className="text-sm text-textSecondary mt-xs">
-                {displayRole}
-              </Text>
-            </View>
-
-            {/* Contact Info */}
-            <View className="w-full gap-sm">
-              <HostInfoRow
-                icon={EnvelopeIcon}
-                label={post.author?.email ?? "No email provided"}
+              <FeatureBulletRow
+                icon={TagIcon}
+                label="Category"
+                value={itemDetailRows[0]?.value ?? "—"}
               />
-              <HostInfoRow
-                icon={PhoneIcon}
-                label={post.author?.phone ?? "No phone provided"}
+              <View className="h-px bg-divider" />
+              <FeatureBulletRow
+                icon={ShoppingBagIcon}
+                label="Brand"
+                value={itemDetailRows[1]?.value ?? "—"}
+              />
+              <View className="h-px bg-divider" />
+              <FeatureBulletRow
+                icon={PaletteIcon}
+                label="Color"
+                value={itemDetailRows[2]?.value ?? "—"}
+              />
+              <View className="h-px bg-divider" />
+              <FeatureBulletRow
+                icon={SealCheckIcon}
+                label="Condition"
+                value={itemDetailRows[3]?.value ?? "—"}
+              />
+              <View className="h-px bg-divider" />
+              <FeatureBulletRow
+                icon={CubeIcon}
+                label="Material"
+                value={itemDetailRows[4]?.value ?? "—"}
+              />
+              <View className="h-px bg-divider" />
+              <FeatureBulletRow
+                icon={RulerIcon}
+                label="Size"
+                value={itemDetailRows[5]?.value ?? "—"}
               />
             </View>
+          </MotiView>
 
-            <View className="w-full">
+          {/* Divider */}
+          <View className="border-t border-muted" />
+
+          {/* Where it's happening */}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 240, delay: 260 }}
+          >
+            <View className="gap-sm">
+              <Text className="text-xl font-semibold text-textPrimary">
+                Where it&apos;s happening
+              </Text>
+
               <TouchableOpacity
-                onPress={handleStartChat}
-                className="flex-row items-center justify-center py-3 rounded-lg bg-canvas"
+                onPress={handleOpenMaps}
+                activeOpacity={0.85}
+                className="overflow-hidden rounded-xl"
+                style={{ height: 180 }}
               >
-                <Text className="text-sm font-normal text-secondary">
-                  Message Host
-                </Text>
+                <MapView
+                  style={{ flex: 1 }}
+                  initialRegion={{
+                    latitude: post.location?.latitude,
+                    longitude: post.location?.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  provider="google"
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                  pitchEnabled={false}
+                  rotateEnabled={false}
+                >
+                  <UserPlaceMarker
+                    coordinate={post.location}
+                    disabled={false}
+                    onPress={() => {}}
+                  />
+                </MapView>
               </TouchableOpacity>
-            </View>
-          </View>
 
-          {/* Similar Posts */}
-          {!!similarPosts?.length && (
-            <View className="pt-sm gap-sm">
-              <SectionTitle title="Suggestions" icon={SparkleIcon} />
-
-              <Text className="text-base font-extrabold text-textPrimary">
-                Some similar posts you might want to check out
-              </Text>
-              <View className="gap-3">
-                {similarPosts.map((p) => (
-                  <SimilarPostCard key={p.id} postId={post.id} matchPost={p} />
-                ))}
+              <View className="flex-row items-center gap-xs">
+                <MapPinIcon
+                  size={14}
+                  color={colors.hof[400]}
+                  weight="regular"
+                />
+                <Text
+                  className="flex-1 text-base text-textSecondary"
+                  numberOfLines={2}
+                >
+                  {displayAddress}
+                </Text>
               </View>
             </View>
-          )}
+          </MotiView>
+
+          {/* Divider */}
+          <View className="border-t border-muted" />
+
+          {/* Your host */}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 240, delay: 320 }}
+          >
+            <View className="gap-md">
+              <Text className="text-xl font-semibold text-textPrimary">
+                Your host
+              </Text>
+
+              {/* Elevated host card */}
+              <View
+                className="bg-surface border border-divider"
+                style={[
+                  { borderRadius: metrics.borderRadius.primary },
+                  Platform.select({
+                    ios: {
+                      shadowOffset: { width: 0, height: 4 },
+                      shadowOpacity: 0.12,
+                      shadowRadius: 6,
+                    },
+                    android: { elevation: 16 },
+                  }),
+                ]}
+              >
+                {/* Avatar + name + message icon */}
+                <View
+                  className="flex-row items-center gap-md"
+                  style={{ padding: metrics.spacing.md }}
+                >
+                  <AppUserAvatar
+                    avatarUrl={post.author?.avatarUrl ?? ""}
+                    size={56}
+                  />
+                  <View className="flex-1">
+                    <Text className="text-base font-bold text-textPrimary">
+                      {displayName}
+                    </Text>
+                    <View
+                      className="flex-row items-center gap-xs"
+                      style={{ marginTop: 3 }}
+                    >
+                      <View
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: 9999,
+                          backgroundColor: colors.babu[300],
+                        }}
+                      />
+                      <Text className="text-sm text-textMuted">
+                        Active member
+                      </Text>
+                    </View>
+                  </View>
+                  {/* Chat icon button */}
+                  <TouchableOpacity
+                    onPress={handleStartChat}
+                    disabled={isCreating}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: isCreating
+                        ? colors.hof[200]
+                        : colors.primary,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ChatTeardropDotsIcon
+                      size={20}
+                      color={colors.primaryForeground}
+                      weight="fill"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {/* Contact rows (conditional) */}
+                {(hasEmail || hasPhone) && (
+                  <>
+                    <View style={{ height: 1 }} className="bg-divider" />
+                    <View
+                      style={{
+                        paddingHorizontal: metrics.spacing.md,
+                        paddingVertical: metrics.spacing.sm,
+                        gap: metrics.spacing.sm,
+                      }}
+                    >
+                      {hasEmail && (
+                        <View className="flex-row items-center gap-sm">
+                          <EnvelopeIcon
+                            size={16}
+                            color={colors.hof[600]}
+                            weight="regular"
+                          />
+                          <Text className="flex-1 text-base text-textPrimary">
+                            {post.author?.email}
+                          </Text>
+                        </View>
+                      )}
+                      {hasPhone && (
+                        <View className="flex-row items-center gap-sm">
+                          <PhoneIcon
+                            size={16}
+                            color={colors.hof[600]}
+                            weight="regular"
+                          />
+                          <Text className="flex-1 text-base text-textPrimary">
+                            {post.author?.phone}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </>
+                )}
+              </View>
+            </View>
+          </MotiView>
+
+          {/* More in this area */}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 240, delay: 380 }}
+          >
+            {!!similarPosts?.length && (
+              <View className="gap-sm">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-xl font-semibold text-textPrimary">
+                    More in this area
+                  </Text>
+                  {similarPosts.length > 3 && (
+                    <TouchableOpacity
+                      onPress={() => console.log("See all similar posts")}
+                      hitSlop={8}
+                    >
+                      <Text className="text-sm text-primary">See all →</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={{ marginHorizontal: -metrics.spacing.lg }}
+                  contentContainerStyle={{
+                    gap: 12,
+                    paddingLeft: metrics.spacing.lg,
+                    paddingRight: metrics.spacing.lg,
+                  }}
+                >
+                  {similarPosts.map((p) => (
+                    <View
+                      key={p.id}
+                      style={{
+                        width: Math.round(
+                          (width - metrics.spacing.lg - 12) / 1.5,
+                        ),
+                      }}
+                    >
+                      <SimilarPostCard postId={post.id} matchPost={p} />
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </MotiView>
         </View>
       </Animated.ScrollView>
 
@@ -505,7 +713,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         style={{ paddingBottom: insets.bottom }}
       >
         <View className="flex-col items-center flex-1 pr-md">
-          <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
+          <View className="flex-row items-center gap-xs">
             <ClockIcon size={16} color={colors.secondary} weight="regular" />
             <Text
               className="flex-1 text-sm font-normal text-textPrimary"
@@ -515,7 +723,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
             </Text>
           </View>
 
-          <View className="mt-1.5 flex-row items-center gap-1.5 pr-2">
+          <View className="mt-xs flex-row items-center gap-xs">
             <MapPinIcon size={16} color={colors.secondary} weight="regular" />
             <Text
               className="flex-1 text-sm font-normal text-textPrimary"
@@ -528,23 +736,148 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
 
         <TouchableOpacity
           onPress={() => router.back()}
-          className="px-md py-md2 rounded-full bg-primary"
+          className="px-xl py-3 rounded-full bg-primary"
         >
-          <Text className="text-sm font-normal text-white">Handover</Text>
+          <Text className="text-base font-semibold text-white">Handover →</Text>
         </TouchableOpacity>
       </View>
     </>
   );
 };
 
-type HostInfoRowProps = {
+type FeatureBulletRowProps = {
   icon: ComponentType<IconProps>;
   label: string;
+  value: string;
 };
 
-const HostInfoRow = ({ icon: Icon, label }: HostInfoRowProps) => (
-  <View className="flex-row items-center gap-md">
-    <Icon size={24} color={colors.black} />
-    <Text className="flex-1 text-base font-thin text-textPrimary">{label}</Text>
+const FeatureBulletRow = ({
+  icon: Icon,
+  label,
+  value,
+}: FeatureBulletRowProps) => (
+  <View className="flex-row items-center gap-sm py-sm">
+    <Icon size={20} color={colors.hof[600]} weight="regular" />
+    <Text className="flex-1 text-base font-medium text-textPrimary">
+      {label}
+    </Text>
+    <Text className="text-sm text-textSecondary">{value}</Text>
   </View>
 );
+
+type VibeTagsRowProps = {
+  postType: PostType;
+  category: string;
+  status: PostType;
+};
+
+const VibeTagsRow = ({ postType, category }: VibeTagsRowProps) => {
+  const isLost = postType === PostType.Lost;
+
+  const typeBg = isLost ? colors.accent : colors.babu[100];
+  const typeText = isLost ? colors.accentForeground : colors.babu[500];
+  const typeLabel = isLost ? "Lost" : "Found";
+
+  const categoryInfo = CATEGORY_REGISTRY[category as keyof typeof CATEGORY_REGISTRY];
+  const CategoryIcon = categoryInfo?.icon ?? DotsThreeCircleIcon;
+  const categoryLabel = categoryInfo?.label ?? toTitleCase(category);
+
+  return (
+    <View className="flex-row flex-wrap gap-xs">
+      {/* Post type pill */}
+      <View
+        className="rounded-full px-sm py-xs"
+        style={{ backgroundColor: typeBg }}
+      >
+        <Text className="text-sm font-medium" style={{ color: typeText }}>
+          {typeLabel}
+        </Text>
+      </View>
+
+      {/* Category pill — icon + label */}
+      <View
+        className="flex-row rounded-full px-sm py-xs items-center gap-xs"
+        style={{
+          borderWidth: 1,
+          borderColor: colors.border.DEFAULT,
+          backgroundColor: colors.canvas,
+        }}
+      >
+        <CategoryIcon size={14} color={colors.hof[600]} weight="regular" />
+        <Text className="text-sm font-medium text-textPrimary">
+          {categoryLabel}
+        </Text>
+      </View>
+
+      {/* Status badge (existing) */}
+      <PostStatusBadge status={postType} size="sm" />
+    </View>
+  );
+};
+
+type PhotoCarouselProps = {
+  imageUrls: string[];
+  height: number;
+};
+
+const PhotoCarousel = ({ imageUrls, height }: PhotoCarouselProps) => {
+  const { width } = useWindowDimensions();
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+
+  if (imageUrls.length === 0) {
+    return (
+      <View
+        style={{ height, width }}
+        className="bg-canvas items-center justify-center"
+      >
+        <PackageIcon size={64} color={colors.hof[300]} weight="thin" />
+      </View>
+    );
+  }
+
+  return (
+    <View style={{ height, width }}>
+      <FlatList
+        data={imageUrls}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(_, i) => String(i)}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(e.nativeEvent.contentOffset.x / width);
+          setCurrentIndex(index);
+        }}
+        renderItem={({ item }) => (
+          <Image
+            source={{ uri: item }}
+            style={{ width, height }}
+            resizeMode="cover"
+          />
+        )}
+      />
+      {imageUrls.length > 1 && (
+        <View
+          style={{
+            position: "absolute",
+            bottom: 12,
+            right: 12,
+            backgroundColor: "rgba(0,0,0,0.45)",
+            borderRadius: 99,
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.white,
+              fontSize: 13,
+              fontWeight: "500",
+            }}
+          >
+            {currentIndex + 1} / {imageUrls.length}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+};

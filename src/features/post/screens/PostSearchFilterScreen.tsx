@@ -1,3 +1,4 @@
+import { CATEGORY_REGISTRY } from "@/src/features/post/constants";
 import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
 import { radiusSearchSchema } from "@/src/features/post/schemas";
 import { type ItemCategory, PostType } from "@/src/features/post/types";
@@ -12,18 +13,9 @@ import { router } from "expo-router";
 import { MotiView } from "moti";
 import {
   CubeFocusIcon,
-  DeviceMobileIcon,
   DotsThreeCircleIcon,
   FadersIcon,
-  FileTextIcon,
-  HandbagIcon,
-  Icon,
-  KeyIcon,
   MapPinSimpleAreaIcon,
-  SuitcaseRollingIcon,
-  TShirtIcon,
-  WalletIcon,
-  WatchIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
@@ -42,22 +34,6 @@ const POST_TYPE_OPTIONS = [
   { label: "Missing", value: PostType.Lost },
   { label: "Discovered", value: PostType.Found },
 ];
-
-type CategoryInfo = { label: string; icon: Icon };
-
-type CategoryRegistry = Record<ItemCategory, CategoryInfo>;
-
-const CATEGORY_REGISTRY: CategoryRegistry = {
-  electronics: { label: "Electronics", icon: DeviceMobileIcon },
-  clothing: { label: "Clothing", icon: TShirtIcon },
-  accessories: { label: "Accessories", icon: WatchIcon },
-  documents: { label: "Documents", icon: FileTextIcon },
-  wallet: { label: "Wallet", icon: WalletIcon },
-  suitcase: { label: "Suitcase", icon: SuitcaseRollingIcon },
-  bags: { label: "Bags", icon: HandbagIcon },
-  keys: { label: "Keys", icon: KeyIcon },
-  other: { label: "Other", icon: DotsThreeCircleIcon },
-};
 
 type CategoryOptionProps = {
   category: ItemCategory;

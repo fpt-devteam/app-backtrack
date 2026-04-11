@@ -19,10 +19,13 @@ export const PostStatusBadge = ({
   status,
   size = "sm",
 }: PostStatusBadgeProps) => {
+  const bgColor =
+    status === PostType.Lost ? colors.primary : colors.babu[300];
+
   return (
     <View
-      className={`flex-row items-center rounded-full p-1 shadow-xs border border-muted
-                ${status === PostType.Lost ? "bg-primary" : "bg-green-400"}`}
+      className="flex-row items-center rounded-full p-1 shadow-xs border border-muted"
+      style={{ backgroundColor: bgColor }}
     >
       {status === PostType.Lost ? (
         <BinocularsIcon
