@@ -19,13 +19,7 @@ export default function PostsStackLayout() {
       >
         <Stack.Screen name="index" />
 
-        <Stack.Screen
-          name="[postId]/index"
-          options={{
-            headerShown: true,
-
-          }}
-        />
+        <Stack.Screen name="[postId]/index" options={{ headerShown: true }} />
 
         <Stack.Screen
           name="search/index"
@@ -74,6 +68,8 @@ export default function PostsStackLayout() {
               paddingTop: insets.top,
               backgroundColor: colors.white,
             },
+            presentation: "modal",
+            animation: "slide_from_bottom",
           }}
         />
 
