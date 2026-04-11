@@ -12,7 +12,7 @@ export const BottomTabBar = () => {
       tabBar={(props) => <TabBarContent {...props} />}
     >
       <Tabs.Screen name="post" />
-      <Tabs.Screen name="qr" />
+      <Tabs.Screen name="handover" />
       <Tabs.Screen name="chat" />
       <Tabs.Screen name="profile" />
     </Tabs>

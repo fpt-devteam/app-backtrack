@@ -7,9 +7,9 @@ import { StackActions } from "@react-navigation/native";
 import type { IconProps } from "phosphor-react-native";
 import {
   BellIcon,
+  HandshakeIcon,
   MagnifyingGlassIcon,
   PlusIcon,
-  QrCodeIcon,
 } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
@@ -23,14 +23,14 @@ type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
 const TAB_ICONS: Record<string, TabIcon> = {
   post: { Icon: MagnifyingGlassIcon, label: "Explore" },
-  qr: { Icon: QrCodeIcon, label: "QRs" },
+  handover: { Icon: HandshakeIcon, label: "Handover" },
   chat: { Icon: BellIcon, label: "Inbox" },
   profile: { Icon: AppUserAvatarIcon, label: "You" },
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   const [isCreateOptionsVisible, setIsCreateOptionsVisible] = useState(false);
-  const leadingRoutes = state.routes.slice(0, 2); // -> post, qr
+  const leadingRoutes = state.routes.slice(0, 2); // -> post, handover
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
 
   // Auto-hide tab bar on nested screens (any screen deeper than the tab's index)
