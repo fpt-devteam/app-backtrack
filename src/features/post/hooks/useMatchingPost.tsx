@@ -1,5 +1,9 @@
 import { matchingPostsApi } from "@/src/features/post/api";
 import { POST_MATCHING_QUERY_KEY } from "@/src/features/post/constants";
+import {
+  IS_MATCHING_POST_MOCK,
+  MATCHING_POST_MOCK,
+} from "@/src/features/post/constants/post.mock";
 import type {
   MatchingPostsRequest,
   MatchingPostsResponse,
@@ -13,7 +17,7 @@ export const useMatchingPost = (postId: string) => {
 
   const query = useQuery<MatchingPostsResponse>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
-    enabled: !isMatching && !!postId,
+    enabled: !IS_MATCHING_POST_MOCK && !isMatching && !!postId,
     queryFn: async () => {
       const request: MatchingPostsRequest = { postId };
       const response = await matchingPostsApi(request);
@@ -24,6 +28,7 @@ export const useMatchingPost = (postId: string) => {
   });
 
   const error = useMemo(() => {
+    if (IS_MATCHING_POST_MOCK) return null;
     if (!query.error) return null;
     if (query.error instanceof Error) return query.error;
     return new Error("Matching failed");
@@ -31,8 +36,12 @@ export const useMatchingPost = (postId: string) => {
 
   return {
     error,
-    similarPosts: query?.data?.data?.similarPosts || [],
-    isMatching,
-    isLoading: isMatching || query.isLoading,
+    similarPosts: IS_MATCHING_POST_MOCK
+      ? MATCHING_POST_MOCK
+      : query?.data?.data?.similarPosts || [],
+    isMatching: IS_MATCHING_POST_MOCK ? false : isMatching,
+    isLoading: IS_MATCHING_POST_MOCK
+      ? false
+      : isMatching || query.isLoading,
   };
 };

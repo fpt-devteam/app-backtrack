@@ -14,7 +14,6 @@ export default function PostsStackLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          presentation: "transparentModal",
           contentStyle: { backgroundColor: "transparent" },
         }}
       >
@@ -24,7 +23,7 @@ export default function PostsStackLayout() {
           name="[postId]/index"
           options={{
             headerShown: true,
-            
+
           }}
         />
 
@@ -75,6 +74,13 @@ export default function PostsStackLayout() {
               paddingTop: insets.top,
               backgroundColor: colors.white,
             },
+          }}
+        />
+
+        <Stack.Screen
+          name="[postId]/compare/[otherPostId]"
+          options={{
+            headerShown: false,
           }}
         />
       </Stack>

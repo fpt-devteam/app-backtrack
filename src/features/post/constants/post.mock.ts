@@ -1,7 +1,8 @@
-import type { Post } from "@/src/features/post/types";
+import type { Post, SimilarPost } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 
 export const IS_POST_MOCK = true;
+export const IS_MATCHING_POST_MOCK = true;
 
 const MOCK_AUTHOR = {
   id: "UiJ8fa0Ho5Mr167FqqW2rmbpJMu1",
@@ -176,5 +177,378 @@ export const POST_MOCK: Post[] = [
     distinctiveMarks: null,
     eventTime: new Date("2026-03-08T11:20:00.000Z"),
     createdAt: new Date("2026-03-08T12:00:00.000Z"),
+  },
+];
+
+/**
+ * Mock data for the matching posts (similar posts) feature.
+ * Each entry represents a potential match with varying match levels and scores.
+ */
+export const MATCHING_POST_MOCK: SimilarPost[] = [
+  {
+    id: "sim-001-very-high",
+    postType: PostType.Found,
+    itemName: "Black Samsung Fast Charger",
+    description:
+      "Found a black Samsung USB-C fast charger in the cafeteria. It has 'Super Fast Charging' text on the body and appears to be brand new.",
+    images: [
+      {
+        id: "img-sim-001-1",
+        url: "https://picsum.photos/seed/samsung-charger-found/400/400",
+        displayOrder: 0,
+        createdAt: "2026-03-24T08:00:00.000Z",
+      },
+      {
+        id: "img-sim-001-2",
+        url: "https://picsum.photos/seed/samsung-charger-found-2/400/400",
+        displayOrder: 1,
+        createdAt: "2026-03-24T08:00:00.000Z",
+      },
+    ],
+    eventTime: new Date("2026-03-23T14:30:00.000Z"),
+    matchScore: 0.94,
+    distanceMeters: 120,
+    matchingLevel: "VeryHigh",
+    isAssessed: true,
+    assessmentSummary:
+      "Very likely the same item. Both are black Samsung Super Fast Charging wall adapters found within 120m and 4 hours of the reported loss.",
+    criteria: {
+      visualAnalysis: {
+        score: 0.96,
+        points: [
+          {
+            label: "Brand match",
+            detail: "Both items are Samsung-branded USB-C chargers",
+          },
+          {
+            label: "Color match",
+            detail: "Both are black with identical form factor",
+          },
+          {
+            label: "Text marking",
+            detail:
+              "'Super Fast Charging' embossed text visible on both items",
+          },
+        ],
+      },
+      description: {
+        score: 0.91,
+        points: [
+          {
+            label: "Item type",
+            detail: "Both describe a Samsung USB-C fast charger",
+          },
+          {
+            label: "Condition",
+            detail: "Both appear to be in new condition",
+          },
+        ],
+      },
+      location: {
+        score: 0.95,
+        points: [
+          {
+            label: "Proximity",
+            detail: "Found 120m from reported loss location",
+          },
+          {
+            label: "Same campus",
+            detail: "Both locations within FPT University campus",
+          },
+        ],
+      },
+      timeWindow: {
+        score: 0.93,
+        points: [
+          {
+            label: "Time gap",
+            detail: "Found approximately 4 hours after reported loss",
+          },
+        ],
+      },
+    },
+    location: { latitude: 10.8419, longitude: 106.8093 },
+    displayAddress: "FPT University Cafeteria, Thủ Đức, Hồ Chí Minh, Vietnam",
+    externalPlaceId: "ChIJsQdrFzEndTERXq6bN0uyUrc",
+    radiusInKm: 5,
+  },
+  {
+    id: "sim-002-high",
+    postType: PostType.Found,
+    itemName: "Samsung Charger Adapter",
+    description:
+      "Found a Samsung charger on the floor near the entrance of Building B. Black color, USB-C type.",
+    images: [
+      {
+        id: "img-sim-002-1",
+        url: "https://picsum.photos/seed/samsung-adapter-b/400/400",
+        displayOrder: 0,
+        createdAt: "2026-03-23T16:00:00.000Z",
+      },
+    ],
+    eventTime: new Date("2026-03-23T15:45:00.000Z"),
+    matchScore: 0.78,
+    distanceMeters: 350,
+    matchingLevel: "High",
+    isAssessed: true,
+    assessmentSummary:
+      "Likely match. Same brand and type, found on the same day but at a different building. Visual confirmation recommended.",
+    criteria: {
+      visualAnalysis: {
+        score: 0.8,
+        points: [
+          {
+            label: "Brand match",
+            detail: "Samsung charger confirmed",
+          },
+          {
+            label: "Color match",
+            detail: "Black USB-C adapter",
+          },
+        ],
+      },
+      description: {
+        score: 0.75,
+        points: [
+          {
+            label: "Item type",
+            detail: "Both are Samsung USB-C chargers",
+          },
+        ],
+      },
+      location: {
+        score: 0.7,
+        points: [
+          {
+            label: "Proximity",
+            detail: "Found 350m away at Building B entrance",
+          },
+        ],
+      },
+      timeWindow: {
+        score: 0.88,
+        points: [
+          {
+            label: "Time gap",
+            detail: "Found about 5.5 hours after reported loss",
+          },
+        ],
+      },
+    },
+    location: { latitude: 10.8425, longitude: 106.8105 },
+    displayAddress:
+      "FPT University Building B, Thủ Đức, Hồ Chí Minh, Vietnam",
+    externalPlaceId: null,
+    radiusInKm: 5,
+  },
+  {
+    id: "sim-003-medium",
+    postType: PostType.Found,
+    itemName: "Black USB-C Phone Charger",
+    description:
+      "Found a black USB-C phone charger in the library, 2nd floor reading room. Not sure about the brand.",
+    images: [
+      {
+        id: "img-sim-003-1",
+        url: "https://picsum.photos/seed/usbc-charger-library/400/400",
+        displayOrder: 0,
+        createdAt: "2026-03-22T10:00:00.000Z",
+      },
+    ],
+    eventTime: new Date("2026-03-22T09:30:00.000Z"),
+    matchScore: 0.55,
+    distanceMeters: 500,
+    matchingLevel: "Medium",
+    isAssessed: false,
+    assessmentSummary: null,
+    criteria: {
+      visualAnalysis: {
+        score: 0.5,
+        points: [
+          {
+            label: "Color match",
+            detail: "Black USB-C charger, brand unclear from photo",
+          },
+        ],
+      },
+      description: {
+        score: 0.6,
+        points: [
+          {
+            label: "Item type",
+            detail: "USB-C phone charger, brand unconfirmed",
+          },
+        ],
+      },
+      location: {
+        score: 0.55,
+        points: [
+          {
+            label: "Proximity",
+            detail: "Found 500m away in the university library",
+          },
+        ],
+      },
+      timeWindow: {
+        score: 0.45,
+        points: [
+          {
+            label: "Time gap",
+            detail: "Found one day before the reported loss",
+          },
+        ],
+      },
+    },
+    location: { latitude: 10.8421, longitude: 106.8095 },
+    displayAddress: "FPT University Library, Thủ Đức, Hồ Chí Minh, Vietnam",
+    externalPlaceId: null,
+    radiusInKm: 5,
+  },
+  {
+    id: "sim-004-low",
+    postType: PostType.Found,
+    itemName: "White Apple USB-C Charger",
+    description:
+      "Found a white Apple 20W USB-C charger in the gym locker room.",
+    images: [
+      {
+        id: "img-sim-004-1",
+        url: "https://picsum.photos/seed/apple-charger-gym/400/400",
+        displayOrder: 0,
+        createdAt: "2026-03-21T18:00:00.000Z",
+      },
+    ],
+    eventTime: new Date("2026-03-21T17:00:00.000Z"),
+    matchScore: 0.32,
+    distanceMeters: 1200,
+    matchingLevel: "Low",
+    isAssessed: false,
+    assessmentSummary: null,
+    criteria: {
+      visualAnalysis: {
+        score: 0.2,
+        points: [
+          {
+            label: "Brand mismatch",
+            detail: "Apple charger vs Samsung — different brand",
+          },
+          {
+            label: "Color mismatch",
+            detail: "White vs black",
+          },
+        ],
+      },
+      description: {
+        score: 0.4,
+        points: [
+          {
+            label: "Item type",
+            detail: "Both are USB-C chargers but different brands",
+          },
+        ],
+      },
+      location: {
+        score: 0.35,
+        points: [
+          {
+            label: "Distance",
+            detail: "Found 1.2km away at the university gym",
+          },
+        ],
+      },
+      timeWindow: {
+        score: 0.3,
+        points: [
+          {
+            label: "Time gap",
+            detail: "Found 2 days before the reported loss",
+          },
+        ],
+      },
+    },
+    location: { latitude: 10.843, longitude: 106.812 },
+    displayAddress: "FPT University Gym, Thủ Đức, Hồ Chí Minh, Vietnam",
+    externalPlaceId: null,
+    radiusInKm: 5,
+  },
+  {
+    id: "sim-005-medium",
+    postType: PostType.Found,
+    itemName: "Black Samsung Phone Charger with Cable",
+    description:
+      "Found a Samsung charger set (adapter + cable) on a bench outside the main auditorium. Black, looks fairly new.",
+    images: [
+      {
+        id: "img-sim-005-1",
+        url: "https://picsum.photos/seed/samsung-set-auditorium/400/400",
+        displayOrder: 0,
+        createdAt: "2026-03-24T11:00:00.000Z",
+      },
+      {
+        id: "img-sim-005-2",
+        url: "https://picsum.photos/seed/samsung-set-auditorium-2/400/400",
+        displayOrder: 1,
+        createdAt: "2026-03-24T11:00:00.000Z",
+      },
+    ],
+    eventTime: new Date("2026-03-24T10:30:00.000Z"),
+    matchScore: 0.62,
+    distanceMeters: 280,
+    matchingLevel: "Medium",
+    isAssessed: true,
+    assessmentSummary:
+      "Partial match. Same brand and color but this is a charger set with cable, while the lost item was just the adapter.",
+    criteria: {
+      visualAnalysis: {
+        score: 0.65,
+        points: [
+          {
+            label: "Brand match",
+            detail: "Samsung charger confirmed",
+          },
+          {
+            label: "Color match",
+            detail: "Black adapter matches",
+          },
+          {
+            label: "Extra item",
+            detail: "Includes USB-C cable not mentioned in the lost post",
+          },
+        ],
+      },
+      description: {
+        score: 0.6,
+        points: [
+          {
+            label: "Partial match",
+            detail:
+              "Lost item is adapter only; this is a charger set with cable",
+          },
+        ],
+      },
+      location: {
+        score: 0.7,
+        points: [
+          {
+            label: "Proximity",
+            detail: "Found 280m from the loss location",
+          },
+        ],
+      },
+      timeWindow: {
+        score: 0.85,
+        points: [
+          {
+            label: "Time gap",
+            detail: "Found next day, about 24 hours after reported loss",
+          },
+        ],
+      },
+    },
+    location: { latitude: 10.8416, longitude: 106.8098 },
+    displayAddress:
+      "FPT University Auditorium, Thủ Đức, Hồ Chí Minh, Vietnam",
+    externalPlaceId: null,
+    radiusInKm: 5,
   },
 ];

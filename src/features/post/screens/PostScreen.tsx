@@ -85,6 +85,9 @@ const ExploreHeader = ({
         return {
           scale: isPointerIn ? 0.95 : 1,
           opacity: isPointerIn ? 0.92 : 1,
+          shadowOffset: isPointerIn ? { width: 0, height: 6 } : { width: 0, height: 4 },
+          shadowRadius: isPointerIn ? 12 : 8,
+          shadowOpacity: isPointerIn ? 0.2 : 0.15,
         };
       },
     [],
@@ -96,7 +99,7 @@ const ExploreHeader = ({
 
       return {
         type: "timing" as const,
-        duration: 200,
+        duration: 150,
       };
     },
     [],
@@ -130,9 +133,6 @@ const ExploreHeader = ({
                   borderWidth: 0.75,
                   borderColor: colors.border.muted,
                   shadowColor: colors.black,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowRadius: 8,
-                  shadowOpacity: 0.15,
                   elevation: 8,
                 }}
               >

@@ -1,7 +1,7 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
 import { UserPlaceMarker } from "@/src/features/map/components";
-import { PostInfoRow, PostStatusBadge } from "@/src/features/post/components";
-import { useGetPostById } from "@/src/features/post/hooks";
+import { PostInfoRow, PostStatusBadge, SimilarPostCard } from "@/src/features/post/components";
+import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostItem, PostType } from "@/src/features/post/types";
 import {
   AppButton,
@@ -158,7 +158,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   });
 
   const { isLoading, data: post } = useGetPostById({ postId });
-  // const { similarPosts } = useMatchingPost(postId);
+  const { similarPosts } = useMatchingPost(postId);
 
   const { create: createConversation, isCreating } =
     useCreateDirectConversation();
@@ -436,7 +436,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           </View>
 
           {/* Similar Posts */}
-          {/* {!!similarPosts?.length && (
+          {!!similarPosts?.length && (
             <View className="pt-sm gap-sm">
               <SectionTitle title="Suggestions" />
 
@@ -449,7 +449,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                 ))}
               </View>
             </View>
-          )} */}
+          )} 
         </View>
       </Animated.ScrollView>
 
