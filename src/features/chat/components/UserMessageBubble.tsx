@@ -1,22 +1,24 @@
-import { useAppUser } from "@/src/features/auth/providers";
 import type { UserMessage } from "@/src/features/chat/types";
+import { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 import { formatTime } from "@/src/shared/utils";
-import React, { useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useMemo } from "react";
+import { Text, View } from "react-native";
 
 type MessageBubbleProps = {
   message: UserMessage;
+  isOwnMessage: boolean;
+  isTopOfGroup: boolean;
+  isBottomOfGroup: boolean;
+  partnerAvatarUrl: string | null | undefined;
 };
 
-export const UserMessageBubble = ({ message }: MessageBubbleProps) => {
-  const { user } = useAppUser();
-  const [isFocused, setIsFocused] = useState(false);
-
-  const isOwnMessage = useMemo(
-    () => message.senderId === user?.id,
-    [message.senderId, user?.id],
-  );
-
+export const UserMessageBubble = ({
+  message,
+  isOwnMessage,
+  isTopOfGroup,
+  isBottomOfGroup,
+  partnerAvatarUrl,
+}: MessageBubbleProps) => {
   const messageTime = useMemo(
     () =>
       formatTime(new Date(message.createdAt), {
@@ -26,39 +28,51 @@ export const UserMessageBubble = ({ message }: MessageBubbleProps) => {
     [message.createdAt],
   );
 
-  return (
-    <View className={`w-full  ${isOwnMessage ? "items-end" : "items-start"}`}>
-      <Pressable
-        onPress={() => setIsFocused(!isFocused)}
-        className={`max-w-[75%] active:opacity-70 ${isFocused ? "opacity-85" : "opacity-100"}`}
-      >
-        <View
-          className={`
-            px-4 py-2 rounded-[18px]
-            ${
-              isOwnMessage
-                ? "bg-primary rounded-br-[4px]"
-                : "bg-slate-200 rounded-bl-[4px]"
-            }
-          `}
-        >
-          <Text
-            className={`text-[16px] leading-5 ${
-              isOwnMessage ? "text-white" : "text-textPrimary"
-            }`}
-          >
-            {message.content}
-          </Text>
-        </View>
-      </Pressable>
+  const bubbleRounding = isBottomOfGroup
+    ? isOwnMessage
+      ? "rounded-md rounded-br-xs"
+      : "rounded-md rounded-bl-xs"
+    : "rounded-md";
 
-      {isFocused && (
-        <View className="mt-1 mx-2">
-          <Text className="text-[11px] text-textSecondary font-medium">
+  const bubbleColor = isOwnMessage ? "bg-secondary/90 " : "bg-muted/90";
+  const textColor = isOwnMessage ? "text-white" : "text-textPrimary";
+
+  return (
+    <View className={`w-full ${isOwnMessage ? "items-end" : "items-start"}`}>
+      {isTopOfGroup && isOwnMessage && (
+        <View className="pb-xxs px-sm">
+          <Text className="text-xs text-textSecondary font-sm">
             {messageTime}
           </Text>
         </View>
       )}
+
+      {isTopOfGroup && !isOwnMessage && (
+        <View className="pb-xxs px-2xl">
+          <Text className="text-xs text-textSecondary font-sm">
+            {messageTime}
+          </Text>
+        </View>
+      )}
+
+      <View
+        className={`flex-row items-end ${isOwnMessage ? "justify-end" : "justify-start"} max-w-[75%] gap-xs`}
+      >
+        {!isOwnMessage &&
+          (isBottomOfGroup ? (
+            <AppUserAvatar avatarUrl={partnerAvatarUrl} size={28} />
+          ) : (
+            <View style={{ width: 28 }} />
+          ))}
+
+        <View className="flex-shrink ">
+          <View className={`px-md py-sm ${bubbleRounding} ${bubbleColor}`}>
+            <Text className={`text-normal font-thin leading-5 ${textColor}`}>
+              {message.content}
+            </Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };

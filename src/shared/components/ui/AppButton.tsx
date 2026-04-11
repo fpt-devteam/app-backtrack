@@ -1,9 +1,9 @@
+import { AppLoader } from "@/src/shared/components/AppLoader";
 import { cn } from "@/src/shared/utils/cn";
-import { MotiView } from "moti";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 
-type AppButtonVariant = "primary" | "secondary";
+type AppButtonVariant = "primary" | "secondary" | "outline";
 
 type AppButtonProps = {
   title: string;
@@ -17,9 +17,8 @@ type AppButtonProps = {
 const BUTTON_VARIANT_CLASS: Record<AppButtonVariant, string> = {
   primary: "bg-primary",
   secondary: "bg-secondary",
+  outline: "bg-surface border border-secondary",
 };
-
-const DOT_DELAYS = [0, 150, 300];
 
 export const AppButton = ({
   title,
@@ -30,6 +29,9 @@ export const AppButton = ({
   className,
 }: AppButtonProps) => {
   const isDisabled = disabled || loading;
+  const isOutline = variant === "outline";
+  const textColor = isOutline ? "text-secondary" : "text-white";
+  const loaderColor = isOutline ? "bg-secondary" : "bg-white";
 
   return (
     <TouchableOpacity
@@ -47,25 +49,9 @@ export const AppButton = ({
       accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
-        <View className="flex-row items-center gap-1.5">
-          {DOT_DELAYS.map((delay, index) => (
-            <MotiView
-              key={`loading-dot-${index}`}
-              from={{ translateY: 0, opacity: 0.65 }}
-              animate={{ translateY: -6, opacity: 1 }}
-              transition={{
-                type: "timing",
-                duration: 360,
-                delay,
-                loop: true,
-                repeatReverse: true,
-              }}
-              className="h-1.5 w-1.5 rounded-full bg-white"
-            />
-          ))}
-        </View>
+        <AppLoader colorClass={loaderColor} />
       ) : (
-        <Text className="text-base font-semibold text-white tracking-label">
+        <Text className={`text-base font-semibold ${textColor} tracking-label`}>
           {title}
         </Text>
       )}

@@ -1,3 +1,4 @@
+import { AppBackButton } from "@/src/shared/components";
 import { typography } from "@/src/shared/theme";
 import { Stack } from "expo-router";
 import React from "react";
@@ -22,6 +23,28 @@ const ChatLayout = () => {
               .fontWeight as TextStyle["fontWeight"],
           },
           headerShadowVisible: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="conversations/[conversationId]/index"
+        options={{
+          headerShown: true,
+        }}
+      />
+
+      <Stack.Screen
+        name="conversations/[conversationId]/information"
+        options={{
+          headerShown: true,
+          headerTitle: "Details",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.base,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+          headerRight: () => <AppBackButton type="xIcon" />,
+          presentation: "modal",
+          animation: "slide_from_bottom",
         }}
       />
     </Stack>

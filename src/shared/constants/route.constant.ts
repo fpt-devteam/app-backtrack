@@ -11,9 +11,11 @@ const QR_BASE = "/qr" as const;
 export const PROFILE_ROUTE = {
   index: "/(tabs)/profile" as ExternalPathString | RelativePathString,
   other: (userId: string) => `/(tabs)/profile/${userId}` as ExternalPathString | RelativePathString,
+  detail: "/(tabs)/profile/detail" as ExternalPathString | RelativePathString,
   edit: "/(tabs)/profile/edit" as ExternalPathString | RelativePathString,
   setting: "/(tabs)/profile/setting" as ExternalPathString | RelativePathString,
   menuTab: "/(tabs)/profile/menu-tab" as ExternalPathString | RelativePathString,
+  userPosts: "/(tabs)/profile/user-posts" as ExternalPathString | RelativePathString,
 } as const;
 
 export const POST_ROUTE = {
@@ -34,6 +36,7 @@ export const POST_ROUTE = {
 export const CHAT_ROUTE = {
   conversations: createPath(CHAT_BASE),
   message: (id: string) => createPath(`${CHAT_BASE}/${id}`),
+  information: (id: string) => createPath(`${CHAT_BASE}/${id}/information`),
 } as const;
 
 export const QR_ROUTE = {

@@ -473,7 +473,6 @@ const PostSearchResultScreen = () => {
             pointerEvents="box-none"
           >
             <Text>{feedbackState.title}</Text>
-
             <AppLoader />
           </View>
         )}
@@ -486,7 +485,7 @@ const PostSearchResultScreen = () => {
               animate={{ opacity: 1, translateY: 0, scale: 1 }}
               exit={{ opacity: 0, translateY: 100, scale: 0.9 }}
               transition={{ type: "spring", damping: 18, stiffness: 150 }}
-              className="absolute items-center px-lg"
+            className="absolute items-center px-lg gap-md"
               style={{
                 bottom: insets.bottom + 16,
                 left: 0,

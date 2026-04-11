@@ -64,8 +64,8 @@ const InboxScreen = () => {
   const [index, setIndex] = useState(0);
 
   const [routes] = useState<InboxRoute[]>([
-    { key: "chat", title: "Chat" },
-    { key: "notification", title: "Notification" },
+    { key: "chat", title: "Messages" },
+    { key: "notification", title: "Notifications" },
   ]);
 
   return (

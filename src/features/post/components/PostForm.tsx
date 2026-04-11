@@ -218,7 +218,7 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
       <Modal visible={isAnalyzing} transparent animationType="fade">
         <View className="flex-1 bg-black/50 items-center justify-center">
           <View className="bg-surface rounded-2xl p-6 mx-8 items-center">
-            <AppLoader size={40} />
+            <AppLoader dotSize={8} />
             <Text className="text-slate-700 font-semibold mt-4 text-center">
               Analyzing image...
             </Text>

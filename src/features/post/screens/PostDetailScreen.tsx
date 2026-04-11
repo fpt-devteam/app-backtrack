@@ -1,39 +1,42 @@
+import { useCreateDirectConversation } from "@/src/features/chat/hooks";
 import { UserPlaceMarker } from "@/src/features/map/components";
-import {
-  PostInfoRow,
-  PostStatusBadge,
-  SimilarPostCard,
-} from "@/src/features/post/components";
-import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import { PostInfoRow, PostStatusBadge } from "@/src/features/post/components";
+import { useGetPostById } from "@/src/features/post/hooks";
 import { PostItem, PostType } from "@/src/features/post/types";
-import { AppInlineError, AppUserAvatar } from "@/src/shared/components";
+import {
+  AppButton,
+  AppInlineError,
+  AppUserAvatar,
+} from "@/src/shared/components";
+import { toast } from "@/src/shared/components/ui/toast";
+import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors, typography } from "@/src/shared/theme";
 import { Nullable } from "@/src/shared/types";
 import { formatIsoDate, getSafeText, toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { BlurView } from "expo-blur";
-import { router, Stack, useLocalSearchParams } from "expo-router";
-import { View } from "moti";
+import { router, Stack } from "expo-router";
 import {
   ArrowLeftIcon,
   CalendarIcon,
   ExportIcon,
   MapPinIcon,
 } from "phosphor-react-native";
-import React, { useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ImageBackground,
   StyleSheet,
   Text,
   TouchableOpacity,
   useWindowDimensions,
+  View,
 } from "react-native";
 import MapView from "react-native-maps";
 import Animated, {
   interpolate,
-  useAnimatedRef,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
-  useScrollOffset,
+  useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -79,11 +82,9 @@ const SectionTitle = ({ title }: { title: string }) => {
 const AirbnbHeaderIcon = ({
   icon: Icon,
   onPress,
-  style,
 }: {
   icon: React.ComponentType<any>;
   onPress: () => void;
-  style: any;
 }) => {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7} className="">
@@ -101,30 +102,28 @@ const AirbnbHeaderIcon = ({
           },
         ]}
       >
-        <BlurView
-          intensity={80}
-          tint="light"
-          style={[StyleSheet.absoluteFill, style]}
-        />
+        <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
         <Icon size={18} color={colors.text.primary} weight="bold" />
       </Animated.View>
     </TouchableOpacity>
   );
 };
 
-export const PostDetailScreen = () => {
-  const params = useLocalSearchParams<{ postId: string }>();
+type PostDetailScreenProps = {
+  postId: string;
+};
 
+export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const headerHeight = useHeaderHeight();
 
   const IMAGE_HEIGHT = height * 0.5;
 
-  const mapRef = useRef<MapView>(null);
-
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollOffset(scrollRef);
+  const scrollOffset = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollOffset.value = event.contentOffset.y;
+  });
 
   const imgBgAnimationStyle = useAnimatedStyle(() => {
     return {
@@ -158,15 +157,36 @@ export const PostDetailScreen = () => {
     return { opacity };
   });
 
-  const iconAnimationStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(scrollOffset.value, [0, IMAGE_HEIGHT], [1, 0]);
-    return { opacity };
-  });
-
-  const postId = params.postId;
-
   const { isLoading, data: post } = useGetPostById({ postId });
-  const { similarPosts } = useMatchingPost(postId);
+  // const { similarPosts } = useMatchingPost(postId);
+
+  const { create: createConversation, isCreating } =
+    useCreateDirectConversation();
+
+  const [isDismissing, setIsDismissing] = useState(false);
+
+  const handleStartChat = useCallback(async () => {
+    if (!post?.author?.id) return;
+
+    try {
+      const response = await createConversation({
+        memberId: post.author.id,
+      });
+      const conversationId = response.data?.conversation?.conversationId;
+      if (conversationId) {
+        setIsDismissing(true);
+
+        if (router.canDismiss()) {
+          router.dismiss();
+        }
+
+        const path = CHAT_ROUTE.message(conversationId);
+        router.push(path);
+      }
+    } catch {
+      toast.error("Failed to start chat. Please try again.");
+    }
+  }, [post?.author?.id, createConversation]);
 
   const {
     postImageUrls,
@@ -226,7 +246,7 @@ export const PostDetailScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,
+          animation: isDismissing ? "none" : "default",
           headerTitle: "",
           headerTransparent: true,
           headerBackground: () => (
@@ -247,24 +267,25 @@ export const PostDetailScreen = () => {
             <AirbnbHeaderIcon
               icon={ArrowLeftIcon}
               onPress={() => router.back()}
-              style={iconAnimationStyle}
             />
           ),
 
           headerRight: () => (
-            <AirbnbHeaderIcon
-              icon={ExportIcon}
-              onPress={() => console.log("Export")}
-              style={iconAnimationStyle}
-            />
+            <View>
+              <AirbnbHeaderIcon
+                icon={ExportIcon}
+                onPress={() => console.log("Export")}
+              />
+            </View>
           ),
         }}
       />
 
       <Animated.ScrollView
-        ref={scrollRef}
         className="flex-1 bg-surface"
         contentContainerStyle={{ paddingBottom: 3 * insets.bottom }}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
@@ -396,7 +417,6 @@ export const PostDetailScreen = () => {
               style={{ height: height * 0.5 }}
             >
               <MapView
-                ref={mapRef}
                 style={{ flex: 1 }}
                 initialRegion={{
                   latitude: post.location?.latitude,
@@ -416,7 +436,7 @@ export const PostDetailScreen = () => {
           </View>
 
           {/* Similar Posts */}
-          {!!similarPosts?.length && (
+          {/* {!!similarPosts?.length && (
             <View className="pt-sm gap-sm">
               <SectionTitle title="Suggestions" />
 
@@ -429,9 +449,22 @@ export const PostDetailScreen = () => {
                 ))}
               </View>
             </View>
-          )}
+          )} */}
         </View>
       </Animated.ScrollView>
+
+      {/* Footer */}
+      <View
+        className="flex-row items-center justify-between bg-surface px-md border-t border-muted"
+        style={{ paddingBottom: insets.bottom }}
+      >
+        <AppButton
+          title="Start Chat"
+          variant="secondary"
+          onPress={handleStartChat}
+          loading={isCreating}
+        />
+      </View>
     </>
   );
 };

@@ -1,11 +1,12 @@
 import type { Post } from "@/src/features/post/types";
+import { AppImage } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
+import { colors } from "@/src/shared/theme/colors";
 import { formatIsoDate } from "@/src/shared/utils";
-import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import { ClockIcon, MapPinIcon } from "phosphor-react-native";
 import React from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { PostStatusBadge } from "./PostStatusBadge";
 
 type MinimalPostCardProps = {
@@ -18,27 +19,28 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() =>
-        router.push(
-          POST_ROUTE.details(post.id) as
-            | ExternalPathString
-            | RelativePathString,
-        )
-      }
-      className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-3"
+      onPress={() => router.push(POST_ROUTE.details(post.id))}
+      style={{
+        borderWidth: 0.75,
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+      }}
+      className="flex-row gap-3 bg-surface rounded-2xl border border-divider p-lg"
     >
-      <Image
+      <AppImage
         source={{ uri: imgUrl }}
-        className="w-20 h-20 rounded-xl bg-slate-100"
+        className="w-24 rounded-xl bg-slate-100 aspect-square"
       />
 
-      <View className="flex-1 min-w-0 gap-2">
+      <View className="flex-1 gap-2">
         <View className="flex-row justify-between items-start">
           <Text
-            className="w-[70%] text-lg font-semibold text-textPrimary"
-            numberOfLines={1}
+            className="flex-1 text-lg font-normal text-textPrimary"
+            numberOfLines={2}
           >
-            {post.itemName}
+            {post.item.itemName}
           </Text>
 
           <PostStatusBadge status={post.postType} />
@@ -46,9 +48,9 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
 
         <View className="flex-col justify-between gap-1">
           <View className="flex-row items-center gap-2">
-            <MapPinIcon size={16} color="#64748B" />
+            <MapPinIcon size={16} color={colors.foreground} />
             <Text
-              className="flex-1 min-w-0 text-[12px] text-textSecondary"
+              className="flex-1 text-sm text-textSecondary"
               numberOfLines={1}
             >
               {post.displayAddress}
@@ -56,9 +58,9 @@ export const MinimalPostCard = ({ post }: MinimalPostCardProps) => {
           </View>
 
           <View className="flex-row items-center gap-2">
-            <ClockIcon size={16} color="#64748B" />
+            <ClockIcon size={16} color={colors.foreground} />
             <Text
-              className="flex-1 min-w-0 text-[12px] text-textSecondary"
+              className="flex-1 text-sm text-textSecondary"
               numberOfLines={1}
             >
               {formatIsoDate(post.eventTime)}

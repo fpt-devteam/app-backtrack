@@ -1,46 +1,9 @@
 import { useAuth } from "@/src/features/auth/providers";
-import { TouchableIconButton } from "@/src/shared/components";
-import { PROFILE_ROUTE } from "@/src/shared/constants/route.constant";
+import { AppBackButton } from "@/src/shared/components";
 import { typography } from "@/src/shared/theme";
-import { colors } from "@/src/shared/theme/colors";
-import { router, Stack } from "expo-router";
-import { View } from "moti";
-import { GearIcon, ListIcon, PencilSimpleIcon } from "phosphor-react-native";
+import { Stack } from "expo-router";
 import React from "react";
 import { TextStyle } from "react-native";
-
-const navigateToSettingScreen = () => {
-  router.push(PROFILE_ROUTE.setting);
-};
-
-const navigateToEditProfileScreen = () => {
-  router.push(PROFILE_ROUTE.edit);
-};
-
-const navigateToMenuTabScreen = () => {
-  router.push(PROFILE_ROUTE.menuTab);
-};
-
-const ProfileHeaderLeft = () => (
-  <TouchableIconButton
-    onPress={navigateToMenuTabScreen}
-    icon={<ListIcon size={28} color={colors.black} />}
-  />
-);
-
-const ProfileHeaderRight = () => (
-  <View className="flex-row gap-4">
-    <TouchableIconButton
-      onPress={navigateToEditProfileScreen}
-      icon={<PencilSimpleIcon size={28} color={colors.black} />}
-    />
-
-    <TouchableIconButton
-      onPress={navigateToSettingScreen}
-      icon={<GearIcon size={28} color={colors.black} />}
-    />
-  </View>
-);
 
 const ProfileLayout = () => {
   const { isAppReady, isLoggedIn } = useAuth();
@@ -52,21 +15,7 @@ const ProfileLayout = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: true,
-          headerTitle: "Profile",
-          headerLeft: isAuthReady ? ProfileHeaderLeft : undefined,
-          headerRight: isAuthReady ? ProfileHeaderRight : undefined,
-          headerTitleStyle: {
-            fontSize: typography.presets.screenTitle
-              .fontSize as TextStyle["fontSize"],
-            fontWeight: typography.presets.screenTitle
-              .fontWeight as TextStyle["fontWeight"],
-          },
-        }}
-      />
+      <Stack.Screen name="index" />
 
       <Stack.Screen
         name="menu-tab"
@@ -82,11 +31,19 @@ const ProfileLayout = () => {
       <Stack.Screen
         name="edit"
         options={{
-          headerShown: false,
+          headerShown: true,
           title: "Edit Profile",
-          animation: "slide_from_left",
-          presentation: "card",
-          gestureDirection: "horizontal",
+          presentation: "modal",
+          animation: "slide_from_bottom",
+          headerRight: () => (
+            <AppBackButton type={"xIcon"} showBackground={true} />
+          ),
+          headerLeft: () => null,
+          headerShadowVisible: true,
+          headerTitleStyle: {
+            fontSize: typography.fontSize.base,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
         }}
       />
 
@@ -95,6 +52,28 @@ const ProfileLayout = () => {
         options={{
           headerShown: false,
           title: "Settings",
+          animation: "slide_from_right",
+          presentation: "card",
+          gestureDirection: "horizontal",
+        }}
+      />
+
+      <Stack.Screen
+        name="detail"
+        options={{
+          headerShown: false,
+          title: "Profile",
+          animation: "slide_from_right",
+          presentation: "card",
+          gestureDirection: "horizontal",
+        }}
+      />
+
+      <Stack.Screen
+        name="user-posts"
+        options={{
+          headerShown: false,
+          title: "Your posts",
           animation: "slide_from_right",
           presentation: "card",
           gestureDirection: "horizontal",

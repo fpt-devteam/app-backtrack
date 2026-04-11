@@ -1,9 +1,9 @@
 import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 import { colors } from "@/src/shared/theme";
 import {
+  ArrowUpIcon,
   CameraIcon,
   ImageIcon,
-  PaperPlaneRightIcon,
   PlusCircleIcon,
 } from "phosphor-react-native";
 import React, { useState } from "react";
@@ -44,25 +44,25 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
   };
 
   return (
-    <View className="flex-row items-center gap-4 px-4 mb-2 bg-canvas">
-      <View className="flex-row items-center gap-4  ">
+    <View className="flex-row items-center gap-md bg-surface px-md py-sm border-t border-muted shadow-t-sm">
+      <View className="flex-row items-center gap-md">
         {/* Plus Button */}
         <TouchableIconButton
           icon={
-            <PlusCircleIcon size={28} color={colors.primary} weight="fill" />
+            <PlusCircleIcon size={28} color={colors.secondary} weight="fill" />
           }
           onPress={handlePlusAction}
         />
 
         {/* Camera Button */}
         <TouchableIconButton
-          icon={<CameraIcon size={28} color={colors.primary} weight="fill" />}
+          icon={<CameraIcon size={28} color={colors.secondary} weight="fill" />}
           onPress={handleTakePhoto}
         />
 
         {/* Image Upload Button */}
         <TouchableIconButton
-          icon={<ImageIcon size={28} color={colors.primary} weight="fill" />}
+          icon={<ImageIcon size={28} color={colors.secondary} weight="fill" />}
           onPress={handleUploadImage}
         />
       </View>
@@ -72,20 +72,28 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
         value={messageText}
         onChangeText={setMessageText}
         placeholder="Aa"
-        placeholderTextColor={colors.text.secondary}
         multiline
-        className="min-h-touch rounded-full text-textPrimary text-base flex-1 px-4 py-3 justify-center bg-muted"
+        numberOfLines={2}
+        className="rounded-lg text-textPrimary text-base font-thin leading-5 flex-1 px-md py-sm justify-center bg-muted"
         textAlignVertical="center"
+        placeholderTextColor={colors.text.muted}
+        cursorColor={colors.black}
+        selectionColor={colors.black}
       />
 
       {/* Send Button  */}
-      <TouchableIconButton
-        disabled={!messageText.trim() || isSending}
-        icon={
-          <PaperPlaneRightIcon size={28} color={colors.primary} weight="fill" />
-        }
-        onPress={handleSend}
-      />
+      <View
+        className="p-sm rounded-full bg-secondary"
+        style={{
+          opacity: !messageText.trim() || isSending ? 0.4 : 1,
+        }}
+      >
+        <TouchableIconButton
+          disabled={!messageText.trim() || isSending}
+          icon={<ArrowUpIcon size={16} color={colors.white} weight="regular" />}
+          onPress={handleSend}
+        />
+      </View>
     </View>
   );
 };

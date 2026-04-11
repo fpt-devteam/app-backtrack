@@ -30,7 +30,7 @@ export const TouchableIconButton = ({
       onPress={handlePress}
       disabled={isDisabled}
       hitSlop={8}
-      className="min-h-touch min-w-touch items-center justify-center"
+      className="items-center justify-center"
       style={({ pressed }) => ({
         transform: [{ scale: pressed ? 0.97 : 1 }],
         opacity: pressed ? 0.9 : 1,

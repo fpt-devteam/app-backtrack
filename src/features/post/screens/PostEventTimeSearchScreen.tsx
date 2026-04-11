@@ -140,7 +140,16 @@ const PostTemporalFilter = ({
   );
 
   return (
-    <View className="rounded-md border-[0.5] border-muted bg-surface overflow-hidden shadow-sm">
+    <View
+      className="rounded-[16] bg-surface py-xs border-surface stroke-slate-200"
+      style={{
+        borderWidth: 0.75,
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: isExpanded ? 0.385 : 0.2,
+        shadowRadius: 10,
+      }}
+    >
       {/* Measure Mirror (Hidden) */}
       <View
         style={{ position: "absolute", opacity: 0, left: 0, right: 0 }}
@@ -153,7 +162,7 @@ const PostTemporalFilter = ({
       {/* Interactable Header */}
       <Pressable
         onPress={onToggle}
-        className="p-md gap-md flex-row justify-between items-center active:bg-slate-50"
+        className="p-md gap-md flex-row justify-between items-center"
       >
         <View>{renderHeaderTitle}</View>
         <View className="flex-1 ml-2">{renderHeaderSummary}</View>

@@ -215,3 +215,50 @@ export const getTimeMatchStatus = (diffInMs: number): 'high' | 'medium' | 'low' 
   if (hours <= 24) return 'medium'
   return 'low'
 }
+
+/**
+ * Check whether two dates fall on the same calendar day.
+ */
+export function isSameDay(d1: Date, d2: Date): boolean {
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
+const WEEKDAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+/**
+ * Human-friendly date label for chat date separators.
+ *
+ * - Today        → "Today"
+ * - Yesterday    → "Yesterday"
+ * - Same year    → "Monday, Mar 15"
+ * - Other year   → "Monday, Mar 15, 2026"
+ */
+export function getDateLabel(input: Date | string): string {
+  const d = typeof input === "string" ? new Date(input) : input;
+  const now = new Date();
+  if (isSameDay(d, now)) return "Today";
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (isSameDay(d, yesterday)) return "Yesterday";
+
+  const weekday = WEEKDAY_NAMES[d.getDay()];
+  const formatted = formatDate(d.toISOString()); // "Mar 15, 2026"
+
+  if (d.getFullYear() === now.getFullYear()) {
+    return `${weekday}, ${formatted.replace(`, ${now.getFullYear()}`, "")}`;
+  }
+  return `${weekday}, ${formatted}`;
+}

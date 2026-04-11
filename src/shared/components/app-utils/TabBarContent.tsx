@@ -11,8 +11,13 @@ import {
   PlusIcon,
   QrCodeIcon,
 } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
@@ -27,6 +32,22 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   const [isCreateOptionsVisible, setIsCreateOptionsVisible] = useState(false);
   const leadingRoutes = state.routes.slice(0, 2); // -> post, qr
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
+
+  // Auto-hide tab bar on nested screens (any screen deeper than the tab's index)
+  const focusedRoute = state.routes[state.index];
+  const isNested = (focusedRoute?.state?.index ?? 0) > 0;
+
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateY.value = withTiming(isNested ? metrics.tabBar.height : 0, {
+      duration: metrics.motion.duration.normal,
+    });
+  }, [isNested, translateY]);
+
+  const tabBarAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
 
   const renderTabButton = (route: (typeof state.routes)[number]) => {
     const index = state.routes.findIndex((item) => item.key === route.key);
@@ -85,9 +106,12 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
 
   return (
     <>
-      <View
+      <Animated.View
         className="absolute left-0 right-0 bottom-0 bg-surface border-t flex-1 flex-row"
-        style={{ borderColor: colors.muted, height: metrics.tabBar.height }}
+        style={[
+          { borderColor: colors.muted, height: metrics.tabBar.height },
+          tabBarAnimatedStyle,
+        ]}
       >
         {leadingRoutes.map((route) => renderTabButton(route))}
 
@@ -102,7 +126,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
         </View>
 
         {trailingRoutes.map((route) => renderTabButton(route))}
-      </View>
+      </Animated.View>
 
       <PostCreateOptionsBottomSheet
         isVisible={isCreateOptionsVisible}

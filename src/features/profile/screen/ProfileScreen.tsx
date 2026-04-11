@@ -1,276 +1,248 @@
+import { useAppUser, useAuth } from "@/src/features/auth/providers";
+import { socketChatService } from "@/src/features/chat/services";
+import { useUnregisterDeviceMutation } from "@/src/features/notification/hooks";
+import { AppUserAvatar } from "@/src/shared/components";
+import { AUTH_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
+import { auth } from "@/src/shared/lib/firebase";
+import { colors } from "@/src/shared/theme";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { signOut } from "firebase/auth";
 import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
+  CaretRightIcon,
+  GearIcon,
+  HandIcon,
+  PackageIcon,
+  QrCodeIcon,
+  QuestionIcon,
+  SignOutIcon,
+  UserCircleIcon,
+} from "phosphor-react-native";
+import React, { useCallback, useMemo } from "react";
+import {
+  Alert,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
-import type {
-  TabBarProps as RNTabBarProps,
-  Route,
-} from "react-native-tab-view";
-import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
-import { useAppUser, useAuth } from "@/src/features/auth/providers";
-import type { Post } from "@/src/features/post/types";
-import { AppImage, AppUserAvatar } from "@/src/shared/components";
-import { AUTH_ROUTE, POST_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
+import type { IconProps } from "phosphor-react-native";
+import type { ComponentType } from "react";
+import type { ViewStyle } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useGetAllMyPost } from "@/src/features/post/hooks";
-import * as Haptics from "expo-haptics";
+// ─── Shared Styles ───────────────────────────────────────────────
 
-import { PostStatusBadge } from "@/src/features/post/components";
-import EmptyList from "@/src/shared/components/ui/EmptyList";
-import {
-  IconProps,
-  PackageIcon,
-  QrCodeIcon,
-  UserCircleIcon,
-} from "phosphor-react-native";
-
-type RouteProps = {
-  key: Route["key"];
-  title: string;
-  tabIcon: React.ElementType<IconProps>;
+const CARD_SHADOW: ViewStyle = {
+  shadowColor: colors.black,
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
 };
 
-const GRID_COLUMNS = 3;
-const GRID_GAP = 2;
-const GRID_PADDING = 8;
+// ─── Sub-components ──────────────────────────────────────────────
 
-const GridSeparator = () => <View style={{ height: GRID_GAP }} />;
-
-const ProfilePostGridItem = ({ post, size }: { post: Post; size: number }) => {
-  const imageUrl = post.imageUrls?.[0]?.url;
-
-  const handleOpenPost = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(POST_ROUTE.details(post.id));
-  };
-
-  return (
-    <TouchableOpacity
-      onPress={handleOpenPost}
-      style={{ width: size, height: size }}
-      className="aspect-square"
-    >
-      <AppImage
-        source={{ uri: imageUrl }}
-        style={{ width: size, height: size }}
-        resizeMode="cover"
-      />
-
-      {/* Post Status Badge "Lost/Found" */}
-      <View className="absolute top-0 right-0 p-1">
-        <PostStatusBadge status={post.postType} size="sm" />
-      </View>
-    </TouchableOpacity>
-  );
+type MenuRowProps = {
+  icon: ComponentType<IconProps>;
+  label: string;
+  onPress: () => void;
 };
 
-const PostScene = () => {
-  const { width } = useWindowDimensions();
-  const { data, isLoading, error, refetch } = useGetAllMyPost();
-
-  const itemSize = useMemo(() => {
-    const totalGap = GRID_GAP * (GRID_COLUMNS - 1);
-    const totalPadding = GRID_PADDING * 2;
-    return Math.floor((width - totalPadding - totalGap) / GRID_COLUMNS);
-  }, [width]);
-
-  if (isLoading) {
-    return (
-      <View className="flex-1 bg-canvas items-center justify-center">
-        <ActivityIndicator color={colors.black} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View className="flex-1 bg-canvas items-center justify-center px-8">
-        <Text className="text-textSecondary text-center">
-          Unable to load posts
-        </Text>
-        <Pressable
-          onPress={() => refetch()}
-          className="mt-3 px-4 py-2 bg-black rounded-full"
-        >
-          <Text className="text-white font-semibold">Try again</Text>
-        </Pressable>
-      </View>
-    );
-  }
-
-  return (
-    <FlatList
-      data={data || []}
-      keyExtractor={(item) => item.id}
-      numColumns={GRID_COLUMNS}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingHorizontal: GRID_PADDING,
-        paddingVertical: GRID_PADDING,
-      }}
-      columnWrapperStyle={{ gap: GRID_GAP }}
-      ItemSeparatorComponent={GridSeparator}
-      renderItem={({ item }) => (
-        <ProfilePostGridItem post={item} size={itemSize} />
-      )}
-      ListEmptyComponent={
-        <EmptyList
-          icon={<PackageIcon size={96} weight="light" color={colors.primary} />}
-          title="No Posts Yet"
-          subtitle="Your posts will appear here once you create them."
-        />
-      }
-    />
-  );
-};
-
-const QRScene = () => {
-  return (
-    <EmptyList
-      icon={<QrCodeIcon size={96} weight="light" color={colors.primary} />}
-      title="No QR Codes Yet"
-      subtitle="Your QR codes will appear here once you create them."
-    />
-  );
-};
-
-const renderScene = SceneMap({
-  posts: PostScene,
-  qr: QRScene,
-});
-
-const renderTabIcon = ({
-  route,
-  focused,
-  color: _color,
-  size: _size,
-}: {
-  route: RouteProps;
-  focused: boolean;
-  color: string;
-  size: number;
-}) => (
-  <route.tabIcon
-    weight="fill"
-    size={24}
-    color={focused ? colors.black : colors.gray[400]}
-  />
+const MenuRow = ({ icon: Icon, label, onPress }: MenuRowProps) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.5}
+    className="flex-row items-center gap-md py-md"
+  >
+    <Icon size={24} color={colors.black} />
+    <Text className="flex-1 text-base font-thin text-textPrimary">{label}</Text>
+    <CaretRightIcon size={16} color={colors.slate[400]} weight="bold" />
+  </TouchableOpacity>
 );
 
-const CustomTabBar = (props: RNTabBarProps<RouteProps>) => {
+type FeatureCardProps = {
+  icon: ComponentType<IconProps>;
+  label: string;
+  onPress: () => void;
+};
+
+const FeatureCard = ({ icon: Icon, label, onPress }: FeatureCardProps) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className="flex-1 bg-surface items-center gap-sm p-md rounded-xl border border-divider justify-between"
+    style={CARD_SHADOW}
+  >
+    <Icon size={80} color={colors.secondary} weight="thin" />
+    <Text className="text-normal font-normal text-textPrimary">{label}</Text>
+  </TouchableOpacity>
+);
+
+const GuestView = () => {
   const layout = useWindowDimensions();
 
-  const TAB_COUNT = props.navigationState.routes.length;
-  const TAB_WIDTH = layout.width / TAB_COUNT;
-  const INDICATOR_WIDTH = 24;
-  const INDICATOR_MARGIN = (TAB_WIDTH - INDICATOR_WIDTH) / 2;
-
   return (
-    <TabBar
-      {...props}
-      indicatorStyle={{
-        backgroundColor: colors.black,
-        width: INDICATOR_WIDTH,
-        marginLeft: INDICATOR_MARGIN,
-      }}
-      indicatorContainerStyle={{
-        borderBottomWidth: 0.5,
-        borderBottomColor: colors.slate[100],
-      }}
-      style={{ backgroundColor: "transparent" }}
-    />
+    <View
+      className="flex-1 bg-surface px-10 gap-10 pt-20"
+      style={{ paddingTop: layout.height * 0.15 }}
+    >
+      <View className="flex-row justify-center">
+        <UserCircleIcon size={128} color={colors.primary} />
+      </View>
+
+      <View className="gap-y-2">
+        <Text className="text-xl font-normal text-textPrimary text-center">
+          Log in to view your profile
+        </Text>
+
+        <Text className="text-base font-thin text-textSecondary text-center leading-6">
+          Once you log in, you will find all your conversations here.
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+        onPress={() => router.push(AUTH_ROUTE.onboarding)}
+        activeOpacity={0.8}
+      >
+        <Text className="text-base font-normal text-white text-center">
+          Log in or Sign up
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 export function ProfileScreen() {
   const layout = useWindowDimensions();
   const { user } = useAppUser();
-  const [index, setIndex] = useState(0);
-
   const { isAppReady, isLoggedIn } = useAuth();
-  const isAuthReady = isAppReady && isLoggedIn;
+  const { mutateAsync: unregisterDevice } = useUnregisterDeviceMutation();
 
-  const [routes] = useState<RouteProps[]>([
-    { key: "posts", title: "Post", tabIcon: PackageIcon },
-    { key: "qr", title: "QR Code", tabIcon: QrCodeIcon },
-  ]);
+  const isAuthReady = isAppReady && isLoggedIn;
 
   const displayName = useMemo(
     () => user?.displayName?.trim() || user?.email || "User",
     [user?.displayName, user?.email],
   );
 
-  const avatarSource = useMemo(() => {
-    return user?.avatarUrl;
-  }, [user?.avatarUrl]);
+  const handleShowProfile = useCallback(() => {
+    router.push(PROFILE_ROUTE.detail);
+  }, []);
 
-  if (!isAuthReady) {
-    return (
-      <View
-        className="flex-1 bg-surface px-10 gap-10 pt-20"
-        style={{ paddingTop: layout.height * 0.15 }}
-      >
-        <View className="flex-row justify-center">
-          <UserCircleIcon size={128} color={colors.primary} />
-        </View>
+  const handleUserPosts = useCallback(() => {
+    router.push(PROFILE_ROUTE.userPosts);
+  }, []);
 
-        <View className="gap-y-2">
-          <Text className="text-xl font-normal text-textPrimary text-center">
-            Log in to view your profile
-          </Text>
+  const handleUserQR = useCallback(() => {
+    // TODO: Navigate to user QR screen
+  }, []);
 
-          <Text className="text-base font-thin text-textSecondary text-center leading-6">
-            Once you log in, you will find all your conversations here.
-          </Text>
-        </View>
+  const handleGetHelp = useCallback(() => {
+    // TODO: Navigate to help / support screen
+  }, []);
 
-        <TouchableOpacity
-          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
-          onPress={() => router.push(AUTH_ROUTE.onboarding)}
-          activeOpacity={0.8}
-        >
-          <Text className="text-base font-normal text-white text-center">
-            Log in or Sign up
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const handlePrivacy = useCallback(() => {
+    // TODO: Navigate to privacy screen
+  }, []);
+
+  const handleSettings = useCallback(() => {
+    router.push(PROFILE_ROUTE.setting);
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    Alert.alert("Log Out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: () => {
+          void (async () => {
+            try {
+              await socketChatService.disconnect();
+              await unregisterDevice();
+              await signOut(auth);
+            } catch (error) {
+              console.error("Logout failed", error);
+            }
+          })();
+        },
+      },
+    ]);
+  }, [unregisterDevice]);
+
+  if (!isAuthReady) return <GuestView />;
 
   return (
-    <View className="flex-1 bg-surface">
-      {/* Info Header */}
-      <View className="items-center py-8 px-4 bg-surface">
-        <View className="flex-col items-center gap-4">
-          <AppUserAvatar size={128} avatarUrl={avatarSource} />
-          <Text className="text-lg font-extrabold text-textPrimary">
+    <SafeAreaView className="flex-1 bg-surface">
+      <ScrollView
+        className="flex-1 bg-surface"
+        contentContainerClassName="px-lg pt-md pb-xl"
+        contentContainerStyle={{ paddingBottom: layout.height * 0.1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile Card */}
+        <TouchableOpacity
+          onPress={handleShowProfile}
+          className="bg-surface items-center gap-sm py-xl rounded-xl border border-divider"
+          style={CARD_SHADOW}
+        >
+          <AppUserAvatar size={80} avatarUrl={user?.avatarUrl} />
+          <Text className="text-lg font-semibold text-textPrimary">
             {displayName}
           </Text>
-        </View>
-      </View>
+          {user?.email ? (
+            <Text className="text-sm text-textSecondary">{user.email}</Text>
+          ) : null}
+        </TouchableOpacity>
 
-      {/* TabView Area */}
-      <TabView<RouteProps>
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-        renderTabBar={CustomTabBar}
-        swipeEnabled={true}
-        commonOptions={{
-          icon: renderTabIcon,
-          label: () => null,
-        }}
-      />
-    </View>
+        {/* Feature Cards */}
+        <View className="flex-row gap-md mt-xl">
+          <FeatureCard
+            icon={PackageIcon}
+            label="Your Posts"
+            onPress={handleUserPosts}
+          />
+          <FeatureCard
+            icon={QrCodeIcon}
+            label="Your QR"
+            onPress={handleUserQR}
+          />
+        </View>
+
+        {/* Menu Actions */}
+        <View className="mt-xl">
+          <MenuRow
+            icon={GearIcon}
+            label="Account Settings"
+            onPress={handleSettings}
+          />
+
+          <MenuRow icon={HandIcon} label="Privacy" onPress={handlePrivacy} />
+
+          <MenuRow
+            icon={QuestionIcon}
+            label=" Help & Support"
+            onPress={handleGetHelp}
+          />
+        </View>
+
+        {/* Log Out */}
+        <TouchableOpacity
+          onPress={handleLogout}
+          activeOpacity={0.5}
+          className="flex-row items-center gap-md mt-md"
+        >
+          <SignOutIcon size={24} color={colors.red[600]} />
+          <Text
+            className="text-base font-thin"
+            style={{ color: colors.red[600] }}
+          >
+            Log out
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

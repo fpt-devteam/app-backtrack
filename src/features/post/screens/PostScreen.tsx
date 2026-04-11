@@ -13,6 +13,7 @@ import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
 import { MotiView } from "moti";
+import { MotiPressable } from "moti/interactions";
 import {
   ArrowRightIcon,
   BinocularsIcon,
@@ -70,6 +71,37 @@ const ExploreHeader = ({
 }) => {
   const insets = useSafeAreaInsets();
 
+  const handleOpenSearch = useCallback(() => {
+    router.push(POST_ROUTE.search);
+  }, []);
+
+  const searchButtonAnimate = useMemo(
+    () =>
+      ({ hovered, pressed }: { hovered: boolean; pressed: boolean }) => {
+        "worklet";
+
+        const isPointerIn = hovered || pressed;
+
+        return {
+          scale: isPointerIn ? 0.95 : 1,
+          opacity: isPointerIn ? 0.92 : 1,
+        };
+      },
+    [],
+  );
+
+  const searchButtonTransition = useMemo(
+    () => () => {
+      "worklet";
+
+      return {
+        type: "timing" as const,
+        duration: 200,
+      };
+    },
+    [],
+  );
+
   return (
     <Stack.Screen
       options={{
@@ -80,10 +112,29 @@ const ExploreHeader = ({
             style={{ paddingTop: insets.top }}
           >
             <View className="px-md">
-              <Pressable
-                onPress={() => router.push(POST_ROUTE.search)}
-                className="w-full py-sm h-control-lg rounded-full bg-white flex-row items-center justify-center gap-2 shadow-md"
-                style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
+              <MotiPressable
+                onPress={handleOpenSearch}
+                animate={searchButtonAnimate}
+                transition={searchButtonTransition}
+                style={{
+                  opacity: 1,
+                  width: "100%",
+                  height: metrics.layout.controlHeight.lg,
+                  paddingVertical: metrics.spacing.sm,
+                  borderRadius: 999,
+                  backgroundColor: colors.surface,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: metrics.spacing.xs,
+                  borderWidth: 0.75,
+                  borderColor: colors.border.muted,
+                  shadowColor: colors.black,
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowRadius: 8,
+                  shadowOpacity: 0.15,
+                  elevation: 8,
+                }}
               >
                 <MagnifyingGlassIcon
                   size={14}
@@ -94,7 +145,7 @@ const ExploreHeader = ({
                 <Text className="text-md font-md2 text-textPrimary">
                   Start your search
                 </Text>
-              </Pressable>
+              </MotiPressable>
             </View>
 
             {/* Tabs */}
@@ -226,7 +277,7 @@ export const PostScreen = () => {
   );
 
   const listEmpty = useMemo(() => {
-    if (isLoading) return <AppLoader />;
+    if (isLoading) return <View className="flex-1 items-center justify-center py-xl"><AppLoader /></View>;
 
     if (error) {
       return (

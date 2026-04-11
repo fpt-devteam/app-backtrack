@@ -72,11 +72,9 @@ export const PostCard = ({ item, size = "sm" }: PostCardProps) => {
     >
       {/* IMAGE */}
       <View className="w-full overflow-hidden" style={{ aspectRatio: 1.18 }}>
-        <AppImage
-          resizeMode="cover"
-          className="w-full h-full"
-          source={{ uri: imageUrl }}
-        />
+        <View className="">
+          <AppImage className="w-full h-full" source={{ uri: imageUrl }} />
+        </View>
 
         {/* Status badge */}
         <View className="absolute top-2 left-2">

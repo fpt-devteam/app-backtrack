@@ -2,18 +2,11 @@ import { useAppUser } from "@/src/features/auth/providers";
 import { AvatarFormField, FormField } from "@/src/features/profile/components";
 import { usePatchProfile } from "@/src/features/profile/hooks";
 import type { UpdateProfileRequest } from "@/src/features/profile/types";
-import {
-  AppHeader,
-  AppLoader,
-  BackButton,
-  TextButton,
-} from "@/src/shared/components";
+import { AppBackButton, AppButton, AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { colors } from "@/src/shared/theme";
 import { getErrorMessage } from "@/src/shared/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { router } from "expo-router";
-import { IdentificationBadgeIcon, PhoneIcon } from "phosphor-react-native";
+import { router, Stack } from "expo-router";
 import React, { useEffect, useMemo } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -24,7 +17,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context"; // 🚀 Import thêm cái này
 import * as yup from "yup";
 
 type ProfileEditSchema = {
@@ -53,12 +46,12 @@ const profileEditSchema = yup
 const ProfileEditScreen = () => {
   const { user: profile } = useAppUser();
   const { patchProfile, isPatchingProfile } = usePatchProfile();
+  const insets = useSafeAreaInsets(); // 🚀 Khởi tạo insets
 
   const initialValues = useMemo(
     () => ({
       displayName: profile?.displayName?.trim() ?? "",
       phone: profile?.phone?.trim() ?? "",
-      avatar: null,
     }),
     [profile],
   );
@@ -81,6 +74,7 @@ const ProfileEditScreen = () => {
   const isSaveDisabled = !isDirty || isPatchingProfile;
 
   const onSubmit: SubmitHandler<ProfileEditSchema> = async (data) => {
+    // ... (Giữ nguyên logic onSubmit của bạn)
     const payload: UpdateProfileRequest = {};
     if (dirtyFields.displayName) payload.displayName = data.displayName.trim();
     if (dirtyFields.phone) payload.phone = data.phone.trim();
@@ -97,88 +91,98 @@ const ProfileEditScreen = () => {
 
   if (!profile) {
     return (
-      <SafeAreaView className="flex-1 bg-canvas">
-        <View className="flex-1 items-center justify-center">
-          <AppLoader size={30} />
+      <>
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerLeft: () => <AppBackButton />,
+          }}
+        />
+        <View className="flex-1 bg-surface items-center justify-center">
+          <AppLoader />
         </View>
-      </SafeAreaView>
+      </>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas">
-      <AppHeader
-        left={<BackButton />}
-        center={
-          <Text className="text-lg font-bold text-textPrimary">Edit profile</Text>
-        }
-        right={
-          <TextButton
-            label="Save"
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSaveDisabled}
-            isSubmitting={isPatchingProfile}
-          />
-        }
-      />
-
+    <>
       <KeyboardAvoidingView
-        className="flex-1"
+        className="flex-1 bg-surface"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           className="flex-1"
+          contentContainerClassName="px-md pb-32"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {/* Avatar Section */}
           <AvatarFormField />
 
-          <View className="rounded-3xl border border-divider bg-surface p-4 gap-4 mx-4 mb-4">
-            <Text className="text-sm font-semibold text-textPrimary">
-              Personal Details
+          <View className="px-sm mb-lg gap-xs mt-md">
+            <Text className="text-xl font-bold text-textPrimary">
+              Personal Information
             </Text>
+            <Text className="text-sm font-normal text-textSecondary leading-5">
+              These details will be shared with others when you connect over a
+              lost or found item. Make sure they are accurate.
+            </Text>
+          </View>
 
-            <Controller
-              control={control}
-              name="displayName"
-              render={({ field: { onChange, value } }) => (
-                <FormField
-                  label="Display name"
-                  icon={
-                    <IdentificationBadgeIcon
-                      size={16}
-                      color={colors.primary}
-                      weight="fill"
-                    />
-                  }
-                  value={value}
-                  onChange={onChange}
-                  placeholder="Your display name"
-                  error={errors.displayName?.message}
-                />
-              )}
-            />
+          <View className="bg-surface rounded-2xl border border-divider overflow-hidden">
+            {/* Display Name Field */}
+            <View className="px-md py-sm">
+              <Controller
+                control={control}
+                name="displayName"
+                render={({ field: { onChange, value } }) => (
+                  <FormField
+                    label="Display name"
+                    value={value}
+                    onChange={onChange}
+                    placeholder="Your display name"
+                    error={errors.displayName?.message}
+                  />
+                )}
+              />
+            </View>
 
-            <Controller
-              control={control}
-              name="phone"
-              render={({ field: { onChange, value } }) => (
-                <FormField
-                  label="Phone number"
-                  icon={
-                    <PhoneIcon size={16} color={colors.primary} weight="fill" />
-                  }
-                  value={value}
-                  onChange={onChange}
-                  placeholder="Your phone number"
-                  error={errors.phone?.message}
-                />
-              )}
-            />
+            {/* Phone Field */}
+            <View className="px-md py-sm">
+              <Controller
+                control={control}
+                name="phone"
+                render={({ field: { onChange, value } }) => (
+                  <FormField
+                    label="Phone number"
+                    value={value}
+                    onChange={onChange}
+                    placeholder="Your phone number"
+                    error={errors.phone?.message}
+                  />
+                )}
+              />
+            </View>
           </View>
         </ScrollView>
+
+        {/* 🚀 Sticky Bottom Action Bar */}
+        <View
+          className="absolute bottom-0 left-0 right-0 border-t border-divider bg-surface px-md pt-md"
+          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        >
+          <AppButton
+            title="Save Changes"
+            variant="secondary"
+            onPress={handleSubmit(onSubmit)}
+            loading={isPatchingProfile}
+            disabled={isSaveDisabled}
+          />
+        </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </>
   );
 };
 

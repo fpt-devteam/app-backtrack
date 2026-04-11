@@ -4,139 +4,127 @@ Agent guidance for `app-backtrack` (Expo + React Native + TypeScript).
 
 ## Project Snapshot
 
-- App type: mobile app built with Expo Router (`src/app`) and feature modules (`src/features`).
-- Language: TypeScript (strict mode enabled).
-- Package manager: npm (`package-lock.json` is present).
-- Runtime stack: Expo 54, React Native 0.81, React 19, NativeWind, React Query, Zustand, Firebase.
+- Mobile app built with Expo Router (`src/app`) and feature modules (`src/features`).
+- TypeScript strict mode. Package manager: npm.
+- Expo 54, React Native 0.81 (New Architecture enabled), React 19, NativeWind, React Query, Zustand, Firebase.
+- Typed routes enabled (`experiments.typedRoutes: true`).
+- Reference docs: `CLAUDE.md` (architecture context, partially stale on routing), `GEMINI.md`, `DESIGN.md`.
 
-## Source of Truth and Rule Files
+## Commands
 
-- Primary architecture/context doc: `CLAUDE.md`.
-- ESLint config: `eslint.config.js`.
-- TypeScript config: `tsconfig.json`.
-- Pre-commit staged checks: `lint-staged.config.js`.
-- Existing Cursor rules: none found (`.cursor/rules/` and `.cursorrules` absent).
-- Existing Copilot instructions: none found (`.github/copilot-instructions.md` absent).
+```bash
+npm start              # Expo dev server
+npm run android        # Android
+npm run ios            # iOS
+npm run lint           # ESLint (expo lint)
+npm run ts             # TypeScript check (tsc --noEmit)
+npm run check:all      # Typecheck THEN lint (fail-fast on types)
+npx eslint "src/path"  # Lint a single file
+```
 
-## Install and Run
+- **No test runner configured.** No Jest/Vitest, no `test` script. Single-file typecheck not supported; use full `npm run ts`.
+- **Husky + lint-staged exist** (`lint-staged.config.js` runs eslint --fix + tsc on staged .ts/.tsx) but the `.husky/pre-commit` hook file is currently **empty** — pre-commit checks do not run automatically.
+- **EAS Build** configured: `development`, `preview`, `production` profiles in `eas.json`.
 
-- Install deps: `npm install`
-- Start dev server: `npm start`
-- Run Android: `npm run android`
-- Run iOS: `npm run ios`
-- Run web: `npm run web`
+## Verification
 
-## Build / Lint / Typecheck / Test Commands
+- For code changes: run `npm run check:all`. Do not claim success without command evidence.
+- For docs-only changes: verification may be skipped; state that explicitly.
 
-- Lint entire repo: `npm run lint`
-- Typecheck entire repo: `npm run ts`
-- Combined checks: `npm run check:all`
-- Staged-file checks (used by commit hooks): `npm run check:changed`
+## Path Aliases (Critical)
 
-Notes on tests:
+`@/` maps to the **repo root** (not `./src/`). Actual imports look like:
 
-- There is currently no configured unit/integration test runner (no Jest/Vitest config, no `test` script).
-- "Run a single test" is not available in this repo yet.
-- If asked to run "one test", explain this limitation and offer nearest equivalents:
-  - single file lint: `npx eslint "src/path/to/file.tsx"`
-  - single file typecheck is not directly supported by repo scripts; use full `npm run ts`.
+```ts
+import { PostScreen } from "@/src/features/post/screens";
+import { colors } from "@/src/shared/theme/colors";
+```
 
-## Practical Verification Workflow for Agents
+- Parent-relative imports (`../`) across feature boundaries are **banned by ESLint**.
+- Use `@/src/features/...` or `@/src/shared/...` for cross-module imports.
 
-- For code changes, run: `npm run check:all`.
-- For docs-only changes, verification command may be skipped; state that explicitly.
-- Do not claim success without command evidence (exit code + key output summary).
+## Routing
 
-## Routing and Module Layout
+File-based routing under `src/app/` with three route groups:
 
-- Routing uses Expo Router with file-based routes under `src/app`.
-- Route groups include `(auth)`, `(tabs)`, `(shared)`.
-- Feature code is organized under `src/features/<feature>/` with common folders:
-  - `api/`, `components/`, `hooks/`, `screens/`, `types/`.
-- Shared cross-feature code lives in `src/shared/` (`api`, `components`, `constants`, `hooks`, `store`, `theme`, `types`, `utils`).
+- `(auth)/` — login, register, password-reset, verify-email, onboarding.
+- `(tabs)/` — bottom tab navigator (post, chat, map, profile, qr).
+- `(shared)/` — cross-cutting screens (not-available).
 
-## Import Rules (Important)
+Route files are thin re-exports: `export { XScreen as default } from "@/src/features/..."`.
+Route constants: `src/shared/constants/route.constant.ts` — use these, not hardcoded strings.
 
-- Use path aliases (`@/`) for project imports.
-- Do not use parent-relative imports (`../`) across feature boundaries.
-- The lint config enforces restricted patterns for `../*`.
-- Prefer feature-local imports and shared modules over ad-hoc deep relative paths.
+## Feature Modules
 
-## Disallowed Libraries and UI Stack Constraints
+`src/features/`: `auth`, `chat`, `map`, `notification`, `post`, `profile`, `qr` (7 features).
+Each follows: `api/`, `components/`, `hooks/`, `screens/`, `types/`.
 
-- Do not use `@expo/vector-icons`; use `phosphor-react-native`.
-- Do not use `react-native-paper` (Material stack is intentionally excluded).
-- Before creating new shared UI, check `src/shared/components/ui/` for an existing primitive.
+`src/shared/`: `api`, `components` (incl. `ui/`, `fields/`), `constants`, `hooks`, `lib`, `mocks`, `screens`, `services`, `store`, `theme`, `types`, `utils`.
 
-## TypeScript and Types
+## Banned Libraries
 
-- TS is strict (`"strict": true` in `tsconfig.json`).
-- Avoid `any` (`@typescript-eslint/no-explicit-any` is error).
-- Use explicit DTO/types from each feature's `types/` folder.
-- Use shared aliases/types from `src/shared/types` when applicable.
-- Prefer `type` imports where appropriate for clarity and tree-shaking friendliness.
+- `@expo/vector-icons` — use `phosphor-react-native`. Enforced by ESLint.
+- `react-native-paper` — banned. Enforced by ESLint.
+- Before creating new shared UI, check `src/shared/components/ui/` for existing primitives.
 
-## Formatting and Style Conventions
+## TypeScript
 
-- Follow existing file-local style (the repo currently contains both single-quote and double-quote files).
-- Keep diffs minimal; do not reformat unrelated code.
-- Use descriptive names and keep functions focused.
-- Avoid adding comments unless logic is non-obvious.
-- Keep components/hooks cohesive and colocated by feature.
+- Strict mode (`"strict": true`).
+- `@typescript-eslint/no-explicit-any` is `error`.
+- Feature-specific types in `src/features/<feature>/types/`. Shared types in `src/shared/types`.
 
-## Naming Conventions (Observed)
+## Styling
 
-- React screens/components: PascalCase (`PostScreen`, `AppHeader`).
+- NativeWind (Tailwind classes). Theme tokens in `src/shared/theme/` (`colors.js`, `typography.js`, `metrics.js`).
+- Use semantic token classes (`bg-primary`, `text-textPrimary`, `rounded-primary`, `gap-md`) over raw values.
+- Tailwind config in `tailwind.config.js` consumes these tokens. Dark mode: class-based.
+
+## Toolchain Quirks
+
+- **SVG as components**: Metro uses `react-native-svg-transformer`. Import `.svg` files directly as React components. SVG is excluded from asset exts and added to source exts.
+- **Reanimated plugin**: `react-native-reanimated/plugin` in `babel.config.js` **must remain the last plugin**.
+- **NativeWind**: Configured via both `babel.config.js` (preset) and `metro.config.js` (`withNativeWind` wrapper with `global.css` input).
+- **Firebase auth**: Custom path mapping `@firebase/auth` → RN-specific dist in `tsconfig.json`.
+
+## API Layer
+
+- Two Axios clients in `src/shared/api/client.tsx`: `publicClient` (unauthed), `privateClient` (injects Firebase ID token, retries once on 401 after token refresh).
+- All API responses follow `ApiResponse<T> = { success: boolean; data: T; message?: string }` (see `src/shared/api/api.types.ts`).
+- Feature APIs: `src/features/<feature>/api/<feature>.api.ts`. Return `response.data`.
+- Real-time: Socket.io for chat (`src/features/chat/services/`) and notifications (`src/features/notification/services/`).
+
+## State Management
+
+- Server state: React Query hooks per feature.
+- Global UI state: Zustand (`src/shared/store/ui.store.ts`).
+- Scoped state: React Context providers (auth, app user, location selection).
+
+## Forms
+
+React Hook Form + Yup. Shared form fields in `src/shared/components/fields/`.
+
+## Environment
+
+- Firebase initialized in `src/shared/lib/firebase.ts`. Firebase services in `src/shared/services/firebase.service.ts`.
+- API base URL: `EXPO_PUBLIC_API_URL` env var.
+- Never commit `.env*` files or secrets. `.env.local` is gitignored.
+
+## Naming Conventions
+
+- Components/screens: PascalCase (`PostScreen`, `AppHeader`).
 - Hooks: `useXxx` (`usePosts`, `useGetMyQR`).
-- Utility modules: lowercase domain names with suffix (`datetime.utils.ts`, `error.utils.ts`).
-- Constants: uppercase object names (`POST_API`) and route constants in `route.constant.ts`.
-- Query keys/constants are centralized by feature (for example `*.key.ts`).
+- Utils: `<domain>.utils.ts`. Constants: `<domain>.constant.ts`. Query keys: `<domain>.key.ts`.
+- API endpoint objects: uppercase (`POST_API`).
 
-## API and Data Access Patterns
+## Style
 
-- Axios clients are centralized in `src/shared/api/client.tsx`:
-  - `publicClient` for unauthenticated calls.
-  - `privateClient` injects Firebase ID token and retries once on 401 after refresh.
-- Keep endpoint constants grouped (example: `POST_API`).
-- Return `response.data` from API helpers; keep transport concerns in API layer.
+- Mixed quote style across files — follow file-local convention.
+- Keep diffs minimal; do not reformat unrelated code.
 
-## State Management Patterns
+## Git Hygiene
 
-- Server/async state: React Query hooks in feature modules.
-- Lightweight global UI state: Zustand stores in `src/shared/store` (and feature stores where needed).
-- Scoped app state and lifecycle: React Context providers (auth/app user/location selection, etc.).
-
-## Error Handling Guidelines
-
-- Prefer mapping user-facing errors through `src/shared/utils/error.utils.ts` helpers.
-- Surface clear, actionable messages for auth/network/validation failures.
-- Do not swallow exceptions silently.
-- In hooks/services, preserve useful context when rethrowing or returning error state.
-
-## UI / Styling Rules
-
-- Styling uses NativeWind (Tailwind classes in RN components).
-- Theme tokens are defined in `src/shared/theme/` (`colors.js`, `typography.js`, `metrics.js`).
-- Prefer semantic tokens (`colors.primary`, `colors.text.primary`, spacing/radius tokens) over raw values.
-- Keep touch targets accessible (token system targets minimums via metrics).
-
-## Forms and Validation
-
-- Use React Hook Form + Yup for form flows.
-- Keep validation schema close to the form/screen.
-- Use shared form fields from `src/shared/components/fields` when possible.
-
-## Firebase / Environment
-
-- Use initialized Firebase exports from `src/shared/lib/firebase.ts`.
-- API base URL comes from `EXPO_PUBLIC_API_URL`.
-- Never commit secrets or local env contents.
-
-## Git and Change Hygiene for Agents
-
-- Respect existing uncommitted user changes; do not revert unrelated files.
-- Keep commits scoped and atomic when asked to commit.
-- Run `npm run check:all` before commit when code changes affect runtime behavior.
+- Respect existing uncommitted changes; do not revert unrelated files.
+- Run `npm run check:all` before commit for code changes.
 
 ## GitNexus Usage Requirements
 
@@ -149,18 +137,18 @@ Notes on tests:
   - `gitnexus_query({query: "concept"})`
   - `gitnexus_context({name: "symbolName"})`
 
-## Completion Checklist for Agents
+## Completion Checklist
 
-- Changes align with feature/module boundaries.
-- Imports follow alias/lint restrictions.
-- No forbidden libraries introduced.
-- `npm run check:all` executed (or explicit reason if skipped).
-- GitNexus impact and change-detection steps performed when code symbols changed.
+- [ ] Changes stay within feature/module boundaries.
+- [ ] Imports use `@/src/...` aliases (no cross-boundary `../`).
+- [ ] No banned libraries introduced.
+- [ ] `npm run check:all` passes (or reason documented).
+- [ ] GitNexus impact + detect_changes run when code symbols changed.
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **app-backtrack** (1125 symbols, 2432 relationships, 62 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **app-backtrack** (1126 symbols, 2432 relationships, 62 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 

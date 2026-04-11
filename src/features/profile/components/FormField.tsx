@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 
 type FormFieldProps = {
-  icon: React.ReactNode;
   value: string;
   placeholder: string;
   label: string;
@@ -14,7 +13,6 @@ type FormFieldProps = {
 };
 
 export const FormField = ({
-  icon,
   label,
   placeholder,
   value,
@@ -34,59 +32,39 @@ export const FormField = ({
     onBlur?.();
   };
 
-  const getColor = () => {
+  const getBorderColor = () => {
     if (error) return colors.text.error;
-    if (isFocused) return colors.primary;
-    return colors.slate[400];
+    if (isFocused) return colors.secondary;
+    return colors.divider;
   };
 
   return (
-    <View>
-      {/* Field Label */}
-      <Text
-        className="mb-2 text-base font-medium"
-        style={{ color: colors.text.main }}
-      >
+    <View className="py-md">
+      <Text className="text-base font-semibold text-textPrimary mb-sm">
         {label}
       </Text>
 
-      {/* Field */}
-      <View
-        className={`flex-row gap-2 items-center rounded-lg border p-3`}
-        style={{
-          borderWidth: 1,
-          borderColor: getColor(),
-        }}
-      >
-        {/* Field Icon */}
-        {icon}
+      <TextInput
+        className="text-base text-textPrimary rounded-lg px-md py-sm"
+        style={{ borderWidth: 1, borderColor: getBorderColor() }}
+        placeholder={placeholder}
+        placeholderTextColor={colors.slate[400]}
+        autoCapitalize="none"
+        autoCorrect={false}
+        value={value}
+        onChangeText={onChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      />
 
-        {/* Field Text */}
-        <TextInput
-          className="flex-1"
-          style={{ color: colors.text.main }}
-          placeholder={placeholder}
-          placeholderTextColor={colors.slate[400]}
-          autoCapitalize="none"
-          autoCorrect={false}
-          value={value}
-          onChangeText={onChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
-      </View>
-
-      {/* Text Error */}
-      {error && (
-        <View className="flex-row items-center mt-1.5 px-1">
-          <Text
-            className="text-sm text-error"
-            style={{ color: colors.text.error }}
-          >
-            {error}
-          </Text>
-        </View>
-      )}
+      {error ? (
+        <Text
+          className="text-sm mt-xs px-xs"
+          style={{ color: colors.text.error }}
+        >
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 };

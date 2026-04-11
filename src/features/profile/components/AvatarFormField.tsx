@@ -10,7 +10,7 @@ import {
 } from "expo-image-picker";
 import { CameraIcon } from "phosphor-react-native";
 import React, { useState } from "react";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 export const AvatarFormField = () => {
   const { user: profile, refetch } = useAppUser();
@@ -55,11 +55,11 @@ export const AvatarFormField = () => {
   };
 
   return (
-    <View className="items-center justify-center py-6">
+    <View className="bg-sruface items-center justify-center py-md mb-md">
       <View className="relative">
         {/* Avatar Container */}
         <View className="rounded-full border-4 border-white shadow-sm overflow-hidden bg-slate-100">
-          <AppUserAvatar size={128} avatarUrl={profile?.avatarUrl} />
+          <AppUserAvatar size={200} avatarUrl={profile?.avatarUrl} />
 
           {/* Loading Overlay */}
           {isUpdating && (
@@ -73,9 +73,10 @@ export const AvatarFormField = () => {
         <Pressable
           onPress={handlePickAvatar}
           disabled={isUpdating}
-          className="absolute bottom-0 right-0 bg-primary w-10 h-10 rounded-full items-center justify-center border-2 border-white shadow-lg active:scale-90"
+          className="absolute bottom-0 left-16 right-16 bg-surface right-0 items-center justify-center shadow-lg active:scale-90 flex-row gap-sm p-sm rounded-full"
         >
-          <CameraIcon size={22} color="white" weight="bold" />
+          <CameraIcon size={24} weight="fill" />
+          <Text className="font-normal text-normal">Edit</Text>
         </Pressable>
       </View>
     </View>

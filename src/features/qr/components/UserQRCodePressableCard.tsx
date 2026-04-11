@@ -47,7 +47,7 @@ export const UserQRCodePressableCard = ({
   if (isQRLoading || !qrCode) {
     return (
       <View className="bg-surface rounded-3xl items-center justify-center border border-divider w-full">
-        <AppLoader size={28} gap={6} />
+        <AppLoader />
       </View>
     );
   }

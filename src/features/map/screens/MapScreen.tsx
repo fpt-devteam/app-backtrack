@@ -6,7 +6,7 @@ import {
 import { DEFAULT_RADIUS_KM } from "@/src/features/map/constants";
 import { useReverseGeocoding, useUserLocation } from "@/src/features/map/hooks";
 import { useLocationSelectionStore } from "@/src/features/map/store";
-import { PostDetails, PostList } from "@/src/features/post/components";
+import { PostList } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostsFiltersOptions } from "@/src/features/post/hooks/usePosts";
 import type { PostFilters } from "@/src/features/post/types";
@@ -22,6 +22,7 @@ import { Pressable, Text, View } from "react-native";
 import type { LatLng, Region } from "react-native-maps";
 import MapView from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { PostDetailScreen } from "@/src/features/post/screens";
 
 const placeholder = "Search for a location";
 
@@ -164,7 +165,9 @@ export const MapScreen = () => {
                 disabled={false}
                 onPress={() => {
                   handleOpenSheet();
-                  bottomSheetElement.current = <PostDetails postId={item.id} />;
+                  bottomSheetElement.current = (
+                    <PostDetailScreen postId={item.id} />
+                  );
                 }}
               />
             ))}

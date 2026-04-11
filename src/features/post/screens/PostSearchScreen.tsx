@@ -54,7 +54,7 @@ const SEARCH_TYPE_TABS: {
 ];
 
 const DEFAULT_EXPANDED_SECTION: FilterSectionVariant = "item";
-const DEFAULT_BLUR_INTENSITY = 80;
+const DEFAULT_BLUR_INTENSITY = 100;
 
 type SearchTabSelectorProps = {
   selectedTab: SearchTabValue;
