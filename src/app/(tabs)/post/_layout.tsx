@@ -84,7 +84,6 @@ export default function PostsStackLayout() {
               paddingTop: insets.top,
               backgroundColor: colors.white,
             },
-            presentation: "modal",
             animation: "slide_from_bottom",
           }}
         />

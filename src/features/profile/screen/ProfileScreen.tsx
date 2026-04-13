@@ -2,7 +2,7 @@ import { useAppUser, useAuth } from "@/src/features/auth/providers";
 import { socketChatService } from "@/src/features/chat/services";
 import { useUnregisterDeviceMutation } from "@/src/features/notification/hooks";
 import { AppUserAvatar } from "@/src/shared/components";
-import { AUTH_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, PROFILE_ROUTE, QR_ROUTE } from "@/src/shared/constants";
 import { auth } from "@/src/shared/lib/firebase";
 import { colors } from "@/src/shared/theme";
 import { router } from "expo-router";
@@ -136,6 +136,7 @@ export function ProfileScreen() {
   }, []);
 
   const handleUserQR = useCallback(() => {
+    router.push(QR_ROUTE.index);
     // TODO: Navigate to user QR screen
   }, []);
 

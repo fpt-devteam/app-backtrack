@@ -9,10 +9,10 @@ import type {
 import { privateClient } from "@/src/shared/api";
 
 export const QR_API = {
-  me: "/api/qr/me",
-  design: "/api/qr/me/design",
-  getMySubscription: "/api/qr/subscriptions/me",
-  getAllSubscriptionPlans: "/api/qr/subscriptions/plans",
+  me: "/api/core/qr/me",
+  design: "/api/core/me/design",
+  getMySubscription: "/api/core/subscriptions/me",
+  getAllSubscriptionPlans: "/api/core/subscription-plans",
 } as const;
 
 export async function getMyQRCode(): Promise<GetMyQrCodeResponse> {

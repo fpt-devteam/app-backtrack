@@ -21,35 +21,25 @@ type UserLocationContextValue = {
 const LocationSelectionContext =
   createContext<Nullable<UserLocationContextValue>>(null);
 
-const MOCK_LOCATION: UserLocation = {
-  displayAddress:
-    "702 Võ Nguyên Giáp, Hiệp Phú, Tăng Nhơn Phú, Hồ Chí Minh 70000, Việt Nam",
-  externalPlaceId: "ChIJm0qMwQkndTERc5s0xiK131M",
-  location: {
-    latitude: 10.84308399341188,
-    longitude: 106.77177212981283,
-  },
-  radiusInKm: 20,
-};
-
 export const LocationSelectionProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const { getUserLocation } = useUserLocation();
+
   const [selection, setSelection] = useState<Nullable<UserLocation>>(null);
   const [confirmedSelection, setConfirmedSelection] =
     useState<Nullable<UserLocation>>(null);
 
   useEffect(() => {
     (async () => {
-      // const data = await getUserLocation();
-      // if (!data?.location) return;
-      // console.log("User Location: ", data);
-      // setSelection(data);
-      setSelection(MOCK_LOCATION);
-      setConfirmedSelection(MOCK_LOCATION);
+      const data = await getUserLocation();
+      if (!data?.location) return;
+
+      setSelection(data);
+      setConfirmedSelection(data);
+      console.log("User Location: ", data);
     })();
   }, [getUserLocation]);
 
@@ -82,8 +72,6 @@ export const LocationSelectionProvider = ({
       reset,
     ],
   );
-
-  console.log("Location Selection Context Value:", contextValue);
 
   return (
     <LocationSelectionContext.Provider value={contextValue}>

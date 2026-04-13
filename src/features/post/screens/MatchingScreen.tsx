@@ -10,7 +10,7 @@ import { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 import { getErrorMessage } from "@/src/shared/utils";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const MatchingScreen = () => {
@@ -63,6 +63,13 @@ export const MatchingScreen = () => {
         keyExtractor={(item) => item.id}
         className="p-3"
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        ListEmptyComponent={() => {
+          return (
+            <View>
+              <Text>No similar posts found.</Text>
+            </View>
+          );
+        }}
       />
     </View>
   );

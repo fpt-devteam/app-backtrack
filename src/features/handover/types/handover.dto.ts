@@ -1,4 +1,4 @@
-import type { ApiResponse, PagedResponse } from "@/src/shared/api"
+import type { ApiResponse, PagedRequest, PagedResponse } from "@/src/shared/api"
 import type { Handover, ReturnReportStatus } from "./handover.type"
 
 // POST /return-reports/c2c
@@ -11,14 +11,12 @@ export type CreateC2CReturnReportRequest = {
 }
 
 // GET /return-reports/c2c  (query params)
-export type GetC2CReturnReportsRequest = {
-  page?: number
-  pageSize?: number
+export type GetC2CHandoverRequest = {
   status?: ReturnReportStatus
-}
+} & PagedRequest
 
 // Single report response
 export type C2CReturnReportResponse = ApiResponse<Handover>
 
 // Paged list response
-export type C2CReturnReportsResponse = ApiResponse<PagedResponse<Handover>>
+export type C2CHandoversResponse = ApiResponse<PagedResponse<Handover>>

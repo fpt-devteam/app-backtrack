@@ -1,45 +1,49 @@
-import { analyzeImageApi } from '@/src/features/post/api'
-import { POST_ANALYZE_IMAGE_KEY } from '@/src/features/post/constants'
-import type { AnalyzeImageRequest } from '@/src/features/post/types'
-import { useMutation } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { analyzeImageApi } from "@/src/features/post/api";
+import { POST_ANALYZE_IMAGE_KEY } from "@/src/features/post/constants";
+import type {
+  AnalyzeImageData,
+  AnalyzeImageRequest,
+} from "@/src/features/post/types";
+import { useMutation } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 interface UseAnalyzeImageOptions {
-  onSuccess?: (data: { itemName: string; description: string }) => void
-  onError?: (error: Error) => void
+  onSuccess?: (data: AnalyzeImageData) => void;
+  onError?: (error: Error) => void;
 }
 
 export const useAnalyzeImage = (options?: UseAnalyzeImageOptions) => {
   const mutation = useMutation({
     mutationKey: POST_ANALYZE_IMAGE_KEY,
     mutationFn: async (request: AnalyzeImageRequest) => {
-      const response = await analyzeImageApi(request)
-      if (!response.success) throw new Error('Failed to analyze image')
-      return response.data
+      const response = await analyzeImageApi(request);
+      if (!response.success) throw new Error("Failed to analyze image");
+      return response.data;
     },
 
     onSuccess: (data) => {
       if (data) {
-        options?.onSuccess?.(data)
+        options?.onSuccess?.(data);
       }
     },
 
     onError: (error) => {
-      const err = error instanceof Error ? error : new Error('Failed to analyze image')
-      options?.onError?.(err)
+      const err =
+        error instanceof Error ? error : new Error("Failed to analyze image");
+      options?.onError?.(err);
     },
-  })
+  });
 
   const error = useMemo(() => {
-    if (!mutation.error) return null
-    if (mutation.error instanceof Error) return mutation.error
-    return new Error('Failed to analyze image')
-  }, [mutation.error])
+    if (!mutation.error) return null;
+    if (mutation.error instanceof Error) return mutation.error;
+    return new Error("Failed to analyze image");
+  }, [mutation.error]);
 
   return {
     analyzeImage: mutation.mutateAsync,
     isAnalyzing: mutation.isPending,
     error,
     data: mutation.data,
-  }
-}
+  };
+};

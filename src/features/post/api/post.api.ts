@@ -8,7 +8,7 @@ export const POST_API = {
   detail: (postId: string) => `/api/core/posts/${postId}`,
   matching: (postId: string) => `/api/core/posts/${postId}/similar`,
   checkPostMatchingStatus: (postId: string) => `/api/core/posts/${postId}/matching-status`,
-  analyzeImage: "/api/core/image-analysis/analyze",
+  analyzeImage: "/api/core/post-image/analyze",
   getAllMyPost: "/api/core/posts/me"
 } as const;
 

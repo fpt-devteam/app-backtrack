@@ -20,22 +20,16 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { HANDOVER_MOCK, IS_HANDOVER_MOCK } from "../constants";
 
 const HandoverScreen = () => {
   const { width } = useWindowDimensions();
   const cardWidth = useMemo(() => 0.9 * width, [width]);
 
-  const { data, isLoading, error } = useGetC2CReturnReports();
+  const { data: handovers, isLoading, error } = useGetC2CReturnReports();
 
-  const reports = useMemo(() => {
-    if (IS_HANDOVER_MOCK) return HANDOVER_MOCK;
-    return data?.items ?? [];
-  }, [data, IS_HANDOVER_MOCK]);
-
-  const draftReports = useMemo(
-    () => reports.filter((report) => report.status === "Draft"),
-    [reports],
+  const draftHandovers = useMemo(
+    () => handovers.filter((report) => report.status === "Draft"),
+    [handovers],
   );
 
   const handleGetStarted = useCallback(() => {
@@ -82,7 +76,7 @@ const HandoverScreen = () => {
       <View className="bg-surface py-md pb-md2 px-sm overflow-hidden">
         <View className="flex-col justify-between gap-xs ">
           <Text className="text-xl font-medium text-textPrimary ">
-            Draft Handovers ({draftReports.length})
+            Draft Handovers ({draftHandovers.length})
           </Text>
 
           <Text className="text-sm font-normal text-textSecondary">
@@ -94,7 +88,7 @@ const HandoverScreen = () => {
 
         {/* Draft Handovers */}
         <FlatList
-          data={draftReports.slice(0, 2)}
+          data={draftHandovers.slice(0, 2)}
           keyExtractor={keyExtractor}
           renderItem={renderDraftHandoverItem}
           scrollEnabled={false}
@@ -141,7 +135,7 @@ const HandoverScreen = () => {
 
         {/* Active Handovers */}
         <FlatList
-          data={reports.slice(0, 2)}
+          data={handovers.slice(0, 2)}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           horizontal

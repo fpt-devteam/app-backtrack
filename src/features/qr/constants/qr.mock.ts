@@ -1,7 +1,7 @@
 
 import { SubscriptionStatus, UserSubscription } from "@/src/features/qr/types";
 
-export const IS_QR_FEATURE_MOCK = true;
+export const IS_QR_FEATURE_MOCK = false;
 
 export const MOCK_QR_CODE = {
   id: "69991b6e192ff90b71f5fc07",

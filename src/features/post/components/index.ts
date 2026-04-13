@@ -1,14 +1,11 @@
-export { MatchedAttributesSection } from "@/src/features/post/components/MatchedAttributesSection";
 export { MinimalPostCard } from "@/src/features/post/components/MinimalPostCard";
 export { PostForm } from "@/src/features/post/components/PostForm";
-export { PostList } from "@/src/features/post/components/PostList";
 export { PostStatusBadge } from "@/src/features/post/components/PostStatusBadge";
 export {
   SimilarPostCard,
-  SimilarPostCardSkeleton,
+  SimilarPostCardSkeleton
 } from "@/src/features/post/components/SimilarPostCard";
 
 export { PostCard } from "@/src/features/post/components/PostCard";
 export { default as PostCreateOptionsBottomSheet } from "@/src/features/post/components/PostCreateOptionsBottomSheet";
-export { PostInfoRow } from "@/src/features/post/components/PostInfoRow";
-export { PostSuggestionCard } from "@/src/features/post/components/PostSuggestionCard";
+

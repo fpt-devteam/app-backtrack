@@ -1,6 +1,6 @@
 import type { AppUser } from "@/src/features/auth/types";
 import type { Handover } from "@/src/features/handover/types";
-import { POST_MOCK } from "@/src/features/post/constants/post.mock";
+import { POST_STORAGE_MOCK } from "@/src/shared/mocks/post.mock";
 
 export const IS_HANDOVER_MOCK = true;
 
@@ -48,7 +48,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finder: null,
     owner: OWNER_USER,
     finderPost: null,
-    ownerPost: POST_MOCK[0], // Lost: Samsung charger
+    ownerPost: POST_STORAGE_MOCK[0], // Lost: Samsung charger
     status: "Draft",
     confirmedAt: null,
     expiresAt: "2026-04-30T00:00:00.000Z",
@@ -60,8 +60,8 @@ export const HANDOVER_MOCK: Handover[] = [
     id: "h-002-active",
     finder: FINDER_USER,
     owner: OWNER_USER,
-    finderPost: POST_MOCK[1], // Found: MacBook charger
-    ownerPost: POST_MOCK[0], // Lost: Samsung charger
+    finderPost: POST_STORAGE_MOCK[1], // Found: MacBook charger
+    ownerPost: POST_STORAGE_MOCK[0], // Lost: Samsung charger
     status: "Active",
     confirmedAt: null,
     expiresAt: "2026-04-20T00:00:00.000Z",
@@ -73,8 +73,8 @@ export const HANDOVER_MOCK: Handover[] = [
     id: "h-003-confirmed",
     finder: FINDER_USER,
     owner: OWNER_USER,
-    finderPost: POST_MOCK[3], // Found: Blue backpack
-    ownerPost: POST_MOCK[2], // Lost: Brown wallet
+    finderPost: POST_STORAGE_MOCK[3], // Found: Blue backpack
+    ownerPost: POST_STORAGE_MOCK[2], // Lost: Brown wallet
     status: "Confirmed",
     confirmedAt: "2026-03-26T10:15:00.000Z",
     expiresAt: "2026-04-02T00:00:00.000Z",
@@ -86,8 +86,8 @@ export const HANDOVER_MOCK: Handover[] = [
     id: "h-004-rejected",
     finder: FINDER_USER,
     owner: OWNER_USER,
-    finderPost: POST_MOCK[5], // Found: Vietnamese ID card
-    ownerPost: POST_MOCK[4], // Lost: Honda keys
+    finderPost: POST_STORAGE_MOCK[5], // Found: Vietnamese ID card
+    ownerPost: POST_STORAGE_MOCK[4], // Lost: Honda keys
     status: "Rejected",
     confirmedAt: null,
     expiresAt: "2026-03-22T00:00:00.000Z",
@@ -99,8 +99,8 @@ export const HANDOVER_MOCK: Handover[] = [
     id: "h-005-expired",
     finder: FINDER_USER,
     owner: OWNER_USER,
-    finderPost: POST_MOCK[1], // Found: MacBook charger
-    ownerPost: POST_MOCK[4], // Lost: Honda keys
+    finderPost: POST_STORAGE_MOCK[1], // Found: MacBook charger
+    ownerPost: POST_STORAGE_MOCK[4], // Lost: Honda keys
     status: "Expired",
     confirmedAt: null,
     expiresAt: "2026-03-12T00:00:00.000Z",
@@ -112,8 +112,8 @@ export const HANDOVER_MOCK: Handover[] = [
     id: "h-006-active",
     finder: FINDER_USER,
     owner: OWNER_USER,
-    finderPost: POST_MOCK[3], // Found: Blue backpack
-    ownerPost: POST_MOCK[4], // Lost: Honda keys
+    finderPost: POST_STORAGE_MOCK[3], // Found: Blue backpack
+    ownerPost: POST_STORAGE_MOCK[4], // Lost: Honda keys
     status: "Active",
     confirmedAt: null,
     expiresAt: "2026-04-25T00:00:00.000Z",

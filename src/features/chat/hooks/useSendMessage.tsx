@@ -1,13 +1,10 @@
-import {
-  CHAT_QUERY_KEY,
-  IS_CHAT_FEATURE_MOCK,
-  sendMockMessage,
-} from "@/src/features/chat/constants";
+import { CHAT_QUERY_KEY } from "@/src/features/chat/constants";
 import { socketChatService } from "@/src/features/chat/services";
 import type {
   MessageSendRequest,
   MessageSendResponse,
-} from "@/src/features/chat/types/chat.dto";
+} from "@/src/features/chat/types";
+import { IS_CHAT_FEATURE_MOCK, sendMockMessage } from "@/src/shared/mocks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 

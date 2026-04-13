@@ -50,7 +50,6 @@ const MOCK_POST: Post = {
     "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2Fcasio-2.jpg?alt=media&token=9497f7df-d640-4bd7-bf88-6bbca36f27aa",
   ],
   description: "Lost near the park entrance",
-  distinctiveMarks: null,
   organization: null,
   eventTime: new Date("2026-04-08T14:30:00"),
   createdAt: new Date("2026-04-08T14:30:00"),

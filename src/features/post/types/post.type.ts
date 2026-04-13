@@ -63,7 +63,6 @@ export type Post = {
   item: PostItem
   imageUrls: string[]
   description: string | null
-  distinctiveMarks: string | null
   organization: Nullable<string>
   eventTime: Date
   createdAt: Date

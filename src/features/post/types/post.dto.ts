@@ -7,6 +7,7 @@ import { LatLng } from "react-native-maps";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
   ITEM_CATEGORIES,
+  PostItem,
   type Post,
   type PostSearchOptions,
   type PostSuggestion,
@@ -37,10 +38,8 @@ export type PostFeedResponse = ApiResponse<PostFeedResult>;
  */
 export type PostCreateRequest = {
   postType: PostType;
-  itemName: string;
-  description: string;
+  item: PostItem;
   imageUrls: string[];
-  distinctiveMarks: string | null;
   eventTime: Date;
 } & UserLocation;
 
@@ -63,14 +62,9 @@ export type MatchingPostsData = {
 export type MatchingPostsResponse = ApiResponse<MatchingPostsData>;
 
 export type AnalyzeImageRequest = {
-  imageBase64: string;
-  mimeType: "image/jpeg" | "image/png" | "image/webp" | "image/gif";
+  imageUrl: string;
 };
-
-export type AnalyzeImageData = {
-  itemName: string;
-  description: string;
-};
+export type AnalyzeImageData = Omit<PostItem, "size" | "additionalDetails">;
 
 export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
 

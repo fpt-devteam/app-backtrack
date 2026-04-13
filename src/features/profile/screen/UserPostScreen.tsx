@@ -1,8 +1,7 @@
-import { IS_POST_MOCK, POST_MOCK } from "@/src/features/post/constants/post.mock";
+import { PostStatusBadge } from "@/src/features/post/components";
 import { useGetAllMyPost } from "@/src/features/post/hooks";
 import type { Post } from "@/src/features/post/types";
-import { PostStatusBadge } from "@/src/features/post/components";
-import { AppImage, AppLoader, AppBackButton } from "@/src/shared/components";
+import { AppBackButton, AppImage, AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
@@ -15,8 +14,8 @@ import {
   Pressable,
   Text,
   TouchableOpacity,
-  View,
   useWindowDimensions,
+  View,
 } from "react-native";
 
 const GRID_COLUMNS = 3;
@@ -54,7 +53,7 @@ const PostGridItem = ({ post, size }: { post: Post; size: number }) => {
 
 const UserPostScreen = () => {
   const { width } = useWindowDimensions();
-  const { data, isLoading, error, refetch } = useGetAllMyPost();
+  const { data: posts, isLoading, error, refetch } = useGetAllMyPost();
 
   const itemSize = useMemo(() => {
     const totalGap = GRID_GAP * (GRID_COLUMNS - 1);
@@ -62,64 +61,36 @@ const UserPostScreen = () => {
     return Math.floor((width - totalPadding - totalGap) / GRID_COLUMNS);
   }, [width]);
 
-  // Use mock data as fallback when API returns empty and mocks are enabled
-  const posts = useMemo(() => {
-    const apiPosts = data || [];
-    if (apiPosts.length > 0) return apiPosts;
-    return IS_POST_MOCK ? POST_MOCK : apiPosts;
-  }, [data]);
+  const renderBody = () => {
+    if (isLoading) {
+      return (
+        <>
+          <View className="flex-1 bg-surface items-center justify-center">
+            <AppLoader />
+          </View>
+        </>
+      );
+    }
 
-  if (isLoading) {
+    if (error) {
+      return (
+        <>
+          <View className="flex-1 bg-surface items-center justify-center px-lg">
+            <Text className="text-textSecondary text-center">
+              Unable to load posts
+            </Text>
+            <Pressable
+              onPress={() => refetch()}
+              className="mt-md px-lg py-sm bg-secondary rounded-full"
+            >
+              <Text className="text-white font-semibold">Try again</Text>
+            </Pressable>
+          </View>
+        </>
+      );
+    }
+
     return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            headerTitle: "Your posts",
-            headerLeft: () => <AppBackButton />,
-          }}
-        />
-        <View className="flex-1 bg-surface items-center justify-center">
-          <AppLoader />
-        </View>
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <Stack.Screen
-          options={{
-            headerShown: true,
-            headerTitle: "Your posts",
-            headerLeft: () => <AppBackButton />,
-          }}
-        />
-        <View className="flex-1 bg-surface items-center justify-center px-lg">
-          <Text className="text-textSecondary text-center">
-            Unable to load posts
-          </Text>
-          <Pressable
-            onPress={() => refetch()}
-            className="mt-md px-lg py-sm bg-secondary rounded-full"
-          >
-            <Text className="text-white font-semibold">Try again</Text>
-          </Pressable>
-        </View>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: "Your posts",
-          headerLeft: () => <AppBackButton />,
-        }}
-      />
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
@@ -132,19 +103,30 @@ const UserPostScreen = () => {
         }}
         columnWrapperStyle={{ gap: GRID_GAP }}
         ItemSeparatorComponent={GridSeparator}
-        renderItem={({ item }) => (
-          <PostGridItem post={item} size={itemSize} />
-        )}
+        renderItem={({ item }) => <PostGridItem post={item} size={itemSize} />}
         ListEmptyComponent={
           <EmptyList
             icon={
-              <PackageIcon size={96} weight="light" color={colors.primary} />
+              <PackageIcon size={128} weight="light" color={colors.secondary} />
             }
             title="No Posts Yet"
             subtitle="Your posts will appear here once you create them."
           />
         }
       />
+    );
+  };
+
+  return (
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerTitle: "Your posts",
+          headerLeft: () => <AppBackButton />,
+        }}
+      />
+      {renderBody()}
     </>
   );
 };

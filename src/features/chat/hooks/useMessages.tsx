@@ -1,7 +1,6 @@
 import { getMessagesApi } from "@/src/features/chat/api";
-import {
-  CHAT_QUERY_KEY
-} from "@/src/features/chat/constants";
+import { CHAT_QUERY_KEY } from "@/src/features/chat/constants";
+import { DEFAULT_PAGE_SIZE } from "@/src/shared/constants";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 export const useMessages = (conversationId: string) => {
@@ -10,7 +9,7 @@ export const useMessages = (conversationId: string) => {
     queryFn: async ({ pageParam }) => {
       const params = {
         cursor: pageParam || undefined,
-        limit: 10,
+        limit: DEFAULT_PAGE_SIZE,
       };
 
       const response = await getMessagesApi(conversationId, params);

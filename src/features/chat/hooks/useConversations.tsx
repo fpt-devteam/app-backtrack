@@ -1,9 +1,6 @@
 import { getConversationsApi } from "@/src/features/chat/api";
-import {
-  CHAT_QUERY_KEY,
-  getMockConversations,
-  IS_CHAT_FEATURE_MOCK,
-} from "@/src/features/chat/constants";
+import { CHAT_QUERY_KEY } from "@/src/features/chat/constants";
+import { getMockConversations, IS_CHAT_FEATURE_MOCK } from "@/src/shared/mocks";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 type UseConversationsProps = {
@@ -20,9 +17,7 @@ export const useConversations = ({ enabled = true }: UseConversationsProps) => {
         limit: 10,
       };
 
-      if (IS_CHAT_FEATURE_MOCK) {
-        return getMockConversations(params);
-      }
+      if (IS_CHAT_FEATURE_MOCK) return getMockConversations(params);
 
       const response = await getConversationsApi(params);
       if (!response?.success) throw new Error("Failed to fetch conversations");

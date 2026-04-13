@@ -24,19 +24,23 @@ const PostCreateOptionsBottomSheet = ({
         id: "add-lost-post",
         icon: BinocularsIcon,
         label: "Add Lost Item",
-        onPress: () =>
+        onPress: () => {
+          onClose();
           router.push(
             `${POST_ROUTE.create}?postType=Lost` as RelativePathString,
-          ),
+          );
+        },
       },
       {
         id: "add-found-post",
         icon: BarcodeIcon,
         label: "Add Found Item",
-        onPress: () =>
+        onPress: () => {
+          onClose();
           router.push(
             `${POST_ROUTE.create}?postType=Found` as RelativePathString,
-          ),
+          );
+        },
       },
     ],
     [onClose],

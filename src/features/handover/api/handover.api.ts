@@ -1,12 +1,12 @@
 // src/features/handover/api/handover.api.ts
 
-import { privateClient } from "@/src/shared/api"
 import type {
+  C2CHandoversResponse,
   C2CReturnReportResponse,
-  C2CReturnReportsResponse,
   CreateC2CReturnReportRequest,
-  GetC2CReturnReportsRequest,
+  GetC2CHandoverRequest,
 } from "@/src/features/handover/types"
+import { privateClient } from "@/src/shared/api"
 
 export const RETURN_REPORT_API = {
   c2cList: "/api/core/return-reports/c2c",
@@ -15,8 +15,8 @@ export const RETURN_REPORT_API = {
   c2cOwnerConfirm: (id: string) => `/api/core/return-reports/c2c/${id}/owner-confirm`,
 } as const
 
-export async function getC2CReturnReportsApi(params?: GetC2CReturnReportsRequest) {
-  const response = await privateClient.get<C2CReturnReportsResponse>(
+export async function getC2CReturnReportsApi(params?: GetC2CHandoverRequest) {
+  const response = await privateClient.get<C2CHandoversResponse>(
     RETURN_REPORT_API.c2cList,
     { params },
   )

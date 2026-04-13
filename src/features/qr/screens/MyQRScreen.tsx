@@ -130,7 +130,14 @@ const MyQRScreen = () => {
     }
   };
 
-  return <View className="flex-1 bg-surface">{renderBody()}</View>;
+  return (
+    <View className="flex-1 bg-surface">
+      <>
+        <MyQRScreenHeader />
+        {renderBody()}
+      </>
+    </View>
+  );
 };
 
 export default MyQRScreen;
