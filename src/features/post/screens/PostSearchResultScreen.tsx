@@ -113,7 +113,7 @@ const PostSearchResultScreen = () => {
   const validSearchOptions = useMemo<PostSearchOptions | null>(() => {
     try {
       const castedOptions = postOptionSchema.cast({
-        query: "wallet",
+        query: keyword ?? "wallet",
         mode: POST_SEARCH_MODE.KEYWORD,
         filters: {
           location: safeCoords,
@@ -485,7 +485,7 @@ const PostSearchResultScreen = () => {
               animate={{ opacity: 1, translateY: 0, scale: 1 }}
               exit={{ opacity: 0, translateY: 100, scale: 0.9 }}
               transition={{ type: "spring", damping: 18, stiffness: 150 }}
-            className="absolute items-center px-lg gap-md"
+              className="absolute items-center px-lg gap-md"
               style={{
                 bottom: insets.bottom + 16,
                 left: 0,

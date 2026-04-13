@@ -7,6 +7,7 @@ const TAB = "/(tabs)" as const;
 const POST_BASE = `${TAB}/post` as const;
 const CHAT_BASE = `${TAB}/chat/conversations` as const;
 const QR_BASE = "/qr" as const;
+const HANDOVER_BASE = `${TAB}/handover` as const;
 
 export const PROFILE_ROUTE = {
   index: "/(tabs)/profile" as ExternalPathString | RelativePathString,
@@ -23,6 +24,7 @@ export const POST_ROUTE = {
   create: "/(tabs)/post/create" as ExternalPathString | RelativePathString,
   createOptions: "/(tabs)/post/create-options" as ExternalPathString | RelativePathString,
   details: (postId: string) => `/(tabs)/post/${postId}` as ExternalPathString | RelativePathString,
+  handoverRequest: (postId: string) => `/(tabs)/post/${postId}/handover-request` as ExternalPathString | RelativePathString,
   matching: (postId: string) => `/(tabs)/post/${postId}/matching` as ExternalPathString | RelativePathString,
   detailMatch: (postId: string, otherPostId: string) =>
     `/(tabs)/post/${postId}/compare/${otherPostId}` as ExternalPathString | RelativePathString,
@@ -45,6 +47,12 @@ export const QR_ROUTE = {
   profile: createPath(`${QR_BASE}/qr-profile`),
   customize: createPath(`${QR_BASE}/qr-customize`),
   profileSetting: createPath(`${QR_BASE}/qr-profile-setting`),
+} as const;
+
+export const HANDOVER_ROUTE = {
+  index: `${HANDOVER_BASE}` as ExternalPathString | RelativePathString,
+  detail: (handoverId: string) =>
+    `${HANDOVER_BASE}/${handoverId}` as ExternalPathString | RelativePathString,
 } as const;
 
 export const MAP_ROUTE = {

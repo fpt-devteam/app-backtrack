@@ -1,0 +1,39 @@
+import { ownerConfirmC2CReturnReportApi } from "@/src/features/handover/api";
+import {
+  C2C_RETURN_REPORT_DETAIL_QUERY_KEY,
+  C2C_RETURN_REPORTS_QUERY_KEY,
+  OWNER_CONFIRM_C2C_RETURN_REPORT_KEY,
+} from "@/src/features/handover/constants";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+
+export const useOwnerConfirmC2CReturnReport = () => {
+  const qc = useQueryClient();
+
+  const mutation = useMutation({
+    mutationKey: OWNER_CONFIRM_C2C_RETURN_REPORT_KEY,
+    mutationFn: async (id: string) => {
+      const response = await ownerConfirmC2CReturnReportApi(id);
+      if (!response.success) throw new Error("Failed to confirm return report");
+      return response.data;
+    },
+    onSuccess: async (_, id) => {
+      qc.invalidateQueries({ queryKey: C2C_RETURN_REPORTS_QUERY_KEY });
+      qc.invalidateQueries({
+        queryKey: [...C2C_RETURN_REPORT_DETAIL_QUERY_KEY, id],
+      });
+    },
+  });
+
+  const error = useMemo(() => {
+    if (!mutation.error) return null;
+    if (mutation.error instanceof Error) return mutation.error;
+    return new Error("Failed to confirm return report");
+  }, [mutation.error]);
+
+  return {
+    ownerConfirm: mutation.mutateAsync,
+    isConfirming: mutation.isPending,
+    error,
+  };
+};

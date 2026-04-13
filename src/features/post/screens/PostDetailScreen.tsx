@@ -14,7 +14,7 @@ import {
   ImageCarousel,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { Nullable } from "@/src/shared/types";
 import { formatIsoDate, getSafeText, toTitleCase } from "@/src/shared/utils";
@@ -595,6 +595,10 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     );
   };
 
+  const handleHandover = () => {
+    router.push(POST_ROUTE.handoverRequest(postId));
+  };
+
   return (
     <>
       <Stack.Screen
@@ -650,6 +654,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         className="flex-row items-center justify-between bg-surface p-md border-t border-muted"
         style={{ paddingBottom: insets.bottom }}
       >
+        {/* Summary Info */}
         <View className="flex-col items-center flex-1 pr-md">
           <View className="flex-row items-center gap-xs">
             <ClockIcon size={16} color={colors.secondary} weight="regular" />
@@ -672,11 +677,12 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           </View>
         </View>
 
+        {/* Handover Button */}
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleHandover}
           className="px-xl py-3 rounded-full bg-primary"
         >
-          <Text className="text-base font-semibold text-white">Handover →</Text>
+          <Text className="text-base font-semibold text-white">Handover</Text>
         </TouchableOpacity>
       </View>
     </>

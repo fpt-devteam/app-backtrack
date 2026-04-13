@@ -22,6 +22,22 @@ export default function PostsStackLayout() {
         <Stack.Screen name="[postId]/index" options={{ headerShown: true }} />
 
         <Stack.Screen
+          name="[postId]/handover-request"
+          options={{
+            headerShown: true,
+            headerTitle: "Handover Request",
+            headerTitleStyle: {
+              fontSize: typography.fontSize.lg,
+              fontWeight: typography.fontWeight
+                .normal as TextStyle["fontWeight"],
+            },
+            headerRight: () => <AppBackButton type="xIcon" />,
+            presentation: "modal",
+            animation: "slide_from_bottom",
+          }}
+        />
+
+        <Stack.Screen
           name="search/index"
           options={{
             headerShown: false,
