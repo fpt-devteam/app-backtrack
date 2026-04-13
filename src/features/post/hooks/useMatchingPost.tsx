@@ -4,10 +4,7 @@ import type {
   MatchingPostsRequest,
   MatchingPostsResponse,
 } from "@/src/features/post/types";
-import {
-  getMockMatchingPosts,
-  IS_POST_MOCK,
-} from "@/src/shared/mocks/post.mock";
+import { IS_POST_MOCK } from "@/src/shared/mocks/post.mock";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useCheckPostMatchingStatus } from "./useCheckPostMatchingStatus";
@@ -19,12 +16,6 @@ export const useMatchingPost = (postId: string) => {
     queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
     enabled: !IS_POST_MOCK && !isMatching && !!postId,
     queryFn: async () => {
-      if (IS_POST_MOCK)
-        return {
-          success: true,
-          data: { similarPosts: getMockMatchingPosts(postId) },
-        };
-
       const request: MatchingPostsRequest = { postId };
       const response = await matchingPostsApi(request);
 

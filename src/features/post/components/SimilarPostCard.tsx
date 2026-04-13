@@ -2,9 +2,8 @@ import type { SimilarPost } from "@/src/features/post/types";
 import { AppImage } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { formatIsoDate } from "@/src/shared/utils";
 import { router } from "expo-router";
-import { ClockIcon, MapPinIcon } from "phosphor-react-native";
+import { CalendarBlankIcon, MapPinIcon } from "phosphor-react-native";
 import React from "react";
 import { Platform, Pressable, Text, View } from "react-native";
 import PostMatchingScoreBadge from "./PostMatchingScoreBadge";
@@ -12,6 +11,11 @@ import PostMatchingScoreBadge from "./PostMatchingScoreBadge";
 type SimilarPostCardProps = {
   postId: string;
   matchPost?: SimilarPost;
+};
+
+const formatTimeGap = (days: number): string => {
+  if (days === 0) return "Same day";
+  return `${days} day${days > 1 ? "s" : ""} apart`;
 };
 
 export const SimilarPostCardSkeleton = () => {
@@ -36,7 +40,7 @@ export const SimilarPostCard = ({
 }: SimilarPostCardProps) => {
   if (!matchPost) return <SimilarPostCardSkeleton />;
 
-  const imgUrl = matchPost.images?.[0]?.url;
+  const imgUrl = matchPost.imageUrls?.[0];
 
   const handleNavigateToMatch = () => {
     router.push(POST_ROUTE.detailMatch(postId, matchPost.id));
@@ -61,7 +65,7 @@ export const SimilarPostCard = ({
           resizeMode="cover"
         />
         <View style={{ position: "absolute", top: 6, right: 6 }}>
-          <PostMatchingScoreBadge score={matchPost.matchScore} />
+          <PostMatchingScoreBadge level={matchPost.matchingLevel} />
         </View>
       </View>
 
@@ -72,7 +76,7 @@ export const SimilarPostCard = ({
           style={{ color: colors.hof[900] }}
           numberOfLines={1}
         >
-          {matchPost.itemName}
+          {matchPost.item.itemName}
         </Text>
 
         <View className="flex-row items-center" style={{ gap: 4 }}>
@@ -87,13 +91,17 @@ export const SimilarPostCard = ({
         </View>
 
         <View className="flex-row items-center" style={{ gap: 4 }}>
-          <ClockIcon size={14} color={colors.primary} weight="regular" />
+          <CalendarBlankIcon
+            size={14}
+            color={colors.primary}
+            weight="regular"
+          />
           <Text
             className="flex-1 text-sm"
             style={{ color: colors.hof[400] }}
             numberOfLines={1}
           >
-            {formatIsoDate(matchPost.eventTime)}
+            {formatTimeGap(matchPost.timeGapDays)}
           </Text>
         </View>
       </View>

@@ -41,6 +41,9 @@ const FINDER_USER: AppUser = {
 
 // ─── Mock handovers ────────────────────────────────────────────────────────────
 
+export const getMockHandoverById = (id: string): Handover | null =>
+  HANDOVER_MOCK.find((h) => h.id === id) ?? null;
+
 export const HANDOVER_MOCK: Handover[] = [
   // 1. Draft — owner initiated, no finder matched yet
   {

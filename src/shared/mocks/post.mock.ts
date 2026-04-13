@@ -1,7 +1,7 @@
 import type { Post, SimilarPost } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 
-export const IS_POST_MOCK = true;
+export const IS_POST_MOCK = false;
 
 const MOCK_AUTHOR = {
   id: "UiJ8fa0Ho5Mr167FqqW2rmbpJMu1",
@@ -35,7 +35,7 @@ export const POST_STORAGE_MOCK: Post[] = [
     description:
       "Lost my Samsung Super Fast Charging wall adapter. It's black with 'Super Fast Charging' embossed on the body.",
     imageUrls: [
-      "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2FDQFfRZq2eKaTumrr4VuWlStW3142%2Fimg_1773658959051_0?alt=media&token=64f37abe-b128-4bbb-a584-fd475dcb57c1",
+      "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2Fwhite_macbook_charger_2.jpg?alt=media&token=a96f55d8-7976-4a05-8820-b0d79927b11b"
     ],
     location: { latitude: 10.8411276, longitude: 106.809883 },
     externalPlaceId: "ChIJsQdrFzEndTERXq6bN0uyUrc",

@@ -9,46 +9,17 @@ import {
 } from "@/src/features/qr/constants";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
-import { AUTH_ROUTE, QR_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
+import { LightbulbIcon, QrCodeIcon } from "phosphor-react-native";
+import React, { useMemo } from "react";
 import {
-  GearSixIcon,
-  LightbulbIcon,
-  MagicWandIcon,
-  QrCodeIcon,
-} from "phosphor-react-native";
-import React, { useCallback, useMemo } from "react";
-import {
-  Pressable,
   Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
-
-const MyQRScreenHeader = () => {
-  const handleEditQRProfile = useCallback(() => {
-    router.push(QR_ROUTE.customize);
-  }, []);
-
-  const handleNavigateSettingScreen = useCallback(() => {
-    router.push(QR_ROUTE.profileSetting);
-  }, []);
-
-  return (
-    <View className="flex-row gap-4 px-2">
-      {/* Edit QR Profile */}
-      <Pressable onPress={handleEditQRProfile} hitSlop={10}>
-        <MagicWandIcon size={22} color={colors.black} weight="bold" />
-      </Pressable>
-      {/* Edit Profile Setting */}
-      <Pressable onPress={handleNavigateSettingScreen} hitSlop={10}>
-        <GearSixIcon size={22} color={colors.black} weight="bold" />
-      </Pressable>
-    </View>
-  );
-};
 
 const TipCard = () => {
   return (
@@ -132,10 +103,7 @@ const MyQRScreen = () => {
 
   return (
     <View className="flex-1 bg-surface">
-      <>
-        <MyQRScreenHeader />
-        {renderBody()}
-      </>
+      <>{renderBody()}</>
     </View>
   );
 };

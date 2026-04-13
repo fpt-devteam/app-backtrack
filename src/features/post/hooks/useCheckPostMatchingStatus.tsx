@@ -22,8 +22,10 @@ export const useCheckPostMatchingStatus = (postId: string) => {
     queryFn: async () => {
       const request: PostMatchingStatusCheckRequest = { postId };
       const response = await checkPostMatchingStatusApi(request);
-      if (!response?.success) throw new Error("Matching failed");
-      if (!response?.data?.matchingStatus) throw new Error("Matching failed");
+
+      if (!response?.success || !response?.data?.matchingStatus)
+        throw new Error("Matching failed");
+
       return response;
     },
 

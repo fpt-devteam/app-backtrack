@@ -183,6 +183,11 @@ export function ProfileScreen() {
         contentContainerStyle={{ paddingBottom: layout.height * 0.1 }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Title */}
+        <View className="pt-lg pb-lg">
+          <Text className="text-3xl font-normal text-textPrimary">Profile</Text>
+        </View>
+
         {/* Profile Card */}
         <TouchableOpacity
           onPress={handleShowProfile}

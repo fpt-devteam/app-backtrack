@@ -144,6 +144,7 @@ const HandoverScreen = () => {
           contentContainerStyle={{
             flexGrow: 0,
             gap: metrics.spacing.md,
+            paddingVertical: metrics.spacing.lg,
           }}
           ListEmptyComponent={
             <EmptyList

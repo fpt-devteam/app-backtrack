@@ -1,12 +1,11 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import { PostStatusBadge } from "@/src/features/post/components";
-import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
-import type { Post } from "@/src/features/post/types";
 import {
-  PostType,
-  SimilarPost,
-  SimilarPostCriterionPoint,
-} from "@/src/features/post/types";
+  PostMatchingScoreBadge,
+  PostStatusBadge,
+} from "@/src/features/post/components";
+import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import type { Post, SimilarPost } from "@/src/features/post/types";
+import { PostType } from "@/src/features/post/types";
 
 import {
   AppAccordion,
@@ -23,10 +22,7 @@ import { router } from "expo-router";
 import { MotiView } from "moti";
 import {
   CaretDownIcon,
-  ClockIcon,
-  EyeIcon,
   MapPinIcon,
-  NoteIcon,
   SparkleIcon,
   TagIcon,
 } from "phosphor-react-native";
@@ -58,8 +54,6 @@ type Category = {
   icon: React.ReactNode;
   rows: ComparisonRow[];
 };
-
-const fmtScore = (score: number) => `${parseFloat((score * 100).toFixed(2))}%`;
 
 // ─── Shared card style ────────────────────────────────────────────────────────
 
@@ -200,6 +194,17 @@ const HeroImage = ({
 
 // ─── buildCategories ─────────────────────────────────────────────────────────
 
+const formatTimeGap = (days: number): string => {
+  if (days === 0) return "Same day";
+  return `${days} day${days > 1 ? "s" : ""} apart`;
+};
+
+const formatDistance = (meters?: number): string => {
+  if (meters == null) return "—";
+  if (meters < 1000) return `${Math.round(meters)} m`;
+  return `${(meters / 1000).toFixed(1)} km`;
+};
+
 const buildCategories = (post1: Post, post2: SimilarPost): Category[] => {
   return [
     {
@@ -210,7 +215,12 @@ const buildCategories = (post1: Post, post2: SimilarPost): Category[] => {
         {
           attribute: "Name",
           post1Value: post1.item.itemName,
-          post2Value: post2.itemName,
+          post2Value: post2.item.itemName,
+        },
+        {
+          attribute: "Category",
+          post1Value: post1.item.category,
+          post2Value: post2.item.category,
         },
         {
           attribute: "Type",
@@ -220,7 +230,7 @@ const buildCategories = (post1: Post, post2: SimilarPost): Category[] => {
         {
           attribute: "Description",
           post1Value: post1.description ?? "—",
-          post2Value: post2.description || "—",
+          post2Value: post2.description ?? "—",
         },
         {
           attribute: "Address",
@@ -232,179 +242,17 @@ const buildCategories = (post1: Post, post2: SimilarPost): Category[] => {
           post1Value: formatDateTime(post1.eventTime),
           post2Value: formatDateTime(post2.eventTime),
         },
+        {
+          attribute: "Time Gap",
+          post1Value: "—",
+          post2Value: formatTimeGap(post2.timeGapDays),
+        },
       ],
     },
   ];
 };
 
-// ─── AI Criteria ─────────────────────────────────────────────────────────────
-
-type CriterionCategory = {
-  id: string;
-  title: string;
-  icon: React.ReactNode;
-  score: number;
-  points: SimilarPostCriterionPoint[];
-};
-
-const getScoreColor = (score: number) => {
-  if (score >= 0.7) return colors.babu[400];
-  if (score >= 0.4) return colors.kazan[500];
-  return colors.error[500];
-};
-
-const CriterionPointRow = ({
-  label,
-  detail,
-}: {
-  label: string;
-  detail: string;
-}) => (
-  <View className="flex-row items-start py-2.5 px-3">
-    <View style={{ flex: 2 }}>
-      <Text
-        className="text-xs font-semibold"
-        style={{ color: colors.text.primary }}
-        numberOfLines={3}
-      >
-        {label}
-      </Text>
-    </View>
-    <View style={{ flex: 3 }}>
-      <Text
-        className="text-xs leading-4"
-        style={{ color: colors.text.secondary }}
-      >
-        {detail}
-      </Text>
-    </View>
-  </View>
-);
-
-const CriteriaAppAccordion = ({
-  title,
-  icon,
-  score,
-  points,
-}: Omit<CriterionCategory, "id">) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [trackWidth, setTrackWidth] = useState(0);
-  const scoreColor = getScoreColor(score);
-  const scorePercent = Math.min(score * 100, 100);
-  const fillWidth = Math.round((trackWidth * scorePercent) / 100);
-
-  return (
-    <View className="mb-3" style={cardStyle}>
-      <AppAccordion
-        isExpanded={isExpanded}
-        onToggle={() => setIsExpanded((prev) => !prev)}
-        collapsedContent={
-          <View>
-            <View className="flex-row items-center px-4 pt-3.5 pb-2.5 gap-3">
-              {icon}
-              <Text
-                className="font-bold text-base flex-1"
-                style={{ color: colors.text.primary }}
-              >
-                {title}
-              </Text>
-              <Text className="text-xs font-bold" style={{ color: scoreColor }}>
-                {fmtScore(score)}
-              </Text>
-              <MotiView
-                animate={{ rotate: isExpanded ? "180deg" : "0deg" }}
-                transition={{ type: "timing", duration: 250 }}
-              >
-                <CaretDownIcon size={16} color={colors.hof[400]} />
-              </MotiView>
-            </View>
-            {/* Score progress bar */}
-            <View className="px-4 pb-3">
-              <View
-                style={{
-                  height: 3,
-                  backgroundColor: colors.hof[200],
-                  borderRadius: metrics.borderRadius.full,
-                }}
-                onLayout={(e) => setTrackWidth(e.nativeEvent.layout.width)}
-              >
-                <MotiView
-                  from={{ width: 0 }}
-                  animate={{ width: fillWidth }}
-                  transition={{ type: "timing", duration: 300, delay: 120 }}
-                  style={{
-                    height: 3,
-                    backgroundColor: scoreColor,
-                    borderRadius: metrics.borderRadius.full,
-                  }}
-                />
-              </View>
-            </View>
-          </View>
-        }
-        expandedContent={
-          points.length > 0 ? (
-            <View
-              style={{
-                backgroundColor: colors.muted,
-                borderTopWidth: 1,
-                borderTopColor: colors.divider,
-              }}
-            >
-              {points.map((point, index) => (
-                <React.Fragment key={index}>
-                  <CriterionPointRow
-                    label={point.label}
-                    detail={point.detail}
-                  />
-                  {index < points.length - 1 && (
-                    <View
-                      className="mx-3 h-px"
-                      style={{ backgroundColor: colors.divider }}
-                    />
-                  )}
-                </React.Fragment>
-              ))}
-            </View>
-          ) : null
-        }
-      />
-    </View>
-  );
-};
-
-const buildCriteriaCategories = (
-  criteria: NonNullable<SimilarPost["criteria"]>,
-): CriterionCategory[] => [
-  {
-    id: "visual",
-    title: "Visual Analysis",
-    icon: <EyeIcon size={20} color={colors.info[500]} weight="fill" />,
-    score: criteria.visualAnalysis.score,
-    points: criteria.visualAnalysis.points ?? [],
-  },
-  {
-    id: "description",
-    title: "Description Match",
-    icon: <NoteIcon size={20} color={colors.info[500]} weight="fill" />,
-    score: criteria.description.score,
-    points: criteria.description.points ?? [],
-  },
-  {
-    id: "location",
-    title: "Location Match",
-    icon: <MapPinIcon size={20} color={colors.babu[400]} weight="fill" />,
-    score: criteria.location.score,
-    points: criteria.location.points ?? [],
-  },
-  {
-    id: "timeWindow",
-    title: "Time Window",
-    icon: <ClockIcon size={20} color={colors.kazan[600]} weight="fill" />,
-    score: criteria.timeWindow.score,
-    points: criteria.timeWindow.points ?? [],
-  },
-];
+// ─── ComparePostsScreen ───────────────────────────────────────────────────────
 
 export const ComparePostsScreen = ({
   postId,
@@ -426,14 +274,6 @@ export const ComparePostsScreen = ({
   const categories = useMemo(
     () => (post1 && matchedPost ? buildCategories(post1, matchedPost) : []),
     [post1, matchedPost],
-  );
-
-  const criteriaCategories = useMemo(
-    () =>
-      matchedPost?.criteria
-        ? buildCriteriaCategories(matchedPost.criteria)
-        : [],
-    [matchedPost],
   );
 
   const handleContactAuthor = async () => {
@@ -504,9 +344,9 @@ export const ComparePostsScreen = ({
               style={{ flex: 1 }}
             >
               <HeroImage
-                imageUrl={matchedPost.images[0]?.url}
+                imageUrl={matchedPost.imageUrls[0]}
                 postType={matchedPost.postType}
-                itemName={matchedPost.itemName}
+                itemName={matchedPost.item.itemName}
               />
             </MotiView>
           </View>
@@ -550,20 +390,7 @@ export const ComparePostsScreen = ({
                       delay: 400,
                     }}
                   >
-                    <View
-                      className="px-2.5 py-1 rounded-full"
-                      style={{
-                        backgroundColor:
-                          getScoreColor(matchedPost.matchScore) + "20",
-                      }}
-                    >
-                      <Text
-                        className="text-xs font-bold"
-                        style={{ color: getScoreColor(matchedPost.matchScore) }}
-                      >
-                        {fmtScore(matchedPost.matchScore)} match
-                      </Text>
-                    </View>
+                    <PostMatchingScoreBadge level={matchedPost.matchingLevel} />
                   </MotiView>
                 </View>
 
@@ -583,7 +410,7 @@ export const ComparePostsScreen = ({
             </MotiView>
           )}
 
-          {/* ── AppAccordion Categories ── */}
+          {/* ── Comparison Categories ── */}
           {categories.map((category, index) => (
             <MotiView
               key={category.id}
@@ -599,25 +426,47 @@ export const ComparePostsScreen = ({
             </MotiView>
           ))}
 
-          {/* ── AI Analysis ── */}
-          {criteriaCategories.length > 0 && (
-            <>
-              {criteriaCategories.map((item, index) => (
-                <MotiView
-                  key={item.id}
-                  from={{ opacity: 0, translateY: 16 }}
-                  animate={{ opacity: 1, translateY: 0 }}
-                  transition={{
-                    type: "timing",
-                    duration: 260,
-                    delay: 260 + index * 60,
-                  }}
+          {/* ── Location row ── */}
+          <MotiView
+            from={{ opacity: 0, translateY: 16 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 260, delay: 260 }}
+          >
+            <View className="mb-3" style={cardStyle}>
+              <View className="flex-row items-center px-4 py-3.5 gap-3">
+                <MapPinIcon
+                  size={20}
+                  color={colors.babu[400]}
+                  weight="fill"
+                />
+                <Text
+                  className="font-bold text-base flex-1"
+                  style={{ color: colors.text.primary }}
                 >
-                  <CriteriaAppAccordion {...item} />
-                </MotiView>
-              ))}
-            </>
-          )}
+                  Location
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: colors.muted,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.divider,
+                }}
+              >
+                <ComparisonRowItem
+                  attribute="Address"
+                  post1Value={post1.displayAddress ?? "—"}
+                  post2Value={matchedPost.displayAddress ?? "—"}
+                />
+                <View className="mx-3 h-px" style={{ backgroundColor: colors.divider }} />
+                <ComparisonRowItem
+                  attribute="Distance"
+                  post1Value="—"
+                  post2Value={formatDistance(matchedPost.distanceInMeters)}
+                />
+              </View>
+            </View>
+          </MotiView>
         </View>
       </ScrollView>
 

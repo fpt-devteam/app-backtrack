@@ -1,5 +1,3 @@
-// src/features/handover/components/HandoverCard.tsx
-
 import type { Handover } from "@/src/features/handover/types";
 import { PostStatusBadge } from "@/src/features/post/components";
 import { AppImage } from "@/src/shared/components";
@@ -8,9 +6,9 @@ import { colors } from "@/src/shared/theme";
 import { formatDate } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { ArrowsLeftRightIcon, CalendarBlankIcon } from "phosphor-react-native";
+import { CalendarBlankIcon } from "phosphor-react-native";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 type HandoverCardProps = {
   report: Handover;
@@ -27,10 +25,9 @@ function deriveDisplayName(report: Handover): string {
 }
 
 export const HandoverCard = ({ report, width }: HandoverCardProps) => {
-  const imageHeight = Math.floor(width * 0.52);
-  const halfWidth = Math.floor(width / 2);
-  const firstImageUrl = report.finderPost?.imageUrls?.[0];
-  const secondImageUrl = report.ownerPost?.imageUrls?.[0];
+  const imageHeight = Math.floor(width * 0.75);
+  const imageUrl =
+    report.finderPost?.imageUrls?.[0] || report.ownerPost?.imageUrls?.[0];
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -50,45 +47,18 @@ export const HandoverCard = ({ report, width }: HandoverCardProps) => {
         style={{ width, height: imageHeight }}
       >
         {/* Left half — finder post */}
-        <View style={{ width: halfWidth, height: imageHeight }}>
+        <View style={{ width, height: imageHeight }}>
           <AppImage
-            source={{ uri: firstImageUrl }}
-            style={{ width: halfWidth, height: imageHeight }}
+            source={{ uri: imageUrl }}
+            style={{ width, height: imageHeight }}
             resizeMode="cover"
           />
+
           {report.finderPost && (
             <View className="absolute bottom-2 left-2">
               <PostStatusBadge status={report.finderPost.postType} size="sm" />
             </View>
           )}
-        </View>
-
-        {/* Right half — owner post */}
-        <View style={{ width: halfWidth, height: imageHeight }}>
-          <AppImage
-            source={{ uri: secondImageUrl }}
-            style={{ width: halfWidth, height: imageHeight }}
-            resizeMode="cover"
-          />
-          {report.ownerPost && (
-            <View className="absolute bottom-2 right-2">
-              <PostStatusBadge status={report.ownerPost.postType} size="sm" />
-            </View>
-          )}
-        </View>
-
-        {/* Center arrow overlay */}
-        <View
-          className="absolute inset-0 items-center justify-center"
-          pointerEvents="none"
-        >
-          <View style={styles.arrowBadge}>
-            <ArrowsLeftRightIcon
-              size={18}
-              color={colors.text.primary}
-              weight="bold"
-            />
-          </View>
         </View>
       </View>
 
@@ -112,19 +82,3 @@ export const HandoverCard = ({ report, width }: HandoverCardProps) => {
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  arrowBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-});

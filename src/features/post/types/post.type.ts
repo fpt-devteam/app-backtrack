@@ -96,20 +96,12 @@ export type SimilarPostCriteria = {
   timeWindow: SimilarPostCriterionResult
 }
 
-export type SimilarPost = {
-  id: string
-  postType: PostType
-  itemName: string
-  description: string
-  images: PostImage[]
-  eventTime: Date
-  matchScore: number
-  distanceMeters: number
+export type SimilarPost = Post & {
+  timeGapDays: number
   matchingLevel: SimilarPostMatchingLevel
   isAssessed: boolean
   assessmentSummary: Nullable<string>
-  criteria: Nullable<SimilarPostCriteria>
-} & UserLocation
+} & Omit<UserLocation, "radiusInKm">
 
 /**
  * POST_SEARCH_MODE - This constant defines the modes of searching for posts. The modes include:

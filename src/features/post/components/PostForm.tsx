@@ -45,10 +45,6 @@ import {
 } from "react-native";
 import * as yup from "yup";
 
-
-
-
-
 const imageValidation = yup
   .mixed<ImagePickerAsset>()
   .defined()
@@ -86,19 +82,11 @@ const postSchema = yup
 
 type PostFormSchema = yup.InferType<typeof postSchema>;
 
-
-
-
-
 type PostFormProps = {
   postType: PostType;
   mode: "create" | "edit";
   initialData: Nullable<Post>;
 };
-
-
-
-
 
 export const PostForm = ({ postType, initialData }: PostFormProps) => {
   const [postData] = useState<Nullable<Post>>(initialData);
@@ -159,10 +147,6 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
 
   const loading = isUploadingImages || isCreatingPost || isAnalyzing;
 
-  
-  
-  
-
   const handleUploadImages = async (
     picked: ImagePickerAsset[],
   ): Promise<string[]> => {
@@ -189,8 +173,8 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
           condition: data.item.condition ?? null,
           material: data.item.material ?? null,
           distinctiveMarks: data.item.distinctiveMarks ?? null,
-          additionalDetails: null, 
-          size: null, 
+          additionalDetails: null,
+          size: null,
         },
         imageUrls,
         eventTime: data.eventTime,
@@ -215,10 +199,6 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
     }
   };
 
-  
-  
-  
-
   return (
     <View className="flex-1">
       <PostFormHeader
@@ -230,7 +210,7 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
       />
 
       {/* AI Analyzing Modal */}
-      <Modal visible={isAnalyzing} transparent animationType="fade">
+      <Modal visible={isAnalyzing } transparent animationType="fade">
         <View className="flex-1 bg-black/50 items-center justify-center">
           <View className="bg-surface rounded-2xl p-6 mx-8 items-center">
             <AppLoader dotSize={8} />
@@ -338,7 +318,6 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
 
           {/* ── Location ───────────────────────────────────────────── */}
           <View className="mb-4">
-            <FieldLabel label="Location" />
             <Controller
               control={control}
               name="detailLocation"
@@ -442,16 +421,11 @@ export const PostForm = ({ postType, initialData }: PostFormProps) => {
   );
 };
 
-
-
-
-
 const FieldLabel = ({ label }: { label: string }) => (
   <Text className="text-slate-700 font-bold text-sm mb-2">{label}</Text>
 );
 
 type OptionalTextInputProps = {
-  
   control: any;
   name: string;
   label: string;
