@@ -11,7 +11,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -21,8 +21,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import type { AppUser } from "@/src/features/auth/types";
-import type { ConversationPartner } from "@/src/features/chat/types";
 import { CHAT_ROUTE } from "@/src/shared/constants";
 import { router, Stack } from "expo-router";
 import { useMemo } from "react";
@@ -30,10 +28,6 @@ import { Text } from "react-native";
 
 type Props = {
   conversationId: string;
-};
-
-type HeaderProps = {
-  partner: AppUser | ConversationPartner | null | undefined;
 };
 
 export const ConversationDetailScreen = ({ conversationId }: Props) => {
@@ -136,6 +130,9 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
           />
         )}
 
+
+
+        {/* Message input */}
         <MessageInput onSend={handleSendMessage} isSending={isSendingMessage} />
       </View>
     </KeyboardAvoidingView>

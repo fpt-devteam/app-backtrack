@@ -124,6 +124,52 @@ export class SocketChatService {
     });
   }
 
+  readMessages(conversationId: string): void {
+    if (!this.socket?.connected) {
+      console.warn("Socket not connected, cannot mark messages as read");
+      return;
+    }
+
+    this.socket.emit("conversation:read", conversationId);
+    console.log("Marking messages as read for conversation:", conversationId);
+  }
+
+  startTyping(conversationId: string): void {
+    if (!this.socket?.connected) {
+      console.warn("Socket not connected, cannot send typing indicator");
+      return;
+    }
+
+    this.socket.emit("typing:start", conversationId);
+  }
+
+  stopTyping(conversationId: string): void {
+    if (!this.socket?.connected) {
+      console.warn("Socket not connected, cannot send typing indicator");
+      return;
+    }
+
+    this.socket.emit("typing:stop", conversationId);
+  }
+
+  onTypingUser(
+    callback: (payload: {
+      userId: string;
+      displayName: string;
+      isTyping: boolean;
+    }) => void,
+  ): () => void {
+    if (!this.socket) {
+      console.warn("Socket not initialized");
+      return () => {};
+    }
+
+    this.socket.on("typing:user", callback);
+    return () => {
+      this.socket?.off("typing:user", callback);
+    };
+  }
+
   isConnected(): boolean {
     return this.socket?.connected ?? false;
   }

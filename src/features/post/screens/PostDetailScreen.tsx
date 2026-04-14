@@ -197,11 +197,11 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         setIsDismissing(true);
 
         if (router.canDismiss()) {
-          router.dismiss();
+          router.dismissTo(POST_ROUTE.index);
         }
 
         const path = CHAT_ROUTE.message(conversationId);
-        router.push(path);
+        router.navigate(path);
       }
     } catch {
       toast.error("Failed to start chat. Please try again.");

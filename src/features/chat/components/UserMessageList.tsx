@@ -5,10 +5,10 @@ import type {
   ConversationPartner,
   UserMessage,
 } from "@/src/features/chat/types";
-import { AppLoader } from "@/src/shared/components";
+import { AppLoader, AppUserAvatar } from "@/src/shared/components";
 import type { Nullable } from "@/src/shared/types";
 import { getDateLabel, isSameDay } from "@/src/shared/utils";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   NativeScrollEvent,
@@ -58,8 +58,20 @@ const DateSeparator = ({ label }: { label: string }) => (
   </View>
 );
 
+const TypingBubble = ({ avatarUrl }: { avatarUrl?: string | null }) => (
+  <View className="w-full items-start mb-md">
+    <View className="flex-row items-end justify-start max-w-[75%] gap-xs">
+      <AppUserAvatar avatarUrl={avatarUrl} size={28} />
+      <View className="px-md py-sm rounded-md rounded-bl-xs bg-muted/90">
+        <AppLoader dotSize={6} colorClass="bg-mutedForeground" bounceHeight={5} />
+      </View>
+    </View>
+  </View>
+);
+
 export const UserMessageList = ({ conversationId, partner }: Props) => {
   const { user } = useAppUser();
+  const [isTyping, setIsTyping] = useState(false);
 
   const {
     data: messages,
@@ -102,15 +114,35 @@ export const UserMessageList = ({ conversationId, partner }: Props) => {
     if (!conversationId) return;
 
     let cleanup: (() => void) | undefined;
+    let cleanupTyping: (() => void) | undefined;
+    let typingTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
     const initSocket = async () => {
       try {
         await socketChatService.connect();
+
         socketChatService.joinConversation(conversationId);
+        socketChatService.readMessages(conversationId);
 
         cleanup = socketChatService.onReceiveMessage((message) => {
           console.log("📨 New message received:", message);
           refetchMessages();
+        });
+
+        cleanupTyping = socketChatService.onTypingUser(({ userId, isTyping }) => {
+          if (userId !== partner?.id) return;
+
+          if (isTyping) {
+            setIsTyping(true);
+            if (typingTimeoutId) clearTimeout(typingTimeoutId);
+            typingTimeoutId = setTimeout(() => setIsTyping(false), 4000);
+          } else {
+            setIsTyping(false);
+            if (typingTimeoutId) {
+              clearTimeout(typingTimeoutId);
+              typingTimeoutId = null;
+            }
+          }
         });
       } catch (error) {
         console.error("Failed to initialize socket:", error);
@@ -120,9 +152,11 @@ export const UserMessageList = ({ conversationId, partner }: Props) => {
 
     return () => {
       if (cleanup) cleanup();
+      if (cleanupTyping) cleanupTyping();
+      if (typingTimeoutId) clearTimeout(typingTimeoutId);
       socketChatService.leaveConversation(conversationId);
     };
-  }, [conversationId, refetchMessages]);
+  }, [conversationId, partner?.id, refetchMessages]);
 
   return (
     <FlatList
@@ -160,6 +194,9 @@ export const UserMessageList = ({ conversationId, partner }: Props) => {
       }}
       className="flex-1"
       showsVerticalScrollIndicator={false}
+      ListHeaderComponent={
+        <>{isTyping && <TypingBubble avatarUrl={partner?.avatarUrl} />}</>
+      }
       inverted
       onScroll={handleScroll}
       scrollEventThrottle={16}
