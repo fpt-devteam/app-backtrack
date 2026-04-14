@@ -1,22 +1,20 @@
 import { useRegister } from "@/src/features/auth/hooks";
 import { type RegisterRequest } from "@/src/features/auth/types";
-import { AppButton, BaseInputField, PasswordField } from "@/src/shared/components";
+import {
+  AppButton,
+  BaseInputField,
+  PasswordField,
+} from "@/src/shared/components";
 import { AUTH_ROUTE } from "@/src/shared/constants";
-import { colors, metrics, typography } from "@/src/shared/theme";
+import { colors, typography } from "@/src/shared/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, useLocalSearchParams } from "expo-router";
 import { CheckCircleIcon, CircleIcon, LockIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import * as yup from "yup";
 
 const passwordSchema = yup
@@ -152,172 +150,156 @@ const RegisterScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    <ScrollView
+      className="flex-1 bg-surface"
+      contentContainerClassName="p-lg gap-lg"
+      automaticallyAdjustKeyboardInsets={true}
+      keyboardShouldPersistTaps="handled"
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View
-          className="flex-1 bg-surface py-2"
-          style={{
-            paddingHorizontal: metrics.spacing.lg,
-            paddingVertical: metrics.spacing.lg,
-          }}
-        >
-          <View className="w-full max-w-screen-sm gap-lg py-4">
-            <View className="gap-md2">
-              <Text className="text-base font-normal text-on-surface">
-                Legal name
-              </Text>
+      {/* Legal name */}
+      <View className="gap-md2">
+        <Text className="text-base font-normal text-on-surface">
+          Legal name
+        </Text>
 
-              <Controller
-                control={control}
-                name="firstName"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <BaseInputField
-                    label="First name"
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    error={errors.firstName?.message}
-                    autoComplete="name"
-                    textContentType="givenName"
-                    autoCapitalize="words"
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="lastName"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <BaseInputField
-                    label="Last name"
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    error={errors.lastName?.message}
-                    autoComplete="name"
-                    textContentType="familyName"
-                    autoCapitalize="words"
-                  />
-                )}
-              />
-              <Text className="text-xs font-normal text-textMuted">
-                Make sure it matches the name on your government ID. If you go
-                by a different name, you can update it.
-              </Text>
-            </View>
-
-            <View className="gap-md2">
-              <Text className="text-base font-normal text-on-surface">
-                Phone
-              </Text>
-              <Controller
-                control={control}
-                name="phone"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <BaseInputField
-                    label="Phone number"
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    error={errors.phone?.message}
-                    keyboardType="phone-pad"
-                    autoComplete="tel"
-                    textContentType="telephoneNumber"
-                    autoCapitalize="none"
-                  />
-                )}
-              />
-            </View>
-
-            <View className="gap-md2">
-              <Text className="text-base font-normal text-on-surface">
-                Password
-              </Text>
-
-              {/* Password field */}
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <PasswordField
-                    value={value}
-                    onChange={(text) => {
-                      if (registerError) {
-                        reset();
-                      }
-                      onChange(text);
-                    }}
-                    onBlur={onBlur}
-                    error={errors.password?.message || registerError}
-                  />
-                )}
-              />
-
-              {/* Password requirements */}
-              <View className="gap-sm bg-surface">
-                {passwordChecklist.map((check) => {
-                  const met = check.test(passwordValue || "");
-
-                  return (
-                    <View
-                      key={check.id}
-                      className="flex-row items-center gap-xs"
-                    >
-                      {met ? (
-                        <CheckCircleIcon
-                          weight="fill"
-                          size={18}
-                          color={colors.status.success}
-                        />
-                      ) : (
-                        <CircleIcon size={18} color={colors.hof[300]} />
-                      )}
-                      <Text
-                        style={{
-                          color: met
-                            ? colors.status.success
-                            : colors.text.secondary,
-                          fontSize: typography.fontSize.sm,
-                          lineHeight: typography.lineHeight.sm,
-                          fontWeight: "400",
-                        }}
-                      >
-                        {check.label}
-                      </Text>
-                    </View>
-                  );
-                })}
-
-                <View className="flex-row items-center gap-xs pt-xs">
-                  <LockIcon size={14} weight="fill" color={colors.text.muted} />
-                  <Text
-                    style={{
-                      color: colors.text.muted,
-                      fontSize: typography.fontSize.xs,
-                      lineHeight: typography.lineHeight.xs,
-                      fontWeight: "400",
-                    }}
-                  >
-                    Your information is encrypted and secure.
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <AppButton
-              title="Create account"
-              onPress={handleSubmit(onSubmit)}
-              loading={isSubmitting}
-              disabled={!isFormReady}
-              variant="secondary"
+        <Controller
+          control={control}
+          name="firstName"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <BaseInputField
+              label="First name"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              error={errors.firstName?.message}
+              autoComplete="name"
+              textContentType="givenName"
+              autoCapitalize="words"
             />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="lastName"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <BaseInputField
+              label="Last name"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              error={errors.lastName?.message}
+              autoComplete="name"
+              textContentType="familyName"
+              autoCapitalize="words"
+            />
+          )}
+        />
+
+        <Text className="text-xs font-normal text-textMuted">
+          Make sure it matches the name on your government ID. If you go by a
+          different name, you can update it.
+        </Text>
+      </View>
+
+      {/* Phone */}
+      <View className="gap-md2">
+        <Text className="text-base font-normal text-on-surface">Phone</Text>
+        <Controller
+          control={control}
+          name="phone"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <BaseInputField
+              label="Phone number"
+              value={value}
+              onChange={onChange}
+              onBlur={onBlur}
+              error={errors.phone?.message}
+              keyboardType="phone-pad"
+              autoComplete="tel"
+              textContentType="telephoneNumber"
+              autoCapitalize="none"
+            />
+          )}
+        />
+      </View>
+
+      {/* Password */}
+      <View className="gap-md2">
+        <Text className="text-base font-normal text-on-surface">Password</Text>
+
+        {/* Password field */}
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <PasswordField
+              value={value}
+              onChange={(text) => {
+                if (registerError) reset();
+                onChange(text);
+              }}
+              onBlur={onBlur}
+              error={errors.password?.message || registerError}
+            />
+          )}
+        />
+
+        {/* Password requirements */}
+        <View className="gap-sm bg-surface">
+          {passwordChecklist.map((check) => {
+            const met = check.test(passwordValue || "");
+
+            return (
+              <View key={check.id} className="flex-row items-center gap-xs">
+                {met ? (
+                  <CheckCircleIcon
+                    weight="fill"
+                    size={18}
+                    color={colors.status.success}
+                  />
+                ) : (
+                  <CircleIcon size={18} color={colors.hof[300]} />
+                )}
+                <Text
+                  style={{
+                    color: met ? colors.status.success : colors.text.secondary,
+                    fontSize: typography.fontSize.sm,
+                    lineHeight: typography.lineHeight.sm,
+                    fontWeight: "400",
+                  }}
+                >
+                  {check.label}
+                </Text>
+              </View>
+            );
+          })}
+
+          <View className="flex-row items-center gap-xs pt-xs">
+            <LockIcon size={14} weight="fill" color={colors.text.muted} />
+            <Text
+              style={{
+                color: colors.text.muted,
+                fontSize: typography.fontSize.xs,
+                lineHeight: typography.lineHeight.xs,
+                fontWeight: "400",
+              }}
+            >
+              Your information is encrypted and secure.
+            </Text>
           </View>
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </View>
+
+      {/* Submit Button */}
+      <AppButton
+        title="Create account"
+        onPress={handleSubmit(onSubmit)}
+        loading={isSubmitting}
+        disabled={!isFormReady}
+        variant="secondary"
+      />
+    </ScrollView>
   );
 };
 

@@ -1,5 +1,5 @@
-import { useLogin } from "@/src/features/auth/hooks";
-import type { LoginRequest } from "@/src/features/auth/types";
+import { useCheckEmailStatus, useLogin } from "@/src/features/auth/hooks";
+import { EMAIL_STATUS, type LoginRequest } from "@/src/features/auth/types";
 import { AppButton, PasswordField } from "@/src/shared/components";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -29,6 +29,7 @@ type LoginFormSchema = yup.InferType<typeof loginFormSchema>;
 const LoginScreen = () => {
   const { email: emailParam } = useLocalSearchParams<{ email?: string }>();
   const { login, loading, error: loginError, reset } = useLogin();
+  const { checkEmailStatus } = useCheckEmailStatus();
 
   const email = Array.isArray(emailParam)
     ? (emailParam[0] ?? "")
@@ -57,6 +58,18 @@ const LoginScreen = () => {
       };
 
       await login(req);
+
+      const emailStatusResponse = await checkEmailStatus({ email });
+      const { status } = emailStatusResponse;
+
+      if (status === EMAIL_STATUS.NOT_VERIFIED) {
+        router.push({
+          pathname: AUTH_ROUTE.verifyEmail,
+          params: { email },
+        });
+        return;
+      }
+
       router.dismissAll();
     } catch (error) {
       console.log("Login error:", error);

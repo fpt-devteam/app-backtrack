@@ -1,6 +1,7 @@
 import { firebaseStorage } from "@/src/shared/lib";
 import type { ImageUploadRequest, ImageUploadResponse } from "@/src/shared/types";
 import { getMediaLibraryPermissionsAsync, PermissionStatus, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import { getAuth, sendEmailVerification } from "firebase/auth";
 import type { StorageReference } from "firebase/storage";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Alert, Linking, Platform } from "react-native";
@@ -43,4 +44,16 @@ export const ensureMediaPermission = async () => {
   );
 
   return false;
+};
+
+export const resendVerificationEmail = async () => {
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (user) {
+    await sendEmailVerification(user);
+    return true;
+  } else {
+    throw new Error("No user is currently signed in.");
+  }
 };

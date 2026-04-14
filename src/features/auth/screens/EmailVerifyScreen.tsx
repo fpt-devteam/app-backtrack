@@ -1,48 +1,86 @@
+import { AppBackButton, AppButton, AppLink } from "@/src/shared/components";
 import { AUTH_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
-import { router, useLocalSearchParams } from "expo-router";
-import { EnvelopeIcon } from "phosphor-react-native";
-import React from "react";
+import { resendVerificationEmail } from "@/src/shared/services";
+import { colors, typography } from "@/src/shared/theme";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { EnvelopeOpenIcon } from "phosphor-react-native";
+import React, { useEffect, useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
+  Alert,
   Text,
-  TouchableOpacity,
+  TextStyle,
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+const COOLDOWN_TIME_SECOND = 60;
 const EmailVerifyScreen = () => {
   const { email } = useLocalSearchParams<{ email: string }>();
   const { height } = useWindowDimensions();
 
-  const handleResendVerificationEmail = () => {
-    // TODO: Implement resend verification email functionality
+  const [countdown, setCountdown] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [countdown]);
+
+  const handleResendVerificationEmail = async () => {
+    if (countdown > 0) return;
+    setIsLoading(true);
+
+    try {
+      await resendVerificationEmail();
+      setCountdown(COOLDOWN_TIME_SECOND);
+    } catch (error) {
+      console.log("Error: ", error);
+      Alert.alert(
+        "Error",
+        "Failed to resend verification email. Please try again later.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoBackToLogin = () => {
-    router.replace(AUTH_ROUTE.onboarding);
+  const handleBackToOnboarding = () => {
+    router.dismissTo(AUTH_ROUTE.onboarding);
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <View
-        className="flex-1 bg-surface px-10 gap-10"
-        style={{
-          paddingTop: height * 0.15,
-          paddingBottom: height * 0.1,
+    <>
+      {/* Header */}
+      <Stack.Screen
+        options={{
+          headerTitle: "Verify Your Email",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.base,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+            color: colors.text.primary,
+          },
+          headerLeft: () => <AppBackButton />,
         }}
+      />
+
+      {/* Content */}
+      <SafeAreaView
+        className="flex-1 px-md bg-surface gap-md"
+        style={{ paddingVertical: height * 0.1 }}
       >
         <View className="flex-row justify-center">
-          <EnvelopeIcon size={128} color={colors.primary} />
+          <EnvelopeOpenIcon size={128} color={colors.primary} />
         </View>
 
         <View className="gap-y-2">
           <Text className="text-xl font-normal text-textPrimary text-center">
-            Verify Your Email
+            Check your email
           </Text>
 
           <Text className="text-base font-thin text-textSecondary text-center leading-6">
@@ -50,27 +88,18 @@ const EmailVerifyScreen = () => {
           </Text>
         </View>
 
-        <TouchableOpacity
-          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+        <AppButton
+          title={
+            countdown > 0 ? `Resend Email in ${countdown}s` : "Resend Email"
+          }
           onPress={handleResendVerificationEmail}
-          activeOpacity={0.8}
-        >
-          <Text className="text-base font-normal text-white text-center">
-            Resend Verification Email
-          </Text>
-        </TouchableOpacity>
+          disabled={countdown > 0}
+          loading={isLoading}
+        />
 
-        <TouchableOpacity
-          className="w-full py-5 items-center justify-center"
-          onPress={handleGoBackToLogin}
-          activeOpacity={0.8}
-        >
-          <Text className="text-base font-normal text-secondary text-center underline">
-            Back to Login
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        <AppLink onPress={handleBackToOnboarding} title="Back to login" />
+      </SafeAreaView>
+    </>
   );
 };
 

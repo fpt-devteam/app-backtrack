@@ -61,14 +61,6 @@ const OnboardingScreen = () => {
       const emailStatusResponse = await checkEmailStatus({ email: data.email });
       const { status } = emailStatusResponse;
 
-      if (status === EMAIL_STATUS.NOT_VERIFIED) {
-        router.push({
-          pathname: AUTH_ROUTE.verifyEmail,
-          params: { email: data.email },
-        });
-        return;
-      }
-
       if (status === EMAIL_STATUS.NOT_FOUND) {
         router.push({
           pathname: AUTH_ROUTE.register,

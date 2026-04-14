@@ -68,19 +68,7 @@ function PublicLayout() {
         }}
       />
 
-      <Stack.Screen
-        name="verify-email"
-        options={{
-          headerShown: true,
-          headerTitle: "Verify Your Email",
-          headerTitleStyle: {
-            fontSize: typography.fontSize.base,
-            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
-            color: colors.text.primary,
-          },
-          headerLeft: () => <AppBackButton />,
-        }}
-      />
+      <Stack.Screen name="verify-email" options={{ headerShown: true }} />
     </Stack>
   );
 }

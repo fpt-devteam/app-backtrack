@@ -1,7 +1,13 @@
 import { colors, metrics, typography } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Animated, TextInput, type TextInputProps, View } from "react-native";
+import {
+  Animated,
+  TextInput,
+  type TextInputProps,
+  TextStyle,
+  View,
+} from "react-native";
 import { AppInlineError } from "../AppInlineError";
 
 type BaseInputFieldProps = {
@@ -95,7 +101,7 @@ export const BaseInputField = forwardRef<TextInput, BaseInputFieldProps>(
     return (
       <View>
         <View
-          className="relative h-control-xl rounded-sm bg-surface pb-2"
+          className="relative h-control-xl rounded-sm bg-surface pb-sm mb-xs"
           style={{ borderWidth: isFocused ? 2 : 1, borderColor }}
         >
           <Animated.Text
@@ -104,10 +110,10 @@ export const BaseInputField = forwardRef<TextInput, BaseInputFieldProps>(
               left: metrics.spacing.md2,
               top: labelTop,
               fontSize: labelFontSize,
-              fontWeight: "400",
+              fontWeight: typography.fontWeight
+                .medium as TextStyle["fontWeight"],
               color: labelColor,
             }}
-            numberOfLines={1}
           >
             {label}
           </Animated.Text>
@@ -119,7 +125,8 @@ export const BaseInputField = forwardRef<TextInput, BaseInputFieldProps>(
               style={{
                 color: colors.text.primary,
                 fontSize: typography.fontSize.base,
-                fontWeight: "400",
+                fontWeight: typography.fontWeight
+                  .medium as TextStyle["fontWeight"],
               }}
               value={value}
               onChangeText={onChange}
