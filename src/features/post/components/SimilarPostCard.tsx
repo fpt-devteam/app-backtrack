@@ -15,7 +15,12 @@ type SimilarPostCardProps = {
 
 const formatTimeGap = (days: number): string => {
   if (days === 0) return "Same day";
-  return `${days} day${days > 1 ? "s" : ""} apart`;
+  if (days === 1) return "1 day apart";
+  if (days < 7) return `${days} days apart`;
+  if (days < 14) return "~1 week apart";
+  if (days < 30) return `~${Math.round(days / 7)} weeks apart`;
+  if (days < 60) return "~1 month apart";
+  return `~${Math.round(days / 30)} months apart`;
 };
 
 export const SimilarPostCardSkeleton = () => {

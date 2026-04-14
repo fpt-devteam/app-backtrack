@@ -164,6 +164,7 @@ export function ProfileScreen() {
               await socketChatService.disconnect();
               await unregisterDevice();
               await signOut(auth);
+              router.push(AUTH_ROUTE.onboarding);
             } catch (error) {
               console.error("Logout failed", error);
             }

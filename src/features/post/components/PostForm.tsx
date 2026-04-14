@@ -33,7 +33,7 @@ import type { ExternalPathString, RelativePathString } from "expo-router";
 import { router } from "expo-router";
 import { CaretDownIcon, CaretUpIcon } from "phosphor-react-native";
 import React, { useState } from "react";
-import type { SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
+import type { Control, SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
@@ -426,7 +426,7 @@ const FieldLabel = ({ label }: { label: string }) => (
 );
 
 type OptionalTextInputProps = {
-  control: any;
+  control: Control<PostFormSchema>;
   name: string;
   label: string;
   placeholder: string;
