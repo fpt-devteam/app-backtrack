@@ -68,6 +68,22 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
     [conversationId, user, sendMessage, conversationDetail],
   );
 
+  const handleSendImage = useCallback(
+    async (imageUrl: string) => {
+      if (!conversationId || !user) return;
+
+      try {
+        await sendMessage({
+          conversationId,
+          request: { conversationId, type: "image", content: imageUrl },
+        });
+      } catch {
+        toast.error("Failed to send image. Please try again.");
+      }
+    },
+    [conversationId, user, sendMessage],
+  );
+
   const handlePressDetails = useCallback(() => {
     router.push(CHAT_ROUTE.information(conversationId));
   }, [conversationId]);
@@ -133,7 +149,11 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
 
 
         {/* Message input */}
-        <MessageInput onSend={handleSendMessage} isSending={isSendingMessage} />
+        <MessageInput
+          onSend={handleSendMessage}
+          onSendImage={handleSendImage}
+          isSending={isSendingMessage}
+        />
       </View>
     </KeyboardAvoidingView>
   );

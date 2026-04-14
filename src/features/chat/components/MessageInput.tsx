@@ -1,5 +1,16 @@
+import { AppLoader } from "@/src/shared/components";
 import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
+import { toast } from "@/src/shared/components/ui/toast";
+import { useUploadImage } from "@/src/shared/hooks";
+import { ensureMediaPermission } from "@/src/shared/services";
 import { colors } from "@/src/shared/theme";
+import {
+  launchCameraAsync,
+  launchImageLibraryAsync,
+  requestCameraPermissionsAsync,
+  type ImagePickerAsset,
+  type ImagePickerOptions,
+} from "expo-image-picker";
 import {
   ArrowUpIcon,
   CameraIcon,
@@ -11,11 +22,23 @@ import { TextInput, View } from "react-native";
 
 type MessageInputProps = {
   onSend: (message: string) => Promise<void>;
+  onSendImage: (imageUrl: string) => Promise<void>;
   isSending?: boolean;
 };
 
-export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
+const PICKER_OPTIONS: ImagePickerOptions = {
+  mediaTypes: ["images"],
+  quality: 1,
+  allowsMultipleSelection: false,
+};
+
+export const MessageInput = ({
+  onSend,
+  onSendImage,
+  isSending,
+}: MessageInputProps) => {
   const [messageText, setMessageText] = useState("");
+  const { uploadImages, isUploadingImages } = useUploadImage();
 
   const handleSend = async () => {
     if (!messageText.trim() || isSending) return;
@@ -31,17 +54,50 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
     }
   };
 
+  const uploadAndSend = async (uri: string) => {
+    // useUploadImage only reads .uri from each asset, cast is safe
+    const results = await uploadImages([{ uri } as ImagePickerAsset]);
+    const downloadURL = results?.[0]?.downloadURL;
+    if (!downloadURL) throw new Error("Upload returned no URL");
+    await onSendImage(downloadURL);
+  };
+
   const handleUploadImage = async () => {
-    console.log("Uploading image...");
+    const hasPermission = await ensureMediaPermission();
+    if (!hasPermission) return;
+
+    const result = await launchImageLibraryAsync(PICKER_OPTIONS);
+    if (result.canceled || !result.assets[0]?.uri) return;
+
+    try {
+      await uploadAndSend(result.assets[0].uri);
+    } catch {
+      toast.error("Failed to upload image. Please try again.");
+    }
   };
 
   const handleTakePhoto = async () => {
-    console.log("Taking photo...");
+    const { status } = await requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      toast.error("Camera permission is required to take photos.");
+      return;
+    }
+
+    const result = await launchCameraAsync(PICKER_OPTIONS);
+    if (result.canceled || !result.assets[0]?.uri) return;
+
+    try {
+      await uploadAndSend(result.assets[0].uri);
+    } catch {
+      toast.error("Failed to upload photo. Please try again.");
+    }
   };
 
   const handlePlusAction = async () => {
     console.log("Plus action triggered...");
   };
+
+  const isMediaDisabled = isUploadingImages || !!isSending;
 
   return (
     <View className="flex-row items-center gap-md bg-surface px-md py-sm border-t border-muted shadow-t-sm">
@@ -54,17 +110,38 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
           onPress={handlePlusAction}
         />
 
-        {/* Camera Button */}
-        <TouchableIconButton
-          icon={<CameraIcon size={28} color={colors.secondary} weight="fill" />}
-          onPress={handleTakePhoto}
-        />
+        {/* Uploading indicator replaces camera + image buttons */}
+        {isUploadingImages ? (
+          <AppLoader dotSize={5} colorClass="bg-secondary" bounceHeight={4} />
+        ) : (
+          <>
+            {/* Camera Button */}
+            <TouchableIconButton
+              disabled={isMediaDisabled}
+              icon={
+                <CameraIcon
+                  size={28}
+                  color={isMediaDisabled ? colors.text.muted : colors.secondary}
+                  weight="fill"
+                />
+              }
+              onPress={handleTakePhoto}
+            />
 
-        {/* Image Upload Button */}
-        <TouchableIconButton
-          icon={<ImageIcon size={28} color={colors.secondary} weight="fill" />}
-          onPress={handleUploadImage}
-        />
+            {/* Image Library Button */}
+            <TouchableIconButton
+              disabled={isMediaDisabled}
+              icon={
+                <ImageIcon
+                  size={28}
+                  color={isMediaDisabled ? colors.text.muted : colors.secondary}
+                  weight="fill"
+                />
+              }
+              onPress={handleUploadImage}
+            />
+          </>
+        )}
       </View>
 
       {/* Message Input */}
@@ -81,7 +158,7 @@ export const MessageInput = ({ onSend, isSending }: MessageInputProps) => {
         selectionColor={colors.black}
       />
 
-      {/* Send Button  */}
+      {/* Send Button */}
       <View
         className="p-sm rounded-full bg-secondary"
         style={{

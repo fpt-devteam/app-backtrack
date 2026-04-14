@@ -2,7 +2,7 @@ import type { UserMessage } from "@/src/features/chat/types";
 import { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 import { formatTime } from "@/src/shared/utils";
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 
 type MessageBubbleProps = {
   message: UserMessage;
@@ -65,12 +65,25 @@ export const UserMessageBubble = ({
             <View style={{ width: 28 }} />
           ))}
 
-        <View className="flex-shrink ">
-          <View className={`px-md py-sm ${bubbleRounding} ${bubbleColor}`}>
-            <Text className={`text-normal font-thin leading-5 ${textColor}`}>
-              {message.content}
-            </Text>
-          </View>
+        <View className="flex-shrink">
+          {message.type === "image" ? (
+            <View
+              className={`overflow-hidden ${bubbleRounding}`}
+              style={{ width: 200, height: 200 }}
+            >
+              <Image
+                source={{ uri: message.content }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
+            </View>
+          ) : (
+            <View className={`px-md py-sm ${bubbleRounding} ${bubbleColor}`}>
+              <Text className={`text-normal font-thin leading-5 ${textColor}`}>
+                {message.content}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </View>

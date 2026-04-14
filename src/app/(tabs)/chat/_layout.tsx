@@ -11,20 +11,7 @@ const ChatLayout = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: true,
-          headerTitle: "Inbox",
-          headerTitleStyle: {
-            fontSize: typography.presets.screenTitle
-              .fontSize as TextStyle["fontSize"],
-            fontWeight: typography.presets.screenTitle
-              .fontWeight as TextStyle["fontWeight"],
-          },
-          headerShadowVisible: false,
-        }}
-      />
+      <Stack.Screen name="index" options={{ headerShown: true }} />
 
       <Stack.Screen
         name="conversations/[conversationId]/index"

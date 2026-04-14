@@ -1,8 +1,9 @@
 import { ChatScreen } from "@/src/features/chat/screens";
 import NotificationScreen from "@/src/features/notification/screens/NotificationScreen";
-import { colors } from "@/src/shared/theme";
+import { colors, typography } from "@/src/shared/theme";
+import { Stack } from "expo-router";
 import React, { useState } from "react";
-import { View, useWindowDimensions } from "react-native";
+import { TextStyle, View, useWindowDimensions } from "react-native";
 import type {
   TabBarProps as RNTabBarProps,
   Route,
@@ -69,17 +70,30 @@ const InboxScreen = () => {
   ]);
 
   return (
-    <View className="flex-1 bg-surface">
-      <TabView<InboxRoute>
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-        style={{ backgroundColor: "transparent" }}
-        renderTabBar={CustomTabBar}
-        swipeEnabled={true}
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerTitle: "Inbox",
+          headerTitleStyle: {
+            fontSize: typography.fontSize["3xl"] as TextStyle["fontSize"],
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+          headerShadowVisible: false,
+        }}
       />
-    </View>
+      <View className="flex-1 bg-surface">
+        <TabView<InboxRoute>
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{ width: layout.width }}
+          style={{ backgroundColor: "transparent" }}
+          renderTabBar={CustomTabBar}
+          swipeEnabled={true}
+        />
+      </View>
+    </>
   );
 };
 
