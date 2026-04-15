@@ -1,18 +1,11 @@
 import { Conversation } from "@/src/features/chat/types";
 import { AppUserAvatar } from "@/src/shared/components";
 import { CHAT_ROUTE } from "@/src/shared/constants/route.constant";
-import { formatMessageTimestamp } from "@/src/shared/utils/datetime.utils";
+import { formatMessageTimestamp } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { Animated, Easing, Pressable, Text, View } from "react-native";
-import ReanimatedAnimated, {
-  Easing as ReanimatedEasing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "react-native-reanimated";
 
 type Props = {
   conversation: Conversation;
@@ -46,12 +39,17 @@ export const ConversationCard = ({ conversation }: Props) => {
   }, [conversation, isLastMessageFromPartner]);
 
   const displayTimeText = useMemo(() => {
-    if (!conversation.lastMessage?.timestamp || !conversation.updatedAt)
+    if (
+      !conversation.lastMessage?.timestamp ||
+      !conversation.updatedAt ||
+      !conversation.createdAt
+    )
       return "";
 
     return (
       formatMessageTimestamp(conversation.lastMessage?.timestamp) ||
-      formatMessageTimestamp(conversation.updatedAt)
+      formatMessageTimestamp(conversation.updatedAt) ||
+      formatMessageTimestamp(conversation.createdAt)
     );
   }, [conversation]);
 
@@ -87,7 +85,7 @@ export const ConversationCard = ({ conversation }: Props) => {
       hitSlop={6}
     >
       <Animated.View
-        className="w-full py-3"
+        className="w-full primary"
         style={{
           transform: [{ scale }],
         }}
@@ -100,7 +98,7 @@ export const ConversationCard = ({ conversation }: Props) => {
           />
 
           {/* Main */}
-          <View className="flex-1 ml-3">
+          <View className="flex-1 ml-3 gap-xs">
             {/* Row 1: Name + unread dot */}
             <View className="flex-row items-center">
               <Text className={`flex-1 ${nameTextClass}`} numberOfLines={1}>
@@ -112,17 +110,21 @@ export const ConversationCard = ({ conversation }: Props) => {
               )}
             </View>
 
-            {/* Last message · time */}
-            <View className="flex-row items-center mt-1">
-              <Text className={`${subtitleTextClass}`} numberOfLines={1}>
+            {/* Last message  */}
+            <View className="flex-row">
+              <Text className={`${subtitleTextClass} flex-1`} numberOfLines={1}>
                 {displayLastMessage}
               </Text>
 
-              {!!displayTimeText && (
-                <View className="flex-row ml-2">
-                  <Text className="text-sm text-textSecondary">{" · "}</Text>
-                  <Text className="text-sm text-textSecondary" numberOfLines={1}>
-                    {displayTimeText}
+              {/* Time */}
+              {displayTimeText && (
+                <View className="">
+                  <Text
+                    className="text-sm text-textSecondary"
+                    style={{ flexShrink: 0 }}
+                    numberOfLines={1}
+                  >
+                    {" · " + displayTimeText}
                   </Text>
                 </View>
               )}
@@ -131,101 +133,5 @@ export const ConversationCard = ({ conversation }: Props) => {
         </View>
       </Animated.View>
     </Pressable>
-  );
-};
-
-export const ConversationCardSkeleton = () => {
-  const opacity = useSharedValue(0.3);
-
-  useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(1, {
-        duration: 1000,
-        easing: ReanimatedEasing.inOut(ReanimatedEasing.ease),
-      }),
-      -1,
-      true,
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-  }));
-
-  return (
-    <View className="w-full py-3">
-      <View className="flex-row items-center">
-        {/* Avatar skeleton */}
-        <View
-          className="rounded-full overflow-hidden"
-          style={{
-            width: 64,
-            height: 64,
-            backgroundColor: "#e2e8f0",
-          }}
-        >
-          <ReanimatedAnimated.View
-            style={[
-              {
-                width: 64,
-                height: 64,
-                backgroundColor: "#f1f5f9",
-              },
-              animatedStyle,
-            ]}
-          />
-        </View>
-
-        {/* Main content skeleton */}
-        <View className="flex-1 ml-3">
-          {/* Name skeleton */}
-          <View
-            style={{
-              width: "60%",
-              height: 18,
-              borderRadius: 4,
-              backgroundColor: "#e2e8f0",
-              overflow: "hidden",
-            }}
-          >
-            <ReanimatedAnimated.View
-              style={[
-                {
-                  width: "100%",
-                  height: 18,
-                  backgroundColor: "#f1f5f9",
-                },
-                animatedStyle,
-              ]}
-            />
-          </View>
-
-          {/* Last message skeleton */}
-          <View className="mt-2">
-            <View
-              style={{
-                width: "85%",
-                height: 14,
-                borderRadius: 4,
-                backgroundColor: "#e2e8f0",
-                overflow: "hidden",
-              }}
-            >
-              <ReanimatedAnimated.View
-                style={[
-                  {
-                    width: "100%",
-                    height: 14,
-                    backgroundColor: "#f1f5f9",
-                  },
-                  animatedStyle,
-                ]}
-              />
-            </View>
-          </View>
-        </View>
-      </View>
-    </View>
   );
 };

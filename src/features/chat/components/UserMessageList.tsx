@@ -13,6 +13,7 @@ import {
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Pressable,
   Text,
   View,
 } from "react-native";
@@ -21,9 +22,16 @@ import { UserMessageBubble } from "./UserMessageBubble";
 type Props = {
   conversationId: string;
   partner: Nullable<ConversationPartner>;
+  onSendSuggestion?: (text: string) => Promise<void>;
 };
 
 const GROUP_THRESHOLD_MS = 2 * 60 * 1000;
+
+const SUGGESTIONS = [
+  "👋 Hi there!",
+  "Did you find something?",
+  "I think I found your item!",
+];
 
 function computeGroupInfo(
   messages: UserMessage[],
@@ -62,19 +70,64 @@ const TypingBubble = ({ avatarUrl }: { avatarUrl?: string | null }) => (
   <View className="w-full items-start mb-md">
     <View className="flex-row items-end justify-start max-w-[75%] gap-xs">
       <AppUserAvatar avatarUrl={avatarUrl} size={28} />
-      <View className="px-md py-sm rounded-md rounded-bl-xs bg-muted/90">
-        <AppLoader dotSize={6} colorClass="bg-mutedForeground" bounceHeight={5} />
+
+      <View className="px-md py-md2 items-center justify-center rounded-md bg-muted/90">
+        <AppLoader
+          dotSize={6}
+          colorClass="bg-mutedForeground"
+          bounceHeight={5}
+        />
       </View>
     </View>
   </View>
 );
 
-export const UserMessageList = ({ conversationId, partner }: Props) => {
+type EmptyConversationStateProps = {
+  partner: Nullable<ConversationPartner>;
+  onSendSuggestion?: (text: string) => Promise<void>;
+};
+
+const EmptyConversationState = ({
+  partner,
+  onSendSuggestion,
+}: EmptyConversationStateProps) => (
+  <View className="flex-1 items-center justify-center gap-lg px-xl">
+    <AppUserAvatar avatarUrl={partner?.avatarUrl} size={72} />
+
+    <View className="items-center gap-xs">
+      <Text className="text-lg font-semibold text-textPrimary">
+        {partner?.displayName ?? "Unknown User"}
+      </Text>
+      <Text className="text-sm text-textSecondary text-center">
+        Start the conversation
+      </Text>
+    </View>
+
+    <View className="flex-row flex-wrap justify-center gap-sm">
+      {SUGGESTIONS.map((suggestion) => (
+        <Pressable
+          key={suggestion}
+          onPress={() => onSendSuggestion?.(suggestion)}
+          className="px-md py-sm rounded-full border border-divider bg-surface active:bg-muted"
+        >
+          <Text className="text-sm text-textPrimary">{suggestion}</Text>
+        </Pressable>
+      ))}
+    </View>
+  </View>
+);
+
+export const UserMessageList = ({
+  conversationId,
+  partner,
+  onSendSuggestion,
+}: Props) => {
   const { user } = useAppUser();
   const [isTyping, setIsTyping] = useState(false);
 
   const {
     data: messages,
+    isLoading,
     refetch: refetchMessages,
     fetchNextPage,
     hasNextPage,
@@ -129,21 +182,23 @@ export const UserMessageList = ({ conversationId, partner }: Props) => {
           refetchMessages();
         });
 
-        cleanupTyping = socketChatService.onTypingUser(({ userId, isTyping }) => {
-          if (userId !== partner?.id) return;
+        cleanupTyping = socketChatService.onTypingUser(
+          ({ userId, isTyping }) => {
+            if (userId !== partner?.id) return;
 
-          if (isTyping) {
-            setIsTyping(true);
-            if (typingTimeoutId) clearTimeout(typingTimeoutId);
-            typingTimeoutId = setTimeout(() => setIsTyping(false), 4000);
-          } else {
-            setIsTyping(false);
-            if (typingTimeoutId) {
-              clearTimeout(typingTimeoutId);
-              typingTimeoutId = null;
+            if (isTyping) {
+              setIsTyping(true);
+              if (typingTimeoutId) clearTimeout(typingTimeoutId);
+              typingTimeoutId = setTimeout(() => setIsTyping(false), 4000);
+            } else {
+              setIsTyping(false);
+              if (typingTimeoutId) {
+                clearTimeout(typingTimeoutId);
+                typingTimeoutId = null;
+              }
             }
-          }
-        });
+          },
+        );
       } catch (error) {
         console.error("Failed to initialize socket:", error);
       }
@@ -157,6 +212,15 @@ export const UserMessageList = ({ conversationId, partner }: Props) => {
       socketChatService.leaveConversation(conversationId);
     };
   }, [conversationId, partner?.id, refetchMessages]);
+
+  if (messages.length === 0 && !isLoading) {
+    return (
+      <EmptyConversationState
+        partner={partner}
+        onSendSuggestion={onSendSuggestion}
+      />
+    );
+  }
 
   return (
     <FlatList

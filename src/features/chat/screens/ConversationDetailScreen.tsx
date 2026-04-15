@@ -11,7 +11,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -143,10 +143,9 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
           <UserMessageList
             conversationId={conversationId}
             partner={conversationDetail?.partner}
+            onSendSuggestion={handleSendMessage}
           />
         )}
-
-
 
         {/* Message input */}
         <MessageInput

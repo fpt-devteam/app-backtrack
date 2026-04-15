@@ -1,29 +1,20 @@
 import { useAuth } from "@/src/features/auth/providers";
-import {
-  ConversationCard,
-  ConversationCardSkeleton,
-} from "@/src/features/chat/components/ConversationCard";
+import { ConversationCard } from "@/src/features/chat/components";
 import { useConversations } from "@/src/features/chat/hooks";
-import { AppInlineError } from "@/src/shared/components";
-import EmptyList from "@/src/shared/components/ui/EmptyList";
+import { AppButton, AppLoader } from "@/src/shared/components";
 import { AUTH_ROUTE } from "@/src/shared/constants";
+import { metrics } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
-import { ChatCenteredTextIcon } from "phosphor-react-native";
+import { ChatCenteredTextIcon, WarningCircleIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef } from "react";
-import {
-  FlatList,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { FlatList, Text, useWindowDimensions, View } from "react-native";
+import { RefreshControl } from "react-native-gesture-handler";
 
 export const ChatScreen = () => {
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
-  const { height } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
   const {
     data,
@@ -58,80 +49,154 @@ export const ChatScreen = () => {
     return isFetching && !isFetchingNextPage;
   }, [isFetching, isFetchingNextPage]);
 
-  if (!isAuthReady) {
-    return (
-      <View
-        className="flex-1 bg-surface px-10 gap-10 pt-20"
-        style={{ paddingTop: height * 0.15 }}
-      >
-        <View className="flex-row justify-center">
-          <ChatCenteredTextIcon size={128} color={colors.primary} />
-        </View>
+  const handleNavigateToOnboarding = useCallback(() => {
+    router.push(AUTH_ROUTE.onboarding);
+  }, []);
 
-        <View className="gap-y-2">
-          <Text className="text-xl font-normal text-textPrimary text-center">
-            Log in to see messages
-          </Text>
+  const handleRefetch = useCallback(() => {
+    refetch();
+  }, []);
 
-          <Text className="text-base font-thin text-textSecondary text-center leading-6">
-            Once you log in, you will find all your conversations here.
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
-          onPress={() => router.push(AUTH_ROUTE.onboarding)}
-          activeOpacity={0.8}
+  const renderBody = () => {
+    if (isLoading) {
+      return (
+        <View
+          className="flex-1 px-md"
+          style={{
+            justifyContent: "center",
+            marginBottom: metrics.tabBar.height,
+          }}
         >
-          <Text className="text-base font-normal text-white text-center">
-            Log in or Sign up
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+          <AppLoader />
+        </View>
+      );
+    }
 
-  if (isLoading) {
+    if (!isAuthReady) {
+      return (
+        <View
+          className="flex-1 px-md"
+          style={{
+            justifyContent: "center",
+            gap: metrics.spacing.md,
+            marginBottom: metrics.tabBar.height,
+          }}
+        >
+          <View className="flex-row justify-center">
+            <ChatCenteredTextIcon
+              size={200}
+              weight="thin"
+              color={colors.primary}
+            />
+          </View>
+
+          <View className="gap-y-xs">
+            <Text className="text-xl font-normal text-textPrimary text-center">
+              Log in to see messages
+            </Text>
+
+            <Text className="text-base font-thin text-textSecondary text-center leading-6">
+              Once you log in, you will find all your conversations here.
+            </Text>
+          </View>
+
+          <View className="w-full">
+            <AppButton
+              title="Log in or Sign up"
+              onPress={handleNavigateToOnboarding}
+            />
+          </View>
+        </View>
+      );
+    }
+
+    if (isError) {
+      return (
+        <View
+          className="flex-1 px-md"
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            gap: metrics.spacing.md,
+            marginBottom: metrics.tabBar.height,
+          }}
+        >
+          <View className="bg-red-50 p-md rounded-full">
+            <WarningCircleIcon
+              size={200}
+              weight="duotone"
+              color={colors.status.error}
+            />
+          </View>
+
+          <View className="gap-y-xs">
+            <Text className="text-xl font-semibold text-textPrimary text-center">
+              Oops! Something went wrong
+            </Text>
+            <Text className="text-base font-light text-textSecondary text-center leading-6">
+              We're having trouble loading your conversations. Please check your
+              connection and try again.
+            </Text>
+          </View>
+
+          <View className="w-full">
+            <AppButton
+              title="Try Again"
+              onPress={handleRefetch}
+              variant="secondary"
+            />
+          </View>
+        </View>
+      );
+    }
+
     return (
-      <View className="px-4 flex-1 pt-4">
-        {Array.from({ length: 6 }, (_, i) => `skeleton-item-${i}`).map((id) => (
-          <ConversationCardSkeleton key={id} />
-        ))}
-      </View>
-    );
-  }
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.conversationId}
+        renderItem={({ item }) => <ConversationCard conversation={item} />}
+        contentContainerClassName="p-md flex-1"
+        showsVerticalScrollIndicator={false}
+        onEndReached={onLoadMore}
+        onEndReachedThreshold={0.35}
+        ItemSeparatorComponent={() => <View className="h-md" />}
+        ListEmptyComponent={
+          <View
+            className="flex-1"
+            style={{
+              justifyContent: "center",
+              gap: metrics.spacing.md,
+            }}
+          >
+            <View className="flex-row justify-center">
+              <ChatCenteredTextIcon
+                size={200}
+                weight="thin"
+                color={colors.primary}
+              />
+            </View>
 
-  if (isError) {
-    return (
-      <AppInlineError message="Failed to load conversations. Please try again." />
-    );
-  }
+            <View className="gap-y-xs">
+              <Text className="text-xl font-normal text-textPrimary text-center">
+                You don't have any conversations yet.
+              </Text>
 
-  return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.conversationId}
-      renderItem={({ item }) => <ConversationCard conversation={item} />}
-      contentContainerClassName="px-4"
-      showsVerticalScrollIndicator={false}
-      onEndReached={onLoadMore}
-      onEndReachedThreshold={0.35}
-      // ItemSeparatorComponent={AppDivider}
-      ListEmptyComponent={
-        <EmptyList
-          icon={<ChatCenteredTextIcon size={128} color={colors.primary} />}
-          title="You don't have any conversations yet."
-          subtitle="Once you receive messages, they will appear here."
-          backButton={null}
-        />
-      }
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={() => refetch()}
-          tintColor={colors.primary}
-        />
-      }
-    />
-  );
+              <Text className="text-base font-thin text-textSecondary text-center leading-6">
+                Once you receive messages, they will appear here.
+              </Text>
+            </View>
+          </View>
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefetch}
+            tintColor={colors.primary}
+          />
+        }
+      />
+    );
+  };
+
+  return <View className="flex-1">{renderBody()}</View>;
 };

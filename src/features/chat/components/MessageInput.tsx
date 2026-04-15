@@ -55,10 +55,14 @@ export const MessageInput = ({
   };
 
   const uploadAndSend = async (uri: string) => {
-    // useUploadImage only reads .uri from each asset, cast is safe
     const results = await uploadImages([{ uri } as ImagePickerAsset]);
     const downloadURL = results?.[0]?.downloadURL;
-    if (!downloadURL) throw new Error("Upload returned no URL");
+
+    if (!downloadURL) {
+      console.log("Upload returned no URL");
+      return;
+    }
+    
     await onSendImage(downloadURL);
   };
 

@@ -85,7 +85,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
       }
     };
 
-    return (
+  return (
       <TabBarButton
         key={route.key}
         isFocused={isFocused}

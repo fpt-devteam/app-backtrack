@@ -46,16 +46,6 @@ const CustomTabBar = (props: RNTabBarProps<InboxRoute>) => {
       }}
       activeColor={colors.black}
       inactiveColor={colors.hof[400]}
-      options={Object.fromEntries(
-        props.navigationState.routes.map((route) => [
-          route.key,
-          {
-            labelText: route.title,
-            labelStyle: { fontWeight: "500" },
-            fontSize: 14,
-          },
-        ]),
-      )}
     />
   );
 };

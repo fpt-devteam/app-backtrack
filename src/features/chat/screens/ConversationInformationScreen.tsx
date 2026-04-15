@@ -1,12 +1,7 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { useConversationDetail } from "@/src/features/chat/hooks";
 import { PostType } from "@/src/features/post/types";
-import {
-  AppButton,
-  AppImage,
-  AppLoader,
-  AppUserAvatar,
-} from "@/src/shared/components";
+import { AppImage, AppLoader, AppUserAvatar } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { formatDate } from "@/src/shared/utils";
 import { ArchiveIcon, ChatDotsIcon } from "phosphor-react-native";
@@ -69,10 +64,14 @@ const PostInfoCard = ({ post }: { post: Post }) => {
   const typeLabel = POST_TYPE_LABEL[post.postType] ?? post.postType;
   const dateLabel = formatDate(post.eventTime.toISOString());
 
+  const handleNavigateToPostDetails = useCallback(() => {
+    router.push(POST_ROUTE.details(post.id));
+  }, [post]);
+
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => router.push(POST_ROUTE.details(post.id))}
+      onPress={handleNavigateToPostDetails}
       style={{
         borderWidth: 0.75,
         shadowColor: colors.black,
@@ -80,7 +79,7 @@ const PostInfoCard = ({ post }: { post: Post }) => {
         shadowOpacity: 0.2,
         shadowRadius: 10,
       }}
-      className="flex-row gap-md bg-surface rounded-2xl border border-divider p-lg"
+      className="flex-row gap-md bg-surface rounded-2xl border border-divider p-md"
     >
       <AppImage
         source={{ uri: imgUrl }}
@@ -90,20 +89,17 @@ const PostInfoCard = ({ post }: { post: Post }) => {
       <View className="flex-1 gap-xs justify-center">
         <Text
           className="text-base font-semibold text-textPrimary"
-          numberOfLines={2}
+          numberOfLines={1}
         >
           {post.item.itemName}
         </Text>
+
         <Text className="text-sm text-textSecondary" numberOfLines={1}>
           {typeLabel} · {dateLabel}
         </Text>
-        {post.displayAddress ? (
-          <Text className="text-sm text-textSecondary" numberOfLines={1}>
-            {post.displayAddress}
-          </Text>
-        ) : null}
-        <Text className="text-sm font-semibold text-textPrimary">
-          Show details &gt;
+
+        <Text className="text-sm text-textSecondary" numberOfLines={1}>
+          {post.displayAddress}
         </Text>
       </View>
     </TouchableOpacity>
@@ -212,15 +208,6 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
       {/* Post Card section*/}
       <View className="gap-lg">
         <PostInfoCard post={MOCK_POST} />
-
-        <View className="flex-row gap-md">
-          <View className="flex-1">
-            <AppButton onPress={() => {}} title="Decline" variant="outline" />
-          </View>
-          <View className="flex-1">
-            <AppButton onPress={() => {}} title="Resolve" variant="secondary" />
-          </View>
-        </View>
       </View>
       {/* People in this conversation */}
       <View className="mt-xl">
