@@ -11,6 +11,15 @@ const SharedScreensLayout = () => {
           animation: "fade",
         }}
       />
+
+      <Stack.Screen
+        name="[userId]"
+        options={{
+          headerShown: true,
+          presentation: "modal",
+          animation: "slide_from_bottom",
+        }}
+      />
     </Stack>
   );
 };

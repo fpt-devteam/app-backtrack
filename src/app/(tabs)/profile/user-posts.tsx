@@ -1,1 +1,1 @@
-export { UserPostScreen as default } from "@/src/features/profile/screen";
+export { UserPostScreen as default } from "@/src/features/profile/screens";

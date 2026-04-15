@@ -1,1 +1,1 @@
-export { ProfileMenuTabScreen as default } from "@/src/features/profile/screen";
+export { ProfileMenuTabScreen as default } from "@/src/features/profile/screens";

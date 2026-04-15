@@ -14,7 +14,7 @@ import {
   ImageCarousel,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE, POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { Nullable } from "@/src/shared/types";
 import { formatIsoDate, getSafeText, toTitleCase } from "@/src/shared/utils";
@@ -57,6 +57,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppUser } from "@/src/features/auth/providers";
 
 /**
  * Generates Airbnb-style descriptions (approx. 10-15 words).
@@ -175,6 +176,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   });
 
   const { isLoading, data: post } = useGetPostById({ postId });
+  const { user } = useAppUser();
   const { similarPosts } = useMatchingPost(postId);
 
   const { create: createConversation, isCreating } =
@@ -208,6 +210,11 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     }
   }, [post?.author?.id, createConversation]);
 
+  const handleShowHostProfile = useCallback(() => {
+    if (!post?.author?.id) return;
+    router.push(SHARED_ROUTE.publicProfile(post.author.id));
+  }, [post]);
+
   const {
     postImageUrls,
     displayDescription,
@@ -215,6 +222,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     displayName,
     displayEventTime,
     itemDetailRows,
+    isMyPost,
   } = useMemo(() => {
     if (!post) {
       return {
@@ -224,6 +232,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
         displayName: "Anonymous",
         displayEventTime: "Event time not specified",
         itemDetailRows: [] as { label: string; value: string }[],
+        isMyPost: true,
       };
     }
 
@@ -249,8 +258,9 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
       ],
       hasEmail: !!author?.showEmail && !!author?.email,
       hasPhone: !!author?.showPhone && !!author?.phone,
+      isMyPost: author.id === user?.id,
     };
-  }, [post]);
+  }, [post, user]);
 
   if (!postId) return <AppInlineError message="Failed to load post details." />;
 
@@ -487,7 +497,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                 {/* Avatar + name + message icon */}
                 <Pressable
                   className="flex-row items-center gap-md p-md"
-                  onPress={() => console.log("Go to host profile")}
+                  onPress={handleShowHostProfile}
                 >
                   <View className="relative">
                     <AppUserAvatar
@@ -529,13 +539,15 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                   </View>
 
                   {/* Chat icon button */}
-                  <TouchableOpacity
-                    onPress={handleStartChat}
-                    disabled={isCreating}
-                    className="p-2 rounded-full border"
-                  >
-                    <ChatCircleDotsIcon size={24} weight="regular" />
-                  </TouchableOpacity>
+                  {isMyPost ? null : (
+                    <TouchableOpacity
+                      onPress={handleStartChat}
+                      disabled={isCreating}
+                      className="p-2 rounded-full border"
+                    >
+                      <ChatCircleDotsIcon size={24} weight="regular" />
+                    </TouchableOpacity>
+                  )}
                 </Pressable>
               </View>
             </View>
