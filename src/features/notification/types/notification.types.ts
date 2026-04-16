@@ -24,6 +24,9 @@ export const NOTIFICATION_EVENT = {
   AIMatchingEvent: "AIMatchingEvent",
   QRScanEvent: "QRScanEvent",
   SystemAlertEvent: "SystemAlertEvent",
+  HandoverRequest: "HandoverRequest",
+  HandoverAccepted: "HandoverAccepted",
+  HandoverRejected: "HandoverRejected",
 } as const;
 
 export type NotificationEvent =

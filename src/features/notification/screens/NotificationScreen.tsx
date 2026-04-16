@@ -5,6 +5,10 @@ import {
   useUpdateNotificationStatus,
 } from "@/src/features/notification/hooks";
 import {
+  IS_NOTIFICATIONS_MOCK,
+  MOCK_NOTIFICATIONS,
+} from "@/src/features/notification/screens/mock";
+import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
@@ -28,8 +32,17 @@ const NotificationScreen = () => {
   const isAuthReady = isAppReady && isLoggedIn;
   const { height } = useWindowDimensions();
 
-  const { items, isLoading, hasMore, loadMore, isLoadingNextPage } =
-    useNotifications({ enabled: isAuthReady });
+  const {
+    items: fetchedItems,
+    isLoading,
+    hasMore,
+    loadMore,
+    isLoadingNextPage,
+  } = useNotifications({ enabled: isAuthReady });
+
+  const items: UserNotification[] = IS_NOTIFICATIONS_MOCK
+    ? MOCK_NOTIFICATIONS
+    : fetchedItems;
 
   const { updateStatus } = useUpdateNotificationStatus();
 

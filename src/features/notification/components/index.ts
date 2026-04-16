@@ -1,2 +1,2 @@
-export { NotificationRow } from "./NotificationRow";
+export { NotificationRow } from "./NotificationRow/NotificationRow";
 

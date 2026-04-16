@@ -2,13 +2,14 @@ import { ChatScreen } from "@/src/features/chat/screens";
 import NotificationScreen from "@/src/features/notification/screens/NotificationScreen";
 import { colors, typography } from "@/src/shared/theme";
 import { Stack } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { TextStyle, View, useWindowDimensions } from "react-native";
 import type {
   TabBarProps as RNTabBarProps,
   Route,
 } from "react-native-tab-view";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+import { useUnreadNotificationCount } from "../hooks";
 
 type InboxRoute = {
   key: Route["key"];
@@ -21,11 +22,15 @@ const ChatScene = () => (
   </View>
 );
 
-const NotificationScene = () => (
-  <View className="flex-1 bg-surface">
-    <NotificationScreen />
-  </View>
-);
+const NotificationScene = () => {
+  const { count } = useUnreadNotificationCount();
+
+  return (
+    <View className="flex-1 bg-surface">
+      <NotificationScreen />
+    </View>
+  );
+};
 
 const renderScene = SceneMap({
   chat: ChatScene,
@@ -54,9 +59,20 @@ const InboxScreen = () => {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
 
+  const { count } = useUnreadNotificationCount();
+
+  const displayCount = useMemo(() => {
+    if (count === 0) return "";
+    if (count > 99) return "99+";
+    return count.toString();
+  }, [count]);
+
   const [routes] = useState<InboxRoute[]>([
     { key: "chat", title: "Messages" },
-    { key: "notification", title: "Notifications" },
+    {
+      key: "notification",
+      title: `Notifications ${displayCount ?? `(${displayCount})`}`,
+    },
   ]);
 
   return (
@@ -72,6 +88,7 @@ const InboxScreen = () => {
           headerShadowVisible: false,
         }}
       />
+
       <View className="flex-1 bg-surface">
         <TabView<InboxRoute>
           navigationState={{ index, routes }}
