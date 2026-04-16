@@ -357,6 +357,23 @@ const PostLocationSearchScreen = ({
     ],
   );
 
+  const handleOnToggle = useCallback(async () => {
+    if (!isExpanded) {
+      setIsFocused(true);
+      inputRef.current?.focus();
+    } else {
+      setIsFocused(false);
+      inputRef.current?.blur();
+
+      if (
+        displayMode === "suggestions" &&
+        predictions.length > 0
+      )
+        await handleSelectSuggestion(predictions[0]);
+    }
+    onToggle();
+  }, [isExpanded, onToggle, displayMode, predictions, handleSelectSuggestion]);
+
   return (
     <View
       className="rounded-[16] bg-surface py-xs border-surface stroke-slate-200"
@@ -377,7 +394,7 @@ const PostLocationSearchScreen = ({
       </View>
 
       <Pressable
-        onPress={onToggle}
+        onPress={handleOnToggle}
         className="p-md gap-md flex-row justify-between items-center"
       >
         <View>{renderTitle}</View>
