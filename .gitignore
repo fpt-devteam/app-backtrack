@@ -57,3 +57,5 @@ GoogleService-Info.plist
 
 # opencode config
 opencode.json
+
+.env*
