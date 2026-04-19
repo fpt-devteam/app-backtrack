@@ -25,6 +25,11 @@ const STEPS: { path: ExternalPathString | RelativePathString }[] = [
 const PostCreationStepperLayout = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
+  const debug = usePostCreationStore((state) => state.debug);
+  const images = usePostCreationStore((state) => state.images);
+
+  const isNextDisabled = currentStep === 2 && images.length === 0;
+
   const handleNext = () => {
     debug();
 
@@ -33,7 +38,6 @@ const PostCreationStepperLayout = () => {
     setCurrentStep(newStep);
     router.push(STEPS[newStep].path);
   };
-  const debug = usePostCreationStore((state) => state.debug);
 
   const handleBack = () => {
     router.back();
@@ -95,6 +99,36 @@ const PostCreationStepperLayout = () => {
               headerRight: () => <AppBackButton type="xIcon" />,
             }}
           />
+
+          <Stack.Screen
+            name="location"
+            options={{
+              headerShown: true,
+              headerTitle: "Location of Incident",
+              headerBackVisible: false,
+              headerTitleStyle: {
+                fontSize: typography.fontSize.lg,
+                fontWeight: typography.fontWeight
+                  .normal as TextStyle["fontWeight"],
+              },
+              headerRight: () => <AppBackButton type="xIcon" />,
+            }}
+          />
+
+          <Stack.Screen
+            name="timeline"
+            options={{
+              headerShown: true,
+              headerTitle: "Time of Incident",
+              headerBackVisible: false,
+              headerTitleStyle: {
+                fontSize: typography.fontSize.lg,
+                fontWeight: typography.fontWeight
+                  .normal as TextStyle["fontWeight"],
+              },
+              headerRight: () => <AppBackButton type="xIcon" />,
+            }}
+          />
         </Stack>
       </View>
 
@@ -113,6 +147,8 @@ const PostCreationStepperLayout = () => {
         <TouchableOpacity
           className=" border bg-secondary rounded-sm px-lg py-md"
           onPress={handleNext}
+          disabled={isNextDisabled}
+          style={{ opacity: isNextDisabled ? 0.4 : 1 }}
         >
           <Text className="text-base font-normal text-center text-white tracking-label">
             Next
