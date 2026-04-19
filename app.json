@@ -27,7 +27,9 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.fptdevteam.backtrack",
       "googleServicesFile": "./google-services.json",
-      "permissions": ["android.permission.RECORD_AUDIO"]
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -55,7 +57,8 @@
           "cameraPermission": "The app accesses your camera to let you take photos and share them with your friends."
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,

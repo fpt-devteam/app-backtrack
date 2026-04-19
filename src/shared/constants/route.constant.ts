@@ -22,7 +22,14 @@ export const PROFILE_ROUTE = {
 export const POST_ROUTE = {
   index: "/(tabs)/post" as ExternalPathString | RelativePathString,
   create: "/(tabs)/post/create" as ExternalPathString | RelativePathString,
-  createOptions: "/(tabs)/post/create-options" as ExternalPathString | RelativePathString,
+  stepper: "/(tabs)/post/create/stepper" as ExternalPathString | RelativePathString,
+  category: "/(tabs)/post/create/stepper/category" as ExternalPathString | RelativePathString,
+  subCategory: "/(tabs)/post/create/stepper/sub-category" as ExternalPathString | RelativePathString,
+  identity: "/(tabs)/post/create/stepper/identity" as ExternalPathString | RelativePathString,
+  location: "/(tabs)/post/create/stepper/location" as ExternalPathString | RelativePathString,
+  timeline: "/(tabs)/post/create/stepper/timeline" as ExternalPathString | RelativePathString,
+  itemDetail: "/(tabs)/post/create/stepper/detail" as ExternalPathString | RelativePathString,
+
   details: (postId: string) => `/(tabs)/post/${postId}` as ExternalPathString | RelativePathString,
   handoverRequest: (postId: string) => `/(tabs)/post/${postId}/handover-request` as ExternalPathString | RelativePathString,
   matching: (postId: string) => `/(tabs)/post/${postId}/matching` as ExternalPathString | RelativePathString,

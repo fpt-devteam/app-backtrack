@@ -125,3 +125,83 @@ export type PostSuggestion = {
 }
 
 export type PostSearchOptions = yup.InferType<typeof postOptionSchema>
+
+
+/**
+ * POST_CATEGORIES 
+ * This constant defines the categories of posts that can be created. 
+ */
+export const POST_CATEGORIES = {
+  ELECTRONICS: "Electronics",
+  CARD: "Card",
+  PERSONAL_BELONGINGS: "Personal Belongings",
+  OTHER: "Other",
+} as const;
+
+export type PostCategory = typeof POST_CATEGORIES[keyof typeof POST_CATEGORIES]
+
+/**
+ * ELECTRONICS_SUBCATEGORY 
+ * This constant defines the subcategories of electronics that can be associated with a post.
+ */
+export const ELECTRONICS_SUBCATEGORY = {
+  PHONE: "Phone",
+  LAPTOP: "laptop",
+  SMARTWATCH: "smartwatch",
+  CHARGER_ADAPTER: "charger_adapter",
+  MOUSE: "mouse",
+  KEYBOARD: "keyboard",
+  POWERBANK: "powerbank",
+  POWER_OUTLET: "power_outlet",
+  HEADPHONE: "headphone",
+  EARPHONE: "earphone",
+} as const
+
+export type ElectronicsSubcategory = typeof ELECTRONICS_SUBCATEGORY[keyof typeof ELECTRONICS_SUBCATEGORY]
+
+/**
+ * CARD_SUBCATEGORY
+ * This constant defines the subcategories of cards that can be associated with a post.
+ */
+export const CARD_SUBCATEGORY = {
+  BANK_CARD: "bank_card",
+  COMPANY_CARD: "company_card",
+  DRIVER_LICENSE: "driver_license",
+  IDENTIFICATION_CARD: "identification_card",
+  PASSPORT: "passport",
+  PERSONAL_CARD: "personal_card",
+  STUDENT_CARD: "student_card",
+} as const
+
+export type CardSubcategory = typeof CARD_SUBCATEGORY[keyof typeof CARD_SUBCATEGORY]
+
+/**
+ * PERSONAL_BELONGING_SUBCATEGORY
+ * This constant defines the subcategories of personal belongings that can be associated with a post.
+ */
+export const PERSONAL_BELONGING_SUBCATEGORY = {
+  BACKPACK: "backpack",
+  CLOTHINGS: "clothings",
+  JEWELRY: "jewelry",
+  KEYS: "keys",
+  SUITCASES: "suitcases",
+  WALLETS: "wallets",
+} as const
+
+export type PersonalBelongingSubcategory = typeof PERSONAL_BELONGING_SUBCATEGORY[keyof typeof PERSONAL_BELONGING_SUBCATEGORY]
+
+/**
+ * OTHER_SUBCATEGORY
+ * This constant defines the subcategories of other items that can be associated with a post.
+ */
+export const OTHER_SUBCATEGORY = {
+  OTHER: "other",
+} as const
+
+export type OtherSubcategory = typeof OTHER_SUBCATEGORY[keyof typeof OTHER_SUBCATEGORY]
+
+export type PostSubcategory =
+  | ElectronicsSubcategory
+  | CardSubcategory
+  | PersonalBelongingSubcategory
+  | OtherSubcategory

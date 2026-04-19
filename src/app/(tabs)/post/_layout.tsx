@@ -1,7 +1,6 @@
 import { LocationSelectionProvider } from "@/src/features/map/store/location.store";
 import { AppBackButton } from "@/src/shared/components";
 import { typography } from "@/src/shared/theme";
-import { colors } from "@/src/shared/theme/colors";
 import { Stack } from "expo-router";
 import { TextStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -79,11 +78,7 @@ export default function PostsStackLayout() {
         <Stack.Screen
           name="create"
           options={{
-            headerShown: false,
-            contentStyle: {
-              paddingTop: insets.top,
-              backgroundColor: colors.white,
-            },
+            presentation: "modal",
             animation: "slide_from_bottom",
           }}
         />

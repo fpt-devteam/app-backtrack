@@ -1,9 +1,11 @@
 import PostCreateOptionsBottomSheet from "@/src/features/post/components/PostCreateOptionsBottomSheet";
 import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
+import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
+import { router } from "expo-router";
 import type { IconProps } from "phosphor-react-native";
 import {
   BellIcon,
@@ -85,7 +87,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
       }
     };
 
-  return (
+    return (
       <TabBarButton
         key={route.key}
         isFocused={isFocused}
@@ -97,11 +99,11 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   };
 
   const handleAddPress = () => {
-    setIsCreateOptionsVisible(true);
+    router.push(POST_ROUTE.create);
   };
 
   const handleCloseCreateOptions = () => {
-    setIsCreateOptionsVisible(false);
+    router.dismissAll();
   };
 
   return (

@@ -9,15 +9,21 @@ type Prop = {
   type?: "xIcon" | "CaretLeftIcon" | "arrowLeftIcon";
   size?: number;
   showBackground?: boolean;
+  onPress?: () => void;
 };
 
 export const AppBackButton = ({
   type = "CaretLeftIcon",
   size = 20,
   showBackground = true,
+  onPress,
 }: Prop) => {
   const handleBackPress = () => {
-    router.back();
+    if (onPress) {
+      onPress();
+    } else {
+      router.back();
+    }
   };
 
   if (type === "arrowLeftIcon") {

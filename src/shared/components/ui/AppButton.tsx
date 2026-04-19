@@ -1,5 +1,6 @@
 import { AppLoader } from "@/src/shared/components/AppLoader";
 import { cn } from "@/src/shared/utils/cn";
+import { View } from "moti";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 
@@ -12,6 +13,7 @@ type AppButtonProps = {
   disabled?: boolean;
   variant?: AppButtonVariant;
   className?: string;
+  icon?: React.ReactNode;
 };
 
 const BUTTON_VARIANT_CLASS: Record<AppButtonVariant, string> = {
@@ -27,6 +29,7 @@ export const AppButton = ({
   disabled = false,
   variant = "primary",
   className,
+  icon,
 }: AppButtonProps) => {
   const isDisabled = disabled || loading;
   const isOutline = variant === "outline";
@@ -51,9 +54,12 @@ export const AppButton = ({
       {loading ? (
         <AppLoader colorClass={loaderColor} />
       ) : (
-        <Text className={`text-base font-semibold ${textColor} tracking-label`}>
-          {title}
-        </Text>
+        <View className="flex-row items-center justify-center gap-2">
+          {icon && <View className="">{icon}</View>}
+          <Text className={`text-base font-normal ${textColor} tracking-label`}>
+            {title}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );

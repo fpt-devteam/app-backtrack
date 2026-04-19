@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 
-type LinkSize = "sm" | "md" | "lg";
+type LinkSize = "sm" | "md" | "lg" | "base";
 
 type AppLinkProps = {
   title: string;
