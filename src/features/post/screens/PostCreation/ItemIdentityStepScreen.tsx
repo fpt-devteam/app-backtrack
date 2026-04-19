@@ -2,6 +2,7 @@ import { usePostCreationStore } from "@/src/features/post/hooks";
 import { MenuBottomSheet, type MenuOption } from "@/src/shared/components/ui/MenuBottomSheet";
 import { toast } from "@/src/shared/components/ui/toast";
 import { ensureMediaPermission } from "@/src/shared/services";
+import { colors } from "@/src/shared/theme/colors";
 import {
   launchCameraAsync,
   launchImageLibraryAsync,
@@ -173,8 +174,10 @@ const HeroSlot = ({ image, onPress, onRemove }: HeroSlotProps) => {
         onPress={onPress}
         className="w-full aspect-square bg-muted rounded-xl items-center justify-center border border-divider"
         style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+        accessibilityLabel="Add photo"
+        accessibilityRole="button"
       >
-        <ImageIcon size={40} />
+        <ImageIcon size={40} color={colors.text.muted} />
         <Text className="text-textMuted text-sm mt-2">Tap to add main photo</Text>
       </Pressable>
     );
@@ -196,6 +199,8 @@ const HeroSlot = ({ image, onPress, onRemove }: HeroSlotProps) => {
         className="absolute top-3 right-3 bg-black/60 rounded-full p-1"
         onPress={onRemove}
         hitSlop={8}
+        accessibilityLabel="Remove photo"
+        accessibilityRole="button"
       >
         <XIcon size={16} color="#fff" />
       </TouchableOpacity>
@@ -220,8 +225,10 @@ const SecondarySlot = ({ image, onPress, onRemove }: SecondarySlotProps) => {
         onPress={onPress}
         className="bg-muted rounded-xl items-center justify-center border border-divider"
         style={({ pressed }) => ({ flex: 1, minWidth: "45%", aspectRatio: 1, opacity: pressed ? 0.7 : 1 })}
+        accessibilityLabel="Add photo"
+        accessibilityRole="button"
       >
-        <ImageIcon size={28} />
+        <ImageIcon size={28} color={colors.text.muted} />
       </Pressable>
     );
   }
@@ -234,6 +241,8 @@ const SecondarySlot = ({ image, onPress, onRemove }: SecondarySlotProps) => {
       <Pressable
         onPress={onPress}
         style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1, flex: 1 })}
+        accessibilityLabel="Set as main photo"
+        accessibilityRole="button"
       >
         <Image
           source={{ uri: image.uri }}
@@ -245,6 +254,8 @@ const SecondarySlot = ({ image, onPress, onRemove }: SecondarySlotProps) => {
         className="absolute top-2 right-2 bg-black/60 rounded-full p-1"
         onPress={onRemove}
         hitSlop={8}
+        accessibilityLabel="Remove photo"
+        accessibilityRole="button"
       >
         <XIcon size={14} color="#fff" />
       </TouchableOpacity>
