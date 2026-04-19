@@ -1,4 +1,5 @@
 import { usePostCreationStore } from "@/src/features/post/hooks";
+import { eventTimeSchema } from "@/src/features/post/schemas";
 import { AppBackButton, AppLink } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, typography } from "@/src/shared/theme";
@@ -27,8 +28,17 @@ const PostCreationStepperLayout = () => {
 
   const debug = usePostCreationStore((state) => state.debug);
   const images = usePostCreationStore((state) => state.images);
+  const locationCoords = usePostCreationStore((state) => state.location.coords);
+  const timelineDate = usePostCreationStore((state) => state.timeline.date);
 
-  const isNextDisabled = currentStep === 2 && images.length === 0;
+  const isIdentityStepInvalid = currentStep === 2 && images.length === 0;
+  const isLocationStepInvalid = currentStep === 3 && !locationCoords;
+  const isTimelineStepInvalid =
+    currentStep === 4 &&
+    (!timelineDate || !eventTimeSchema.isValidSync(timelineDate));
+
+  const isNextDisabled =
+    isIdentityStepInvalid || isLocationStepInvalid || isTimelineStepInvalid;
 
   const handleNext = () => {
     debug();
