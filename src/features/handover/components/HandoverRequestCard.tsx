@@ -1,103 +1,116 @@
-import { Handover } from "@/src/features/handover/types";
+// src/features/handover/components/HandoverRequestCard.tsx
+
+import type { Handover } from "@/src/features/handover/types";
+import { AppImage, AppUserAvatar } from "@/src/shared/components";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import { CalendarBlankIcon, CheckIcon, XIcon } from "phosphor-react-native";
+import { formatDate } from "@/src/shared/utils";
+import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
+import { CalendarBlankIcon, CaretRightIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   handover: Handover;
+  currentUserId: string;
 };
 
-const MOCK_IMAGE =
-  "https://hips.hearstapps.com/hmg-prod/images/most-popular-dog-breeds-kerry-blue-terrier-68096bdb872b7.jpg?crop=0.668xw:1.00xh;0.0833xw,0";
+function deriveDisplayName(handover: Handover): string {
+  const finderName = handover.finderPost?.item.itemName;
+  const ownerName = handover.ownerPost?.item.itemName;
+  if (finderName && ownerName) return `${finderName} ↔ ${ownerName}`;
+  if (finderName) return `Found: ${finderName}`;
+  if (ownerName) return `Lost: ${ownerName}`;
+  return "Return Report";
+}
 
-const MOCK_AVATAR_IMAGE =
-  "https://hips.hearstapps.com/clv.h-cdn.co/assets/16/18/gettyimages-586890581.jpg?crop=0.668xw:1.00xh;0.219xw,0";
+export const HandoverRequestCard = ({ handover, currentUserId }: Props) => {
+  const isFinder = handover.finder?.id === currentUserId;
+  const counterpart = isFinder ? handover.owner : handover.finder;
+  const roleLabel = isFinder ? "You found it" : "You lost it";
 
-const MOCK_TITLE = "Vintage Woasfasfasdfasdfasdfasdfasdfoden Chair";
+  const imageUrl = useMemo(
+    () =>
+      handover.finderPost?.imageUrls?.[0] ??
+      handover.ownerPost?.imageUrls?.[0],
+    [handover],
+  );
 
-const MOCK_SUBTITLE =
-  "John Doe, I want to return this item because it is not as described. The item is in good condition and I have all the original packaging.";
-
-export const HandoverRequestCard = ({ handover }: Props) => {
-  const imageUrl = useMemo(() => {
-    return MOCK_IMAGE;
-  }, [handover]);
-
-  const avartaImageUrl = useMemo(() => {
-    return MOCK_AVATAR_IMAGE;
-  }, [handover]);
-
-  const displayUsername = useMemo(() => {
-    return MOCK_TITLE;
-  }, [handover]);
-
-  const displayEventDate = useMemo(() => {
-    const eventDate = new Date(handover.createdAt);
-    return eventDate.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  }, [handover]);
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push(HANDOVER_ROUTE.detail(handover.id));
+  };
 
   return (
-    <View className="flex-row items-center gap-md py-md border-b border-divider">
-      {/* Post Image & Avatar */}
-      <View className="relative ">
-        <Image
+    <TouchableOpacity
+      onPress={handlePress}
+      activeOpacity={0.8}
+      className="flex-row items-center gap-md py-md border-b border-divider"
+    >
+      {/* Item image */}
+      <View className="relative">
+        <AppImage
           source={{ uri: imageUrl }}
-          className="w-20 aspect-square rounded-lg"
+          style={{ width: 64, height: 64, borderRadius: 10 }}
+          resizeMode="cover"
         />
-
-        <Image
-          source={{ uri: avartaImageUrl }}
-          className="absolute bottom-[-12] right-[-8] w-12 aspect-square rounded-full border-2 border-white"
-        />
+        {counterpart && (
+          <View
+            className="absolute bottom-[-10] right-[-8]"
+            style={{
+              borderWidth: 2,
+              borderColor: colors.white,
+              borderRadius: 999,
+            }}
+          >
+            <AppUserAvatar avatarUrl={counterpart.avatarUrl} size={28} />
+          </View>
+        )}
       </View>
 
-      {/* Post Information */}
+      {/* Details */}
       <View className="flex-1 flex-col gap-xs">
-        <Text className="font-normal" numberOfLines={1}>
-          {displayUsername}
-        </Text>
-
         <Text
-          className="font-thin text-sm text-textSecondary"
-          numberOfLines={2}
+          className="text-sm font-semibold text-textPrimary"
+          numberOfLines={1}
         >
-          {MOCK_SUBTITLE}
+          {deriveDisplayName(handover)}
         </Text>
 
-        {/* Event Date */}
-        <View className="flex-row gap-xs">
-          <CalendarBlankIcon size={12} color={colors.text.muted} />
-          <Text className="font-thin text-xs text-textSecondary">
-            {displayEventDate}
+        <View className="flex-row items-center gap-xs">
+          <View
+            className="px-2 py-0.5 rounded-full"
+            style={{ backgroundColor: colors.hof[100] }}
+          >
+            <Text
+              className="text-xs font-medium"
+              style={{ color: colors.hof[600] }}
+            >
+              {roleLabel}
+            </Text>
+          </View>
+          {counterpart?.displayName && (
+            <Text
+              className="text-xs text-textMuted"
+              numberOfLines={1}
+              style={{ flexShrink: 1 }}
+            >
+              with {counterpart.displayName}
+            </Text>
+          )}
+        </View>
+
+        <View className="flex-row items-center gap-xs">
+          <CalendarBlankIcon size={11} color={colors.text.muted} />
+          <Text className="text-xs text-textMuted">
+            {formatDate(handover.createdAt)}
           </Text>
         </View>
       </View>
 
-      {/* Button Actions */}
-      <View className="flex-row gap-sm">
-        <Pressable
-          className="p-xs rounded-full border"
-          style={{
-            borderColor: colors.status.error,
-          }}
-        >
-          <XIcon size={16} color={colors.status.error} />
-        </Pressable>
-
-        <Pressable
-          className="p-xs rounded-full border"
-          style={{
-            borderColor: colors.status.success,
-          }}
-        >
-          <CheckIcon size={16} color={colors.status.success} />
-        </Pressable>
-      </View>
-    </View>
+      {/* Chevron */}
+      <CaretRightIcon size={16} color={colors.text.muted} />
+    </TouchableOpacity>
   );
 };
