@@ -8,6 +8,18 @@ export const IS_NOTIFICATIONS_MOCK = true;
 
 export const MOCK_NOTIFICATIONS: UserNotification[] = [
   {
+    id: "mock-1",
+    userId: "mock-user",
+    type: NOTIFICATION_EVENT.ChatEvent,
+    title: "New message",
+    body: "Alex sent you a message about the phone you reported.",
+    status: NOTIFICATION_STATUS.Unread,
+    sentAt: new Date(Date.now() - 8 * 60 * 1000),
+    data: {
+      screenPath: "/(tabs)/chat/conversations/chat-42",
+    },
+  },
+  {
     id: "mock-2",
     userId: "mock-user",
     type: NOTIFICATION_EVENT.AIMatchingEvent,

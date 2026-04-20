@@ -3,6 +3,7 @@ import { NOTIFICATION_EVENT } from "@/src/features/notification/types";
 import React from "react";
 import {
   AIMatchingNotificationRow,
+  ChatEventNotificationRow,
   HandoverAcceptNotificationRow,
   HandoverRejectNotificationRow,
   HandoverRequestNotificationRow,
@@ -20,6 +21,13 @@ export const NotificationRow = ({
   onPress,
 }: NotificationRowProps) => {
   switch (notification.type) {
+    case NOTIFICATION_EVENT.ChatEvent:
+      return (
+        <ChatEventNotificationRow
+          notification={notification}
+          onPress={onPress}
+        />
+      );
     case NOTIFICATION_EVENT.AIMatchingEvent:
       return (
         <AIMatchingNotificationRow
