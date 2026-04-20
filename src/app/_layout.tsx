@@ -4,9 +4,14 @@ import { toastConfig } from "@/src/shared/components/ui/toast/toast-config";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Notifications from "expo-notifications";
-import { Stack } from "expo-router";
+import {
+  ExternalPathString,
+  RelativePathString,
+  router,
+  Stack,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -32,6 +37,28 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
+  useEffect(() => {
+    function redirect(notification: Notifications.Notification) {
+      const url = notification.request.content.data?.screenPath;
+      console.log("Url: ", url);
+      router.push(url as RelativePathString | ExternalPathString);
+    }
+
+    const response = Notifications.getLastNotificationResponse();
+    if (response?.notification) {
+      redirect(response.notification);
+    }
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        redirect(response.notification);
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
