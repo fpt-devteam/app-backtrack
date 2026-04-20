@@ -32,6 +32,7 @@ export const useRegisterDeviceMutation = () => {
       const deviceId = token;
 
       console.log("Obtained Expo push token:", token);
+      
       Alert.alert(
         "Device Registered",
         `Device registered with token: ${token}`,
