@@ -1,8 +1,12 @@
-import { usePostCreationStore } from "@/src/features/post/hooks";
+import { useCreatePost, usePostCreationStore } from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
-import { AppBackButton, AppLink } from "@/src/shared/components";
+import { PostCreateRequest } from "@/src/features/post/types";
+import { AppLink, AppLoader } from "@/src/shared/components";
+import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
+import { useUploadImage } from "@/src/shared/hooks";
 import { colors, typography } from "@/src/shared/theme";
+import { ImagePickerAsset } from "expo-image-picker";
 import {
   ExternalPathString,
   RelativePathString,
@@ -24,28 +28,41 @@ const STEPS: { path: ExternalPathString | RelativePathString }[] = [
 ];
 
 const PostCreationStepperLayout = () => {
+  const { uploadImages, isUploadingImages } = useUploadImage();
+  const { createPost, isCreatingPost } = useCreatePost();
+
   const [currentStep, setCurrentStep] = useState(0);
 
   const debug = usePostCreationStore((state) => state.debug);
+
+  const postType = usePostCreationStore((state) => state.postType);
+  const category = usePostCreationStore((state) => state.category);
+  const subCategory = usePostCreationStore((state) => state.subCategory);
   const images = usePostCreationStore((state) => state.images);
-  const locationCoords = usePostCreationStore((state) => state.location.coords);
+  const location = usePostCreationStore((state) => state.location);
   const timelineDate = usePostCreationStore((state) => state.timeline.date);
 
+  const resetForm = usePostCreationStore((state) => state.resetForm);
+
+  const electronicDetail = usePostCreationStore(
+    (state) => state.electronicDetail,
+  );
+
   const isIdentityStepInvalid = currentStep === 2 && images.length === 0;
-
-  const isLocationStepInvalid = currentStep === 3 && !locationCoords;
-
+  const isLocationStepInvalid = currentStep === 3 && !location.coords;
   const isTimelineStepInvalid =
     currentStep === 4 &&
     (!timelineDate || !eventTimeSchema.isValidSync(timelineDate));
-
   const isNextDisabled =
     isIdentityStepInvalid || isLocationStepInvalid || isTimelineStepInvalid;
 
   const handleNext = () => {
     debug();
 
-    if (currentStep >= STEPS.length - 1) return;
+    if (currentStep >= STEPS.length - 1) {
+      handleSubmit();
+      return;
+    }
 
     const newStep = Math.min(currentStep + 1, STEPS.length - 1);
     setCurrentStep(newStep);
@@ -58,6 +75,53 @@ const PostCreationStepperLayout = () => {
     const newStep = Math.max(currentStep - 1, 0);
     setCurrentStep(newStep);
   };
+
+  const handleUploadImages = async (picked: ImagePickerAsset[]) => {
+    const uploadRes = await uploadImages(picked);
+    if (!uploadRes) return [];
+    return uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const imageUrls = await handleUploadImages(images);
+
+      const req: PostCreateRequest = {
+        postType,
+        category,
+        subcategoryCode: subCategory,
+        imageUrls,
+        location: location.coords,
+        externalPlaceId: location.placeId,
+        displayAddress: location.address,
+        eventTime: timelineDate ?? new Date(),
+        electronicDetail,
+      };
+
+      const postDetails = await createPost(req);
+      const postId = postDetails?.id;
+      if (!postId) {
+        toast.error("Failed to create post. Please try again.");
+        return;
+      }
+
+      resetForm();
+
+      router.push(
+        POST_ROUTE.matching(postId) as RelativePathString | ExternalPathString,
+      );
+    } catch (e) {
+      console.warn("Submit failed", e);
+      toast.error("Failed to create post. Please try again.");
+    }
+  };
+
+  const handleCancel = () => {
+    router.dismissAll();
+    resetForm();
+  };
+
+  const isLoading = isUploadingImages || isCreatingPost;
 
   return (
     <SafeAreaView className="flex-1 bg-surface">
@@ -73,13 +137,12 @@ const PostCreationStepperLayout = () => {
             name="category"
             options={{
               headerShown: true,
-              headerTitle: "Select category",
+              headerTitle: "Item Classification",
               headerTitleStyle: {
                 fontSize: typography.fontSize.lg,
                 fontWeight: typography.fontWeight
                   .normal as TextStyle["fontWeight"],
               },
-              headerRight: () => <AppBackButton type="xIcon" />,
             }}
           />
 
@@ -87,14 +150,13 @@ const PostCreationStepperLayout = () => {
             name="sub-category"
             options={{
               headerShown: true,
-              headerTitle: "Select sub-category",
+              headerTitle: "Detailed Classification",
               headerBackVisible: false,
               headerTitleStyle: {
                 fontSize: typography.fontSize.lg,
                 fontWeight: typography.fontWeight
                   .normal as TextStyle["fontWeight"],
               },
-              headerRight: () => <AppBackButton type="xIcon" />,
             }}
           />
 
@@ -109,7 +171,6 @@ const PostCreationStepperLayout = () => {
                 fontWeight: typography.fontWeight
                   .normal as TextStyle["fontWeight"],
               },
-              headerRight: () => <AppBackButton type="xIcon" />,
             }}
           />
 
@@ -124,7 +185,6 @@ const PostCreationStepperLayout = () => {
                 fontWeight: typography.fontWeight
                   .normal as TextStyle["fontWeight"],
               },
-              headerRight: () => <AppBackButton type="xIcon" />,
             }}
           />
 
@@ -139,7 +199,20 @@ const PostCreationStepperLayout = () => {
                 fontWeight: typography.fontWeight
                   .normal as TextStyle["fontWeight"],
               },
-              headerRight: () => <AppBackButton type="xIcon" />,
+            }}
+          />
+
+          <Stack.Screen
+            name="detail"
+            options={{
+              headerShown: true,
+              headerTitle: "Detail Identification",
+              headerBackVisible: false,
+              headerTitleStyle: {
+                fontSize: typography.fontSize.lg,
+                fontWeight: typography.fontWeight
+                  .normal as TextStyle["fontWeight"],
+              },
             }}
           />
         </Stack>
@@ -155,17 +228,26 @@ const PostCreationStepperLayout = () => {
 
       {/* Actions footer */}
       <View className="flex-row border-t justify-between items-center px-lg pt-md">
-        <AppLink title="Back" onPress={handleBack} size="base" />
+        <AppLink
+          title="Back"
+          onPress={handleBack}
+          size="base"
+          disabled={isLoading}
+        />
 
         <TouchableOpacity
           className=" border bg-secondary rounded-sm px-lg py-md"
           onPress={handleNext}
-          disabled={isNextDisabled}
-          style={{ opacity: isNextDisabled ? 0.4 : 1 }}
+          disabled={isNextDisabled || isLoading}
+          style={{ opacity: isNextDisabled || isLoading ? 0.4 : 1 }}
         >
-          <Text className="text-base font-normal text-center text-white tracking-label">
-            Next
-          </Text>
+          {isLoading ? (
+            <AppLoader colorClass="bg-white" />
+          ) : (
+            <Text className="text-base font-normal text-center text-white tracking-label">
+              {currentStep < STEPS.length - 1 ? "Next" : "Submit"}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

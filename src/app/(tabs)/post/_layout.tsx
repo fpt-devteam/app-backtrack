@@ -78,7 +78,6 @@ export default function PostsStackLayout() {
         <Stack.Screen
           name="create"
           options={{
-            presentation: "modal",
             animation: "slide_from_bottom",
           }}
         />

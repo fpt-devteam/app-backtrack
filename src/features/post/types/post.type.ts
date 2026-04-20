@@ -145,7 +145,7 @@ export type PostCategory = typeof POST_CATEGORIES[keyof typeof POST_CATEGORIES]
  * This constant defines the subcategories of electronics that can be associated with a post.
  */
 export const ELECTRONICS_SUBCATEGORY = {
-  PHONE: "Phone",
+  PHONE: "phone",
   LAPTOP: "laptop",
   SMARTWATCH: "smartwatch",
   CHARGER_ADAPTER: "charger_adapter",

@@ -1,18 +1,15 @@
-import { Nullable } from '@/src/shared/types';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { StateCreator } from 'zustand';
 
-type PhotoItem = Nullable<ImagePickerAsset>
-
 export type PhotoSlice = {
-  images: PhotoItem[];
+  images: ImagePickerAsset[];
   isUploadingImages: boolean;
   maxImages: number;
 
   setUploadingImages: (status: boolean) => void;
-  setImages: (images: PhotoItem[]) => void;
-  addImage: (image: PhotoItem) => void;
-  addMultipleImages: (newImages: PhotoItem[]) => void;
+  setImages: (images: ImagePickerAsset[]) => void;
+  addImage: (image: ImagePickerAsset) => void;
+  addMultipleImages: (newImages: ImagePickerAsset[]) => void;
   removeImage: (index: number) => void;
   resetPhotoSlice: () => void;
 }

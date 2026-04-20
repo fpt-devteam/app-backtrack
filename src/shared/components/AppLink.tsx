@@ -7,11 +7,21 @@ type AppLinkProps = {
   title: string;
   onPress: () => void;
   size?: LinkSize;
+  disabled?: boolean;
 };
 
-export const AppLink = ({ title, onPress, size = "md" }: AppLinkProps) => {
+export const AppLink = ({
+  title,
+  onPress,
+  size = "md",
+  disabled,
+}: AppLinkProps) => {
   return (
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      style={{ opacity: disabled ? 0.4 : 1 }}
+    >
       <Text
         className={`text-${size} font-normal text-secondary text-center underline`}
       >

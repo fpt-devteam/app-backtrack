@@ -7,7 +7,9 @@ import { LatLng } from "react-native-maps";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
   ITEM_CATEGORIES,
+  PostCategory,
   PostItem,
+  PostSubcategory,
   type Post,
   type PostSearchOptions,
   type PostSuggestion,
@@ -38,10 +40,12 @@ export type PostFeedResponse = ApiResponse<PostFeedResult>;
  */
 export type PostCreateRequest = {
   postType: PostType;
-  item: PostItem;
+  category: PostCategory;
+  subcategoryCode: PostSubcategory
   imageUrls: string[];
   eventTime: Date;
-} & UserLocation;
+  electronicDetail?: ElectronicDetail
+} & Omit<UserLocation, "radiusInKm">;
 
 export type PostCreateResponse = ApiResponse<Post>;
 
@@ -91,3 +95,20 @@ export type PostSearchResponse = ApiResponse<Post[]>;
 
 // Post Suggestion
 export type PostsSuggestionResponse = ApiResponse<PostSuggestion[]>;
+
+
+/**
+ * 
+ */
+export type ElectronicDetail = {
+  brand: Nullable<string>;
+  model: Nullable<string>;
+  color: Nullable<string>;
+  hasCase: Nullable<boolean>;
+  caseDescription: Nullable<string>;
+  screenCondition: Nullable<string>;
+  lockScreenDescription: Nullable<string>;
+  distinguishingFeatures: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};
