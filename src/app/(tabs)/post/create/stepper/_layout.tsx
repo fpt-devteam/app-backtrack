@@ -32,7 +32,9 @@ const PostCreationStepperLayout = () => {
   const timelineDate = usePostCreationStore((state) => state.timeline.date);
 
   const isIdentityStepInvalid = currentStep === 2 && images.length === 0;
+
   const isLocationStepInvalid = currentStep === 3 && !locationCoords;
+
   const isTimelineStepInvalid =
     currentStep === 4 &&
     (!timelineDate || !eventTimeSchema.isValidSync(timelineDate));
@@ -44,6 +46,7 @@ const PostCreationStepperLayout = () => {
     debug();
 
     if (currentStep >= STEPS.length - 1) return;
+
     const newStep = Math.min(currentStep + 1, STEPS.length - 1);
     setCurrentStep(newStep);
     router.push(STEPS[newStep].path);
@@ -114,7 +117,7 @@ const PostCreationStepperLayout = () => {
             name="location"
             options={{
               headerShown: true,
-              headerTitle: "Location of Incident",
+              headerTitle: "Pinpoint location",
               headerBackVisible: false,
               headerTitleStyle: {
                 fontSize: typography.fontSize.lg,
@@ -129,7 +132,7 @@ const PostCreationStepperLayout = () => {
             name="timeline"
             options={{
               headerShown: true,
-              headerTitle: "Time of Incident",
+              headerTitle: "Occurrence time",
               headerBackVisible: false,
               headerTitleStyle: {
                 fontSize: typography.fontSize.lg,

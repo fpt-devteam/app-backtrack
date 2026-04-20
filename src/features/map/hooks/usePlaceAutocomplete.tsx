@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const DEBOUNCE_MS_DEFAULT = 350;
 const MIN_QUERY_LENGTH = 1;
+const SUGGESTION_LIMIT = 3;
 
 const API_CONFIG = {
   placeAutocomplete: {
@@ -74,10 +75,12 @@ export const usePlaceAutocomplete = ({
       });
 
       const resData: PlaceAutocompleteResponse = res.data;
-      const predictions: PlacePrediction[] = resData.suggestions.map((s) => ({
-        placeId: s.placePrediction.placeId,
-        formattedAddress: s.placePrediction.text.text,
-      }));
+      const predictions: PlacePrediction[] = resData.suggestions
+        .map((s) => ({
+          placeId: s.placePrediction.placeId,
+          formattedAddress: s.placePrediction.text.text,
+        }))
+        .slice(0, SUGGESTION_LIMIT);
 
       return predictions;
     },
