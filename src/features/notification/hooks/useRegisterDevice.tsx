@@ -35,8 +35,6 @@ export const useRegisterDeviceMutation = () => {
         return;
       }
 
-      console.log("finalStatus", finalStatus);
-
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ??
         Constants?.easConfig?.projectId;
@@ -49,13 +47,6 @@ export const useRegisterDeviceMutation = () => {
       const token = (await Notifications.getExpoPushTokenAsync({ projectId }))
         .data;
       const deviceId = token;
-
-      console.log("Obtained Expo push token:", token);
-
-      Alert.alert(
-        "Device Registered",
-        `Device registered with token: ${token}`,
-      );
 
       const req: PushTokenDeviceUpdateRequest = {
         token,
