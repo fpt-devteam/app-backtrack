@@ -92,7 +92,7 @@ export const AppUserProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           await doSync();
         } catch (e) {
-          console.log("Automatic sync failed silently");
+          console.log("Automatic sync failed silently", e);
         }
       }
     };
