@@ -1,5 +1,4 @@
 export { MinimalPostCard } from "@/src/features/post/components/MinimalPostCard";
-export { PostForm } from "@/src/features/post/components/PostForm";
 export { PostStatusBadge } from "@/src/features/post/components/PostStatusBadge";
 export {
   SimilarPostCard,

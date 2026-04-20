@@ -1,5 +1,4 @@
 export { ComparePostsScreen } from "@/src/features/post/screens/ComparePostsScreen";
-export { CreatePostScreen } from "@/src/features/post/screens/CreatePostScreen";
 export { default as HandoverRequestScreen } from "@/src/features/post/screens/HandoverRequestScreen";
 export { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
 export { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoResultScreen";

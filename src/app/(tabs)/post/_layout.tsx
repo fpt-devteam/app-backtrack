@@ -65,17 +65,6 @@ export default function PostsStackLayout() {
         <Stack.Screen name="search/result" />
 
         <Stack.Screen
-          name="search/location"
-          options={{
-            headerShown: false,
-            contentStyle: {
-              paddingTop: insets.top,
-              paddingBottom: insets.bottom,
-            },
-          }}
-        />
-
-        <Stack.Screen
           name="create"
           options={{
             animation: "slide_from_bottom",
