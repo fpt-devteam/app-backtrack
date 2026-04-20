@@ -18,6 +18,25 @@ export const useRegisterDeviceMutation = () => {
   return useMutation({
     mutationKey: ["device", "register"],
     mutationFn: async () => {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Failed to get push token for push notification!",
+        );
+        return;
+      }
+
+      console.log("finalStatus", finalStatus);
+
       const projectId =
         Constants?.expoConfig?.extra?.eas?.projectId ??
         Constants?.easConfig?.projectId;
@@ -32,7 +51,7 @@ export const useRegisterDeviceMutation = () => {
       const deviceId = token;
 
       console.log("Obtained Expo push token:", token);
-      
+
       Alert.alert(
         "Device Registered",
         `Device registered with token: ${token}`,
