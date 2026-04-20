@@ -1,8 +1,14 @@
 import "@/global.css";
 import { AppUserProvider, AuthProvider } from "@/src/features/auth/providers";
 import { toastConfig } from "@/src/shared/components/ui/toast/toast-config";
+import {
+  CARD_SUB_CATEGORY_ICONS,
+  ELECTRONICS_SUB_CATEGORY_ICONS,
+  PERSONAL_BELONGING_SUB_CATEGORY_ICONS,
+} from "@/src/shared/constants";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Asset } from "expo-asset";
 import * as Notifications from "expo-notifications";
 import {
   ExternalPathString,
@@ -59,6 +65,29 @@ export default function RootLayout() {
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    async function preloadImages() {
+      try {
+        const images = [
+          ...Object.values(CARD_SUB_CATEGORY_ICONS),
+          ...Object.values(ELECTRONICS_SUB_CATEGORY_ICONS),
+          ...Object.values(PERSONAL_BELONGING_SUB_CATEGORY_ICONS),
+        ];
+
+        const cacheImages = images.map((image) =>
+          Asset.fromModule(image).downloadAsync(),
+        );
+
+        await Promise.all(cacheImages);
+      } catch (e) {
+        console.warn("Preload failed", e);
+      }
+    }
+
+    preloadImages();
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
@@ -88,6 +117,7 @@ export default function RootLayout() {
 
                 <Toast config={toastConfig} position="top" topOffset={56} />
               </BottomSheetModalProvider>
+              PostItem,
             </AppUserProvider>
           </AuthProvider>
         </SafeAreaProvider>
