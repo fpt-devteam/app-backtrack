@@ -8,6 +8,7 @@ import { createAsyncStorageKey } from "@/src/features/notification/utils";
 import { useMutation } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
+import { Alert } from "react-native";
 
 const storage = createAsyncStorageKey<typeof StorageKey, ExpoTokenValue>(
   StorageKey,
@@ -31,6 +32,10 @@ export const useRegisterDeviceMutation = () => {
       const deviceId = token;
 
       console.log("Obtained Expo push token:", token);
+      Alert.alert(
+        "Device Registered",
+        `Device registered with token: ${token}`,
+      );
 
       const req: PushTokenDeviceUpdateRequest = {
         token,
