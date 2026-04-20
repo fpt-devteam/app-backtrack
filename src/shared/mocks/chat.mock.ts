@@ -68,6 +68,8 @@ const initialConversations: Conversation[] = [
     type: 'direct',
     partner: PARTNERS[0],
     orgId: null,
+    status: null,
+    assignedStaffId: null,
     lastMessage: {
       senderId: PARTNERS[0].id,
       content: "I found a black wallet near Gate C. Is it yours?",
@@ -82,6 +84,8 @@ const initialConversations: Conversation[] = [
     type: 'direct',
     partner: PARTNERS[1],
     orgId: null,
+    status: null,
+    assignedStaffId: null,
     lastMessage: {
       senderId: MOCK_ME_ID,
       content: "Thanks, I can pick it up after 6 PM.",
@@ -96,6 +100,8 @@ const initialConversations: Conversation[] = [
     type: "organization",
     partner: PARTNERS[2],
     orgId: "org_mock_001",
+    status: "in_progress",
+    assignedStaffId: PARTNERS[2].id,
     lastMessage: {
       senderId: PARTNERS[2].id,
       content: "Please share a photo of the keychain for verification.",
@@ -110,6 +116,8 @@ const initialConversations: Conversation[] = [
     type: 'direct',
     partner: PARTNERS[3],
     orgId: null,
+    status: null,
+    assignedStaffId: null,
     lastMessage: {
       senderId: MOCK_ME_ID,
       content: "I just arrived at the reception desk.",
@@ -124,6 +132,8 @@ const initialConversations: Conversation[] = [
     type: 'direct',
     partner: PARTNERS[4],
     orgId: null,
+    status: null,
+    assignedStaffId: null,
     lastMessage: {
       senderId: PARTNERS[4].id,
       content: "Can you confirm the serial number?",
@@ -327,6 +337,8 @@ const createConversationFromRequest = (
     type: conversationType,
     partner,
     orgId: request.type === "organization" ? "org_mock_new" : null,
+    status: null,
+    assignedStaffId: null,
     lastMessage: null,
     unreadCount: 0,
     createdAt,

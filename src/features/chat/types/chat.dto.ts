@@ -48,3 +48,8 @@ export type MessagesPaginationGetResponse = ApiResponse<{
   nextCursor: string | null;
   hasMore: boolean;
 }>;
+
+// GET /api/chat/conversations/partner?partnerId={partnerId}
+export type ConversationByPartnerResponse = ApiResponse<{
+  conversation: DirectConversation | null;
+}>;

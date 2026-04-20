@@ -5,6 +5,8 @@ import { Nullable } from "@/src/shared/types"
 /**
  * 
  */
+export type ReturnReportRole = "Finder" | "Owner"
+
 export type Handover = {
   id: string
   finder: Nullable<AppUser>
@@ -12,6 +14,7 @@ export type Handover = {
   finderPost: Nullable<Post>
   ownerPost: Nullable<Post>
   status: ReturnReportStatus
+  activatedByRole: Nullable<ReturnReportRole>
   confirmedAt: Nullable<string>
   expiresAt: string
   createdAt: string

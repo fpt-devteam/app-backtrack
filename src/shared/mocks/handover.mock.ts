@@ -53,6 +53,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finderPost: null,
     ownerPost: POST_STORAGE_MOCK[0], // Lost: Samsung charger
     status: "Draft",
+    activatedByRole: null,
     confirmedAt: null,
     expiresAt: "2026-04-30T00:00:00.000Z",
     createdAt: "2026-04-01T09:00:00.000Z",
@@ -66,6 +67,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finderPost: POST_STORAGE_MOCK[1], // Found: MacBook charger
     ownerPost: POST_STORAGE_MOCK[0], // Lost: Samsung charger
     status: "Active",
+    activatedByRole: "Finder",
     confirmedAt: null,
     expiresAt: "2026-04-20T00:00:00.000Z",
     createdAt: "2026-04-08T14:30:00.000Z",
@@ -79,6 +81,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finderPost: POST_STORAGE_MOCK[3], // Found: Blue backpack
     ownerPost: POST_STORAGE_MOCK[2], // Lost: Brown wallet
     status: "Confirmed",
+    activatedByRole: "Finder",
     confirmedAt: "2026-03-26T10:15:00.000Z",
     expiresAt: "2026-04-02T00:00:00.000Z",
     createdAt: "2026-03-24T09:00:00.000Z",
@@ -92,6 +95,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finderPost: POST_STORAGE_MOCK[5], // Found: Vietnamese ID card
     ownerPost: POST_STORAGE_MOCK[4], // Lost: Honda keys
     status: "Rejected",
+    activatedByRole: null,
     confirmedAt: null,
     expiresAt: "2026-03-22T00:00:00.000Z",
     createdAt: "2026-03-15T08:00:00.000Z",
@@ -105,6 +109,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finderPost: POST_STORAGE_MOCK[1], // Found: MacBook charger
     ownerPost: POST_STORAGE_MOCK[4], // Lost: Honda keys
     status: "Expired",
+    activatedByRole: null,
     confirmedAt: null,
     expiresAt: "2026-03-12T00:00:00.000Z",
     createdAt: "2026-03-08T11:00:00.000Z",
@@ -118,6 +123,7 @@ export const HANDOVER_MOCK: Handover[] = [
     finderPost: POST_STORAGE_MOCK[3], // Found: Blue backpack
     ownerPost: POST_STORAGE_MOCK[4], // Lost: Honda keys
     status: "Active",
+    activatedByRole: "Owner",
     confirmedAt: null,
     expiresAt: "2026-04-25T00:00:00.000Z",
     createdAt: "2026-04-10T15:00:00.000Z",

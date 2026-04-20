@@ -1,4 +1,4 @@
-import { ownerConfirmC2CReturnReportApi } from "@/src/features/handover/api";
+import { confirmC2CReturnReportApi } from "@/src/features/handover/api";
 import {
   C2C_RETURN_REPORT_DETAIL_QUERY_KEY,
   C2C_RETURN_REPORTS_QUERY_KEY,
@@ -13,7 +13,7 @@ export const useOwnerConfirmC2CReturnReport = () => {
   const mutation = useMutation({
     mutationKey: OWNER_CONFIRM_C2C_RETURN_REPORT_KEY,
     mutationFn: async (id: string) => {
-      const response = await ownerConfirmC2CReturnReportApi(id);
+      const response = await confirmC2CReturnReportApi(id);
       if (!response.success) throw new Error("Failed to confirm return report");
       return response.data;
     },
