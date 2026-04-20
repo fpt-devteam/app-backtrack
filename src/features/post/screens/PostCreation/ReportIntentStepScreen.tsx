@@ -1,14 +1,14 @@
 import { usePostCreationStore } from "@/src/features/post/hooks";
-import { AppButton, AppLoader } from "@/src/shared/components";
+import { PostType } from "@/src/features/post/types";
+import { AppButton } from "@/src/shared/components";
 import {
   CARD_SUB_CATEGORY_ICONS,
   ELECTRONICS_SUB_CATEGORY_ICONS,
   PERSONAL_BELONGING_SUB_CATEGORY_ICONS,
 } from "@/src/shared/constants";
 import { POST_ROUTE } from "@/src/shared/constants/route.constant";
-import { Asset } from "expo-asset";
 import { RelativePathString, router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Image, ImageSourcePropType, Text, View } from "react-native";
 import Animated, {
   cancelAnimation,
@@ -19,7 +19,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PostType } from "../../types";
 
 const ICON_SIZE = 128;
 const ICON_GAP = 12;
@@ -87,35 +86,12 @@ const ConveyorRow = ({ icons, direction }: ConveyorRowProps) => {
 };
 
 const ReportIntentStepScreen = () => {
-  const [isReady, setIsReady] = useState(false);
-  const [icons, setIcons] = useState<ImageSourcePropType[]>([]);
-
+  const icons = [
+    ...Object.values(CARD_SUB_CATEGORY_ICONS),
+    ...Object.values(ELECTRONICS_SUB_CATEGORY_ICONS),
+    ...Object.values(PERSONAL_BELONGING_SUB_CATEGORY_ICONS),
+  ];
   const { selectPostType } = usePostCreationStore();
-
-  useEffect(() => {
-    async function preloadImages() {
-      try {
-        const images = [
-          ...Object.values(CARD_SUB_CATEGORY_ICONS),
-          ...Object.values(ELECTRONICS_SUB_CATEGORY_ICONS),
-          ...Object.values(PERSONAL_BELONGING_SUB_CATEGORY_ICONS),
-        ];
-
-        const cacheImages = images.map((image) =>
-          Asset.fromModule(image).downloadAsync(),
-        );
-
-        await Promise.all(cacheImages);
-        setIcons(images);
-      } catch (e) {
-        console.warn("Preload failed", e);
-      } finally {
-        setIsReady(true);
-      }
-    }
-
-    preloadImages();
-  }, []);
 
   const handleNavigate = (postType: PostType) => {
     selectPostType(postType);
@@ -123,13 +99,6 @@ const ReportIntentStepScreen = () => {
   };
 
   const renderContent = () => {
-    if (!isReady)
-      return (
-        <View className="flex-1 items-center justify-center">
-          <AppLoader />
-        </View>
-      );
-
     return (
       <>
         {/* Header */}
