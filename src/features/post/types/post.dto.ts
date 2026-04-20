@@ -6,7 +6,6 @@ import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
-  ITEM_CATEGORIES,
   PostCategory,
   PostItem,
   PostSubcategory,
@@ -29,7 +28,7 @@ export type PostFeedRequest = {
 };
 
 type PostFeedResult = {
-  [key in (typeof ITEM_CATEGORIES)[keyof typeof ITEM_CATEGORIES]]: Post[];
+  [key in PostCategory]: Post[];
 };
 
 export type PostFeedResponse = ApiResponse<PostFeedResult>;

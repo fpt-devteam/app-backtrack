@@ -1,4 +1,3 @@
-import PostCreateOptionsBottomSheet from "@/src/features/post/components/PostCreateOptionsBottomSheet";
 import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
 import { POST_ROUTE } from "@/src/shared/constants";
@@ -13,7 +12,7 @@ import {
   MagnifyingGlassIcon,
   PlusIcon,
 } from "phosphor-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -31,7 +30,6 @@ const TAB_ICONS: Record<string, TabIcon> = {
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
-  const [isCreateOptionsVisible, setIsCreateOptionsVisible] = useState(false);
   const leadingRoutes = state.routes.slice(0, 2); // -> post, handover
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
 
@@ -102,39 +100,28 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
     router.push(POST_ROUTE.create);
   };
 
-  const handleCloseCreateOptions = () => {
-    router.dismissAll();
-  };
-
   return (
-    <>
-      <Animated.View
-        className="absolute left-0 right-0 bottom-0 bg-surface border-t flex-1 flex-row"
-        style={[
-          { borderColor: colors.muted, height: metrics.tabBar.height },
-          tabBarAnimatedStyle,
-        ]}
-      >
-        {leadingRoutes.map((route) => renderTabButton(route))}
+    <Animated.View
+      className="absolute left-0 right-0 bottom-0 bg-surface border-t flex-1 flex-row"
+      style={[
+        { borderColor: colors.muted, height: metrics.tabBar.height },
+        tabBarAnimatedStyle,
+      ]}
+    >
+      {leadingRoutes.map((route) => renderTabButton(route))}
 
-        {/* Add Button */}
-        <View className="w-[72px] items-center justify-center">
-          <Pressable
-            onPress={handleAddPress}
-            className="w-14 h-14 rounded-full bg-primary items-center justify-center -translate-y-[16px]"
-          >
-            <PlusIcon size={24} color={colors.white} weight="bold" />
-          </Pressable>
-        </View>
+      {/* Add Button */}
+      <View className="w-[72px] items-center justify-center">
+        <Pressable
+          onPress={handleAddPress}
+          className="w-14 h-14 rounded-full bg-primary items-center justify-center -translate-y-[16px]"
+        >
+          <PlusIcon size={24} color={colors.white} weight="bold" />
+        </Pressable>
+      </View>
 
-        {trailingRoutes.map((route) => renderTabButton(route))}
-      </Animated.View>
-
-      <PostCreateOptionsBottomSheet
-        isVisible={isCreateOptionsVisible}
-        onClose={handleCloseCreateOptions}
-      />
-    </>
+      {trailingRoutes.map((route) => renderTabButton(route))}
+    </Animated.View>
   );
 };
 

@@ -40,7 +40,7 @@ const IncidentSceneStepScreen = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState(address ?? "");
 
-  const { predictions, loading: isSearching } = usePlaceAutocomplete({
+  const { predictions } = usePlaceAutocomplete({
     searchQuery: query,
     // enabled: false,
   });
@@ -56,9 +56,9 @@ const IncidentSceneStepScreen = () => {
   );
 
   useEffect(() => {
-    if (!location || !mapRef.current) return;
+    if (!mapRef.current) return;
     mapRef.current.animateToRegion(mapRegion, 300);
-  }, [location, mapRegion]);
+  }, [mapRegion]);
 
   const handleFocus = useCallback(() => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

@@ -339,7 +339,6 @@ const metrics = {
     },
 
     // Legacy aliases — prefer semantic names above for new work
-    /** @deprecated use level1 */
     sm: {
       ios: {
         shadowColor: "#000",
@@ -349,7 +348,6 @@ const metrics = {
       },
       android: { elevation: 1 },
     },
-    /** @deprecated use level1 or level2 */
     md: {
       ios: {
         shadowColor: "#000",
@@ -359,7 +357,6 @@ const metrics = {
       },
       android: { elevation: 3 },
     },
-    /** @deprecated use level2 */
     lg: {
       ios: {
         shadowColor: "#000",

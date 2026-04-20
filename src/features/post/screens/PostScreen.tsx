@@ -3,8 +3,8 @@ import { PostCard } from "@/src/features/post/components";
 import { usePosts } from "@/src/features/post/hooks";
 import type { PostFeedSection } from "@/src/features/post/hooks/usePosts";
 import type {
-  ItemCategory,
   Post,
+  PostCategory,
   PostFilters,
 } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
@@ -50,16 +50,11 @@ const EXPLORE_TABS: {
   },
 ];
 
-const SECTION_TITLES: Record<ItemCategory, string> = {
+const SECTION_TITLES: Record<PostCategory, string> = {
   electronics: "Electronics",
-  clothing: "Clothing",
-  accessories: "Accessories",
-  documents: "Documents",
-  wallet: "Wallet",
-  suitcase: "Suitcase",
-  bags: "Bags",
-  keys: "Keys",
-  other: "Others",
+  card: "Card",
+  personal_belongings: "Personal Belongings",
+  other: "Other",
 };
 
 const ExploreHeader = ({
@@ -85,7 +80,9 @@ const ExploreHeader = ({
         return {
           scale: isPointerIn ? 0.95 : 1,
           opacity: isPointerIn ? 0.92 : 1,
-          shadowOffset: isPointerIn ? { width: 0, height: 6 } : { width: 0, height: 4 },
+          shadowOffset: isPointerIn
+            ? { width: 0, height: 6 }
+            : { width: 0, height: 4 },
           shadowRadius: isPointerIn ? 12 : 8,
           shadowOpacity: isPointerIn ? 0.2 : 0.15,
         };
@@ -277,7 +274,12 @@ export const PostScreen = () => {
   );
 
   const listEmpty = useMemo(() => {
-    if (isLoading) return <View className="flex-1 items-center justify-center py-xl"><AppLoader /></View>;
+    if (isLoading)
+      return (
+        <View className="flex-1 items-center justify-center py-xl">
+          <AppLoader />
+        </View>
+      );
 
     if (error) {
       return (

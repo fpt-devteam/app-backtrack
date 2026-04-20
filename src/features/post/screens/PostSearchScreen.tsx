@@ -178,105 +178,103 @@ const PostSearchScreen = () => {
   if (!hasHydrated) return <ActivityIndicator color={colors.primary} />;
 
   return (
-    <>
-      <BlurView
+    <BlurView
+      className="flex-1"
+      intensity={DEFAULT_BLUR_INTENSITY}
+      tint="light"
+    >
+      <KeyboardAvoidingView
         className="flex-1"
-        intensity={DEFAULT_BLUR_INTENSITY}
-        tint="light"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <KeyboardAvoidingView
-          className="flex-1"
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
-          <View className="flex-1">
-            <View
-              className="flex-row items-center px-md"
-              style={{ paddingTop: insets.top }}
-            >
-              <AppBackButton
-                type="arrowLeftIcon"
-                size={20}
-                showBackground={false}
-              />
-
-              <SearchTabSelector
-                selectedTab={selectedTab}
-                onChangeTab={onChangeTab}
-              />
-
-              <AppBackButton type="xIcon" size={20} showBackground={false} />
-            </View>
-
-            <ScrollView
-              className="flex-1 px-md pt-md"
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled"
-            >
-              {selectedTab === "posts" ? (
-                <View className="gap-md2">
-                  {/* Item Search */}
-                  <PostTermSearchScreen
-                    onToggle={() => handleToggleSection("item")}
-                    isExpanded={expandedSection === "item"}
-                  />
-
-                  {/* Location Search */}
-                  <PostLocationSearchScreen
-                    onToggle={() => handleToggleSection("location")}
-                    isExpanded={expandedSection === "location"}
-                  />
-
-                  {/* Event Time Search */}
-                  <PostEventTimeSearchScreen
-                    onToggle={() => handleToggleSection("event")}
-                    isExpanded={expandedSection === "event"}
-                  />
-                </View>
-              ) : (
-                // Placeholder content for People search tab until the feature is implemented.
-                <MotiView
-                  from={{ opacity: 0, translateY: 12 }}
-                  animate={{ opacity: 1, translateY: 0 }}
-                  transition={{ type: "timing", duration: 220 }}
-                  className="rounded-2xl border bg-white/90 p-lg"
-                  style={{ borderColor: colors.slate[200] }}
-                >
-                  <Text className="text-base font-semibold text-textPrimary">
-                    People search is coming soon
-                  </Text>
-                  <Text className="mt-xs text-sm text-textMuted">
-                    Switch back to Posts to search lost and found items.
-                  </Text>
-                </MotiView>
-              )}
-            </ScrollView>
-          </View>
-        </KeyboardAvoidingView>
-
-        {/* Search Button */}
-        <View
-          className="flex-row items-center justify-between px-md pt-sm"
-          style={{ paddingBottom: insets.bottom }}
-        >
-          <AppLink title="Clear all" onPress={handleClearFilter} />
-
-          <TouchableOpacity
-            className="h-control-lg flex-row items-center justify-center gap-xs rounded-sm px-md bg-primary"
-            onPress={() => void handleSubmitSearch()}
-            activeOpacity={0.88}
-            accessibilityRole="button"
-            disabled={!canSearch}
-            style={{ opacity: canSearch ? 1 : 0.6 }}
+        <View className="flex-1">
+          <View
+            className="flex-row items-center px-md"
+            style={{ paddingTop: insets.top }}
           >
-            <MagnifyingGlassIcon size={20} color={colors.white} weight="bold" />
+            <AppBackButton
+              type="arrowLeftIcon"
+              size={20}
+              showBackground={false}
+            />
 
-            <Text className="text-md font-normal tracking-label text-white">
-              Search
-            </Text>
-          </TouchableOpacity>
+            <SearchTabSelector
+              selectedTab={selectedTab}
+              onChangeTab={onChangeTab}
+            />
+
+            <AppBackButton type="xIcon" size={20} showBackground={false} />
+          </View>
+
+          <ScrollView
+            className="flex-1 px-md pt-md"
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {selectedTab === "posts" ? (
+              <View className="gap-md2">
+                {/* Item Search */}
+                <PostTermSearchScreen
+                  onToggle={() => handleToggleSection("item")}
+                  isExpanded={expandedSection === "item"}
+                />
+
+                {/* Location Search */}
+                <PostLocationSearchScreen
+                  onToggle={() => handleToggleSection("location")}
+                  isExpanded={expandedSection === "location"}
+                />
+
+                {/* Event Time Search */}
+                <PostEventTimeSearchScreen
+                  onToggle={() => handleToggleSection("event")}
+                  isExpanded={expandedSection === "event"}
+                />
+              </View>
+            ) : (
+              // Placeholder content for People search tab until the feature is implemented.
+              <MotiView
+                from={{ opacity: 0, translateY: 12 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "timing", duration: 220 }}
+                className="rounded-2xl border bg-white/90 p-lg"
+                style={{ borderColor: colors.slate[200] }}
+              >
+                <Text className="text-base font-semibold text-textPrimary">
+                  People search is coming soon
+                </Text>
+                <Text className="mt-xs text-sm text-textMuted">
+                  Switch back to Posts to search lost and found items.
+                </Text>
+              </MotiView>
+            )}
+          </ScrollView>
         </View>
-      </BlurView>
-    </>
+      </KeyboardAvoidingView>
+
+      {/* Search Button */}
+      <View
+        className="flex-row items-center justify-between px-md pt-sm"
+        style={{ paddingBottom: insets.bottom }}
+      >
+        <AppLink title="Clear all" onPress={handleClearFilter} />
+
+        <TouchableOpacity
+          className="h-control-lg flex-row items-center justify-center gap-xs rounded-sm px-md bg-primary"
+          onPress={() => handleSubmitSearch()}
+          activeOpacity={0.88}
+          accessibilityRole="button"
+          disabled={!canSearch}
+          style={{ opacity: canSearch ? 1 : 0.6 }}
+        >
+          <MagnifyingGlassIcon size={20} color={colors.white} weight="bold" />
+
+          <Text className="text-md font-normal tracking-label text-white">
+            Search
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </BlurView>
   );
 };
 

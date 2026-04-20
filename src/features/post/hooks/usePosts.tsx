@@ -1,8 +1,8 @@
 import { getFeedPostsApi } from "@/src/features/post/api";
 import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import type {
-  ItemCategory,
   Post,
+  PostCategory,
   PostFeedRequest,
   PostFeedResponse,
   PostFilters,
@@ -16,19 +16,14 @@ export type PostsFiltersOptions = {
 };
 
 export type PostFeedSection = {
-  key: ItemCategory;
+  key: PostCategory;
   items: Post[];
 };
 
-const SECTION_ORDER: ItemCategory[] = [
+const SECTION_ORDER: PostCategory[] = [
   "electronics",
-  "clothing",
-  "accessories",
-  "documents",
-  "wallet",
-  "suitcase",
-  "bags",
-  "keys",
+  "card",
+  "personal_belongings",
   "other",
 ];
 
