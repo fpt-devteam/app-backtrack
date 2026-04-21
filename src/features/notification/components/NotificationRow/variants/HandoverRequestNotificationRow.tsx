@@ -6,7 +6,7 @@ import type { UserNotification } from "@/src/features/notification/types";
 import { colors } from "@/src/shared/theme";
 import { ArrowsClockwiseIcon } from "phosphor-react-native";
 import React from "react";
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   notification: UserNotification;
@@ -43,7 +43,7 @@ export const HandoverRequestNotificationRow = ({
             className="flex-1 text-base leading-5 font-normal text-textPrimary"
             numberOfLines={1}
           >
-            {notification.title ?? "Handover request"}
+            {notification.title ?? "Handover request ready to review"}
           </Text>
 
           <Text className="text-sm font-normal text-textPrimary">

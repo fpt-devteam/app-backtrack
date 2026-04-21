@@ -1,106 +1,153 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { useConversationDetail } from "@/src/features/chat/hooks";
-import { AppLoader, AppUserAvatar } from "@/src/shared/components";
-import { ArchiveIcon, ChatDotsIcon } from "phosphor-react-native";
+import {
+  getHandoverCounterpart,
+  getHandoverNextStep,
+  getHandoverStatusLabel,
+  getHandoverTitle,
+  getViewerRoleContext,
+} from "@/src/features/handover/components/handover.presentation";
+import { useGetC2CReturnReportsByPartner } from "@/src/features/handover/hooks";
+import type {
+  Handover,
+  ReturnReportStatus,
+} from "@/src/features/handover/types";
+import { AppImage, AppLoader, AppUserAvatar } from "@/src/shared/components";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
+import {
+  ArchiveIcon,
+  CaretRightIcon,
+  ChatDotsIcon,
+} from "phosphor-react-native";
 import React, { useCallback } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  InteractionManager,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import type { AppUser } from "@/src/features/auth/types";
 import type { ConversationPartner } from "@/src/features/chat/types";
-import { colors } from "@/src/shared/theme";
+import { colors, metrics } from "@/src/shared/theme";
+import { router } from "expo-router";
 import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
 
-// const MOCK_AUTHOR: AppUser = {
-//   id: "mock-author-001",
-//   email: "owner@example.com",
-//   phone: null,
-//   displayName: "Alex Johnson",
-//   avatarUrl: "",
-//   globalRole: "user",
-//   showEmail: false,
-//   showPhone: false,
-// };
+const STATUS_THEME: Record<ReturnReportStatus, { bg: string; text: string }> = {
+  Ongoing: { bg: colors.kazan[100], text: colors.kazan[600] },
+  Delivered: { bg: colors.info[100], text: colors.info[500] },
+  Confirmed: { bg: colors.babu[100], text: colors.babu[500] },
+  Rejected: { bg: colors.error[100], text: colors.error[500] },
+  Closed: { bg: colors.hof[100], text: colors.hof[400] },
+};
 
-// const MOCK_POST: Post = {
-//   id: "mock-post-001",
-//   postType: PostType.Lost,
-//   item: {
-//     itemName: "Blue Leather Backpack",
-//     category: "bags",
-//     color: "Blue",
-//     brand: "Herschel",
-//     condition: null,
-//     material: "Leather",
-//     size: null,
-//     distinctiveMarks: null,
-//     additionalDetails: null,
-//   },
-//   imageUrls: [
-//     "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2Fcasio-2.jpg?alt=media&token=9497f7df-d640-4bd7-bf88-6bbca36f27aa",
-//   ],
-//   description: "Lost near the park entrance",
-//   organization: null,
-//   eventTime: new Date("2026-04-08T14:30:00"),
-//   createdAt: new Date("2026-04-08T14:30:00"),
-//   author: MOCK_AUTHOR,
-//   location: { latitude: 10.762622, longitude: 106.660172 },
-//   externalPlaceId: null,
-//   displayAddress: "District 1, Ho Chi Minh City",
-// };
+const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
+  const { user } = useAppUser();
+  const currentUserId = user?.id;
 
-// const POST_TYPE_LABEL: Record<string, string> = {
-//   [PostType.Lost]: "Lost item",
-//   [PostType.Found]: "Found item",
-// };
+  const counterpart = getHandoverCounterpart(handover, currentUserId);
+  const title = getHandoverTitle(handover);
+  const statusLabel = getHandoverStatusLabel(handover.status);
+  const nextStep = getHandoverNextStep(handover, currentUserId);
+  const roleContext = getViewerRoleContext(handover, currentUserId);
 
-// const PostInfoCard = ({ post }: { post: Post }) => {
-//   const imgUrl = post.imageUrls?.[0];
-//   const typeLabel = POST_TYPE_LABEL[post.postType] ?? post.postType;
-//   const dateLabel = formatDate(post.eventTime.toISOString());
+  const imageUrl =
+    handover.finderPost?.imageUrls?.[0] ?? handover.ownerPost?.imageUrls?.[0];
 
-//   const handleNavigateToPostDetails = useCallback(() => {
-//     router.push(POST_ROUTE.details(post.id));
-//   }, [post]);
+  const handlePress = useCallback(() => {
+    // Dismiss the info modal first, then navigate once the dismiss animation
+    // has fully completed — prevents two competing animations playing at once.
+    router.dismiss();
+    InteractionManager.runAfterInteractions(() => {
+      router.push(HANDOVER_ROUTE.detail(handover.id));
+    });
+  }, [handover.id]);
 
-//   return (
-//     <TouchableOpacity
-//       activeOpacity={0.7}
-//       onPress={handleNavigateToPostDetails}
-//       style={{
-//         borderWidth: 0.75,
-//         shadowColor: colors.black,
-//         shadowOffset: { width: 0, height: 8 },
-//         shadowOpacity: 0.2,
-//         shadowRadius: 10,
-//       }}
-//       className="flex-row gap-md bg-surface rounded-2xl border border-divider p-md"
-//     >
-//       <AppImage
-//         source={{ uri: imgUrl }}
-//         className="w-20 aspect-square rounded-xl bg-muted"
-//       />
+  return (
+    <TouchableOpacity
+      onPress={handlePress}
+      activeOpacity={0.84}
+      className="flex-row items-center gap-md rounded-2xl bg-surface px-md py-md2 mb-md2 border border-divider"
+      style={
+        Platform.OS === "ios"
+          ? metrics.shadows.level1.ios
+          : metrics.shadows.level1.android
+      }
+    >
+      <View className="relative">
+        <AppImage
+          source={{ uri: imageUrl }}
+          style={{ width: 72, height: 72, borderRadius: 14 }}
+          resizeMode="cover"
+        />
 
-//       <View className="flex-1 gap-xs justify-center">
-//         <Text
-//           className="text-base font-semibold text-textPrimary"
-//           numberOfLines={1}
-//         >
-//           {post.item.itemName}
-//         </Text>
+        {counterpart && (
+          <View
+            className="absolute bottom-[-4] right-[-4]"
+            style={{
+              borderWidth: 2,
+              borderColor: colors.white,
+              borderRadius: 10,
+            }}
+          >
+            <AppUserAvatar
+              avatarUrl={counterpart.avatarUrl}
+              size={26}
+              borderRadius={8}
+            />
+          </View>
+        )}
+      </View>
 
-//         <Text className="text-sm text-textSecondary" numberOfLines={1}>
-//           {typeLabel} · {dateLabel}
-//         </Text>
+      <View className="flex-1">
+        <Text
+          className="text-sm font-semibold text-textPrimary"
+          numberOfLines={1}
+        >
+          {title}
+        </Text>
 
-//         <Text className="text-sm text-textSecondary" numberOfLines={1}>
-//           {post.displayAddress}
-//         </Text>
-//       </View>
-//     </TouchableOpacity>
-//   );
-// };
+        <View className="flex-row items-center gap-xs flex-wrap">
+          <View
+            className="px-2 py-0.5 rounded-full"
+            style={{ backgroundColor: STATUS_THEME[handover.status].bg }}
+          >
+            <Text
+              className="text-xs font-semibold"
+              style={{ color: STATUS_THEME[handover.status].text }}
+            >
+              {statusLabel}
+            </Text>
+          </View>
 
+          {counterpart?.displayName ? (
+            <Text className="text-xs text-textSecondary" numberOfLines={1}>
+              with {counterpart.displayName}
+            </Text>
+          ) : null}
+        </View>
+
+        <Text
+          className="text-sm font-medium text-textPrimary mt-sm"
+          numberOfLines={1}
+        >
+          {nextStep}
+        </Text>
+
+        <View className="gap-xs">
+          <Text className="text-xs text-textMuted" numberOfLines={1}>
+            {roleContext}
+          </Text>
+        </View>
+      </View>
+
+      <CaretRightIcon size={16} color={colors.text.muted} />
+    </TouchableOpacity>
+  );
+};
 type ParticipantRowProps = {
   avatarUrl: string | null;
   name: string;
@@ -176,6 +223,9 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
 
   const partner = conversation?.partner;
 
+  const { inProgressHandovers, isLoading: isHandoverLoading } =
+    useGetC2CReturnReportsByPartner(partner?.id);
+
   const currentUser = getParticipantInfo(user, "You");
   const partnerInfo = getParticipantInfo(partner, "Unknown User");
 
@@ -200,8 +250,17 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
       className="flex-1 bg-surface"
       contentContainerClassName="px-lg pt-md pb-xl"
     >
-      {/* Post Card section*/}
-      <View className="gap-lg">{/* <PostInfoCard post={MOCK_POST} /> */}</View>
+      {/* Handover section — only shown when in-progress handovers exist */}
+      {!isHandoverLoading && inProgressHandovers.length > 0 && (
+        <View className="mt-xl">
+          <SectionHeader title="Handover" />
+          <View className="gap-md">
+            {inProgressHandovers.map((handover) => (
+              <HandoverInfoCard key={handover.id} handover={handover} />
+            ))}
+          </View>
+        </View>
+      )}
       {/* People in this conversation */}
       <View className="mt-xl">
         <SectionHeader title="In this conversation" />

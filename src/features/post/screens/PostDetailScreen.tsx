@@ -694,7 +694,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           onPress={handleHandover}
           className="px-xl py-3 rounded-full bg-primary"
         >
-          <Text className="text-base font-semibold text-white">Handover</Text>
+          <Text className="text-base font-semibold text-white">Start handover</Text>
         </TouchableOpacity>
       </View>
     </>

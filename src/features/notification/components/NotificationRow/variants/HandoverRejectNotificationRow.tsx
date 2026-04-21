@@ -43,7 +43,7 @@ export const HandoverRejectNotificationRow = ({
             className="flex-1 text-base leading-5 font-normal text-textPrimary"
             numberOfLines={1}
           >
-            {notification.title ?? "Handover declined"}
+            {notification.title ?? "Handover request declined"}
           </Text>
 
           <Text className="text-sm font-normal text-textPrimary">

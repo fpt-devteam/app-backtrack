@@ -33,9 +33,20 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   const leadingRoutes = state.routes.slice(0, 2); // -> post, handover
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
 
-  // Auto-hide tab bar on nested screens (any screen deeper than the tab's index)
+  // Auto-hide tab bar on nested screens.
+  // Two cases require hiding:
+  //   1. Normal in-tab push: the tab stack has depth > 0.
+  //   2. Cross-tab navigate: Expo Router lands the destination screen at index 0
+  //      as the only entry in the stack (no 'index' screen below it), so we also
+  //      hide when the current screen name is not the root 'index' screen.
   const focusedRoute = state.routes[state.index];
-  const isNested = (focusedRoute?.state?.index ?? 0) > 0;
+  const focusedNestedState = focusedRoute?.state;
+  const focusedNestedIndex = focusedNestedState?.index ?? 0;
+  const currentNestedRoute = focusedNestedState?.routes?.[focusedNestedIndex];
+  const isNested =
+    focusedNestedIndex > 0 ||
+    (currentNestedRoute?.name !== undefined &&
+      currentNestedRoute.name !== "index");
 
   const translateY = useSharedValue(0);
 

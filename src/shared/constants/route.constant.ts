@@ -43,6 +43,7 @@ export const POST_ROUTE = {
 } as const;
 
 export const CHAT_ROUTE = {
+  index: createPath("/(tabs)/chat"),
   conversations: createPath(CHAT_BASE),
   message: (id: string) => createPath(`${CHAT_BASE}/${id}`),
   information: (id: string) => createPath(`${CHAT_BASE}/${id}/information`),
@@ -60,6 +61,10 @@ export const HANDOVER_ROUTE = {
   index: `${HANDOVER_BASE}` as ExternalPathString | RelativePathString,
   detail: (handoverId: string) =>
     `${HANDOVER_BASE}/${handoverId}` as ExternalPathString | RelativePathString,
+  all: (filter: "ongoing" | "past") =>
+    `${HANDOVER_BASE}/all?filter=${filter}` as ExternalPathString | RelativePathString,
+  conversation: (conversationId: string) =>
+    `${HANDOVER_BASE}/conversations/${conversationId}` as ExternalPathString | RelativePathString,
 } as const;
 
 export const MAP_ROUTE = {

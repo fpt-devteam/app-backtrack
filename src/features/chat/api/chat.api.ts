@@ -1,4 +1,4 @@
-import { ConversationCreateRequest, ConversationCreateResponse, ConversationDetailResponse, ConversationsGetResponse, DirectConversationCreateRequest, DirectConversationCreateResponse, MessagesPaginationGetResponse } from "@/src/features/chat/types";
+import { ConversationByPartnerResponse, ConversationCreateRequest, ConversationCreateResponse, ConversationDetailResponse, ConversationsGetResponse, DirectConversationCreateRequest, DirectConversationCreateResponse, MessagesPaginationGetResponse } from "@/src/features/chat/types";
 import { CursorPaginationParams, privateClient } from "@/src/shared/api";
 
 const CHAT_API = {
@@ -7,6 +7,7 @@ const CHAT_API = {
   getConversationDetail: (conversationId: string) => `/api/chat/conversations/${conversationId}`,
   getMessages: (conversationId: string) => `/api/chat/conversations/${conversationId}/messages`,
   createDirectConversation: '/api/chat/conversations/direct',
+  getConversationByPartner: '/api/chat/conversations/partner',
 } as const;
 
 export const getConversationsApi = async (params: CursorPaginationParams) => {
@@ -36,4 +37,12 @@ export const getConversationDetailApi = async (conversationId: string) => {
 export const createDirectConversationApi = async (req: DirectConversationCreateRequest) => {
   const response = await privateClient.post(CHAT_API.createDirectConversation, req);
   return response.data as DirectConversationCreateResponse;
+};
+
+export const getConversationByPartnerApi = async (partnerId: string) => {
+  const response = await privateClient.get<ConversationByPartnerResponse>(
+    CHAT_API.getConversationByPartner,
+    { params: { partnerId } },
+  );
+  return response.data;
 };
