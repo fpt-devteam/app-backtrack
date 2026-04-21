@@ -3,9 +3,8 @@ import { useConversationDetail } from "@/src/features/chat/hooks";
 import { getHandoverStatusLabel } from "@/src/features/handover/components/handover.presentation";
 import { useGetC2CReturnReportsByPartner } from "@/src/features/handover/hooks";
 import type { Handover } from "@/src/features/handover/types";
-import { PostType } from "@/src/features/post/types";
 import { AppImage, AppLoader, AppUserAvatar } from "@/src/shared/components";
-import { HANDOVER_ROUTE, POST_ROUTE } from "@/src/shared/constants";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { formatDate } from "@/src/shared/utils";
 import { ArchiveIcon, ChatDotsIcon } from "phosphor-react-native";
 import React, { useCallback } from "react";
@@ -13,101 +12,10 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import type { AppUser } from "@/src/features/auth/types";
 import type { ConversationPartner } from "@/src/features/chat/types";
-import type { Post } from "@/src/features/post/types";
 import { colors } from "@/src/shared/theme";
 import { router } from "expo-router";
 import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
-
-const MOCK_AUTHOR: AppUser = {
-  id: "mock-author-001",
-  email: "owner@example.com",
-  phone: null,
-  displayName: "Alex Johnson",
-  avatarUrl: "",
-  globalRole: "user",
-  showEmail: false,
-  showPhone: false,
-};
-
-const MOCK_POST: Post = {
-  id: "mock-post-001",
-  postType: PostType.Lost,
-  item: {
-    itemName: "Blue Leather Backpack",
-    category: "bags",
-    color: "Blue",
-    brand: "Herschel",
-    condition: null,
-    material: "Leather",
-    size: null,
-    distinctiveMarks: null,
-    additionalDetails: null,
-  },
-  imageUrls: [
-    "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/posts%2Fimages%2Fcasio-2.jpg?alt=media&token=9497f7df-d640-4bd7-bf88-6bbca36f27aa",
-  ],
-  description: "Lost near the park entrance",
-  organization: null,
-  eventTime: new Date("2026-04-08T14:30:00"),
-  createdAt: new Date("2026-04-08T14:30:00"),
-  author: MOCK_AUTHOR,
-  location: { latitude: 10.762622, longitude: 106.660172 },
-  externalPlaceId: null,
-  displayAddress: "District 1, Ho Chi Minh City",
-};
-
-const POST_TYPE_LABEL: Record<string, string> = {
-  [PostType.Lost]: "Lost item",
-  [PostType.Found]: "Found item",
-};
-
-const PostInfoCard = ({ post }: { post: Post }) => {
-  const imgUrl = post.imageUrls?.[0];
-  const typeLabel = POST_TYPE_LABEL[post.postType] ?? post.postType;
-  const dateLabel = formatDate(post.eventTime.toISOString());
-
-  const handleNavigateToPostDetails = useCallback(() => {
-    router.push(POST_ROUTE.details(post.id));
-  }, [post]);
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={handleNavigateToPostDetails}
-      style={{
-        borderWidth: 0.75,
-        shadowColor: colors.black,
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-      }}
-      className="flex-row gap-md bg-surface rounded-2xl border border-divider p-md"
-    >
-      <AppImage
-        source={{ uri: imgUrl }}
-        className="w-20 aspect-square rounded-xl bg-muted"
-      />
-
-      <View className="flex-1 gap-xs justify-center">
-        <Text
-          className="text-base font-semibold text-textPrimary"
-          numberOfLines={1}
-        >
-          {post.item.itemName}
-        </Text>
-
-        <Text className="text-sm text-textSecondary" numberOfLines={1}>
-          {typeLabel} · {dateLabel}
-        </Text>
-
-        <Text className="text-sm text-textSecondary" numberOfLines={1}>
-          {post.displayAddress}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
 
 const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
   const imgUrl =
@@ -121,6 +29,7 @@ const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
   const dateLabel = formatDate(handover.createdAt);
 
   const handlePress = useCallback(() => {
+    router.dismiss();
     router.push(HANDOVER_ROUTE.detail(handover.id));
   }, [handover.id]);
 
@@ -258,11 +167,6 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
       className="flex-1 bg-surface"
       contentContainerClassName="px-lg pt-md pb-xl"
     >
-      {/* Post Card section*/}
-      <View className="gap-lg">
-        <PostInfoCard post={MOCK_POST} />
-      </View>
-
       {/* Handover section — only shown when in-progress handovers exist */}
       {!isHandoverLoading && inProgressHandovers.length > 0 && (
         <View className="mt-xl">
