@@ -30,8 +30,8 @@ const ItemIdentityStepScreen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const secondarySize = 0.4 * screenWidth;
 
-  const images = usePostCreationStore((state) => state.images);
-  const addMulti = usePostCreationStore((state) => state.addMultipleImages);
+  const images = usePostCreationStore((state) => state.draftImages);
+  const addMulti = usePostCreationStore((state) => state.addImages);
   const removeImage = usePostCreationStore((state) => state.removeImage);
   const maxImages = usePostCreationStore((state) => state.maxImages);
 

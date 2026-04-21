@@ -226,7 +226,7 @@ const ItemSubCategoryStepScreen = () => {
   const [isReady, setIsReady] = useState(false);
 
   const category = usePostCreationStore((state) => state.category);
-  const subCategory = usePostCreationStore((state) => state.subCategory);
+  const subCategory = usePostCreationStore((state) => state.subCategoryCode);
   const selectSubCategory = usePostCreationStore(
     (state) => state.selectSubCategory,
   );

@@ -7,7 +7,6 @@ import { LatLng } from "react-native-maps";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
   PostCategory,
-  PostItem,
   PostSubcategory,
   PostSubcategoryCode,
   type Post,
@@ -69,9 +68,15 @@ export type MatchingPostsData = {
 export type MatchingPostsResponse = ApiResponse<MatchingPostsData>;
 
 export type AnalyzeImageRequest = {
-  imageUrl: string;
+  imageUrls: string[];
+  subcategoryCode: PostSubcategoryCode;
 };
-export type AnalyzeImageData = Omit<PostItem, "size" | "additionalDetails">;
+export type AnalyzeImageData = {
+  category: PostCategory,
+  electronic?: ElectronicDetail,
+  card?: CardDetail,
+  personalBelonging?: PersonalBelongingDetail,
+};
 
 export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
 

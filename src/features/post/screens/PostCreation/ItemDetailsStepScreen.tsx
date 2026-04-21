@@ -6,8 +6,8 @@ import {
 } from "@/src/features/post/types";
 import React from "react";
 import { Text, View } from "react-native";
-import BankCardForm from "../CategoryForm/BankCardForm";
 import BackpackForm from "../CategoryForm/BackpackForm";
+import BankCardForm from "../CategoryForm/BankCardForm";
 import ChargerAdapterForm from "../CategoryForm/ChargerAdapterForm";
 import ClothingsForm from "../CategoryForm/ClothingsForm";
 import CompanyCardForm from "../CategoryForm/CompanyCardForm";
@@ -31,7 +31,7 @@ import SuitcasesForm from "../CategoryForm/SuitcasesForm";
 import WalletsForm from "../CategoryForm/WalletsForm";
 
 const ItemDetailsStepScreen = () => {
-  const subCategory = usePostCreationStore((state) => state.subCategory);
+  const subCategory = usePostCreationStore((state) => state.subCategoryCode);
 
   const renderForm = () => {
     switch (subCategory) {
