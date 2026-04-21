@@ -10,6 +10,11 @@ const HandoverLayout = () => {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="[handoverId]" options={{ headerShown: false }} />
+      <Stack.Screen name="all" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="conversations/[conversationId]"
+        options={{ presentation: "modal", headerShown: false }}
+      />
     </Stack>
   );
 };

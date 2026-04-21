@@ -2,7 +2,15 @@
 
 import { useAppUser } from "@/src/features/auth/providers/user.provider"
 import type { AppUser } from "@/src/features/auth/types"
-import { getConversationByPartnerApi } from "@/src/features/chat/api"
+import { createDirectConversationApi, getConversationByPartnerApi } from "@/src/features/chat/api"
+import {
+  getHandoverCounterpart,
+  getHandoverDetailGuidance,
+  getHandoverNextStep,
+  getHandoverStatusLabel,
+  getHandoverTitle,
+  getHandoverViewerRole,
+} from "@/src/features/handover/components"
 import {
   useActivateC2CReturnReport,
   useGetC2CReturnReportById,
@@ -16,7 +24,7 @@ import {
   AppInlineError,
   AppUserAvatar,
 } from "@/src/shared/components"
-import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants"
+import { HANDOVER_ROUTE, POST_ROUTE } from "@/src/shared/constants"
 import { colors, metrics } from "@/src/shared/theme"
 import { formatDate, formatShortEventTime } from "@/src/shared/utils"
 import * as Haptics from "expo-haptics"
@@ -25,7 +33,6 @@ import {
   ArrowLeftIcon,
   CalendarBlankIcon,
   CalendarCheckIcon,
-  CalendarXIcon,
   ChatCenteredTextIcon,
   CheckCircleIcon,
   ClockCountdownIcon,
@@ -40,6 +47,7 @@ import React, { useCallback, useMemo, useState } from "react"
 import {
   ActivityIndicator,
   Alert,
+  LayoutChangeEvent,
   Platform,
   ScrollView,
   Text,
@@ -50,18 +58,19 @@ import { SafeAreaView } from "react-native-safe-area-context"
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
-type StatusTheme = { label: string; color: string; bgColor: string }
+type StatusTheme = { color: string; bgColor: string }
 
 const STATUS_THEME: Record<ReturnReportStatus, StatusTheme> = {
-  Draft: { label: "Setting Up", color: colors.hof[500], bgColor: colors.hof[100] },
-  Active: { label: "In Progress", color: colors.kazan[500], bgColor: colors.kazan[100] },
-  Confirmed: { label: "Completed", color: colors.babu[500], bgColor: colors.babu[100] },
-  Rejected: { label: "Rejected", color: colors.error[500], bgColor: colors.error[100] },
-  Expired: { label: "Expired", color: colors.hof[400], bgColor: colors.hof[100] },
+  Draft: { color: colors.hof[500], bgColor: colors.hof[100] },
+  Active: { color: colors.kazan[500], bgColor: colors.kazan[100] },
+  Confirmed: { color: colors.babu[500], bgColor: colors.babu[100] },
+  Rejected: { color: colors.error[500], bgColor: colors.error[100] },
+  Expired: { color: colors.hof[400], bgColor: colors.hof[100] },
 }
 
 const HandoverStatusBadge = ({ status }: { status: ReturnReportStatus }) => {
-  const { label, color, bgColor } = STATUS_THEME[status]
+  const { color, bgColor } = STATUS_THEME[status]
+  const label = getHandoverStatusLabel(status)
   return (
     <View
       className="self-start px-3 py-1 rounded-full"
@@ -84,7 +93,11 @@ type StepDef = {
   state: StepState
 }
 
-function deriveSteps(status: ReturnReportStatus, isFinder: boolean): StepDef[] {
+function deriveSteps(
+  status: ReturnReportStatus,
+  isFinder: boolean,
+  hasMarkedDelivery: boolean,
+): StepDef[] {
   const steps: StepDef[] = [
     {
       label: "Coordinate",
@@ -106,14 +119,24 @@ function deriveSteps(status: ReturnReportStatus, isFinder: boolean): StepDef[] {
   if (status === "Draft") {
     steps[0].state = "active"
   } else if (status === "Active") {
-    // Finder has already marked delivery — step 1 and 2 done; step 3 is what we're waiting on
     steps[0].state = "done"
-    steps[1].state = "done"
-    steps[2].state = "active"
+
+    if (hasMarkedDelivery) {
+      // Delivery is recorded, so the final confirmation is the remaining step.
+      steps[1].state = "done"
+      steps[2].state = "active"
+    } else {
+      steps[1].state = "active"
+    }
   } else if (status === "Confirmed") {
     steps[0].state = "done"
     steps[1].state = "done"
     steps[2].state = "done"
+  } else if (status === "Expired" || status === "Rejected") {
+    if (hasMarkedDelivery) {
+      steps[0].state = "done"
+      steps[1].state = "done"
+    }
   }
   return steps
 }
@@ -156,15 +179,35 @@ const StepDot = ({ state }: { state: StepState }) => {
 const ProgressStepper = ({
   status,
   isFinder,
+  hasMarkedDelivery,
+  viewerRole,
 }: {
   status: ReturnReportStatus
   isFinder: boolean
+  hasMarkedDelivery: boolean
+  viewerRole: "Finder" | "Owner" | "Unknown"
 }) => {
-  const steps = deriveSteps(status, isFinder)
+  const steps = deriveSteps(status, isFinder, hasMarkedDelivery)
+
+  const stepsWithViewerCopy = useMemo(() => {
+    if (viewerRole !== "Unknown") return steps
+
+    return steps.map((step) => {
+      if (step.label === "You Deliver") {
+        return { ...step, label: "Finder Delivers" }
+      }
+
+      if (step.label === "You Confirm") {
+        return { ...step, label: "Owner Confirms" }
+      }
+
+      return step
+    })
+  }, [steps, viewerRole])
 
   return (
     <View className="flex-row items-start justify-between px-2 py-4">
-      {steps.map((step, i) => (
+      {stepsWithViewerCopy.map((step, i) => (
         <React.Fragment key={step.label}>
           {/* Step */}
           <View className="items-center flex-1">
@@ -179,14 +222,12 @@ const ProgressStepper = ({
                       ? colors.primary
                       : colors.hof[400],
               }}
-              numberOfLines={1}
             >
               {step.label}
             </Text>
             <Text
               className="text-xs mt-0.5 text-center"
               style={{ color: colors.hof[400] }}
-              numberOfLines={1}
             >
               {step.sublabel}
             </Text>
@@ -199,7 +240,9 @@ const ProgressStepper = ({
               style={{
                 flex: 0.4,
                 backgroundColor:
-                  steps[i + 1].state === "pending" ? colors.hof[200] : colors.babu[200],
+                  stepsWithViewerCopy[i + 1].state === "pending"
+                    ? colors.hof[200]
+                    : colors.babu[200],
               }}
             />
           )}
@@ -331,7 +374,7 @@ const TimelineRow = ({
 }: {
   icon: React.ReactNode
   label: string
-  value: string
+  value?: string
 }) => (
   <View className="flex-row items-center gap-md py-sm px-md">
     <View
@@ -341,8 +384,14 @@ const TimelineRow = ({
       {icon}
     </View>
     <View className="flex-1">
-      <Text className="text-xs text-textMuted">{label}</Text>
-      <Text className="text-sm font-semibold text-textPrimary">{value}</Text>
+      {value ? (
+        <>
+          <Text className="text-xs text-textMuted">{label}</Text>
+          <Text className="text-sm font-semibold text-textPrimary">{value}</Text>
+        </>
+      ) : (
+        <Text className="text-sm font-semibold text-textPrimary">{label}</Text>
+      )}
     </View>
   </View>
 )
@@ -387,7 +436,7 @@ type ActionPanelProps = {
   isConfirming: boolean
 }
 
-const ACTION_PANEL_HEIGHT = 120
+const ACTION_PANEL_MIN_HEIGHT = 120
 
 const ActionPanel = ({
   report,
@@ -399,13 +448,14 @@ const ActionPanel = ({
   isConfirming,
 }: ActionPanelProps) => {
   const { status } = report
+  const hasMarkedDelivery = !!report.activatedByRole
 
   // ── Confirmed ──
   if (status === "Confirmed") {
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ height: ACTION_PANEL_HEIGHT }}
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <View
           className="flex-1 flex-row items-center justify-center gap-sm rounded-2xl"
@@ -434,7 +484,7 @@ const ActionPanel = ({
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ height: ACTION_PANEL_HEIGHT }}
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <View
           className="flex-1 flex-row items-center justify-center gap-sm rounded-2xl"
@@ -454,10 +504,10 @@ const ActionPanel = ({
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ height: ACTION_PANEL_HEIGHT }}
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <Text className="text-xs text-textMuted mb-2">
-          Once you hand the item back, tap below so the owner can confirm receipt.
+          Once you hand the item back, mark it here so the owner can confirm receipt.
         </Text>
         <TouchableOpacity
           activeOpacity={0.85}
@@ -489,7 +539,7 @@ const ActionPanel = ({
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ height: ACTION_PANEL_HEIGHT }}
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <View
           className="flex-1 flex-row items-center gap-sm px-md rounded-2xl"
@@ -498,10 +548,34 @@ const ActionPanel = ({
           <HourglassIcon size={22} color={colors.hof[400]} weight="fill" />
           <View className="flex-1">
             <Text className="text-sm font-semibold text-textPrimary">
-              Waiting for Finder
+              Waiting for delivery
             </Text>
             <Text className="text-xs text-textMuted mt-0.5">
-              The finder will tap &quot;Delivered&quot; when they hand over the item.
+              The finder will mark this handover as delivered after the item is handed back.
+            </Text>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+  if (status === "Active" && !hasMarkedDelivery) {
+    return (
+      <View
+        className="px-lg py-md2 border-t border-divider bg-surface"
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
+      >
+        <View
+          className="flex-1 flex-row items-center gap-sm px-md rounded-2xl"
+          style={{ backgroundColor: colors.hof[50] }}
+        >
+          <HourglassIcon size={22} color={colors.hof[400]} weight="fill" />
+          <View className="flex-1">
+            <Text className="text-sm font-semibold text-textPrimary">
+              Awaiting delivery update
+            </Text>
+            <Text className="text-xs text-textMuted mt-0.5">
+              This handover is active, but delivery has not been recorded yet. Continue coordinating in chat.
             </Text>
           </View>
         </View>
@@ -514,7 +588,7 @@ const ActionPanel = ({
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ height: ACTION_PANEL_HEIGHT }}
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <View
           className="flex-1 flex-row items-center gap-sm px-md rounded-2xl"
@@ -523,10 +597,10 @@ const ActionPanel = ({
           <HourglassIcon size={22} color={colors.kazan[500]} weight="fill" />
           <View className="flex-1">
             <Text className="text-sm font-semibold" style={{ color: colors.kazan[600] }}>
-              Delivery Marked
+              Waiting for confirmation
             </Text>
             <Text className="text-xs mt-0.5" style={{ color: colors.kazan[600] }}>
-              Waiting for the owner to confirm they received the item.
+              You marked the item as delivered. The owner can confirm receipt to complete the handover.
             </Text>
           </View>
         </View>
@@ -539,10 +613,10 @@ const ActionPanel = ({
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ height: ACTION_PANEL_HEIGHT }}
+        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <Text className="text-xs text-textMuted mb-2">
-          The finder says they&apos;ve returned the item. Confirm if you received it.
+          The finder marked this handover as delivered. Confirm once you have the item in hand.
         </Text>
         <TouchableOpacity
           activeOpacity={0.85}
@@ -572,17 +646,6 @@ const ActionPanel = ({
   return null
 }
 
-// ─── Title derivation ─────────────────────────────────────────────────────────
-
-function deriveTitle(report: Handover): string {
-  const finderName = report.finderPost?.item.itemName
-  const ownerName = report.ownerPost?.item.itemName
-  if (finderName && ownerName) return `${finderName} \u2194 ${ownerName}`
-  if (finderName) return `Found: ${finderName}`
-  if (ownerName) return `Lost: ${ownerName}`
-  return "Return Report"
-}
-
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 const HandoverDetailScreen = () => {
@@ -599,6 +662,7 @@ const HandoverDetailScreen = () => {
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport()
 
   const [isOpeningChat, setIsOpeningChat] = useState(false)
+  const [actionPanelHeight, setActionPanelHeight] = useState(ACTION_PANEL_MIN_HEIGHT)
 
   const isFinder = useMemo(
     () => !!currentUser && report?.finder?.id === currentUser.id,
@@ -616,14 +680,67 @@ const HandoverDetailScreen = () => {
     return undefined
   }, [isFinder, isOwner, report])
 
+  const counterpart = useMemo(
+    () => (report ? getHandoverCounterpart(report, currentUser?.id) : null),
+    [report, currentUser?.id],
+  )
+  const viewerRole = useMemo(
+    () => (report ? getHandoverViewerRole(report, currentUser?.id) : "Unknown"),
+    [report, currentUser?.id],
+  )
+  const title = useMemo(() => (report ? getHandoverTitle(report) : "Handover"), [report])
+  const statusLabel = useMemo(
+    () => (report ? getHandoverStatusLabel(report.status) : "Handover"),
+    [report],
+  )
+  const hasMarkedDelivery = !!report?.activatedByRole
+  const nextStep = useMemo(
+    () => {
+      if (!report) return "Review handover details"
+
+      if (report.status === "Active" && !hasMarkedDelivery) {
+        return "Continue coordinating the return until delivery is marked in the handover flow."
+      }
+
+      return getHandoverNextStep(report, currentUser?.id)
+    },
+    [report, currentUser?.id, hasMarkedDelivery],
+  )
+  const detailGuidance = useMemo(
+    () => {
+      if (!report) return ""
+
+      if (report.status === "Active" && !hasMarkedDelivery) {
+        return "This handover is active, but delivery has not been recorded yet. Use chat to confirm the latest meetup status."
+      }
+
+      return getHandoverDetailGuidance(report, currentUser?.id)
+    },
+    [report, currentUser?.id, hasMarkedDelivery],
+  )
+
+  const handleActionPanelLayout = useCallback((event: LayoutChangeEvent) => {
+    const measuredHeight = event.nativeEvent.layout.height
+
+    if (measuredHeight > 0 && measuredHeight !== actionPanelHeight) {
+      setActionPanelHeight(measuredHeight)
+    }
+  }, [actionPanelHeight])
+
   const handleOpenChat = useCallback(async () => {
     if (!counterpartId) return
     setIsOpeningChat(true)
     try {
       const res = await getConversationByPartnerApi(counterpartId)
-      const conversationId = res.data?.conversation?.conversationId
+      let conversationId = res.data?.conversation?.conversationId
+
+      if (!conversationId) {
+        const created = await createDirectConversationApi({ memberId: counterpartId })
+        conversationId = created.data?.conversation?.conversationId
+      }
+
       if (conversationId) {
-        router.push(CHAT_ROUTE.message(conversationId))
+        router.push(HANDOVER_ROUTE.conversation(conversationId))
       } else {
         Alert.alert("Chat not found", "No conversation exists with this person yet.")
       }
@@ -685,16 +802,26 @@ const HandoverDetailScreen = () => {
     return (
       <SafeAreaView className="flex-1 bg-canvas" edges={["top"]}>
         <Stack.Screen options={{ headerShown: false }} />
-        <View className="flex-row items-center px-lg pt-sm pb-sm gap-sm border-b border-divider bg-surface">
+        <View
+          className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
+          style={
+            Platform.OS === "ios"
+              ? { ...metrics.shadows.tabBar.ios }
+              : metrics.shadows.tabBar.android
+          }
+        >
           <TouchableOpacity
             onPress={() => router.back()}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            className="items-center justify-center rounded-full"
+            style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
           >
-            <ArrowLeftIcon size={24} color={colors.text.primary} />
+            <ArrowLeftIcon size={20} color={colors.text.primary} />
           </TouchableOpacity>
-          <Text className="flex-1 text-base font-semibold text-textPrimary">
-            Handover Details
+          <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
+            Handover
           </Text>
+          <View style={{ width: 44, height: 44 }} />
         </View>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.primary} />
@@ -708,23 +835,38 @@ const HandoverDetailScreen = () => {
     return (
       <SafeAreaView className="flex-1 bg-canvas" edges={["top"]}>
         <Stack.Screen options={{ headerShown: false }} />
-        <View className="flex-row items-center px-lg pt-sm pb-sm gap-sm border-b border-divider bg-surface">
+        <View
+          className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
+          style={
+            Platform.OS === "ios"
+              ? { ...metrics.shadows.tabBar.ios }
+              : metrics.shadows.tabBar.android
+          }
+        >
           <TouchableOpacity
             onPress={() => router.back()}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            className="items-center justify-center rounded-full"
+            style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
           >
-            <ArrowLeftIcon size={24} color={colors.text.primary} />
+            <ArrowLeftIcon size={20} color={colors.text.primary} />
           </TouchableOpacity>
-          <Text className="flex-1 text-base font-semibold text-textPrimary">
-            Handover Details
+          <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
+            Handover
           </Text>
+          <View style={{ width: 44, height: 44 }} />
         </View>
         <AppInlineError message={error?.message ?? "Handover not found."} />
       </SafeAreaView>
     )
   }
 
-  const hasActionPanel = report.status !== undefined
+  const hasActionPanel =
+    report.status === "Confirmed" ||
+    report.status === "Expired" ||
+    report.status === "Rejected" ||
+    ((report.status === "Draft" || report.status === "Active") &&
+      (isFinder || isOwner))
 
   return (
     <SafeAreaView className="flex-1 bg-canvas" edges={["top", "bottom"]}>
@@ -732,39 +874,42 @@ const HandoverDetailScreen = () => {
 
       {/* ── Header ── */}
       <View
-        className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider gap-sm"
+        className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
         style={
           Platform.OS === "ios"
             ? { ...metrics.shadows.tabBar.ios }
             : metrics.shadows.tabBar.android
         }
       >
-        {/* Back */}
         <TouchableOpacity
           onPress={() => router.back()}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          className="items-center justify-center rounded-full"
+          style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
         >
-          <ArrowLeftIcon size={24} color={colors.text.primary} />
+          <ArrowLeftIcon size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
-        {/* Title — item names derived from the report */}
-        <Text className="flex-1 text-base font-semibold text-textPrimary" numberOfLines={1}>
-          {deriveTitle(report)}
+        <Text className="flex-1 text-base font-semibold text-textPrimary text-center" numberOfLines={1}>
+          Handover
         </Text>
 
-        {/* Chat button — only when a counterpart exists */}
-        {counterpartId && (
+        {counterpartId ? (
           <TouchableOpacity
             onPress={handleOpenChat}
             disabled={isOpeningChat}
-            hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            className="items-center justify-center rounded-full"
+            style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
           >
             {isOpeningChat ? (
               <ActivityIndicator size="small" color={colors.primary} />
             ) : (
-              <ChatCenteredTextIcon size={24} color={colors.primary} weight="duotone" />
+              <ChatCenteredTextIcon size={20} color={colors.primary} weight="duotone" />
             )}
           </TouchableOpacity>
+        ) : (
+          <View style={{ width: 44, height: 44 }} />
         )}
       </View>
 
@@ -774,26 +919,48 @@ const HandoverDetailScreen = () => {
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 16,
-          paddingBottom: hasActionPanel ? ACTION_PANEL_HEIGHT + 16 : 32,
+          paddingBottom: hasActionPanel ? actionPanelHeight + 16 : 32,
         }}
       >
-        {/* ── Title ── */}
-        <View className="mb-4">
-          <Text className="text-xl font-bold text-textPrimary" numberOfLines={2}>
-            {deriveTitle(report)}
-          </Text>
-          <View className="flex-row items-center gap-sm mt-2">
-            <HandoverStatusBadge status={report.status} />
-            <View className="flex-row items-center gap-xs">
-              <CalendarBlankIcon size={12} color={colors.text.muted} />
-              <Text className="text-sm text-textMuted">
-                {formatDate(report.createdAt)}
+        <View
+          className="mb-4 rounded-2xl border border-divider bg-surface px-lg py-lg"
+          style={Platform.OS === "ios" ? metrics.shadows.level1.ios : metrics.shadows.level1.android}
+        >
+          <View className="flex-row items-start justify-between gap-sm">
+            <View className="flex-1 gap-xs">
+              <Text className="text-2xl font-semibold text-textPrimary" numberOfLines={2}>
+                {title}
               </Text>
+
+              <View className="flex-row items-center gap-sm flex-wrap">
+                <HandoverStatusBadge status={report.status} />
+                <Text className="text-sm text-textMuted">{statusLabel}</Text>
+              </View>
             </View>
+
+            {counterpart ? <AppUserAvatar avatarUrl={counterpart.avatarUrl} size={44} /> : null}
+          </View>
+
+          <View className="mt-md gap-xs">
+            <Text className="text-sm font-medium text-textPrimary">
+              {counterpart?.displayName ? `With ${counterpart.displayName}` : "Counterpart"}
+              {viewerRole === "Finder" ? " · Owner" : viewerRole === "Owner" ? " · Finder" : ""}
+            </Text>
+            <Text className="text-sm text-textSecondary leading-5">{detailGuidance}</Text>
           </View>
         </View>
 
-        {/* ── Progress stepper ── */}
+        <View className="mb-4 rounded-2xl border border-divider bg-canvas px-lg py-md2">
+          <Text className="text-sm font-semibold text-textPrimary mb-xs">What happens next</Text>
+          <Text className="text-sm text-textSecondary leading-5">{nextStep}</Text>
+        </View>
+
+        <View className="mb-2 px-1">
+          <Text className="text-xs font-bold text-textMuted uppercase tracking-wide">
+            Progress
+          </Text>
+        </View>
+
         <View
           className="bg-surface rounded-2xl border border-divider mb-4 px-2"
           style={
@@ -802,7 +969,12 @@ const HandoverDetailScreen = () => {
               : metrics.shadows.level1.android
           }
         >
-          <ProgressStepper status={report.status} isFinder={isFinder} />
+          <ProgressStepper
+            status={report.status}
+            isFinder={isFinder}
+            hasMarkedDelivery={hasMarkedDelivery}
+            viewerRole={viewerRole}
+          />
         </View>
 
         {/* ── Items involved ── */}
@@ -825,7 +997,7 @@ const HandoverDetailScreen = () => {
         </View>
 
         {/* ── Parties ── */}
-        <SectionCard title="Parties">
+        <SectionCard title="People involved">
           <PartyRow
             user={report.finder}
             role="Finder"
@@ -846,23 +1018,26 @@ const HandoverDetailScreen = () => {
             label="Created"
             value={formatDate(report.createdAt)}
           />
-          <Separator />
-          <TimelineRow
-            icon={
-              <ClockCountdownIcon size={18} color={colors.kazan[500]} weight="fill" />
-            }
-            label="Expires"
-            value={formatDate(report.expiresAt)}
-          />
-          {(report.status === "Active" || report.status === "Confirmed") && (
+          {(report.status === "Draft" || report.status === "Active" || report.status === "Expired") && (
+            <>
+              <Separator />
+              <TimelineRow
+                icon={
+                  <ClockCountdownIcon size={18} color={colors.kazan[500]} weight="fill" />
+                }
+                label={report.status === "Expired" ? "Expired" : "Expires"}
+                value={formatDate(report.expiresAt)}
+              />
+            </>
+          )}
+          {report.activatedByRole && (
             <>
               <Separator />
               <TimelineRow
                 icon={
                   <PackageIcon size={18} color={colors.primary} weight="fill" />
                 }
-                label="Delivery Marked"
-                value={report.activatedByRole ? `By ${report.activatedByRole}` : "\u2014"}
+                label={`${report.activatedByRole} marked delivered`}
               />
             </>
           )}
@@ -883,10 +1058,10 @@ const HandoverDetailScreen = () => {
               <Separator />
               <TimelineRow
                 icon={
-                  <CalendarXIcon size={18} color={colors.error[500]} weight="fill" />
+                  <WarningCircleIcon size={18} color={colors.error[500]} weight="fill" />
                 }
                 label="Rejected"
-                value={formatDate(report.expiresAt)}
+                value="Request was declined"
               />
             </>
           )}
@@ -897,6 +1072,7 @@ const HandoverDetailScreen = () => {
       {hasActionPanel && (
         <View
           className="absolute left-0 right-0 bottom-0 bg-surface"
+          onLayout={handleActionPanelLayout}
           style={
             Platform.OS === "ios"
               ? metrics.shadows.level2.ios
