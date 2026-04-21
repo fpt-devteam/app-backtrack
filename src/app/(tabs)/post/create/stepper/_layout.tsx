@@ -56,11 +56,14 @@ const PostCreationStepperLayout = () => {
   const isNextDisabled =
     isIdentityStepInvalid || isLocationStepInvalid || isTimelineStepInvalid;
 
-  const handleNext = () => {
-    debug();
+  const handleNext = async () => {
+    if (currentStep === 2 && !isIdentityStepInvalid) {
+      const urls = await handleUploadImages(images);
+      console.log("Urls: ", urls);
+    }
 
     if (currentStep >= STEPS.length - 1) {
-      handleSubmit();
+      await handleSubmit();
       return;
     }
 
@@ -87,6 +90,7 @@ const PostCreationStepperLayout = () => {
       const imageUrls = await handleUploadImages(images);
 
       const req: PostCreateRequest = {
+        postTitle: electronicDetail?.itemName || "Untitled Post",
         postType,
         category,
         subcategoryCode: subCategory,
@@ -100,18 +104,16 @@ const PostCreationStepperLayout = () => {
 
       const postDetails = await createPost(req);
       const postId = postDetails?.id;
+
       if (!postId) {
         toast.error("Failed to create post. Please try again.");
         return;
       }
 
       resetForm();
-
-      router.push(
-        POST_ROUTE.matching(postId) as RelativePathString | ExternalPathString,
-      );
+      router.push(POST_ROUTE.matching(postId));
     } catch (e) {
-      console.warn("Submit failed", e);
+      console.log("Submit failed", e);
       toast.error("Failed to create post. Please try again.");
     }
   };
