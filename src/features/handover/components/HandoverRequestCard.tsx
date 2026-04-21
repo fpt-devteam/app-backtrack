@@ -4,13 +4,10 @@ import type { Handover, ReturnReportStatus } from "@/src/features/handover/types
 import { AppImage, AppUserAvatar } from "@/src/shared/components";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { formatDate } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import {
-  CalendarBlankIcon,
   CaretRightIcon,
-  ClockCountdownIcon,
 } from "phosphor-react-native";
 import React from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
@@ -121,24 +118,6 @@ export const HandoverRequestCard = ({ handover, currentUserId }: Props) => {
           <Text className="text-xs text-textMuted" numberOfLines={1}>
             {roleContext}
           </Text>
-
-          <View className="flex-row items-center gap-sm">
-            <View className="flex-row items-center gap-xs">
-              <CalendarBlankIcon size={11} color={colors.text.muted} />
-              <Text className="text-xs text-textMuted">
-                {formatDate(handover.createdAt)}
-              </Text>
-            </View>
-
-            {(handover.status === "Ongoing" || handover.status === "Delivered") && (
-              <View className="flex-row items-center gap-xs">
-                <ClockCountdownIcon size={11} color={colors.text.muted} />
-                <Text className="text-xs text-textMuted">
-                  {formatDate(handover.expiresAt)}
-                </Text>
-              </View>
-            )}
-          </View>
         </View>
       </View>
 

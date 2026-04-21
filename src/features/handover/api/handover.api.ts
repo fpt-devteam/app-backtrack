@@ -13,8 +13,9 @@ export const RETURN_REPORT_API = {
   c2cList: "/api/core/return-reports/c2c",
   c2cDetail: (id: string) => `/api/core/return-reports/c2c/${id}`,
   c2cCreate: "/api/core/return-reports/c2c",
-  c2cActivate: (id: string) => `/api/core/return-reports/c2c/${id}/activate`,
+  c2cActivate: (id: string) => `/api/core/return-reports/c2c/${id}/deliver`,
   c2cConfirm: (id: string) => `/api/core/return-reports/c2c/${id}/confirm`,
+  c2cReject: (id: string) => `/api/core/return-reports/c2c/${id}/reject`,
   c2cByPartner: (partnerId: string) => `/api/core/return-reports/c2c/partner/${partnerId}`,
 } as const;
 
@@ -46,9 +47,8 @@ export async function createC2CReturnReportApi(
 }
 
 /**
- * Moves a Draft report → Active.
- * Either Finder or Owner can call this. The caller becomes the activator
- * and will be blocked from confirming (counterpart must confirm instead).
+ * Moves a report to Delivered status.
+ * Backend endpoint: PATCH /api/core/return-reports/c2c/{id}/deliver
  */
 export async function activateC2CReturnReportApi(id: string) {
   const response = await privateClient.patch<C2CReturnReportResponse>(
@@ -64,6 +64,17 @@ export async function activateC2CReturnReportApi(id: string) {
 export async function confirmC2CReturnReportApi(id: string) {
   const response = await privateClient.patch<C2CReturnReportResponse>(
     RETURN_REPORT_API.c2cConfirm(id),
+  );
+  return response.data;
+}
+
+/**
+ * Rejects a handover (Delivered → Rejected).
+ * Must be called by the Owner when the handover status is Delivered.
+ */
+export async function rejectC2CReturnReportApi(id: string) {
+  const response = await privateClient.patch<C2CReturnReportResponse>(
+    RETURN_REPORT_API.c2cReject(id),
   );
   return response.data;
 }

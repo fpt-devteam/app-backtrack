@@ -18,6 +18,7 @@ import {
   useActivateC2CReturnReport,
   useGetC2CReturnReportById,
   useOwnerConfirmC2CReturnReport,
+  useOwnerRejectC2CReturnReport,
 } from "@/src/features/handover/hooks";
 import type {
   Handover,
@@ -48,11 +49,13 @@ import {
   PackageIcon,
   UserIcon,
   WarningCircleIcon,
+  XCircleIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  InteractionManager,
   LayoutChangeEvent,
   Platform,
   ScrollView,
@@ -339,8 +342,8 @@ const PartyRow = ({
   role: "Finder" | "Owner";
   isCurrentUser: boolean;
 }) => {
-  const roleColor = role === "Finder" ? colors.info[500] : colors.kazan[500];
-  const roleBg = role === "Finder" ? colors.info[50] : colors.kazan[100];
+  const roleColor = role === "Finder" ? colors.babu[500] : colors.rausch[500];
+  const roleBg = role === "Finder" ? colors.babu[100] : colors.rausch[100];
 
   return (
     <View className="flex-row items-center gap-md py-sm px-md">
@@ -356,7 +359,7 @@ const PartyRow = ({
       )}
       <View className="flex-1">
         <View className="flex-row items-center gap-1.5">
-          <Text className="text-sm font-semibold text-textPrimary">
+          <Text className="text-sm font-semibold">
             {user?.displayName ?? "Not assigned"}
           </Text>
           {isCurrentUser && (
@@ -542,8 +545,10 @@ type ActionPanelProps = {
   isOwner: boolean;
   onActivate: () => void;
   onConfirm: () => void;
+  onReject: () => void;
   isActivating: boolean;
   isConfirming: boolean;
+  isRejecting: boolean;
 };
 
 const ACTION_PANEL_MIN_HEIGHT = 120;
@@ -554,8 +559,10 @@ const ActionPanel = ({
   isOwner,
   onActivate,
   onConfirm,
+  onReject,
   isActivating,
   isConfirming,
+  isRejecting,
 }: ActionPanelProps) => {
   const { status } = report;
   const hasMarkedDelivery = !!report.activatedByRole;
@@ -713,7 +720,7 @@ const ActionPanel = ({
     );
   }
 
-  // ── Delivered — Owner: confirm receipt ──
+  // ── Delivered — Owner: confirm receipt or reject ──
   if (status === "Delivered" && isOwner) {
     return (
       <View
@@ -726,12 +733,13 @@ const ActionPanel = ({
         </Text>
         <TouchableOpacity
           activeOpacity={0.85}
-          disabled={isConfirming}
+          disabled={isConfirming || isRejecting}
           onPress={onConfirm}
-          className="flex-row items-center justify-center gap-sm rounded-xl"
+          className="flex-row items-center justify-center gap-sm rounded-xl mb-2"
           style={{
             height: metrics.layout.controlHeight.xl,
-            backgroundColor: isConfirming ? colors.hof[300] : colors.babu[400],
+            backgroundColor:
+              isConfirming || isRejecting ? colors.hof[300] : colors.babu[400],
           }}
         >
           {isConfirming ? (
@@ -741,6 +749,30 @@ const ActionPanel = ({
               <CheckCircleIcon size={18} color={colors.white} weight="bold" />
               <Text className="text-base font-semibold text-white">
                 I&apos;ve Received the Item
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          disabled={isConfirming || isRejecting}
+          onPress={onReject}
+          className="flex-row items-center justify-center gap-sm rounded-xl border border-error"
+          style={{
+            height: metrics.layout.controlHeight.xl,
+            backgroundColor: isRejecting ? colors.error[100] : colors.surface,
+          }}
+        >
+          {isRejecting ? (
+            <ActivityIndicator size="small" color={colors.error[500]} />
+          ) : (
+            <>
+              <XCircleIcon size={18} color={colors.error[500]} weight="bold" />
+              <Text
+                className="text-base font-semibold"
+                style={{ color: colors.error[500] }}
+              >
+                Reject Handover
               </Text>
             </>
           )}
@@ -766,6 +798,7 @@ const HandoverDetailScreen = () => {
 
   const { activate, isActivating } = useActivateC2CReturnReport();
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
+  const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
 
   const [isOpeningChat, setIsOpeningChat] = useState(false);
   const [actionPanelHeight, setActionPanelHeight] = useState(
@@ -914,7 +947,13 @@ const HandoverDetailScreen = () => {
       }
 
       if (conversationId) {
-        router.navigate(CHAT_ROUTE.message(conversationId));
+        // Two-step navigation to avoid the jarring combined "tab switch + screen
+        // push" animation. First switch to the chat tab (tab animation only),
+        // then push the specific conversation once that transition settles.
+        router.navigate(CHAT_ROUTE.index);
+        InteractionManager.runAfterInteractions(() => {
+          router.navigate(CHAT_ROUTE.message(conversationId));
+        });
       } else {
         Alert.alert(
           "Chat not found",
@@ -983,6 +1022,32 @@ const HandoverDetailScreen = () => {
       ],
     );
   }, [report, ownerConfirm]);
+
+  const handleReject = useCallback(() => {
+    if (!report) return;
+    Alert.alert(
+      "Reject Handover?",
+      "Are you sure you want to reject this handover? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reject",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await ownerReject(report.id);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            } catch {
+              Alert.alert(
+                "Error",
+                "Could not reject the handover. Please try again.",
+              );
+            }
+          },
+        },
+      ],
+    );
+  }, [report, ownerReject]);
 
   // ── Loading ──
   if (isLoading) {
@@ -1255,8 +1320,10 @@ const HandoverDetailScreen = () => {
             isOwner={isOwner}
             onActivate={handleActivate}
             onConfirm={handleConfirm}
+            onReject={handleReject}
             isActivating={isActivating}
             isConfirming={isConfirming}
+            isRejecting={isRejecting}
           />
         </View>
       )}

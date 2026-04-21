@@ -43,6 +43,7 @@ export const POST_ROUTE = {
 } as const;
 
 export const CHAT_ROUTE = {
+  index: createPath("/(tabs)/chat"),
   conversations: createPath(CHAT_BASE),
   message: (id: string) => createPath(`${CHAT_BASE}/${id}`),
   information: (id: string) => createPath(`${CHAT_BASE}/${id}/information`),
