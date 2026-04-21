@@ -1,6 +1,8 @@
 import { eventTimeSchema, type EventTime } from "@/src/features/post/schemas";
 import {
+  createCardSlice,
   createElectronicsSlice,
+  CardSlice,
   ElectronicsSlice,
 } from "@/src/features/post/store";
 import {
@@ -61,12 +63,14 @@ export const usePostCreationStore = create<
     PostCreateActions &
     PhotoSlice &
     LocationSlice &
-    ElectronicsSlice
+    ElectronicsSlice &
+    CardSlice
 >((set, get, api) => ({
   ...initialState,
   ...createPhotoSlice(set, get, api),
   ...createLocationSlice(set, get, api),
   ...createElectronicsSlice(set, get, api),
+  ...createCardSlice(set, get, api),
 
   selectPostType: (type) => set({ postType: type }),
   selectCategory: (category) =>

@@ -44,9 +44,8 @@ const PostCreationStepperLayout = () => {
 
   const resetForm = usePostCreationStore((state) => state.resetForm);
 
-  const electronicDetail = usePostCreationStore(
-    (state) => state.electronicDetail,
-  );
+  const electronicDetail = usePostCreationStore((state) => state.electronicDetail);
+  const cardDetail = usePostCreationStore((state) => state.cardDetail);
 
   const isIdentityStepInvalid = currentStep === 2 && images.length === 0;
   const isLocationStepInvalid = currentStep === 3 && !location.coords;
@@ -90,7 +89,8 @@ const PostCreationStepperLayout = () => {
       const imageUrls = await handleUploadImages(images);
 
       const req: PostCreateRequest = {
-        postTitle: electronicDetail?.itemName || "Untitled Post",
+        postTitle:
+          electronicDetail?.itemName || cardDetail?.itemName || "Untitled Post",
         postType,
         category,
         subcategoryCode: subCategory,
@@ -100,6 +100,7 @@ const PostCreationStepperLayout = () => {
         displayAddress: location.address,
         eventTime: timelineDate ?? new Date(),
         electronicDetail,
+        cardDetail,
       };
 
       const postDetails = await createPost(req);

@@ -46,6 +46,7 @@ export type PostCreateRequest = {
   imageUrls: string[];
   eventTime: Date;
   electronicDetail?: ElectronicDetail
+  cardDetail?: CardDetail
 } & Omit<UserLocation, "radiusInKm">;
 
 export type PostCreateResponse = ApiResponse<Post>;
