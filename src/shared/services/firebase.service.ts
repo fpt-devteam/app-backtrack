@@ -1,10 +1,12 @@
-import { firebaseStorage } from "@/src/shared/lib";
+import { auth, firebaseStorage } from "@/src/shared/lib";
 import type { ImageUploadRequest, ImageUploadResponse } from "@/src/shared/types";
-import { getMediaLibraryPermissionsAsync, PermissionStatus, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import { getMediaLibraryPermissionsAsync, ImagePickerAsset, PermissionStatus, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { getAuth, sendEmailVerification } from "firebase/auth";
 import type { StorageReference } from "firebase/storage";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Alert, Linking, Platform } from "react-native";
+
+const UPLOAD_IMAGE_API = "posts/images";
 
 export async function uploadImageToStorage(req: ImageUploadRequest): Promise<ImageUploadResponse> {
   const { path, blob } = req;
@@ -57,3 +59,38 @@ export const resendVerificationEmail = async () => {
     throw new Error("No user is currently signed in.");
   }
 };
+
+
+/**
+ * @param imageAssets An array of ImagePickerAsset objects representing the images to be uploaded.
+ * @returns An array of download URLs for the uploaded images.
+ */
+export async function uploadImageAssets(imageAssets: ImagePickerAsset[]) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Not authenticated");
+
+  const uid = user.uid;
+  const results = [];
+
+  for (let i = 0; i < imageAssets.length; i++) {
+    const img = imageAssets[i];
+    if (!img?.uri) continue;
+
+    const fileName = `img_${Date.now()}_${i}`;
+    const response = await fetch(img.uri);
+    const blob = await response.blob();
+
+    const req: ImageUploadRequest = {
+      filename: fileName,
+      firebaseUid: uid,
+      uri: img.uri,
+      blob,
+      path: `${UPLOAD_IMAGE_API}/${uid}/${fileName}`,
+    };
+
+    const res = await uploadImageToStorage(req);
+    results.push(res.downloadURL);
+  }
+
+  return results;
+}

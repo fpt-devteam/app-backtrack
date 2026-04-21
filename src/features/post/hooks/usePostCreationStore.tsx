@@ -1,13 +1,15 @@
 import { eventTimeSchema, type EventTime } from "@/src/features/post/schemas";
 import {
+  CardSlice,
   createCardSlice,
   createElectronicsSlice,
   createPersonalBelongingSlice,
-  CardSlice,
   ElectronicsSlice,
   PersonalBelongingSlice,
 } from "@/src/features/post/store";
 import {
+  AnalyzeImageRequest,
+  AnalyzeImageResponse,
   CARD_SUBCATEGORY,
   ELECTRONICS_SUBCATEGORY,
   OTHER_SUBCATEGORY,
@@ -23,7 +25,9 @@ import {
   LocationSlice,
   PhotoSlice,
 } from "@/src/shared/store";
+import { Nullable } from "@/src/shared/types";
 import { create } from "zustand";
+import { analyzeImageApi } from "../api";
 
 const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategoryCode> = {
   [POST_CATEGORIES.ELECTRONICS]: ELECTRONICS_SUBCATEGORY.PHONE,
@@ -34,12 +38,15 @@ const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategoryCode> = {
 };
 
 type PostCreationState = {
+  postTitle: string;
   postType: PostType;
   category: PostCategory;
-  subCategory: PostSubcategoryCode;
+  subCategoryCode: PostSubcategoryCode;
   timeline: {
     date: EventTime;
   };
+
+  aiAnalyzeDraft: Promise<Nullable<AnalyzeImageResponse>>;
 };
 
 type PostCreateActions = {
@@ -47,17 +54,23 @@ type PostCreateActions = {
   selectCategory: (category: PostCategory) => void;
   selectSubCategory: (subCategory: PostSubcategoryCode) => void;
   updateEventDate: (date: EventTime) => void;
+  updatePostTitle: (title: string) => void;
+  analyzeByAI: () => Promise<void>;
+  getAnalyzeResult: () => Promise<Nullable<AnalyzeImageResponse>>;
+
   debug: () => void;
   resetForm: () => void;
 };
 
 const initialState: PostCreationState = {
+  postTitle: "Unknown item",
   postType: PostType.Lost,
   category: POST_CATEGORIES.ELECTRONICS,
-  subCategory: ELECTRONICS_SUBCATEGORY.PHONE,
+  subCategoryCode: ELECTRONICS_SUBCATEGORY.PHONE,
   timeline: {
     date: eventTimeSchema.getDefault(),
   },
+  aiAnalyzeDraft: Promise.resolve(null),
 };
 
 export const usePostCreationStore = create<
@@ -78,8 +91,10 @@ export const usePostCreationStore = create<
 
   selectPostType: (type) => set({ postType: type }),
   selectCategory: (category) =>
-    set({ category, subCategory: DEFAULT_SUBCATEGORY[category] }),
-  selectSubCategory: (subCategory) => set({ subCategory }),
+    set({ category, subCategoryCode: DEFAULT_SUBCATEGORY[category] }),
+  selectSubCategory: (subCategory) => set({ subCategoryCode: subCategory }),
+
+  updatePostTitle: (title) => set({ postTitle: title }),
 
   updateEventDate: (date) =>
     set((state) => ({
@@ -88,7 +103,22 @@ export const usePostCreationStore = create<
         date,
       },
     })),
+
+  analyzeByAI: async () => {
+    const { getUploadedImageUrls } = get();
+    const imageUrls = await getUploadedImageUrls();
+
+    const req: AnalyzeImageRequest = {
+      imageUrls,
+      subcategoryCode: get().subCategoryCode,
+    };
+
+    set({ aiAnalyzeDraft: analyzeImageApi(req) });
+  },
+
   resetForm: () => set(initialState),
+  
+  getAnalyzeResult: () => get().aiAnalyzeDraft,
 
   debug: () => {
     set((state) => {

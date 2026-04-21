@@ -1,12 +1,14 @@
 import { useCreatePost, usePostCreationStore } from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
 import { PostCreateRequest } from "@/src/features/post/types";
-import { AppLink, AppLoader } from "@/src/shared/components";
+import {
+  AppLink,
+  AppLoader,
+  TouchableIconButton,
+} from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
-import { useUploadImage } from "@/src/shared/hooks";
 import { colors, typography } from "@/src/shared/theme";
-import { ImagePickerAsset } from "expo-image-picker";
 import {
   ExternalPathString,
   RelativePathString,
@@ -14,55 +16,93 @@ import {
   Stack,
 } from "expo-router";
 import { MotiView } from "moti";
-import React, { useState } from "react";
+import { HeadCircuitIcon } from "phosphor-react-native";
+import React, { useMemo, useState } from "react";
 import { Text, TextStyle, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const STEPS: { path: ExternalPathString | RelativePathString }[] = [
-  { path: POST_ROUTE.category },
-  { path: POST_ROUTE.subCategory },
-  { path: POST_ROUTE.identity },
-  { path: POST_ROUTE.location },
-  { path: POST_ROUTE.timeline },
-  { path: POST_ROUTE.itemDetail },
-];
+const STEP_KEY = {
+  CATEGORY: "category",
+  SUB_CATEGORY: "sub-category",
+  IDENTITY: "identity",
+  LOCATION: "location",
+  TIMELINE: "timeline",
+  DETAIL: "detail",
+} as const;
+
+type StepKey = (typeof STEP_KEY)[keyof typeof STEP_KEY];
+
+const STEPS: { key: StepKey; path: ExternalPathString | RelativePathString }[] =
+  [
+    { key: STEP_KEY.CATEGORY, path: POST_ROUTE.category },
+    { key: STEP_KEY.SUB_CATEGORY, path: POST_ROUTE.subCategory },
+    { key: STEP_KEY.IDENTITY, path: POST_ROUTE.identity },
+    { key: STEP_KEY.LOCATION, path: POST_ROUTE.location },
+    { key: STEP_KEY.TIMELINE, path: POST_ROUTE.timeline },
+    { key: STEP_KEY.DETAIL, path: POST_ROUTE.itemDetail },
+  ];
 
 const PostCreationStepperLayout = () => {
-  const { uploadImages, isUploadingImages } = useUploadImage();
   const { createPost, isCreatingPost } = useCreatePost();
+  const [isCreating, setIsCreating] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(0);
+  const postTitle = usePostCreationStore((state) => state.postTitle);
 
-  const debug = usePostCreationStore((state) => state.debug);
+  const draftImages = usePostCreationStore((state) => state.draftImages);
+  const uploadImages = usePostCreationStore((state) => state.uploadImages);
+  const analyzeByAI = usePostCreationStore((state) => state.analyzeByAI);
+  const getUploadedImageUrls = usePostCreationStore(
+    (state) => state.getUploadedImageUrls,
+  );
 
   const postType = usePostCreationStore((state) => state.postType);
   const category = usePostCreationStore((state) => state.category);
-  const subCategory = usePostCreationStore((state) => state.subCategory);
-  const images = usePostCreationStore((state) => state.images);
+  const subCategoryCode = usePostCreationStore(
+    (state) => state.subCategoryCode,
+  );
   const location = usePostCreationStore((state) => state.location);
   const timelineDate = usePostCreationStore((state) => state.timeline.date);
 
   const resetForm = usePostCreationStore((state) => state.resetForm);
 
-  const electronicDetail = usePostCreationStore((state) => state.electronicDetail);
+  const electronicDetail = usePostCreationStore(
+    (state) => state.electronicDetail,
+  );
   const cardDetail = usePostCreationStore((state) => state.cardDetail);
   const personalBelongingDetail = usePostCreationStore(
     (state) => state.personalBelongingDetail,
   );
 
-  const isIdentityStepInvalid = currentStep === 2 && images.length === 0;
-  const isLocationStepInvalid = currentStep === 3 && !location.coords;
-  const isTimelineStepInvalid =
-    currentStep === 4 &&
-    (!timelineDate || !eventTimeSchema.isValidSync(timelineDate));
-  const isNextDisabled =
-    isIdentityStepInvalid || isLocationStepInvalid || isTimelineStepInvalid;
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const getAnalyzeResult = usePostCreationStore(
+    (state) => state.getAnalyzeResult,
+  );
+
+  const isNextDisabled = useMemo(() => {
+    if (STEPS[currentStep].key === STEP_KEY.IDENTITY) {
+      return draftImages.length === 0;
+    }
+
+    if (STEPS[currentStep].key === STEP_KEY.LOCATION) {
+      return !location.coords;
+    }
+
+    if (STEPS[currentStep].key === STEP_KEY.TIMELINE) {
+      return !timelineDate || !eventTimeSchema.isValidSync(timelineDate);
+    }
+
+    return false;
+  }, [currentStep, timelineDate, draftImages, location]);
+
+  const isLoading = isCreating || isCreatingPost;
 
   const handleNext = async () => {
-    // if (currentStep === 2 && !isIdentityStepInvalid) {
-    //   const urls = await handleUploadImages(images);
-    //   console.log("Urls: ", urls);
-    // }
+    if (STEPS[currentStep].key === STEP_KEY.IDENTITY) {
+      uploadImages();
+      analyzeByAI();
+    }
 
     if (currentStep >= STEPS.length - 1) {
       await handleSubmit();
@@ -81,25 +121,23 @@ const PostCreationStepperLayout = () => {
     setCurrentStep(newStep);
   };
 
-  const handleUploadImages = async (picked: ImagePickerAsset[]) => {
-    const uploadRes = await uploadImages(picked);
-    if (!uploadRes) return [];
-    return uploadRes.map((res: { downloadURL: string }) => res.downloadURL);
-  };
-
   const handleSubmit = async () => {
+    setIsCreating(true);
+
     try {
-      const imageUrls = await handleUploadImages(images);
+      const imageUrls = await getUploadedImageUrls();
+      const draftAnalyzeResult = await getAnalyzeResult();
+
+      const title =
+        draftAnalyzeResult?.data?.electronic?.itemName ||
+        draftAnalyzeResult?.data?.card?.itemName ||
+        draftAnalyzeResult?.data?.personalBelonging?.itemName;
 
       const req: PostCreateRequest = {
-        postTitle:
-          electronicDetail?.itemName ||
-          cardDetail?.itemName ||
-          personalBelongingDetail?.itemName ||
-          "Untitled Post",
+        postTitle: title || "Untitled Post",
         postType,
         category,
-        subcategoryCode: subCategory,
+        subcategoryCode: subCategoryCode,
         imageUrls,
         location: location.coords,
         externalPlaceId: location.placeId,
@@ -123,6 +161,8 @@ const PostCreationStepperLayout = () => {
     } catch (e) {
       console.log("Submit failed", e);
       toast.error("Failed to create post. Please try again.");
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -131,136 +171,172 @@ const PostCreationStepperLayout = () => {
     resetForm();
   };
 
-  const isLoading = isUploadingImages || isCreatingPost;
+  const handleAIAnalyze = async () => {
+    try {
+      setIsAnalyzing(true);
+
+      const minimumDelay = new Promise((resolve) => setTimeout(resolve, 3000));
+      const [result] = await Promise.all([getAnalyzeResult(), minimumDelay]);
+      console.log("AI Analyze Result:", result);
+
+      const electronicDetail = result?.data?.electronic;
+      const cardDetail = result?.data?.card;
+      const personalBelongingDetail = result?.data?.personalBelonging;
+
+      if (electronicDetail) usePostCreationStore.setState({ electronicDetail });
+      if (cardDetail) usePostCreationStore.setState({ cardDetail });
+      if (personalBelongingDetail)
+        usePostCreationStore.setState({ personalBelongingDetail });
+    } catch (error) {
+      console.log("Error during AI analysis:", error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-surface">
-      <View className="flex-1">
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: "slide_from_right",
-            contentStyle: { backgroundColor: "transparent" },
-          }}
-        >
-          <Stack.Screen
-            name="category"
-            options={{
-              headerShown: true,
-              headerTitle: "Item Classification",
-              headerTitleStyle: {
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeight
-                  .normal as TextStyle["fontWeight"],
-              },
+    <>
+      <SafeAreaView className="flex-1 bg-surface">
+        <View className="flex-1">
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: "slide_from_right",
+              contentStyle: { backgroundColor: "transparent" },
             }}
+          >
+            <Stack.Screen
+              name="category"
+              options={{
+                headerShown: true,
+                headerTitle: "Item Classification",
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+              }}
+            />
+
+            <Stack.Screen
+              name="sub-category"
+              options={{
+                headerShown: true,
+                headerTitle: "Detailed Classification",
+                headerBackVisible: false,
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+              }}
+            />
+
+            <Stack.Screen
+              name="identity"
+              options={{
+                headerShown: true,
+                headerTitle: "Visual Evidence",
+                headerBackVisible: false,
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+              }}
+            />
+
+            <Stack.Screen
+              name="location"
+              options={{
+                headerShown: true,
+                headerTitle: "Pinpoint location",
+                headerBackVisible: false,
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+              }}
+            />
+
+            <Stack.Screen
+              name="timeline"
+              options={{
+                headerShown: true,
+                headerTitle: "Occurrence time",
+                headerBackVisible: false,
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+              }}
+            />
+
+            <Stack.Screen
+              name="detail"
+              options={{
+                headerShown: true,
+                headerTitle: "Detail Identification",
+                headerBackVisible: false,
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+                headerRight: () => (
+                  <TouchableIconButton
+                    icon={<HeadCircuitIcon size={32} />}
+                    onPress={handleAIAnalyze}
+                    disabled={isAnalyzing}
+                  />
+                ),
+              }}
+            />
+          </Stack>
+        </View>
+
+        {/* Step Indicator */}
+        <View className="">
+          <StepIndicator
+            currentStep={currentStep + 1}
+            totalSteps={STEPS.length}
+          />
+        </View>
+
+        {/* Actions footer */}
+        <View className="flex-row border-t justify-between items-center px-lg pt-md">
+          <AppLink
+            title="Back"
+            onPress={handleBack}
+            size="base"
+            disabled={isNextDisabled}
           />
 
-          <Stack.Screen
-            name="sub-category"
-            options={{
-              headerShown: true,
-              headerTitle: "Detailed Classification",
-              headerBackVisible: false,
-              headerTitleStyle: {
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeight
-                  .normal as TextStyle["fontWeight"],
-              },
-            }}
-          />
+          <TouchableOpacity
+            className=" border bg-secondary rounded-sm px-lg py-md"
+            onPress={handleNext}
+            disabled={isNextDisabled}
+            style={{ opacity: isNextDisabled ? 0.4 : 1 }}
+          >
+            {isLoading ? (
+              <AppLoader colorClass="bg-white" />
+            ) : (
+              <Text className="text-base font-normal text-center text-white tracking-label">
+                {currentStep < STEPS.length - 1 ? "Next" : "Submit"}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
 
-          <Stack.Screen
-            name="identity"
-            options={{
-              headerShown: true,
-              headerTitle: "Visual Evidence",
-              headerBackVisible: false,
-              headerTitleStyle: {
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeight
-                  .normal as TextStyle["fontWeight"],
-              },
-            }}
-          />
-
-          <Stack.Screen
-            name="location"
-            options={{
-              headerShown: true,
-              headerTitle: "Pinpoint location",
-              headerBackVisible: false,
-              headerTitleStyle: {
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeight
-                  .normal as TextStyle["fontWeight"],
-              },
-            }}
-          />
-
-          <Stack.Screen
-            name="timeline"
-            options={{
-              headerShown: true,
-              headerTitle: "Occurrence time",
-              headerBackVisible: false,
-              headerTitleStyle: {
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeight
-                  .normal as TextStyle["fontWeight"],
-              },
-            }}
-          />
-
-          <Stack.Screen
-            name="detail"
-            options={{
-              headerShown: true,
-              headerTitle: "Detail Identification",
-              headerBackVisible: false,
-              headerTitleStyle: {
-                fontSize: typography.fontSize.lg,
-                fontWeight: typography.fontWeight
-                  .normal as TextStyle["fontWeight"],
-              },
-            }}
-          />
-        </Stack>
-      </View>
-
-      {/* Step Indicator */}
-      <View className="">
-        <StepIndicator
-          currentStep={currentStep + 1}
-          totalSteps={STEPS.length}
-        />
-      </View>
-
-      {/* Actions footer */}
-      <View className="flex-row border-t justify-between items-center px-lg pt-md">
-        <AppLink
-          title="Back"
-          onPress={handleBack}
-          size="base"
-          disabled={isLoading}
-        />
-
-        <TouchableOpacity
-          className=" border bg-secondary rounded-sm px-lg py-md"
-          onPress={handleNext}
-          disabled={isNextDisabled || isLoading}
-          style={{ opacity: isNextDisabled || isLoading ? 0.4 : 1 }}
-        >
-          {isLoading ? (
-            <AppLoader colorClass="bg-white" />
-          ) : (
-            <Text className="text-base font-normal text-center text-white tracking-label">
-              {currentStep < STEPS.length - 1 ? "Next" : "Submit"}
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      {isAnalyzing && (
+        <View className="absolute inset-0 z-10 items-center justify-center bg-black/10">
+          <AppLoader />
+        </View>
+      )}
+    </>
   );
 };
 

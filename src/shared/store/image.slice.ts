@@ -1,52 +1,57 @@
 import { ImagePickerAsset } from 'expo-image-picker';
 import { StateCreator } from 'zustand';
+import { uploadImageAssets } from '../services';
 
 export type PhotoSlice = {
-  images: ImagePickerAsset[];
-  isUploadingImages: boolean;
   maxImages: number;
+  draftImages: ImagePickerAsset[];
+  imageUrls: Promise<string[]>;
 
-  setUploadingImages: (status: boolean) => void;
-  setImages: (images: ImagePickerAsset[]) => void;
-  addImage: (image: ImagePickerAsset) => void;
-  addMultipleImages: (newImages: ImagePickerAsset[]) => void;
+  uploadImages: () => void;
+  getUploadedImageUrls: () => Promise<string[]>;
+
+  addImages: (newImages: ImagePickerAsset[]) => void;
   removeImage: (index: number) => void;
   resetPhotoSlice: () => void;
 }
 
 export const createPhotoSlice: StateCreator<PhotoSlice> = (set, get) => ({
-  images: [],
-  isUploadingImages: false,
+  draftImages: [],
+  imageUrls: Promise.resolve([]),
   maxImages: 5,
+  isUploadingImages: false,
 
-  setUploadingImages: (status) => set({ isUploadingImages: status }),
-
-  setImages: (images) => set({ images }),
-
-  addImage: (image) => {
-    const { images, maxImages } = get();
-    if (images.length < maxImages) {
-      set({ images: [...images, image] });
-    } else {
-      console.warn("Detective, we've reached the maximum evidence limit!");
-    }
-  },
-
-  addMultipleImages: (newImages) => {
-    const { images, maxImages } = get();
+  addImages: (newImages) => {
+    const { draftImages: images, maxImages } = get();
     const availableSlots = maxImages - images.length;
 
     if (availableSlots > 0) {
       const imagesToAdd = newImages.slice(0, availableSlots);
-      set({ images: [...images, ...imagesToAdd] });
+      set({ draftImages: [...images, ...imagesToAdd] });
     }
+  },
+
+  getUploadedImageUrls: () => get().imageUrls,
+
+  uploadImages: () => {
+    const uploadTask = uploadImageAssets(get().draftImages);
+
+    uploadTask
+      .catch((error) => {
+        console.log("Error uploading images:", error);
+        set({ imageUrls: Promise.resolve([]) });
+      })
+    set({ imageUrls: uploadTask });
   },
 
   removeImage: (index) => {
     set((state) => ({
-      images: state.images.filter((_, i) => i !== index),
+      draftImages: state.draftImages.filter((_, i) => i !== index),
     }));
   },
 
-  resetPhotoSlice: () => set({ images: [], isUploadingImages: false }),
+  resetPhotoSlice: () => set({
+    draftImages: [],
+    imageUrls: Promise.resolve([]),
+  }),
 });
