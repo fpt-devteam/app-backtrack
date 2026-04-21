@@ -115,6 +115,31 @@ export type ElectronicDetail = {
   additionalDetails: Nullable<string>;
 };
 
+export type PersonalBelongingDetail = {
+  itemName: string;
+  color: Nullable<string>;
+  brand: Nullable<string>;
+  material: Nullable<string>;
+  size: Nullable<string>;
+  condition: Nullable<string>;
+  distinctiveMarks: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};
+
+export type CardDetail = {
+  itemName: string;
+  cardNumberHash: Nullable<string>;
+  cardNumberMasked: Nullable<string>;
+  holderName: Nullable<string>;
+  holderNameNormalized: Nullable<string>;
+  dateOfBirth: Date | null;
+  issueDate: Date | null;
+  expiryDate: Date | null;
+  issuingAuthority: Nullable<string>;
+  ocrText: Nullable<string>;
+};
+
 /**
  * Post Subcategory Response
  * This type defines the structure of the response when fetching post subcategories.

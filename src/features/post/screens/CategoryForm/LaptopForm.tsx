@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-const PhoneForm = () => {
+const LaptopForm = () => {
   const electronicDetail = usePostCreationStore(
     (state) => state.electronicDetail,
   );
@@ -71,7 +71,6 @@ const PhoneForm = () => {
             </Text>
           </View>
 
-          {/* Identification */}
           <View className="border rounded-md overflow-hidden">
             <PostFormField
               label="Device Brand"
@@ -112,7 +111,6 @@ const PhoneForm = () => {
             />
           </View>
 
-          {/* Case Information */}
           <View>
             <View className="flex-row items-center justify-between mb-sm">
               <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
@@ -144,7 +142,6 @@ const PhoneForm = () => {
             </MotiView>
           </View>
 
-          {/* Unique marks & traits*/}
           <View className="gap-sm">
             <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
               Unique marks & traits
@@ -161,4 +158,4 @@ const PhoneForm = () => {
   );
 };
 
-export default PhoneForm;
+export default LaptopForm;

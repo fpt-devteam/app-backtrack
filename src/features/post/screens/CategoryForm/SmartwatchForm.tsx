@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-const PhoneForm = () => {
+const SmartwatchForm = () => {
   const electronicDetail = usePostCreationStore(
     (state) => state.electronicDetail,
   );
@@ -71,10 +71,9 @@ const PhoneForm = () => {
             </Text>
           </View>
 
-          {/* Identification */}
           <View className="border rounded-md overflow-hidden">
             <PostFormField
-              label="Device Brand"
+              label="Watch Brand"
               value={electronicDetail.brand ?? ""}
               onChange={setElectronicBrand}
             />
@@ -98,7 +97,7 @@ const PhoneForm = () => {
             <View className="border-t" />
 
             <PostFormField
-              label="Screen & Glass condition"
+              label="Screen condition"
               value={electronicDetail.screenCondition ?? ""}
               onChange={setElectronicScreenCondition}
             />
@@ -106,13 +105,12 @@ const PhoneForm = () => {
             <View className="border-t" />
 
             <PostFormField
-              label="Wallpaper / Lock screen"
+              label="Watch face / background"
               value={electronicDetail.lockScreenDescription ?? ""}
               onChange={setElectronicLockScreenDescription}
             />
           </View>
 
-          {/* Case Information */}
           <View>
             <View className="flex-row items-center justify-between mb-sm">
               <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
@@ -136,7 +134,7 @@ const PhoneForm = () => {
 
               <View className="border rounded-sm overflow-hidden">
                 <PostFormField
-                  label="Case colors, materials or stickers"
+                  label="Bumper, case color or cover details"
                   value={electronicDetail.caseDescription ?? ""}
                   onChange={setElectronicCaseDescription}
                 />
@@ -144,7 +142,6 @@ const PhoneForm = () => {
             </MotiView>
           </View>
 
-          {/* Unique marks & traits*/}
           <View className="gap-sm">
             <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
               Unique marks & traits
@@ -161,4 +158,4 @@ const PhoneForm = () => {
   );
 };
 
-export default PhoneForm;
+export default SmartwatchForm;
