@@ -60,6 +60,10 @@ export const HANDOVER_ROUTE = {
   index: `${HANDOVER_BASE}` as ExternalPathString | RelativePathString,
   detail: (handoverId: string) =>
     `${HANDOVER_BASE}/${handoverId}` as ExternalPathString | RelativePathString,
+  all: (filter: "in-progress" | "past") =>
+    `${HANDOVER_BASE}/all?filter=${filter}` as ExternalPathString | RelativePathString,
+  conversation: (conversationId: string) =>
+    `${HANDOVER_BASE}/conversations/${conversationId}` as ExternalPathString | RelativePathString,
 } as const;
 
 export const MAP_ROUTE = {
