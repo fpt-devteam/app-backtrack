@@ -54,6 +54,8 @@ const PostGridItem = ({ post, size }: { post: Post; size: number }) => {
 const UserPostScreen = () => {
   const { width } = useWindowDimensions();
   const { data: posts, isLoading, error, refetch } = useGetAllMyPost();
+  
+  console.log("Posts: ", posts);
 
   const itemSize = useMemo(() => {
     const totalGap = GRID_GAP * (GRID_COLUMNS - 1);
@@ -64,29 +66,25 @@ const UserPostScreen = () => {
   const renderBody = () => {
     if (isLoading) {
       return (
-        <>
-          <View className="flex-1 bg-surface items-center justify-center">
-            <AppLoader />
-          </View>
-        </>
+        <View className="flex-1 bg-surface items-center justify-center">
+          <AppLoader />
+        </View>
       );
     }
 
     if (error) {
       return (
-        <>
-          <View className="flex-1 bg-surface items-center justify-center px-lg">
-            <Text className="text-textSecondary text-center">
-              Unable to load posts
-            </Text>
-            <Pressable
-              onPress={() => refetch()}
-              className="mt-md px-lg py-sm bg-secondary rounded-full"
-            >
-              <Text className="text-white font-semibold">Try again</Text>
-            </Pressable>
-          </View>
-        </>
+        <View className="flex-1 bg-surface items-center justify-center px-lg">
+          <Text className="text-textSecondary text-center">
+            Unable to load posts
+          </Text>
+          <Pressable
+            onPress={() => refetch()}
+            className="mt-md px-lg py-sm bg-secondary rounded-full"
+          >
+            <Text className="text-white font-semibold">Try again</Text>
+          </Pressable>
+        </View>
       );
     }
 

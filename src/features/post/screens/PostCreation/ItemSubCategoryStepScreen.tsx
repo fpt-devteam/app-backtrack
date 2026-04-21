@@ -6,7 +6,7 @@ import {
   PERSONAL_BELONGING_SUBCATEGORY,
   POST_CATEGORIES,
   PostCategory,
-  PostSubcategory,
+  PostSubcategoryCode,
 } from "@/src/features/post/types";
 import { AppLoader } from "@/src/shared/components";
 import {
@@ -33,7 +33,7 @@ type SubCategoryItem = {
   title: string;
   description: string;
   icon: ImageSourcePropType;
-  value: PostSubcategory;
+  value: PostSubcategoryCode;
 };
 
 const SUBCATEGORIES: Record<PostCategory, SubCategoryItem[]> = {

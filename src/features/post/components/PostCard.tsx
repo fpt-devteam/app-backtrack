@@ -31,8 +31,8 @@ export const PostCard = ({ item, size = "sm" }: PostCardProps) => {
   }, [item.eventTime]);
 
   const itemNameLabel = useMemo(
-    () => item.item?.itemName || "Untitled item",
-    [item.item?.itemName],
+    () => item.postTitle || "Untitled item",
+    [item],
   );
 
   const locationLabel = useMemo(() => {

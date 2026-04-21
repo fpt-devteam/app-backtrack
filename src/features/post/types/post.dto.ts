@@ -9,6 +9,7 @@ import {
   PostCategory,
   PostItem,
   PostSubcategory,
+  PostSubcategoryCode,
   type Post,
   type PostSearchOptions,
   type PostSuggestion,
@@ -40,7 +41,7 @@ export type PostFeedResponse = ApiResponse<PostFeedResult>;
 export type PostCreateRequest = {
   postType: PostType;
   category: PostCategory;
-  subcategoryCode: PostSubcategory
+  subcategoryCode: PostSubcategoryCode
   imageUrls: string[];
   eventTime: Date;
   electronicDetail?: ElectronicDetail
@@ -111,3 +112,10 @@ export type ElectronicDetail = {
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
 };
+
+/**
+ * Post Subcategory Response
+ * This type defines the structure of the response when fetching post subcategories.
+ * It includes an array of PostSubcategory objects wrapped in an ApiResponse.
+ */
+export type PostSubcategoryResponse = ApiResponse<PostSubcategory[]>;

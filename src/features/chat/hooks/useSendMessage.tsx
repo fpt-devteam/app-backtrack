@@ -4,7 +4,6 @@ import type {
   MessageSendRequest,
   MessageSendResponse,
 } from "@/src/features/chat/types";
-import { IS_CHAT_FEATURE_MOCK, sendMockMessage } from "@/src/shared/mocks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -18,14 +17,6 @@ export const useSendMessage = () => {
   const mutation = useMutation<MessageSendResponse, Error, SendMessageParams>({
     mutationKey: CHAT_QUERY_KEY.messageSend,
     mutationFn: async ({ conversationId, request }) => {
-      if (IS_CHAT_FEATURE_MOCK) {
-        return sendMockMessage({
-          conversationId,
-          type: request.type ?? "text",
-          content: request.content,
-        });
-      }
-
       await socketChatService.connect();
       socketChatService.joinConversation(conversationId);
 
