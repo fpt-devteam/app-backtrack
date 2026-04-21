@@ -17,7 +17,7 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-const PhoneForm = () => {
+const EarphoneForm = () => {
   const electronicDetail = usePostCreationStore(
     (state) => state.electronicDetail,
   );
@@ -29,12 +29,6 @@ const PhoneForm = () => {
   );
   const setElectronicColor = usePostCreationStore(
     (state) => state.setElectronicColor,
-  );
-  const setElectronicScreenCondition = usePostCreationStore(
-    (state) => state.setElectronicScreenCondition,
-  );
-  const setElectronicLockScreenDescription = usePostCreationStore(
-    (state) => state.setElectronicLockScreenDescription,
   );
   const setElectronicHasCase = usePostCreationStore(
     (state) => state.setElectronicHasCase,
@@ -71,10 +65,9 @@ const PhoneForm = () => {
             </Text>
           </View>
 
-          {/* Identification */}
           <View className="border rounded-md overflow-hidden">
             <PostFormField
-              label="Device Brand"
+              label="Brand"
               value={electronicDetail.brand ?? ""}
               onChange={setElectronicBrand}
             />
@@ -94,25 +87,8 @@ const PhoneForm = () => {
               value={electronicDetail.color ?? ""}
               onChange={setElectronicColor}
             />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Screen & Glass condition"
-              value={electronicDetail.screenCondition ?? ""}
-              onChange={setElectronicScreenCondition}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Wallpaper / Lock screen"
-              value={electronicDetail.lockScreenDescription ?? ""}
-              onChange={setElectronicLockScreenDescription}
-            />
           </View>
 
-          {/* Case Information */}
           <View>
             <View className="flex-row items-center justify-between mb-sm">
               <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
@@ -136,7 +112,7 @@ const PhoneForm = () => {
 
               <View className="border rounded-sm overflow-hidden">
                 <PostFormField
-                  label="Case colors, materials or stickers"
+                  label="Charging case or cover details"
                   value={electronicDetail.caseDescription ?? ""}
                   onChange={setElectronicCaseDescription}
                 />
@@ -144,7 +120,6 @@ const PhoneForm = () => {
             </MotiView>
           </View>
 
-          {/* Unique marks & traits*/}
           <View className="gap-sm">
             <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
               Unique marks & traits
@@ -161,4 +136,4 @@ const PhoneForm = () => {
   );
 };
 
-export default PhoneForm;
+export default EarphoneForm;

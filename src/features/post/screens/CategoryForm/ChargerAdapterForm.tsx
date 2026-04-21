@@ -3,21 +3,18 @@ import {
   PostFormTextArea,
 } from "@/src/features/post/components";
 import { usePostCreationStore } from "@/src/features/post/hooks";
-import { colors } from "@/src/shared/theme";
-import { MotiView } from "moti";
 import React from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Switch,
   Text,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-const PhoneForm = () => {
+const ChargerAdapterForm = () => {
   const electronicDetail = usePostCreationStore(
     (state) => state.electronicDetail,
   );
@@ -30,23 +27,9 @@ const PhoneForm = () => {
   const setElectronicColor = usePostCreationStore(
     (state) => state.setElectronicColor,
   );
-  const setElectronicScreenCondition = usePostCreationStore(
-    (state) => state.setElectronicScreenCondition,
-  );
-  const setElectronicLockScreenDescription = usePostCreationStore(
-    (state) => state.setElectronicLockScreenDescription,
-  );
-  const setElectronicHasCase = usePostCreationStore(
-    (state) => state.setElectronicHasCase,
-  );
-  const setElectronicCaseDescription = usePostCreationStore(
-    (state) => state.setElectronicCaseDescription,
-  );
   const setElectronicDistinguishingFeatures = usePostCreationStore(
     (state) => state.setElectronicDistinguishingFeatures,
   );
-
-  const hasCase = electronicDetail.hasCase ?? false;
 
   return (
     <KeyboardAvoidingView
@@ -71,10 +54,9 @@ const PhoneForm = () => {
             </Text>
           </View>
 
-          {/* Identification */}
           <View className="border rounded-md overflow-hidden">
             <PostFormField
-              label="Device Brand"
+              label="Brand"
               value={electronicDetail.brand ?? ""}
               onChange={setElectronicBrand}
             />
@@ -94,57 +76,8 @@ const PhoneForm = () => {
               value={electronicDetail.color ?? ""}
               onChange={setElectronicColor}
             />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Screen & Glass condition"
-              value={electronicDetail.screenCondition ?? ""}
-              onChange={setElectronicScreenCondition}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Wallpaper / Lock screen"
-              value={electronicDetail.lockScreenDescription ?? ""}
-              onChange={setElectronicLockScreenDescription}
-            />
           </View>
 
-          {/* Case Information */}
-          <View>
-            <View className="flex-row items-center justify-between mb-sm">
-              <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
-                Is it in a case?
-              </Text>
-              <Switch
-                value={hasCase}
-                onValueChange={setElectronicHasCase}
-                trackColor={{ false: colors.white, true: colors.secondary }}
-              />
-            </View>
-
-            <MotiView
-              from={{ opacity: 0, height: 0 }}
-              animate={{
-                height: hasCase ? 50 : 0,
-                opacity: hasCase ? 1 : 0,
-              }}
-            >
-              <View className="border-t-[0.5px] border-divider" />
-
-              <View className="border rounded-sm overflow-hidden">
-                <PostFormField
-                  label="Case colors, materials or stickers"
-                  value={electronicDetail.caseDescription ?? ""}
-                  onChange={setElectronicCaseDescription}
-                />
-              </View>
-            </MotiView>
-          </View>
-
-          {/* Unique marks & traits*/}
           <View className="gap-sm">
             <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
               Unique marks & traits
@@ -161,4 +94,4 @@ const PhoneForm = () => {
   );
 };
 
-export default PhoneForm;
+export default ChargerAdapterForm;

@@ -57,10 +57,10 @@ const PostCreationStepperLayout = () => {
     isIdentityStepInvalid || isLocationStepInvalid || isTimelineStepInvalid;
 
   const handleNext = async () => {
-    if (currentStep === 2 && !isIdentityStepInvalid) {
-      const urls = await handleUploadImages(images);
-      console.log("Urls: ", urls);
-    }
+    // if (currentStep === 2 && !isIdentityStepInvalid) {
+    //   const urls = await handleUploadImages(images);
+    //   console.log("Urls: ", urls);
+    // }
 
     if (currentStep >= STEPS.length - 1) {
       await handleSubmit();
