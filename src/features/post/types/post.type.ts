@@ -60,7 +60,10 @@ export type PostItem = {
 export type Post = {
   id: string
   postType: PostType
+  postTitle: Nullable<string>
   item: PostItem
+  category: PostCategory
+  subcategoryId: string
   imageUrls: string[]
   description: string | null
   organization: Nullable<string>
@@ -96,13 +99,6 @@ export type SimilarPostCriteria = {
   timeWindow: SimilarPostCriterionResult
 }
 
-export type SimilarPost = Post & {
-  timeGapDays: number
-  matchingLevel: SimilarPostMatchingLevel
-  isAssessed: boolean
-  assessmentSummary: Nullable<string>
-} & Omit<UserLocation, "radiusInKm">
-
 /**
  * POST_SEARCH_MODE - This constant defines the modes of searching for posts. The modes include:
  * - KEYWORD: Indicates that the search will be based on keywords.
@@ -132,9 +128,9 @@ export type PostSearchOptions = yup.InferType<typeof postOptionSchema>
  * This constant defines the categories of posts that can be created. 
  */
 export const POST_CATEGORIES = {
-  ELECTRONICS: "electronics",
-  CARD: "card",
-  PERSONAL_BELONGINGS: "personal_belongings",
+  ELECTRONICS: "Electronics",
+  CARD: "Cards",
+  PERSONAL_BELONGINGS: "PersonalBelongings",
   OTHER: "other",
 } as const;
 
@@ -200,8 +196,65 @@ export const OTHER_SUBCATEGORY = {
 
 export type OtherSubcategory = typeof OTHER_SUBCATEGORY[keyof typeof OTHER_SUBCATEGORY]
 
-export type PostSubcategory =
+export type PostSubcategoryCode =
   | ElectronicsSubcategory
   | CardSubcategory
   | PersonalBelongingSubcategory
   | OtherSubcategory
+
+export type PostSubcategory = {
+  id: string,
+  category: PostCategory,
+  code: PostSubcategoryCode,
+  name: string,
+  displayOrder: number,
+}
+
+/**
+* 
+*/
+export const MATCH_STRENGTH = {
+  Strong: "Strong",
+  Partial: "Partial",
+  Weak: "Weak",
+  Mismatch: "Mismatch",
+} as const;
+
+export type MatchStrength = typeof MATCH_STRENGTH[keyof typeof MATCH_STRENGTH];
+
+/**
+ * 
+ */
+export type MatchEvidence = {
+  key: string;
+  strength: MatchStrength;
+  displayValue?: string;
+  note?: string;
+}
+
+/**
+ * 
+ */
+export const MATCH_STATUS = {
+  Pending: "Pending",
+  Confirmed: "Confirmed",
+  Rejected: "Rejected",
+} as const;
+
+export type MatchStatus = typeof MATCH_STATUS[keyof typeof MATCH_STATUS];
+
+/**
+ * 
+ */
+export type SimilarPost = {
+  id: string
+  postType: PostType
+  postTitle: Nullable<string>
+  category: PostCategory
+  subcategoryId: string
+  imageUrls: string[]
+  eventTime: string
+  score: number;
+  evidence: MatchEvidence[];
+  status: MatchStatus;
+} & Omit<UserLocation, "radiusInKm">

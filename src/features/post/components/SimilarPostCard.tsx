@@ -1,115 +1,103 @@
-import type { SimilarPost } from "@/src/features/post/types";
+import { SimilarPost } from "@/src/features/post/types";
 import { AppImage } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
-import { colors, metrics } from "@/src/shared/theme";
-import { router } from "expo-router";
-import { CalendarBlankIcon, MapPinIcon } from "phosphor-react-native";
-import React from "react";
-import { Platform, Pressable, Text, View } from "react-native";
-import PostMatchingScoreBadge from "./PostMatchingScoreBadge";
+import { colors } from "@/src/shared/theme";
+import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
+import { MapPinIcon } from "phosphor-react-native";
+import React, { useMemo } from "react";
+import { Pressable, Text, View } from "react-native";
+import ScoreBadge from "./ScoreBadge";
 
 type SimilarPostCardProps = {
-  postId: string;
-  matchPost?: SimilarPost;
-};
-
-const formatTimeGap = (days: number): string => {
-  if (days === 0) return "Same day";
-  if (days === 1) return "1 day apart";
-  if (days < 7) return `${days} days apart`;
-  if (days < 14) return "~1 week apart";
-  if (days < 30) return `~${Math.round(days / 7)} weeks apart`;
-  if (days < 60) return "~1 month apart";
-  return `~${Math.round(days / 30)} months apart`;
-};
-
-export const SimilarPostCardSkeleton = () => {
-  return (
-    <View
-      className="bg-surface border border-divider overflow-hidden"
-      style={{ borderRadius: metrics.borderRadius.primary }}
-    >
-      <View className="w-full bg-muted animate-pulse" style={{ height: 160 }} />
-      <View style={{ padding: 10, gap: 6 }}>
-        <View className="h-3.5 w-3/4 rounded-md bg-muted animate-pulse" />
-        <View className="h-3 w-1/2 rounded-md bg-muted animate-pulse" />
-        <View className="h-3 w-2/5 rounded-md bg-muted animate-pulse" />
-      </View>
-    </View>
-  );
+  matchPost: SimilarPost;
+  onPress: () => void;
 };
 
 export const SimilarPostCard = ({
-  postId,
   matchPost,
+  onPress,
 }: SimilarPostCardProps) => {
-  if (!matchPost) return <SimilarPostCardSkeleton />;
-
   const imgUrl = matchPost.imageUrls?.[0];
 
-  const handleNavigateToMatch = () => {
-    router.push(POST_ROUTE.detailMatch(postId, matchPost.id));
-  };
+  const safeTitle = useMemo(
+    () => matchPost.postTitle || "Untitled item",
+    [matchPost],
+  );
+
+  const safeAddress = useMemo(() => {
+    if (matchPost.displayAddress?.trim()) return matchPost.displayAddress;
+    return "Unknown location";
+  }, [matchPost]);
+
+  const safeScore = useMemo(() => {
+    if (matchPost.score == null) return 0;
+    return Math.round(matchPost.score * 100);
+  }, [matchPost]);
 
   return (
-    <Pressable
-      onPress={handleNavigateToMatch}
-      className="bg-surface border border-divider overflow-hidden active:opacity-70"
-      style={[
-        { borderRadius: metrics.borderRadius.primary },
-        Platform.OS === "ios"
-          ? metrics.shadows.level1.ios
-          : metrics.shadows.level1.android,
-      ]}
-    >
-      {/* Image with badge overlay */}
-      <View style={{ position: "relative" }}>
-        <AppImage
-          source={{ uri: imgUrl }}
-          style={{ width: "100%", height: 160 }}
-          resizeMode="cover"
-        />
-        <View style={{ position: "absolute", top: 6, right: 6 }}>
-          <PostMatchingScoreBadge level={matchPost.matchingLevel} />
-        </View>
-      </View>
-
-      {/* Text content */}
-      <View style={{ padding: 10, gap: 6 }}>
-        <Text
-          className="text-base font-bold"
-          style={{ color: colors.hof[900] }}
-          numberOfLines={1}
+    <Pressable onPress={onPress}>
+      {({ pressed }) => (
+        <MotiView
+          animate={{ scale: pressed ? 0.97 : 1 }}
+          transition={{ type: "timing", duration: 150 }}
+          className="bg-surface rounded-xl overflow-hidden"
+          style={{
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+          }}
         >
-          {matchPost.item.itemName}
-        </Text>
+          <View className="w-full" style={{ aspectRatio: 1 }}>
+            <AppImage className="w-full h-full" source={{ uri: imgUrl }} />
 
-        <View className="flex-row items-center" style={{ gap: 4 }}>
-          <MapPinIcon size={14} color={colors.primary} weight="regular" />
-          <Text
-            className="flex-1 text-sm"
-            style={{ color: colors.hof[500] }}
-            numberOfLines={1}
-          >
-            {matchPost.displayAddress}
-          </Text>
-        </View>
+            <View style={{ position: "absolute", top: 6, right: 6 }}>
+              <ScoreBadge value={safeScore} />
+            </View>
+          </View>
 
-        <View className="flex-row items-center" style={{ gap: 4 }}>
-          <CalendarBlankIcon
-            size={14}
-            color={colors.primary}
-            weight="regular"
-          />
-          <Text
-            className="flex-1 text-sm"
-            style={{ color: colors.hof[400] }}
-            numberOfLines={1}
+          <View
+            className="absolute bottom-0 left-0 right-0 px-md pb-md2 gap-xs"
+            style={{ paddingTop: 72 }}
           >
-            {formatTimeGap(matchPost.timeGapDays)}
-          </Text>
-        </View>
-      </View>
+            <LinearGradient
+              colors={[
+                "rgba(0, 0, 0, 0.92)",
+                "rgba(0, 0, 0, 0.68)",
+                "rgba(0, 0, 0, 0.32)",
+                "rgba(0, 0, 0, 0.12)",
+                "transparent",
+              ]}
+              locations={[0, 0.3, 0.58, 0.8, 1]}
+              pointerEvents="none"
+              start={{ x: 0.5, y: 1 }}
+              end={{ x: 0.5, y: 0 }}
+              style={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+              }}
+            />
+            <Text
+              className="text-base font-normal text-white"
+              numberOfLines={1}
+            >
+              {safeTitle}
+            </Text>
+
+            <View className="flex-row items-center gap-xs">
+              <MapPinIcon size={16} color={colors.primary} weight="fill" />
+              <Text
+                className="flex-1 text-sm text-white font-thin"
+                numberOfLines={1}
+              >
+                {safeAddress}
+              </Text>
+            </View>
+          </View>
+        </MotiView>
+      )}
     </Pressable>
   );
 };

@@ -3,11 +3,8 @@ import { AppBackButton } from "@/src/shared/components";
 import { typography } from "@/src/shared/theme";
 import { Stack } from "expo-router";
 import { TextStyle } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PostsStackLayout() {
-  const insets = useSafeAreaInsets();
-
   return (
     <LocationSelectionProvider>
       <Stack
@@ -76,6 +73,11 @@ export default function PostsStackLayout() {
           options={{
             headerShown: false,
           }}
+        />
+
+        <Stack.Screen
+          name="[postId]/matching"
+          options={{ headerShown: true }}
         />
       </Stack>
     </LocationSelectionProvider>

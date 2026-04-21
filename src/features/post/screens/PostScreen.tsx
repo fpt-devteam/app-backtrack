@@ -7,7 +7,7 @@ import type {
   PostCategory,
   PostFilters,
 } from "@/src/features/post/types";
-import { PostType } from "@/src/features/post/types";
+import { POST_CATEGORIES, PostType } from "@/src/features/post/types";
 import { AppLoader } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
@@ -51,10 +51,10 @@ const EXPLORE_TABS: {
 ];
 
 const SECTION_TITLES: Record<PostCategory, string> = {
-  electronics: "Electronics",
-  card: "Card",
-  personal_belongings: "Personal Belongings",
-  other: "Other",
+  [POST_CATEGORIES.ELECTRONICS]: "Electronics",
+  [POST_CATEGORIES.CARD]: "Card",
+  [POST_CATEGORIES.PERSONAL_BELONGINGS]: "Personal Belongings",
+  [POST_CATEGORIES.OTHER]: "Other",
 };
 
 const ExploreHeader = ({

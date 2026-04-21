@@ -1,13 +1,33 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { useConversationDetail } from "@/src/features/chat/hooks";
-import { getHandoverCounterpart, getHandoverNextStep, getHandoverStatusLabel, getHandoverTitle, getViewerRoleContext } from "@/src/features/handover/components/handover.presentation";
+import {
+  getHandoverCounterpart,
+  getHandoverNextStep,
+  getHandoverStatusLabel,
+  getHandoverTitle,
+  getViewerRoleContext,
+} from "@/src/features/handover/components/handover.presentation";
 import { useGetC2CReturnReportsByPartner } from "@/src/features/handover/hooks";
-import type { Handover, ReturnReportStatus } from "@/src/features/handover/types";
+import type {
+  Handover,
+  ReturnReportStatus,
+} from "@/src/features/handover/types";
 import { AppImage, AppLoader, AppUserAvatar } from "@/src/shared/components";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
-import { ArchiveIcon, CaretRightIcon, ChatDotsIcon } from "phosphor-react-native";
+import {
+  ArchiveIcon,
+  CaretRightIcon,
+  ChatDotsIcon,
+} from "phosphor-react-native";
 import React, { useCallback } from "react";
-import { InteractionManager, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  InteractionManager,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import type { AppUser } from "@/src/features/auth/types";
 import type { ConversationPartner } from "@/src/features/chat/types";
@@ -17,11 +37,11 @@ import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
 
 const STATUS_THEME: Record<ReturnReportStatus, { bg: string; text: string }> = {
-  Ongoing:   { bg: colors.kazan[100], text: colors.kazan[600] },
-  Delivered: { bg: colors.info[100],  text: colors.info[500] },
-  Confirmed: { bg: colors.babu[100],  text: colors.babu[500] },
-  Rejected:  { bg: colors.error[100], text: colors.error[500] },
-  Closed:    { bg: colors.hof[100],   text: colors.hof[400] },
+  Ongoing: { bg: colors.kazan[100], text: colors.kazan[600] },
+  Delivered: { bg: colors.info[100], text: colors.info[500] },
+  Confirmed: { bg: colors.babu[100], text: colors.babu[500] },
+  Rejected: { bg: colors.error[100], text: colors.error[500] },
+  Closed: { bg: colors.hof[100], text: colors.hof[400] },
 };
 
 const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
@@ -73,7 +93,11 @@ const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
               borderRadius: 10,
             }}
           >
-            <AppUserAvatar avatarUrl={counterpart.avatarUrl} size={26} borderRadius={8} />
+            <AppUserAvatar
+              avatarUrl={counterpart.avatarUrl}
+              size={26}
+              borderRadius={8}
+            />
           </View>
         )}
       </View>
@@ -124,7 +148,6 @@ const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
     </TouchableOpacity>
   );
 };
-
 type ParticipantRowProps = {
   avatarUrl: string | null;
   name: string;
@@ -238,7 +261,6 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
           </View>
         </View>
       )}
-
       {/* People in this conversation */}
       <View className="mt-xl">
         <SectionHeader title="In this conversation" />

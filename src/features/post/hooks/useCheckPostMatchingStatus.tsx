@@ -5,7 +5,6 @@ import type {
   PostMatchingStatusCheckResponse,
 } from "@/src/features/post/types";
 import { PostMatchingStatus } from "@/src/features/post/types";
-import { IS_POST_MOCK } from "@/src/shared/mocks/post.mock";
 import { useQuery } from "@tanstack/react-query";
 
 const TIME_INTERVAL_MS = 3000;
@@ -18,7 +17,6 @@ export const useCheckPostMatchingStatus = (postId: string) => {
 
   const query = useQuery<PostMatchingStatusCheckResponse>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "status", postId],
-    enabled: !IS_POST_MOCK,
     queryFn: async () => {
       const request: PostMatchingStatusCheckRequest = { postId };
       const response = await checkPostMatchingStatusApi(request);
@@ -36,8 +34,6 @@ export const useCheckPostMatchingStatus = (postId: string) => {
   });
 
   return {
-    isMatching: IS_POST_MOCK
-      ? false
-      : !isPostMatchingCompleted(query?.data?.data?.matchingStatus),
+    isMatching: !isPostMatchingCompleted(query?.data?.data?.matchingStatus),
   };
 };

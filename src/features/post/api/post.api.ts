@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -9,7 +9,8 @@ export const POST_API = {
   matching: (postId: string) => `/api/core/posts/${postId}/similar`,
   checkPostMatchingStatus: (postId: string) => `/api/core/posts/${postId}/matching-status`,
   analyzeImage: "/api/core/post-image/analyze",
-  getAllMyPost: "/api/core/posts/me"
+  getAllMyPost: "/api/core/posts/me",
+  getSubcategories: "/api/core/subcategories",
 } as const;
 
 export async function getFeedPostsApi(params: PostFeedRequest) {
@@ -51,3 +52,8 @@ export async function searchPost(req: PostSearchRequest) {
   const response = await privateClient.post<PostSearchResponse>(POST_API.search, req);
   return response.data;
 }
+
+export async function getPostSubcategoriesApi() {
+  const response = await publicClient.get<PostSubcategoryResponse>(POST_API.getSubcategories);
+  return response.data;
+} 

@@ -1,10 +1,9 @@
 import { matchingPostsApi } from "@/src/features/post/api";
 import { POST_MATCHING_QUERY_KEY } from "@/src/features/post/constants";
 import type {
+  MatchingPostsData,
   MatchingPostsRequest,
-  MatchingPostsResponse,
 } from "@/src/features/post/types";
-import { IS_POST_MOCK } from "@/src/shared/mocks/post.mock";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useCheckPostMatchingStatus } from "./useCheckPostMatchingStatus";
@@ -12,20 +11,20 @@ import { useCheckPostMatchingStatus } from "./useCheckPostMatchingStatus";
 export const useMatchingPost = (postId: string) => {
   const { isMatching } = useCheckPostMatchingStatus(postId);
 
-  const query = useQuery<MatchingPostsResponse>({
+  const query = useQuery<MatchingPostsData>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
-    enabled: !IS_POST_MOCK && !isMatching && !!postId,
+    enabled: !isMatching && !!postId,
     queryFn: async () => {
       const request: MatchingPostsRequest = { postId };
       const response = await matchingPostsApi(request);
 
-      if (!response?.success) throw new Error("Matching failed");
-      return response;
+      if (!response?.success || !response.data)
+        throw new Error("Matching failed");
+      return response.data;
     },
   });
 
   const error = useMemo(() => {
-    if (IS_POST_MOCK) return null;
     if (!query.error) return null;
     if (query.error instanceof Error) return query.error;
     return new Error("Matching failed");
@@ -33,8 +32,8 @@ export const useMatchingPost = (postId: string) => {
 
   return {
     error,
-    similarPosts: query?.data?.data?.similarPosts || [],
-    isMatching: IS_POST_MOCK ? false : isMatching,
+    similarPosts: query?.data?.similarPosts || [],
+    isMatching,
     isLoading: query.isLoading,
   };
 };

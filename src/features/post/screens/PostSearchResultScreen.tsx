@@ -121,11 +121,12 @@ const PostSearchResultScreen = () => {
           postType: selectedPostType,
           eventTime: eventDate,
         },
-      }) as PostSearchOptions;
+      });
 
       postOptionSchema.validateSync(castedOptions, { abortEarly: true });
       return castedOptions;
-    } catch (_error) {
+    } catch (error) {
+      console.log("Invalid search options:", error);
       return null;
     }
   }, [eventDate, safeCoords, safeRadius, selectedPostType]);
@@ -141,11 +142,8 @@ const PostSearchResultScreen = () => {
   });
 
   const filteredItems = useMemo(() => {
-    // if (__DEV__) return POST_STORAGE_MOCK;
     if (selectedCategories.length === 0) return items;
-    return items.filter((item) =>
-      selectedCategories.includes(item.item.category),
-    );
+    return items.filter((item) => selectedCategories.includes(item.category));
   }, [items, selectedCategories]);
 
   const markerItems = useMemo(

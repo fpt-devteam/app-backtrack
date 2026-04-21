@@ -10,7 +10,7 @@ import {
   PERSONAL_BELONGING_SUBCATEGORY,
   POST_CATEGORIES,
   PostCategory,
-  PostSubcategory,
+  PostSubcategoryCode,
   PostType,
 } from "@/src/features/post/types";
 import {
@@ -21,7 +21,7 @@ import {
 } from "@/src/shared/store";
 import { create } from "zustand";
 
-const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategory> = {
+const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategoryCode> = {
   [POST_CATEGORIES.ELECTRONICS]: ELECTRONICS_SUBCATEGORY.PHONE,
   [POST_CATEGORIES.CARD]: CARD_SUBCATEGORY.BANK_CARD,
   [POST_CATEGORIES.PERSONAL_BELONGINGS]:
@@ -32,7 +32,7 @@ const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategory> = {
 type PostCreationState = {
   postType: PostType;
   category: PostCategory;
-  subCategory: PostSubcategory;
+  subCategory: PostSubcategoryCode;
   timeline: {
     date: EventTime;
   };
@@ -41,7 +41,7 @@ type PostCreationState = {
 type PostCreateActions = {
   selectPostType: (type: PostType) => void;
   selectCategory: (category: PostCategory) => void;
-  selectSubCategory: (subCategory: PostSubcategory) => void;
+  selectSubCategory: (subCategory: PostSubcategoryCode) => void;
   updateEventDate: (date: EventTime) => void;
   debug: () => void;
   resetForm: () => void;

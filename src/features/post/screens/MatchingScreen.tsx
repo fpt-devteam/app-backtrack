@@ -1,25 +1,24 @@
 import { SimilarPostCard } from "@/src/features/post/components";
-import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import { useMatchingPost } from "@/src/features/post/hooks";
 import { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
-import {
-  AppHeader,
-  BackButton,
-  HeaderTitle,
-} from "@/src/shared/components/AppHeader";
+import { AppBackButton } from "@/src/shared/components";
 import { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
+import { POST_ROUTE } from "@/src/shared/constants/route.constant";
+import { colors } from "@/src/shared/theme/colors";
+import { typography } from "@/src/shared/theme/typography";
 import { getErrorMessage } from "@/src/shared/utils";
-import { useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, TextStyle, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MatchingNoResultScreen } from "./MatchingNoResultScreen";
 
 export const MatchingScreen = () => {
-  const insets = useSafeAreaInsets();
-  const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { postId } = useLocalSearchParams<{ postId: string }>();
-
+  const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { isMatching, similarPosts, error } = useMatchingPost(postId);
-  const { data: yourItem } = useGetPostById({ postId });
+
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     setApplyingInterval(true);
@@ -29,48 +28,63 @@ export const MatchingScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
-  if (applyingInterval || !yourItem || isMatching) {
-    console.log("Matching Waiting Screen");
-    return <AppSplashScreen />;
-  }
+  if (applyingInterval || isMatching)
+    return (
+      <>
+        <Stack.Screen
+          options={{
+            headerTitle: "",
+            headerShadowVisible: false,
+            headerBackVisible: false,
+            headerTransparent: true,
+          }}
+        />
+        <AppSplashScreen />
+      </>
+    );
 
-  if (error) {
-    console.log("Matching Error Screen");
+  if (error)
     return <MatchingErrorScreen errorMessage={getErrorMessage(error)} />;
-  }
-
-  // if (similarPosts.length === 0) {
-  //   console.log("Matching No Result Screen");
-  //   return <MatchingNoResultScreen />;
-  // }
 
   return (
-    <View
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 bg-surface"
-    >
-      <AppHeader
-        left={<BackButton />}
-        center={<HeaderTitle title="Matching result" />}
-      />
-
-      {/* Results */}
-      <FlatList
-        data={similarPosts}
-        renderItem={({ item }) => (
-          <SimilarPostCard matchPost={item} postId={postId} />
-        )}
-        keyExtractor={(item) => item.id}
-        className="p-3"
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-        ListEmptyComponent={() => {
-          return (
-            <View>
-              <Text>No similar posts found.</Text>
-            </View>
-          );
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: "Matching Posts",
+          headerShadowVisible: true,
+          headerTransparent: false,
+          headerBackVisible: false,
+          headerTitleStyle: {
+            fontSize: typography.fontSize.base,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+            color: colors.text.primary,
+          },
+          headerRight: () => <AppBackButton type="xIcon" />,
         }}
       />
-    </View>
+      <View className="flex-1 bg-surface">
+        {/* Results */}
+        <FlatList
+          data={similarPosts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <SimilarPostCard
+              matchPost={item}
+              onPress={() => {
+                router.push(POST_ROUTE.detailMatch(postId, item.id));
+              }}
+            />
+          )}
+          className="px-md"
+          contentContainerStyle={{
+            paddingBottom: insets.bottom,
+            paddingTop: insets.top,
+          }}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          ListEmptyComponent={<MatchingNoResultScreen />}
+        />
+      </View>
+    </>
   );
 };

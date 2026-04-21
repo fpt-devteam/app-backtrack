@@ -17,11 +17,13 @@ import {
   Stack,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
+import { usePostSubcategoryStore } from "../features/post/store";
+import { AppSplashScreen } from "../shared/components";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +45,13 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
+  const [isInitializing, setIsInitializing] = useState(false);
+  const isLoaded = usePostSubcategoryStore((state) => state.isLoaded);
+  const loadAllSubcategories = usePostSubcategoryStore(
+    (state) => state.loadAllSubcategories,
+  );
+
+  // Handle notification when app is opened from a killed state
   useEffect(() => {
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.screenPath;
@@ -66,9 +75,12 @@ export default function RootLayout() {
     };
   }, []);
 
+  // Preload icons
   useEffect(() => {
     async function preloadImages() {
       try {
+        setIsInitializing(true);
+
         const images = [
           ...Object.values(CARD_SUB_CATEGORY_ICONS),
           ...Object.values(ELECTRONICS_SUB_CATEGORY_ICONS),
@@ -82,11 +94,16 @@ export default function RootLayout() {
         await Promise.all(cacheImages);
       } catch (e) {
         console.warn("Preload failed", e);
+      } finally {
+        setIsInitializing(false);
       }
     }
 
     preloadImages();
+    loadAllSubcategories();
   }, []);
+
+  if (isInitializing || !isLoaded) return <AppSplashScreen />;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -117,7 +134,6 @@ export default function RootLayout() {
 
                 <Toast config={toastConfig} position="top" topOffset={56} />
               </BottomSheetModalProvider>
-              PostItem,
             </AppUserProvider>
           </AuthProvider>
         </SafeAreaProvider>

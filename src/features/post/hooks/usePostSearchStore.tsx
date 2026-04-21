@@ -8,7 +8,7 @@ import {
   TextSearch,
   textSearchSchema,
 } from "@/src/features/post/schemas";
-import { type ItemCategory, type PostType } from "@/src/features/post/types";
+import { type PostCategory, type PostType } from "@/src/features/post/types";
 import { Optional } from "@/src/shared/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
@@ -34,7 +34,7 @@ type PostSearchStoreState = {
 
   advanced: {
     postType: Optional<PostType>;
-    categories: ItemCategory[];
+    categories: PostCategory[];
   };
 };
 
@@ -72,7 +72,7 @@ type PostSearchActions = {
 
   // Advanced Actions
   updatePostType: (postType: Optional<PostType>) => void;
-  updateCategories: (categories: ItemCategory[]) => void;
+  updateCategories: (categories: PostCategory[]) => void;
 
   // Global Actions
   resetFilters: () => void;
