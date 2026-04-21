@@ -6,7 +6,7 @@ import type {
   CreateC2CReturnReportRequest,
   GetC2CHandoverRequest,
 } from "@/src/features/handover/types";
-import { DEFAULT_PAGED_REQUEST, privateClient } from "@/src/shared/api";
+import { privateClient } from "@/src/shared/api";
 
 export const RETURN_REPORT_API = {
   // C2C
@@ -15,6 +15,7 @@ export const RETURN_REPORT_API = {
   c2cCreate: "/api/core/return-reports/c2c",
   c2cActivate: (id: string) => `/api/core/return-reports/c2c/${id}/activate`,
   c2cConfirm: (id: string) => `/api/core/return-reports/c2c/${id}/confirm`,
+  c2cByPartner: (partnerId: string) => `/api/core/return-reports/c2c/partner/${partnerId}`,
 } as const;
 
 // ─── C2C ─────────────────────────────────────────────────────────────────────
@@ -69,8 +70,11 @@ export async function confirmC2CReturnReportApi(id: string) {
 
 /**
  * Returns all C2C return reports involving a specific partner user.
- * Backend endpoint: GET /api/core/return-reports/c2c?partnerId={partnerId}
+ * Backend endpoint: GET /api/core/return-reports/c2c/partner/{partnerId}
  */
 export async function getC2CReturnReportsByPartnerApi(partnerId: string) {
-  return getC2CReturnReportsApi({ ...DEFAULT_PAGED_REQUEST, partnerId });
+  const response = await privateClient.get<C2CHandoversResponse>(
+    RETURN_REPORT_API.c2cByPartner(partnerId),
+  );
+  return response.data;
 }
