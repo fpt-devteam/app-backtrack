@@ -1,11 +1,12 @@
 import { getFeedPostsApi } from "@/src/features/post/api";
 import { POSTS_QUERY_KEY } from "@/src/features/post/constants";
-import type {
-  Post,
-  PostCategory,
-  PostFeedRequest,
-  PostFeedResponse,
-  PostFilters,
+import {
+  POST_CATEGORIES,
+  type Post,
+  type PostCategory,
+  type PostFeedRequest,
+  type PostFeedResponse,
+  type PostFilters,
 } from "@/src/features/post/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -20,12 +21,7 @@ export type PostFeedSection = {
   items: Post[];
 };
 
-const SECTION_ORDER: PostCategory[] = [
-  "electronics",
-  "card",
-  "personal_belongings",
-  "other",
-];
+const SECTION_ORDER: PostCategory[] = Object.values(POST_CATEGORIES);
 
 export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
   const query = useQuery<PostFeedResponse>({

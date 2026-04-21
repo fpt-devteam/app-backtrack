@@ -39,6 +39,7 @@ export type PostFeedResponse = ApiResponse<PostFeedResult>;
  *  It includes the post type, item name, description, image URLs, distinctive marks, event time, and location details (latitude and longitude).
  */
 export type PostCreateRequest = {
+  postTitle: string;
   postType: PostType;
   category: PostCategory;
   subcategoryCode: PostSubcategoryCode
@@ -101,6 +102,7 @@ export type PostsSuggestionResponse = ApiResponse<PostSuggestion[]>;
  * 
  */
 export type ElectronicDetail = {
+  itemName: string
   brand: Nullable<string>;
   model: Nullable<string>;
   color: Nullable<string>;

@@ -4,6 +4,7 @@ import { StateCreator } from "zustand";
 
 
 const DEFAULT_ELECTRONIC_DETAIL: ElectronicDetail = {
+  itemName: "Electronic Item",
   brand: null,
   model: null,
   color: null,
@@ -18,6 +19,7 @@ const DEFAULT_ELECTRONIC_DETAIL: ElectronicDetail = {
 
 export type ElectronicsSlice = {
   electronicDetail: ElectronicDetail;
+  setItemname: (itemName: string) => void;
   setElectronicDetail: (detail: ElectronicDetail) => void;
   setElectronicBrand: (brand: Nullable<string>) => void;
   setElectronicModel: (model: Nullable<string>) => void;
@@ -42,6 +44,14 @@ export const createElectronicsSlice: StateCreator<ElectronicsSlice> = (set) => (
   electronicDetail: DEFAULT_ELECTRONIC_DETAIL,
 
   setElectronicDetail: (detail) => set({ electronicDetail: detail }),
+
+  setItemname: (itemName) =>
+    set((state) => ({
+      electronicDetail: {
+        ...state.electronicDetail,
+        itemName,
+      },
+    })),
 
   setElectronicBrand: (brand) =>
     set((state) => ({

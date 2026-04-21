@@ -128,9 +128,9 @@ export type PostSearchOptions = yup.InferType<typeof postOptionSchema>
  * This constant defines the categories of posts that can be created. 
  */
 export const POST_CATEGORIES = {
-  ELECTRONICS: "Electronics",
-  CARD: "Cards",
-  PERSONAL_BELONGINGS: "PersonalBelongings",
+  ELECTRONICS: "electronics",
+  CARD: "cards",
+  PERSONAL_BELONGINGS: "personal_belongings",
   OTHER: "other",
 } as const;
 
