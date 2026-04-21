@@ -15,6 +15,7 @@ export type CreateC2CReturnReportRequest = {
 // GET /return-reports/c2c  (query params)
 export type GetC2CHandoverRequest = {
   status?: ReturnReportStatus
+  partnerId?: string
 } & PagedRequest
 
 // Single report response
