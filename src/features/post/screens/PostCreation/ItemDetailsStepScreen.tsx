@@ -1,15 +1,23 @@
 import { usePostCreationStore } from "@/src/features/post/hooks";
-import { CARD_SUBCATEGORY, ELECTRONICS_SUBCATEGORY } from "@/src/features/post/types";
+import {
+  CARD_SUBCATEGORY,
+  ELECTRONICS_SUBCATEGORY,
+  PERSONAL_BELONGING_SUBCATEGORY,
+} from "@/src/features/post/types";
 import React from "react";
 import { Text, View } from "react-native";
 import BankCardForm from "../CategoryForm/BankCardForm";
+import BackpackForm from "../CategoryForm/BackpackForm";
 import ChargerAdapterForm from "../CategoryForm/ChargerAdapterForm";
+import ClothingsForm from "../CategoryForm/ClothingsForm";
 import CompanyCardForm from "../CategoryForm/CompanyCardForm";
 import DriverLicenseForm from "../CategoryForm/DriverLicenseForm";
 import EarphoneForm from "../CategoryForm/EarphoneForm";
 import HeadphoneForm from "../CategoryForm/HeadphoneForm";
 import IdentificationCardForm from "../CategoryForm/IdentificationCardForm";
+import JewelryForm from "../CategoryForm/JewelryForm";
 import KeyboardForm from "../CategoryForm/KeyboardForm";
+import KeysForm from "../CategoryForm/KeysForm";
 import LaptopForm from "../CategoryForm/LaptopForm";
 import MouseForm from "../CategoryForm/MouseForm";
 import PassportForm from "../CategoryForm/PassportForm";
@@ -19,12 +27,26 @@ import PowerbankForm from "../CategoryForm/PowerbankForm";
 import PowerOutletForm from "../CategoryForm/PowerOutletForm";
 import SmartwatchForm from "../CategoryForm/SmartwatchForm";
 import StudentCardForm from "../CategoryForm/StudentCardForm";
+import SuitcasesForm from "../CategoryForm/SuitcasesForm";
+import WalletsForm from "../CategoryForm/WalletsForm";
 
 const ItemDetailsStepScreen = () => {
   const subCategory = usePostCreationStore((state) => state.subCategory);
 
   const renderForm = () => {
     switch (subCategory) {
+      case PERSONAL_BELONGING_SUBCATEGORY.WALLETS:
+        return <WalletsForm />;
+      case PERSONAL_BELONGING_SUBCATEGORY.KEYS:
+        return <KeysForm />;
+      case PERSONAL_BELONGING_SUBCATEGORY.SUITCASES:
+        return <SuitcasesForm />;
+      case PERSONAL_BELONGING_SUBCATEGORY.BACKPACK:
+        return <BackpackForm />;
+      case PERSONAL_BELONGING_SUBCATEGORY.CLOTHINGS:
+        return <ClothingsForm />;
+      case PERSONAL_BELONGING_SUBCATEGORY.JEWELRY:
+        return <JewelryForm />;
       case CARD_SUBCATEGORY.IDENTIFICATION_CARD:
         return <IdentificationCardForm />;
       case CARD_SUBCATEGORY.PASSPORT:

@@ -2,8 +2,10 @@ import { eventTimeSchema, type EventTime } from "@/src/features/post/schemas";
 import {
   createCardSlice,
   createElectronicsSlice,
+  createPersonalBelongingSlice,
   CardSlice,
   ElectronicsSlice,
+  PersonalBelongingSlice,
 } from "@/src/features/post/store";
 import {
   CARD_SUBCATEGORY,
@@ -64,13 +66,15 @@ export const usePostCreationStore = create<
     PhotoSlice &
     LocationSlice &
     ElectronicsSlice &
-    CardSlice
+    CardSlice &
+    PersonalBelongingSlice
 >((set, get, api) => ({
   ...initialState,
   ...createPhotoSlice(set, get, api),
   ...createLocationSlice(set, get, api),
   ...createElectronicsSlice(set, get, api),
   ...createCardSlice(set, get, api),
+  ...createPersonalBelongingSlice(set, get, api),
 
   selectPostType: (type) => set({ postType: type }),
   selectCategory: (category) =>

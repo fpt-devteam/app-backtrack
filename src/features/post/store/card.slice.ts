@@ -17,7 +17,7 @@ const DEFAULT_CARD_DETAIL: CardDetail = {
 
 export type CardSlice = {
   cardDetail: CardDetail;
-  setItemname: (itemName: string) => void;
+  setCardItemName: (itemName: string) => void;
   setCardDetail: (detail: CardDetail) => void;
   setCardNumberHash: (cardNumberHash: Nullable<string>) => void;
   setCardNumberMasked: (cardNumberMasked: Nullable<string>) => void;
@@ -38,7 +38,7 @@ export const createCardSlice: StateCreator<CardSlice> = (set) => ({
 
   setCardDetail: (detail) => set({ cardDetail: detail }),
 
-  setItemname: (itemName) =>
+  setCardItemName: (itemName) =>
     set((state) => ({
       cardDetail: {
         ...state.cardDetail,
