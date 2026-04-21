@@ -1,8 +1,11 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { useConversationDetail } from "@/src/features/chat/hooks";
+import { getHandoverStatusLabel } from "@/src/features/handover/components/handover.presentation";
+import { useGetC2CReturnReportsByPartner } from "@/src/features/handover/hooks";
+import type { Handover } from "@/src/features/handover/types";
 import { PostType } from "@/src/features/post/types";
 import { AppImage, AppLoader, AppUserAvatar } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants";
+import { HANDOVER_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { formatDate } from "@/src/shared/utils";
 import { ArchiveIcon, ChatDotsIcon } from "phosphor-react-native";
 import React, { useCallback } from "react";
@@ -106,6 +109,53 @@ const PostInfoCard = ({ post }: { post: Post }) => {
   );
 };
 
+const HandoverInfoCard = ({ handover }: { handover: Handover }) => {
+  const imgUrl =
+    handover.finderPost?.imageUrls?.[0] ??
+    handover.ownerPost?.imageUrls?.[0];
+  const title =
+    handover.finderPost?.postTitle ??
+    handover.ownerPost?.postTitle ??
+    "Handover";
+  const statusLabel = getHandoverStatusLabel(handover.status);
+  const dateLabel = formatDate(handover.createdAt);
+
+  const handlePress = useCallback(() => {
+    router.push(HANDOVER_ROUTE.detail(handover.id));
+  }, [handover.id]);
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={handlePress}
+      style={{
+        borderWidth: 0.75,
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+      }}
+      className="flex-row gap-md bg-surface rounded-2xl border border-divider p-md"
+    >
+      <AppImage
+        source={{ uri: imgUrl }}
+        className="w-20 aspect-square rounded-xl bg-muted"
+      />
+      <View className="flex-1 gap-xs justify-center">
+        <Text
+          className="text-base font-semibold text-textPrimary"
+          numberOfLines={1}
+        >
+          {title}
+        </Text>
+        <Text className="text-sm text-textSecondary" numberOfLines={1}>
+          {statusLabel} · {dateLabel}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 type ParticipantRowProps = {
   avatarUrl: string | null;
   name: string;
@@ -181,6 +231,9 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
 
   const partner = conversation?.partner;
 
+  const { inProgressHandovers, isLoading: isHandoverLoading } =
+    useGetC2CReturnReportsByPartner(partner?.id);
+
   const currentUser = getParticipantInfo(user, "You");
   const partnerInfo = getParticipantInfo(partner, "Unknown User");
 
@@ -209,6 +262,19 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
       <View className="gap-lg">
         <PostInfoCard post={MOCK_POST} />
       </View>
+
+      {/* Handover section — only shown when in-progress handovers exist */}
+      {!isHandoverLoading && inProgressHandovers.length > 0 && (
+        <View className="mt-xl">
+          <SectionHeader title="Handover" />
+          <View className="gap-md">
+            {inProgressHandovers.map((handover) => (
+              <HandoverInfoCard key={handover.id} handover={handover} />
+            ))}
+          </View>
+        </View>
+      )}
+
       {/* People in this conversation */}
       <View className="mt-xl">
         <SectionHeader title="In this conversation" />
