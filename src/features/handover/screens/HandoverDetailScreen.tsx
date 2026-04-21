@@ -1,8 +1,11 @@
 // src/features/handover/screens/HandoverDetailScreen.tsx
 
-import { useAppUser } from "@/src/features/auth/providers/user.provider"
-import type { AppUser } from "@/src/features/auth/types"
-import { createDirectConversationApi, getConversationByPartnerApi } from "@/src/features/chat/api"
+import { useAppUser } from "@/src/features/auth/providers/user.provider";
+import type { AppUser } from "@/src/features/auth/types";
+import {
+  createDirectConversationApi,
+  getConversationByPartnerApi,
+} from "@/src/features/chat/api";
 import {
   getHandoverCounterpart,
   getHandoverDetailGuidance,
@@ -10,25 +13,28 @@ import {
   getHandoverStatusLabel,
   getHandoverTitle,
   getHandoverViewerRole,
-} from "@/src/features/handover/components"
+} from "@/src/features/handover/components";
 import {
   useActivateC2CReturnReport,
   useGetC2CReturnReportById,
   useOwnerConfirmC2CReturnReport,
-} from "@/src/features/handover/hooks"
-import type { Handover, ReturnReportStatus } from "@/src/features/handover/types"
-import { PostStatusBadge } from "@/src/features/post/components"
-import type { Post } from "@/src/features/post/types"
+} from "@/src/features/handover/hooks";
+import type {
+  Handover,
+  HandoverPost,
+  ReturnReportStatus,
+} from "@/src/features/handover/types";
+import { PostStatusBadge } from "@/src/features/post/components";
 import {
   AppImage,
   AppInlineError,
   AppUserAvatar,
-} from "@/src/shared/components"
-import { HANDOVER_ROUTE, POST_ROUTE } from "@/src/shared/constants"
-import { colors, metrics } from "@/src/shared/theme"
-import { formatDate, formatShortEventTime } from "@/src/shared/utils"
-import * as Haptics from "expo-haptics"
-import { router, Stack, useLocalSearchParams } from "expo-router"
+} from "@/src/shared/components";
+import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
+import { colors, metrics } from "@/src/shared/theme";
+import { formatDate, formatShortEventTime } from "@/src/shared/utils";
+import * as Haptics from "expo-haptics";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeftIcon,
   CalendarBlankIcon,
@@ -42,8 +48,8 @@ import {
   PackageIcon,
   UserIcon,
   WarningCircleIcon,
-} from "phosphor-react-native"
-import React, { useCallback, useMemo, useState } from "react"
+} from "phosphor-react-native";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -53,24 +59,24 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
-type StatusTheme = { color: string; bgColor: string }
+type StatusTheme = { color: string; bgColor: string };
 
 const STATUS_THEME: Record<ReturnReportStatus, StatusTheme> = {
-  Draft: { color: colors.hof[500], bgColor: colors.hof[100] },
-  Active: { color: colors.kazan[500], bgColor: colors.kazan[100] },
+  Ongoing: { color: colors.kazan[500], bgColor: colors.kazan[100] },
+  Delivered: { color: colors.info[500], bgColor: colors.info[50] },
   Confirmed: { color: colors.babu[500], bgColor: colors.babu[100] },
   Rejected: { color: colors.error[500], bgColor: colors.error[100] },
-  Expired: { color: colors.hof[400], bgColor: colors.hof[100] },
-}
+  Closed: { color: colors.hof[400], bgColor: colors.hof[100] },
+};
 
 const HandoverStatusBadge = ({ status }: { status: ReturnReportStatus }) => {
-  const { color, bgColor } = STATUS_THEME[status]
-  const label = getHandoverStatusLabel(status)
+  const { color, bgColor } = STATUS_THEME[status];
+  const label = getHandoverStatusLabel(status);
   return (
     <View
       className="self-start px-3 py-1 rounded-full"
@@ -80,18 +86,18 @@ const HandoverStatusBadge = ({ status }: { status: ReturnReportStatus }) => {
         {label}
       </Text>
     </View>
-  )
-}
+  );
+};
 
 // ─── Progress stepper ─────────────────────────────────────────────────────────
 
-type StepState = "done" | "active" | "pending"
+type StepState = "done" | "active" | "pending";
 
 type StepDef = {
-  label: string
-  sublabel: string
-  state: StepState
-}
+  label: string;
+  sublabel: string;
+  state: StepState;
+};
 
 function deriveSteps(
   status: ReturnReportStatus,
@@ -114,31 +120,25 @@ function deriveSteps(
       sublabel: "Receipt acknowledged",
       state: "pending",
     },
-  ]
+  ];
 
-  if (status === "Draft") {
-    steps[0].state = "active"
-  } else if (status === "Active") {
-    steps[0].state = "done"
-
-    if (hasMarkedDelivery) {
-      // Delivery is recorded, so the final confirmation is the remaining step.
-      steps[1].state = "done"
-      steps[2].state = "active"
-    } else {
-      steps[1].state = "active"
-    }
+  if (status === "Ongoing") {
+    steps[0].state = "active";
+  } else if (status === "Delivered") {
+    steps[0].state = "done";
+    steps[1].state = "done";
+    steps[2].state = "active";
   } else if (status === "Confirmed") {
-    steps[0].state = "done"
-    steps[1].state = "done"
-    steps[2].state = "done"
-  } else if (status === "Expired" || status === "Rejected") {
+    steps[0].state = "done";
+    steps[1].state = "done";
+    steps[2].state = "done";
+  } else if (status === "Closed" || status === "Rejected") {
     if (hasMarkedDelivery) {
-      steps[0].state = "done"
-      steps[1].state = "done"
+      steps[0].state = "done";
+      steps[1].state = "done";
     }
   }
-  return steps
+  return steps;
 }
 
 const StepDot = ({ state }: { state: StepState }) => {
@@ -150,7 +150,7 @@ const StepDot = ({ state }: { state: StepState }) => {
       >
         <CheckCircleIcon size={18} color={colors.white} weight="fill" />
       </View>
-    )
+    );
   }
   if (state === "active") {
     return (
@@ -164,17 +164,24 @@ const StepDot = ({ state }: { state: StepState }) => {
       >
         <View className="w-2.5 h-2.5 rounded-full bg-white" />
       </View>
-    )
+    );
   }
   return (
     <View
       className="w-8 h-8 rounded-full items-center justify-center"
-      style={{ backgroundColor: colors.hof[100], borderWidth: 1.5, borderColor: colors.hof[300] }}
+      style={{
+        backgroundColor: colors.hof[100],
+        borderWidth: 1.5,
+        borderColor: colors.hof[300],
+      }}
     >
-      <View className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors.hof[300] }} />
+      <View
+        className="w-2.5 h-2.5 rounded-full"
+        style={{ backgroundColor: colors.hof[300] }}
+      />
     </View>
-  )
-}
+  );
+};
 
 const ProgressStepper = ({
   status,
@@ -182,28 +189,28 @@ const ProgressStepper = ({
   hasMarkedDelivery,
   viewerRole,
 }: {
-  status: ReturnReportStatus
-  isFinder: boolean
-  hasMarkedDelivery: boolean
-  viewerRole: "Finder" | "Owner" | "Unknown"
+  status: ReturnReportStatus;
+  isFinder: boolean;
+  hasMarkedDelivery: boolean;
+  viewerRole: "Finder" | "Owner" | "Unknown";
 }) => {
-  const steps = deriveSteps(status, isFinder, hasMarkedDelivery)
+  const steps = deriveSteps(status, isFinder, hasMarkedDelivery);
 
   const stepsWithViewerCopy = useMemo(() => {
-    if (viewerRole !== "Unknown") return steps
+    if (viewerRole !== "Unknown") return steps;
 
     return steps.map((step) => {
       if (step.label === "You Deliver") {
-        return { ...step, label: "Finder Delivers" }
+        return { ...step, label: "Finder Delivers" };
       }
 
       if (step.label === "You Confirm") {
-        return { ...step, label: "Owner Confirms" }
+        return { ...step, label: "Owner Confirms" };
       }
 
-      return step
-    })
-  }, [steps, viewerRole])
+      return step;
+    });
+  }, [steps, viewerRole]);
 
   return (
     <View className="flex-row items-start justify-between px-2 py-4">
@@ -249,18 +256,18 @@ const ProgressStepper = ({
         </React.Fragment>
       ))}
     </View>
-  )
-}
+  );
+};
 
 // ─── Post card ────────────────────────────────────────────────────────────────
 
-const PostCard = ({ post, label }: { post: Post; label: string }) => {
-  const imageUrl = post.imageUrls?.[0]
+const PostCard = ({ post, label }: { post: HandoverPost; label: string }) => {
+  const imageUrl = post.imageUrls?.[0];
 
   const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-    router.push(POST_ROUTE.details(post.id))
-  }, [post.id])
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push(POST_ROUTE.details(post.id));
+  }, [post.id]);
 
   return (
     <TouchableOpacity
@@ -288,7 +295,7 @@ const PostCard = ({ post, label }: { post: Post; label: string }) => {
           {label}
         </Text>
         <Text className="text-sm font-bold text-textPrimary" numberOfLines={2}>
-          {post.item.itemName}
+          {post.postTitle}
         </Text>
         <View className="flex-row items-center gap-1">
           <MapPinIcon size={11} color={colors.text.muted} weight="fill" />
@@ -297,15 +304,19 @@ const PostCard = ({ post, label }: { post: Post; label: string }) => {
           </Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <CalendarBlankIcon size={11} color={colors.text.muted} weight="regular" />
+          <CalendarBlankIcon
+            size={11}
+            color={colors.text.muted}
+            weight="regular"
+          />
           <Text className="flex-1 text-xs text-textMuted" numberOfLines={1}>
             {formatShortEventTime(post.eventTime)}
           </Text>
         </View>
       </View>
     </TouchableOpacity>
-  )
-}
+  );
+};
 
 const EmptyPostCard = ({ label }: { label: string }) => (
   <View
@@ -315,7 +326,7 @@ const EmptyPostCard = ({ label }: { label: string }) => (
     <Text className="text-xs text-textMuted">{label}</Text>
     <Text className="text-xs text-textMuted mt-1">Not linked yet</Text>
   </View>
-)
+);
 
 // ─── Party row ────────────────────────────────────────────────────────────────
 
@@ -324,12 +335,12 @@ const PartyRow = ({
   role,
   isCurrentUser,
 }: {
-  user: AppUser | null
-  role: "Finder" | "Owner"
-  isCurrentUser: boolean
+  user: AppUser | null;
+  role: "Finder" | "Owner";
+  isCurrentUser: boolean;
 }) => {
-  const roleColor = role === "Finder" ? colors.info[500] : colors.kazan[500]
-  const roleBg = role === "Finder" ? colors.info[50] : colors.kazan[100]
+  const roleColor = role === "Finder" ? colors.info[500] : colors.kazan[500];
+  const roleBg = role === "Finder" ? colors.info[50] : colors.kazan[100];
 
   return (
     <View className="flex-row items-center gap-md py-sm px-md">
@@ -356,61 +367,65 @@ const PartyRow = ({
           <Text className="text-xs text-textMuted">{user.phone}</Text>
         )}
       </View>
-      <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: roleBg }}>
+      <View
+        className="px-2.5 py-1 rounded-full"
+        style={{ backgroundColor: roleBg }}
+      >
         <Text className="text-xs font-semibold" style={{ color: roleColor }}>
           {role}
         </Text>
       </View>
     </View>
-  )
-}
+  );
+};
 
 // ─── Timeline ─────────────────────────────────────────────────────────────────
 
 type TimelineEventData = {
-  key: string
-  icon: React.ReactNode
-  label: string
-  value?: string
-  state: "done" | "active" | "pending"
-}
+  key: string;
+  icon: React.ReactNode;
+  label: string;
+  value?: string;
+  state: "done" | "active" | "pending";
+};
 
 const VerticalTimelineEvent = ({
   icon,
   label,
   value,
   state,
+  isFirst = false,
   isLast = false,
   connectorDone = false,
 }: {
-  icon: React.ReactNode
-  label: string
-  value?: string
-  state: "done" | "active" | "pending"
-  isFirst?: boolean
-  isLast?: boolean
-  connectorDone?: boolean
+  icon: React.ReactNode;
+  label: string;
+  value?: string;
+  state: "done" | "active" | "pending";
+  isFirst?: boolean;
+  isLast?: boolean;
+  connectorDone?: boolean;
 }) => {
-  const DOT_OUTER = 44
-  const DOT_INNER = 34
-  const PAD_H = metrics.spacing.md
-  const PAD_V = metrics.spacing.sm
+  const DOT_OUTER = 44;
+  const DOT_INNER = 34;
+  const PAD_H = metrics.spacing.md;
+  const PAD_V = metrics.spacing.sm;
 
   const ringBg =
     state === "done"
       ? colors.babu[100]
       : state === "active"
         ? colors.rausch[100]
-        : colors.hof[100]
+        : colors.hof[100];
 
   const innerBorder =
     state === "done"
       ? colors.babu[300]
       : state === "active"
         ? colors.rausch[500]
-        : colors.divider
+        : colors.divider;
 
-  const lineColor = connectorDone ? colors.babu[300] : colors.divider
+  const lineColor = connectorDone ? colors.babu[300] : colors.divider;
 
   return (
     <View
@@ -418,6 +433,8 @@ const VerticalTimelineEvent = ({
         flexDirection: "row",
         alignItems: "stretch",
         paddingHorizontal: PAD_H,
+        paddingTop: isFirst ? PAD_V : 0,
+        paddingBottom: isLast ? PAD_V : 0,
       }}
     >
       {/* Left column: ring dot + connector rail */}
@@ -469,21 +486,25 @@ const VerticalTimelineEvent = ({
           flex: 1,
           paddingLeft: PAD_H,
           paddingTop: PAD_V,
-          paddingBottom: PAD_V,
+          paddingBottom: !isLast ? metrics.spacing.lg : 0,
         }}
       >
         {value ? (
           <>
             <Text className="text-xs text-textMuted">{label}</Text>
-            <Text className="text-sm font-semibold text-textPrimary">{value}</Text>
+            <Text className="text-sm font-semibold text-textPrimary">
+              {value}
+            </Text>
           </>
         ) : (
-          <Text className="text-sm font-semibold text-textPrimary">{label}</Text>
+          <Text className="text-sm font-semibold text-textPrimary">
+            {label}
+          </Text>
         )}
       </View>
     </View>
-  )
-}
+  );
+};
 
 // ─── Section card ─────────────────────────────────────────────────────────────
 
@@ -491,8 +512,8 @@ const SectionCard = ({
   title,
   children,
 }: {
-  title: string
-  children: React.ReactNode
+  title: string;
+  children: React.ReactNode;
 }) => (
   <View className="mb-4">
     <Text className="text-xs font-bold text-textMuted uppercase tracking-wide mb-2 px-1">
@@ -509,23 +530,23 @@ const SectionCard = ({
       {children}
     </View>
   </View>
-)
+);
 
-const Separator = () => <View className="h-px bg-divider mx-md" />
+const Separator = () => <View className="h-px bg-divider mx-md" />;
 
 // ─── Action panel ─────────────────────────────────────────────────────────────
 
 type ActionPanelProps = {
-  report: Handover
-  isFinder: boolean
-  isOwner: boolean
-  onActivate: () => void
-  onConfirm: () => void
-  isActivating: boolean
-  isConfirming: boolean
-}
+  report: Handover;
+  isFinder: boolean;
+  isOwner: boolean;
+  onActivate: () => void;
+  onConfirm: () => void;
+  isActivating: boolean;
+  isConfirming: boolean;
+};
 
-const ACTION_PANEL_MIN_HEIGHT = 120
+const ACTION_PANEL_MIN_HEIGHT = 120;
 
 const ActionPanel = ({
   report,
@@ -536,8 +557,8 @@ const ActionPanel = ({
   isActivating,
   isConfirming,
 }: ActionPanelProps) => {
-  const { status } = report
-  const hasMarkedDelivery = !!report.activatedByRole
+  const { status } = report;
+  const hasMarkedDelivery = !!report.activatedByRole;
 
   // ── Confirmed ──
   if (status === "Confirmed") {
@@ -552,7 +573,10 @@ const ActionPanel = ({
         >
           <CheckCircleIcon size={22} color={colors.babu[500]} weight="fill" />
           <View>
-            <Text className="text-sm font-bold" style={{ color: colors.babu[500] }}>
+            <Text
+              className="text-sm font-bold"
+              style={{ color: colors.babu[500] }}
+            >
               Handover Complete
             </Text>
             <Text className="text-xs" style={{ color: colors.babu[400] }}>
@@ -561,15 +585,15 @@ const ActionPanel = ({
           </View>
         </View>
       </View>
-    )
+    );
   }
 
-  // ── Expired / Rejected ──
-  if (status === "Expired" || status === "Rejected") {
+  // ── Closed / Rejected ──
+  if (status === "Closed" || status === "Rejected") {
     const label =
-      status === "Expired"
-        ? "This handover has expired."
-        : "This handover was rejected."
+      status === "Closed"
+        ? "This handover was closed due to a mismatch."
+        : "This handover was rejected.";
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
@@ -579,24 +603,32 @@ const ActionPanel = ({
           className="flex-1 flex-row items-center justify-center gap-sm rounded-2xl"
           style={{ backgroundColor: colors.error[100] }}
         >
-          <WarningCircleIcon size={22} color={colors.error[500]} weight="fill" />
-          <Text className="text-sm font-medium" style={{ color: colors.error[500] }}>
+          <WarningCircleIcon
+            size={22}
+            color={colors.error[500]}
+            weight="fill"
+          />
+          <Text
+            className="text-sm font-medium"
+            style={{ color: colors.error[500] }}
+          >
             {label}
           </Text>
         </View>
       </View>
-    )
+    );
   }
 
-  // ── Draft — Finder: can mark delivery ──
-  if (status === "Draft" && isFinder) {
+  // ── Ongoing — Finder: can mark delivery ──
+  if (status === "Ongoing" && isFinder) {
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
         style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <Text className="text-xs text-textMuted mb-2">
-          Once you hand the item back, mark it here so the owner can confirm receipt.
+          Once you hand the item back, mark it here so the owner can confirm
+          receipt.
         </Text>
         <TouchableOpacity
           activeOpacity={0.85}
@@ -620,11 +652,11 @@ const ActionPanel = ({
           )}
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 
-  // ── Draft — Owner: waiting for finder to deliver ──
-  if (status === "Draft" && isOwner) {
+  // ── Ongoing — Owner: waiting for finder to deliver ──
+  if (status === "Ongoing" && isOwner) {
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
@@ -640,40 +672,17 @@ const ActionPanel = ({
               Waiting for delivery
             </Text>
             <Text className="text-xs text-textMuted mt-0.5">
-              The finder will mark this handover as delivered after the item is handed back.
+              The finder will mark this handover as delivered after the item is
+              handed back.
             </Text>
           </View>
         </View>
       </View>
-    )
+    );
   }
 
-  if (status === "Active" && !hasMarkedDelivery) {
-    return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <View
-          className="flex-1 flex-row items-center gap-sm px-md rounded-2xl"
-          style={{ backgroundColor: colors.hof[50] }}
-        >
-          <HourglassIcon size={22} color={colors.hof[400]} weight="fill" />
-          <View className="flex-1">
-            <Text className="text-sm font-semibold text-textPrimary">
-              Awaiting delivery update
-            </Text>
-            <Text className="text-xs text-textMuted mt-0.5">
-              This handover is active, but delivery has not been recorded yet. Continue coordinating in chat.
-            </Text>
-          </View>
-        </View>
-      </View>
-    )
-  }
-
-  // ── Active — Finder already delivered, waiting for owner ──
-  if (status === "Active" && isFinder) {
+  // ── Delivered — Finder: waiting for owner ──
+  if (status === "Delivered" && isFinder) {
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
@@ -685,27 +694,35 @@ const ActionPanel = ({
         >
           <HourglassIcon size={22} color={colors.kazan[500]} weight="fill" />
           <View className="flex-1">
-            <Text className="text-sm font-semibold" style={{ color: colors.kazan[600] }}>
+            <Text
+              className="text-sm font-semibold"
+              style={{ color: colors.kazan[600] }}
+            >
               Waiting for confirmation
             </Text>
-            <Text className="text-xs mt-0.5" style={{ color: colors.kazan[600] }}>
-              You marked the item as delivered. The owner can confirm receipt to complete the handover.
+            <Text
+              className="text-xs mt-0.5"
+              style={{ color: colors.kazan[600] }}
+            >
+              You marked the item as delivered. The owner can confirm receipt to
+              complete the handover.
             </Text>
           </View>
         </View>
       </View>
-    )
+    );
   }
 
-  // ── Active — Owner: confirm receipt ──
-  if (status === "Active" && isOwner) {
+  // ── Delivered — Owner: confirm receipt ──
+  if (status === "Delivered" && isOwner) {
     return (
       <View
         className="px-lg py-md2 border-t border-divider bg-surface"
         style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
       >
         <Text className="text-xs text-textMuted mb-2">
-          The finder marked this handover as delivered. Confirm once you have the item in hand.
+          The finder marked this handover as delivered. Confirm once you have
+          the item in hand.
         </Text>
         <TouchableOpacity
           activeOpacity={0.85}
@@ -729,87 +746,76 @@ const ActionPanel = ({
           )}
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 
-  return null
-}
+  return null;
+};
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 
 const HandoverDetailScreen = () => {
-  const { handoverId } = useLocalSearchParams<{ handoverId: string }>()
-  const { user: currentUser } = useAppUser()
+  const { handoverId } = useLocalSearchParams<{ handoverId: string }>();
+  const { user: currentUser } = useAppUser();
 
   const {
     data: report,
     isLoading,
     error,
-  } = useGetC2CReturnReportById(handoverId ?? "")
+  } = useGetC2CReturnReportById(handoverId ?? "");
 
-  const { activate, isActivating } = useActivateC2CReturnReport()
-  const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport()
+  const { activate, isActivating } = useActivateC2CReturnReport();
+  const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
 
-  const [isOpeningChat, setIsOpeningChat] = useState(false)
-  const [actionPanelHeight, setActionPanelHeight] = useState(ACTION_PANEL_MIN_HEIGHT)
+  const [isOpeningChat, setIsOpeningChat] = useState(false);
+  const [actionPanelHeight, setActionPanelHeight] = useState(
+    ACTION_PANEL_MIN_HEIGHT,
+  );
 
   const isFinder = useMemo(
     () => !!currentUser && report?.finder?.id === currentUser.id,
     [currentUser, report],
-  )
+  );
   const isOwner = useMemo(
     () => !!currentUser && report?.owner?.id === currentUser.id,
     [currentUser, report],
-  )
+  );
 
   // ID of the other party (used for chat navigation)
   const counterpartId = useMemo(() => {
-    if (isFinder) return report?.owner?.id
-    if (isOwner) return report?.finder?.id
-    return undefined
-  }, [isFinder, isOwner, report])
+    if (isFinder) return report?.owner?.id;
+    if (isOwner) return report?.finder?.id;
+    return undefined;
+  }, [isFinder, isOwner, report]);
 
   const counterpart = useMemo(
     () => (report ? getHandoverCounterpart(report, currentUser?.id) : null),
     [report, currentUser?.id],
-  )
+  );
   const viewerRole = useMemo(
     () => (report ? getHandoverViewerRole(report, currentUser?.id) : "Unknown"),
     [report, currentUser?.id],
-  )
-  const title = useMemo(() => (report ? getHandoverTitle(report) : "Handover"), [report])
+  );
+  const title = useMemo(
+    () => (report ? getHandoverTitle(report) : "Handover"),
+    [report],
+  );
   const statusLabel = useMemo(
     () => (report ? getHandoverStatusLabel(report.status) : "Handover"),
     [report],
-  )
-  const hasMarkedDelivery = !!report?.activatedByRole
-  const nextStep = useMemo(
-    () => {
-      if (!report) return "Review handover details"
-
-      if (report.status === "Active" && !hasMarkedDelivery) {
-        return "Continue coordinating the return until delivery is marked in the handover flow."
-      }
-
-      return getHandoverNextStep(report, currentUser?.id)
-    },
-    [report, currentUser?.id, hasMarkedDelivery],
-  )
-  const detailGuidance = useMemo(
-    () => {
-      if (!report) return ""
-
-      if (report.status === "Active" && !hasMarkedDelivery) {
-        return "This handover is active, but delivery has not been recorded yet. Use chat to confirm the latest meetup status."
-      }
-
-      return getHandoverDetailGuidance(report, currentUser?.id)
-    },
-    [report, currentUser?.id, hasMarkedDelivery],
-  )
+  );
+  const hasMarkedDelivery = !!report?.activatedByRole;
+  const nextStep = useMemo(() => {
+    if (!report) return "Review handover details";
+    return getHandoverNextStep(report, currentUser?.id);
+  }, [report, currentUser?.id]);
+  const detailGuidance = useMemo(() => {
+    if (!report) return "";
+    return getHandoverDetailGuidance(report, currentUser?.id);
+  }, [report, currentUser?.id]);
 
   const timelineEvents = useMemo((): TimelineEventData[] => {
-    if (!report) return []
+    if (!report) return [];
     const events: TimelineEventData[] = [
       {
         key: "created",
@@ -818,19 +824,21 @@ const HandoverDetailScreen = () => {
         value: formatDate(report.createdAt),
         state: "done",
       },
-    ]
-    if (report.status === "Draft" || report.status === "Active" || report.status === "Expired") {
-      const expiresState: "done" | "active" | "pending" =
-        report.status === "Expired" ? "done"
-        : report.status === "Active" ? "active"
-        : "pending"
+    ];
+    if (report.status === "Ongoing" || report.status === "Delivered") {
       events.push({
         key: "expires",
-        icon: <ClockCountdownIcon size={18} color={colors.kazan[500]} weight="fill" />,
-        label: report.status === "Expired" ? "Expired" : "Expires",
+        icon: (
+          <ClockCountdownIcon
+            size={18}
+            color={colors.kazan[500]}
+            weight="fill"
+          />
+        ),
+        label: "Expires",
         value: formatDate(report.expiresAt),
-        state: expiresState,
-      })
+        state: "active",
+      });
     }
     if (report.activatedByRole) {
       events.push({
@@ -838,63 +846,90 @@ const HandoverDetailScreen = () => {
         icon: <PackageIcon size={18} color={colors.primary} weight="fill" />,
         label: `${report.activatedByRole} marked delivered`,
         state: "done",
-      })
+      });
     }
     if (report.confirmedAt) {
       events.push({
         key: "confirmed",
-        icon: <CalendarCheckIcon size={18} color={colors.babu[500]} weight="fill" />,
+        icon: (
+          <CalendarCheckIcon size={18} color={colors.babu[500]} weight="fill" />
+        ),
         label: "Confirmed",
         value: formatDate(report.confirmedAt),
         state: "done",
-      })
+      });
     }
     if (report.status === "Rejected") {
       events.push({
         key: "rejected",
-        icon: <WarningCircleIcon size={18} color={colors.error[500]} weight="fill" />,
+        icon: (
+          <WarningCircleIcon
+            size={18}
+            color={colors.error[500]}
+            weight="fill"
+          />
+        ),
         label: "Rejected",
         value: "Request was declined",
         state: "done",
-      })
+      });
     }
-    return events
-  }, [report])
-
-  const handleActionPanelLayout = useCallback((event: LayoutChangeEvent) => {
-    const measuredHeight = event.nativeEvent.layout.height
-
-    if (measuredHeight > 0 && measuredHeight !== actionPanelHeight) {
-      setActionPanelHeight(measuredHeight)
+    if (report.status === "Closed") {
+      events.push({
+        key: "closed",
+        icon: (
+          <WarningCircleIcon size={18} color={colors.hof[500]} weight="fill" />
+        ),
+        label: "Closed",
+        value: "Items did not match",
+        state: "done",
+      });
     }
-  }, [actionPanelHeight])
+    return events;
+  }, [report]);
+
+  const handleActionPanelLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const measuredHeight = event.nativeEvent.layout.height;
+
+      if (measuredHeight > 0 && measuredHeight !== actionPanelHeight) {
+        setActionPanelHeight(measuredHeight);
+      }
+    },
+    [actionPanelHeight],
+  );
 
   const handleOpenChat = useCallback(async () => {
-    if (!counterpartId) return
-    setIsOpeningChat(true)
+    if (!counterpartId) return;
+    setIsOpeningChat(true);
     try {
-      const res = await getConversationByPartnerApi(counterpartId)
-      let conversationId = res.data?.conversation?.conversationId
+      const res = await getConversationByPartnerApi(counterpartId);
+      let conversationId = res.data?.conversation?.conversationId;
 
       if (!conversationId) {
-        const created = await createDirectConversationApi({ memberId: counterpartId })
-        conversationId = created.data?.conversation?.conversationId
+        const created = await createDirectConversationApi({
+          memberId: counterpartId,
+        });
+        conversationId = created.data?.conversation?.conversationId;
       }
 
       if (conversationId) {
-        router.push(HANDOVER_ROUTE.conversation(conversationId))
+        router.navigate(CHAT_ROUTE.message(conversationId));
       } else {
-        Alert.alert("Chat not found", "No conversation exists with this person yet.")
+        Alert.alert(
+          "Chat not found",
+          "No conversation exists with this person yet.",
+        );
       }
     } catch {
-      Alert.alert("Error", "Could not open the chat. Please try again.")
+      Alert.alert("Error", "Could not open the chat. Please try again.");
     } finally {
-      setIsOpeningChat(false)
+      setIsOpeningChat(false);
     }
-  }, [counterpartId])
+  }, [counterpartId]);
 
   const handleActivate = useCallback(() => {
-    if (!report) return
+    if (!report) return;
     Alert.alert(
       "Mark as Delivered?",
       "This tells the owner you have handed over the item. They will then confirm receipt to complete the handover.",
@@ -905,19 +940,24 @@ const HandoverDetailScreen = () => {
           style: "default",
           onPress: async () => {
             try {
-              await activate(report.id)
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+              await activate(report.id);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success,
+              );
             } catch {
-              Alert.alert("Error", "Could not mark as delivered. Please try again.")
+              Alert.alert(
+                "Error",
+                "Could not mark as delivered. Please try again.",
+              );
             }
           },
         },
       ],
-    )
-  }, [report, activate])
+    );
+  }, [report, activate]);
 
   const handleConfirm = useCallback(() => {
-    if (!report) return
+    if (!report) return;
     Alert.alert(
       "Confirm Receipt?",
       "Confirm that you have received the item. This will complete the handover and award the finder their points.",
@@ -928,16 +968,21 @@ const HandoverDetailScreen = () => {
           style: "default",
           onPress: async () => {
             try {
-              await ownerConfirm(report.id)
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+              await ownerConfirm(report.id);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success,
+              );
             } catch {
-              Alert.alert("Error", "Could not confirm receipt. Please try again.")
+              Alert.alert(
+                "Error",
+                "Could not confirm receipt. Please try again.",
+              );
             }
           },
         },
       ],
-    )
-  }, [report, ownerConfirm])
+    );
+  }, [report, ownerConfirm]);
 
   // ── Loading ──
   if (isLoading) {
@@ -969,7 +1014,7 @@ const HandoverDetailScreen = () => {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
-    )
+    );
   }
 
   // ── Error / Not found ──
@@ -1000,15 +1045,15 @@ const HandoverDetailScreen = () => {
         </View>
         <AppInlineError message={error?.message ?? "Handover not found."} />
       </SafeAreaView>
-    )
+    );
   }
 
   const hasActionPanel =
     report.status === "Confirmed" ||
-    report.status === "Expired" ||
+    report.status === "Closed" ||
     report.status === "Rejected" ||
-    ((report.status === "Draft" || report.status === "Active") &&
-      (isFinder || isOwner))
+    ((report.status === "Ongoing" || report.status === "Delivered") &&
+      (isFinder || isOwner));
 
   return (
     <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
@@ -1032,7 +1077,10 @@ const HandoverDetailScreen = () => {
           <ArrowLeftIcon size={20} color={colors.text.primary} />
         </TouchableOpacity>
 
-        <Text className="flex-1 text-base font-semibold text-textPrimary text-center" numberOfLines={1}>
+        <Text
+          className="flex-1 text-base font-semibold text-textPrimary text-center"
+          numberOfLines={1}
+        >
           Handover
         </Text>
 
@@ -1047,7 +1095,11 @@ const HandoverDetailScreen = () => {
             {isOpeningChat ? (
               <ActivityIndicator size="small" color={colors.primary} />
             ) : (
-              <ChatCenteredTextIcon size={20} color={colors.primary} weight="duotone" />
+              <ChatCenteredTextIcon
+                size={20}
+                color={colors.primary}
+                weight="duotone"
+              />
             )}
           </TouchableOpacity>
         ) : (
@@ -1066,11 +1118,18 @@ const HandoverDetailScreen = () => {
       >
         <View
           className="mb-4 rounded-2xl border border-divider bg-surface px-lg py-lg"
-          style={Platform.OS === "ios" ? metrics.shadows.level1.ios : metrics.shadows.level1.android}
+          style={
+            Platform.OS === "ios"
+              ? metrics.shadows.level1.ios
+              : metrics.shadows.level1.android
+          }
         >
           <View className="flex-row items-start justify-between gap-sm">
             <View className="flex-1 gap-xs">
-              <Text className="text-2xl font-semibold text-textPrimary" numberOfLines={2}>
+              <Text
+                className="text-2xl font-semibold text-textPrimary"
+                numberOfLines={2}
+              >
                 {title}
               </Text>
 
@@ -1080,21 +1139,35 @@ const HandoverDetailScreen = () => {
               </View>
             </View>
 
-            {counterpart ? <AppUserAvatar avatarUrl={counterpart.avatarUrl} size={44} /> : null}
+            {counterpart ? (
+              <AppUserAvatar avatarUrl={counterpart.avatarUrl} size={44} />
+            ) : null}
           </View>
 
           <View className="mt-md gap-xs">
             <Text className="text-sm font-medium text-textPrimary">
-              {counterpart?.displayName ? `With ${counterpart.displayName}` : "Counterpart"}
-              {viewerRole === "Finder" ? " · Owner" : viewerRole === "Owner" ? " · Finder" : ""}
+              {counterpart?.displayName
+                ? `With ${counterpart.displayName}`
+                : "Counterpart"}
+              {viewerRole === "Finder"
+                ? " · Owner"
+                : viewerRole === "Owner"
+                  ? " · Finder"
+                  : ""}
             </Text>
-            <Text className="text-sm text-textSecondary leading-5">{detailGuidance}</Text>
+            <Text className="text-sm text-textSecondary leading-5">
+              {detailGuidance}
+            </Text>
           </View>
         </View>
 
         <View className="mb-4 rounded-2xl border border-divider bg-canvas px-lg py-md2">
-          <Text className="text-sm font-semibold text-textPrimary mb-xs">What happens next</Text>
-          <Text className="text-sm text-textSecondary leading-5">{nextStep}</Text>
+          <Text className="text-sm font-semibold text-textPrimary mb-xs">
+            What happens next
+          </Text>
+          <Text className="text-sm text-textSecondary leading-5">
+            {nextStep}
+          </Text>
         </View>
 
         <View className="mb-2 px-1">
@@ -1146,11 +1219,7 @@ const HandoverDetailScreen = () => {
             isCurrentUser={isFinder}
           />
           <Separator />
-          <PartyRow
-            user={report.owner}
-            role="Owner"
-            isCurrentUser={isOwner}
-          />
+          <PartyRow user={report.owner} role="Owner" isCurrentUser={isOwner} />
         </SectionCard>
 
         {/* ── Timeline ── */}
@@ -1193,7 +1262,7 @@ const HandoverDetailScreen = () => {
         </View>
       )}
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default HandoverDetailScreen
+export default HandoverDetailScreen;
