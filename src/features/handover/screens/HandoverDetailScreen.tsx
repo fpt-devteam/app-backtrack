@@ -365,36 +365,125 @@ const PartyRow = ({
   )
 }
 
-// ─── Timeline row ─────────────────────────────────────────────────────────────
+// ─── Timeline ─────────────────────────────────────────────────────────────────
 
-const TimelineRow = ({
+type TimelineEventData = {
+  key: string
+  icon: React.ReactNode
+  label: string
+  value?: string
+  state: "done" | "active" | "pending"
+}
+
+const VerticalTimelineEvent = ({
   icon,
   label,
   value,
+  state,
+  isLast = false,
+  connectorDone = false,
 }: {
   icon: React.ReactNode
   label: string
   value?: string
-}) => (
-  <View className="flex-row items-center gap-md py-sm px-md">
+  state: "done" | "active" | "pending"
+  isFirst?: boolean
+  isLast?: boolean
+  connectorDone?: boolean
+}) => {
+  const DOT_OUTER = 44
+  const DOT_INNER = 34
+  const PAD_H = metrics.spacing.md
+  const PAD_V = metrics.spacing.sm
+
+  const ringBg =
+    state === "done"
+      ? colors.babu[100]
+      : state === "active"
+        ? colors.rausch[100]
+        : colors.hof[100]
+
+  const innerBorder =
+    state === "done"
+      ? colors.babu[300]
+      : state === "active"
+        ? colors.rausch[500]
+        : colors.divider
+
+  const lineColor = connectorDone ? colors.babu[300] : colors.divider
+
+  return (
     <View
-      className="w-9 h-9 rounded-full items-center justify-center bg-canvas"
-      style={{ borderWidth: 1, borderColor: colors.divider }}
+      style={{
+        flexDirection: "row",
+        alignItems: "stretch",
+        paddingHorizontal: PAD_H,
+      }}
     >
-      {icon}
+      {/* Left column: ring dot + connector rail */}
+      <View style={{ width: DOT_OUTER, alignItems: "center" }}>
+        {/* Outer colored ring */}
+        <View
+          style={{
+            width: DOT_OUTER,
+            height: DOT_OUTER,
+            borderRadius: DOT_OUTER / 2,
+            backgroundColor: ringBg,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* Inner white dot */}
+          <View
+            style={{
+              width: DOT_INNER,
+              height: DOT_INNER,
+              borderRadius: DOT_INNER / 2,
+              backgroundColor: colors.surface,
+              borderWidth: 1,
+              borderColor: innerBorder,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {icon}
+          </View>
+        </View>
+
+        {/* Connector: fills remaining row height, hidden on last item */}
+        {!isLast && (
+          <View
+            style={{
+              width: 2,
+              flex: 1,
+              minHeight: 8,
+              backgroundColor: lineColor,
+            }}
+          />
+        )}
+      </View>
+
+      {/* Right column: label + value */}
+      <View
+        style={{
+          flex: 1,
+          paddingLeft: PAD_H,
+          paddingTop: PAD_V,
+          paddingBottom: PAD_V,
+        }}
+      >
+        {value ? (
+          <>
+            <Text className="text-xs text-textMuted">{label}</Text>
+            <Text className="text-sm font-semibold text-textPrimary">{value}</Text>
+          </>
+        ) : (
+          <Text className="text-sm font-semibold text-textPrimary">{label}</Text>
+        )}
+      </View>
     </View>
-    <View className="flex-1">
-      {value ? (
-        <>
-          <Text className="text-xs text-textMuted">{label}</Text>
-          <Text className="text-sm font-semibold text-textPrimary">{value}</Text>
-        </>
-      ) : (
-        <Text className="text-sm font-semibold text-textPrimary">{label}</Text>
-      )}
-    </View>
-  </View>
-)
+  )
+}
 
 // ─── Section card ─────────────────────────────────────────────────────────────
 
@@ -719,6 +808,59 @@ const HandoverDetailScreen = () => {
     [report, currentUser?.id, hasMarkedDelivery],
   )
 
+  const timelineEvents = useMemo((): TimelineEventData[] => {
+    if (!report) return []
+    const events: TimelineEventData[] = [
+      {
+        key: "created",
+        icon: <HandshakeIcon size={18} color={colors.hof[500]} weight="fill" />,
+        label: "Created",
+        value: formatDate(report.createdAt),
+        state: "done",
+      },
+    ]
+    if (report.status === "Draft" || report.status === "Active" || report.status === "Expired") {
+      const expiresState: "done" | "active" | "pending" =
+        report.status === "Expired" ? "done"
+        : report.status === "Active" ? "active"
+        : "pending"
+      events.push({
+        key: "expires",
+        icon: <ClockCountdownIcon size={18} color={colors.kazan[500]} weight="fill" />,
+        label: report.status === "Expired" ? "Expired" : "Expires",
+        value: formatDate(report.expiresAt),
+        state: expiresState,
+      })
+    }
+    if (report.activatedByRole) {
+      events.push({
+        key: "activated",
+        icon: <PackageIcon size={18} color={colors.primary} weight="fill" />,
+        label: `${report.activatedByRole} marked delivered`,
+        state: "done",
+      })
+    }
+    if (report.confirmedAt) {
+      events.push({
+        key: "confirmed",
+        icon: <CalendarCheckIcon size={18} color={colors.babu[500]} weight="fill" />,
+        label: "Confirmed",
+        value: formatDate(report.confirmedAt),
+        state: "done",
+      })
+    }
+    if (report.status === "Rejected") {
+      events.push({
+        key: "rejected",
+        icon: <WarningCircleIcon size={18} color={colors.error[500]} weight="fill" />,
+        label: "Rejected",
+        value: "Request was declined",
+        state: "done",
+      })
+    }
+    return events
+  }, [report])
+
   const handleActionPanelLayout = useCallback((event: LayoutChangeEvent) => {
     const measuredHeight = event.nativeEvent.layout.height
 
@@ -800,7 +942,7 @@ const HandoverDetailScreen = () => {
   // ── Loading ──
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-canvas" edges={["top"]}>
+      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
         <Stack.Screen options={{ headerShown: false }} />
         <View
           className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
@@ -833,7 +975,7 @@ const HandoverDetailScreen = () => {
   // ── Error / Not found ──
   if (error || !report) {
     return (
-      <SafeAreaView className="flex-1 bg-canvas" edges={["top"]}>
+      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
         <Stack.Screen options={{ headerShown: false }} />
         <View
           className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
@@ -869,7 +1011,7 @@ const HandoverDetailScreen = () => {
       (isFinder || isOwner))
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas" edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* ── Header ── */}
@@ -1013,58 +1155,18 @@ const HandoverDetailScreen = () => {
 
         {/* ── Timeline ── */}
         <SectionCard title="Timeline">
-          <TimelineRow
-            icon={<HandshakeIcon size={18} color={colors.hof[500]} weight="fill" />}
-            label="Created"
-            value={formatDate(report.createdAt)}
-          />
-          {(report.status === "Draft" || report.status === "Active" || report.status === "Expired") && (
-            <>
-              <Separator />
-              <TimelineRow
-                icon={
-                  <ClockCountdownIcon size={18} color={colors.kazan[500]} weight="fill" />
-                }
-                label={report.status === "Expired" ? "Expired" : "Expires"}
-                value={formatDate(report.expiresAt)}
-              />
-            </>
-          )}
-          {report.activatedByRole && (
-            <>
-              <Separator />
-              <TimelineRow
-                icon={
-                  <PackageIcon size={18} color={colors.primary} weight="fill" />
-                }
-                label={`${report.activatedByRole} marked delivered`}
-              />
-            </>
-          )}
-          {report.confirmedAt && (
-            <>
-              <Separator />
-              <TimelineRow
-                icon={
-                  <CalendarCheckIcon size={18} color={colors.babu[500]} weight="fill" />
-                }
-                label="Confirmed"
-                value={formatDate(report.confirmedAt)}
-              />
-            </>
-          )}
-          {report.status === "Rejected" && (
-            <>
-              <Separator />
-              <TimelineRow
-                icon={
-                  <WarningCircleIcon size={18} color={colors.error[500]} weight="fill" />
-                }
-                label="Rejected"
-                value="Request was declined"
-              />
-            </>
-          )}
+          {timelineEvents.map((event, i) => (
+            <VerticalTimelineEvent
+              key={event.key}
+              icon={event.icon}
+              label={event.label}
+              value={event.value}
+              state={event.state}
+              isFirst={i === 0}
+              isLast={i === timelineEvents.length - 1}
+              connectorDone={event.state === "done"}
+            />
+          ))}
         </SectionCard>
       </ScrollView>
 
