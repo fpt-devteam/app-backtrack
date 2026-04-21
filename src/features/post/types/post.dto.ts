@@ -47,6 +47,7 @@ export type PostCreateRequest = {
   eventTime: Date;
   electronicDetail?: ElectronicDetail
   cardDetail?: CardDetail
+  personalBelongingDetail?: PersonalBelongingDetail
 } & Omit<UserLocation, "radiusInKm">;
 
 export type PostCreateResponse = ApiResponse<Post>;

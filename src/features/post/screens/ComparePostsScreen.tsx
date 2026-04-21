@@ -1,61 +1,109 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import {
-  PostMatchingScoreBadge,
-  PostStatusBadge,
-} from "@/src/features/post/components";
+import { PostStatusBadge } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
-import type { Post, SimilarPost } from "@/src/features/post/types";
+import type {
+  MatchEvidence,
+  MatchStrength,
+  PostCategory,
+  SimilarPost,
+} from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 
 import {
-  AppAccordion,
   AppHeader,
+  AppImage,
   AppInlineError,
   AppSplashScreen,
   CloseButton,
   HeaderTitle,
 } from "@/src/shared/components";
+import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { formatDateTime } from "@/src/shared/utils";
 import { router } from "expo-router";
 import { MotiView } from "moti";
 import {
-  CaretDownIcon,
-  MapPinIcon,
-  SparkleIcon,
-  TagIcon,
+  ArrowRightIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  InfoIcon,
+  WarningCircleIcon,
+  XCircleIcon,
 } from "phosphor-react-native";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
-  Image,
   Platform,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 interface ComparePostsScreenProps {
   postId: string;
   otherPostId: string;
 }
 
-type ComparisonRow = {
-  attribute: string;
-  post1Value: string;
-  post2Value: string;
+type CompareIdentityRow = {
+  label: string;
+  leftValue: string;
+  rightValue: string;
 };
 
-type Category = {
-  id: string;
+type DateInput = Date | string | null | undefined;
+
+type ComparePostLike = {
+  postType: PostType;
+  postTitle?: string | null;
+  category?: string;
+  imageUrls?: string[];
+  displayAddress?: string | null;
+  eventTime?: DateInput;
+  item?: {
+    itemName?: string;
+    category?: string;
+  };
+  cardDetail?: SimilarPost["cardDetail"];
+  personalBelongingDetail?: SimilarPost["personalBelongingDetail"];
+  electronicDetail?: SimilarPost["electronicDetail"];
+  otherDetail?: SimilarPost["otherDetail"];
+};
+
+type EvidenceRow = {
+  key: string;
   title: string;
-  icon: React.ReactNode;
-  rows: ComparisonRow[];
+  detail: string;
+  strength: MatchStrength;
 };
 
-// ─── Shared card style ────────────────────────────────────────────────────────
+type CompareCardProps = {
+  post: ComparePostLike;
+  title: string;
+  rows: { label: string; value: string }[];
+};
+
+const FALLBACK_VALUE = "—";
+
+const CATEGORY_LABELS: Record<PostCategory, string> = {
+  electronics: "Electronics",
+  cards: "Cards",
+  personal_belongings: "Personal belongings",
+  other: "Other",
+};
+
+const EVIDENCE_LABELS: Record<string, string> = {
+  card_number: "Card number matches exactly",
+  holder_name: "Holder name matches",
+  date_of_birth: "Date of birth matches",
+  issue_date: "Issue date is consistent",
+  issuing_authority: "Issuing authority aligns",
+  location: "Location nearby",
+  time_window: "Time window plausible",
+};
 
 const cardStyle = {
   backgroundColor: colors.surface,
@@ -64,229 +112,384 @@ const cardStyle = {
   borderWidth: 1,
   borderColor: colors.divider,
   ...(Platform.OS === "ios"
-    ? metrics.shadows.md.ios
-    : metrics.shadows.md.android),
+    ? metrics.shadows.level1.ios
+    : metrics.shadows.level1.android),
 };
 
-// ─── ComparisonRowItem ────────────────────────────────────────────────────────
-
-const ComparisonRowItem = ({
-  attribute,
-  post1Value,
-  post2Value,
-}: ComparisonRow) => (
-  <View className="flex-row items-start py-2.5 px-3">
-    <View style={{ flex: 3 }}>
-      <Text
-        className="text-xs font-bold"
-        style={{ color: colors.text.primary }}
-      >
-        {attribute}
-      </Text>
-    </View>
-    <View style={{ flex: 3.5 }} className="items-start px-1">
-      <Text className="text-xs" style={{ color: colors.text.secondary }}>
-        {post1Value}
-      </Text>
-    </View>
-    <View style={{ flex: 3.5 }} className="items-start px-1">
-      <Text className="text-xs" style={{ color: colors.text.secondary }}>
-        {post2Value}
-      </Text>
-    </View>
-  </View>
-);
-
-// ─── CategoryAppAccordion ─────────────────────────────────────────────────────
-
-const CategoryAppAccordion = ({ title, icon, rows }: Omit<Category, "id">) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <View className="mb-3" style={cardStyle}>
-      <AppAccordion
-        isExpanded={isExpanded}
-        onToggle={() => setIsExpanded((prev) => !prev)}
-        collapsedContent={
-          <View className="flex-row items-center px-4 py-3.5 gap-3">
-            {icon}
-            <Text
-              className="font-bold text-base flex-1"
-              style={{ color: colors.text.primary }}
-            >
-              {title}
-            </Text>
-            <MotiView
-              animate={{ rotate: isExpanded ? "180deg" : "0deg" }}
-              transition={{ type: "timing", duration: 250 }}
-            >
-              <CaretDownIcon size={16} color={colors.hof[400]} />
-            </MotiView>
-          </View>
-        }
-        expandedContent={
-          <View
-            style={{
-              backgroundColor: colors.muted,
-              borderTopWidth: 1,
-              borderTopColor: colors.divider,
-            }}
-          >
-            {rows.map((row, index) => (
-              <React.Fragment key={row.attribute}>
-                <ComparisonRowItem {...row} />
-                {index < rows.length - 1 && (
-                  <View
-                    className="mx-3 h-px"
-                    style={{ backgroundColor: colors.divider }}
-                  />
-                )}
-              </React.Fragment>
-            ))}
-          </View>
-        }
-      />
-    </View>
-  );
+const safeText = (value: unknown): string => {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return FALLBACK_VALUE;
 };
 
-// ─── HeroImage ────────────────────────────────────────────────────────────────
-
-const HeroImage = ({
-  imageUrl,
-  postType,
-  itemName,
-}: {
-  imageUrl?: string;
-  postType: PostType;
-  itemName: string;
-}) => {
-  return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          borderRadius: metrics.borderRadius.md,
-          overflow: "hidden",
-          aspectRatio: 1,
-          borderWidth: 1,
-          borderColor: colors.divider,
-        }}
-      >
-        <Image
-          source={{ uri: imageUrl }}
-          className="w-full h-full"
-          resizeMode="cover"
-        />
-        <View className="absolute top-2 left-2">
-          <PostStatusBadge status={postType} size="sm" />
-        </View>
-      </View>
-      <Text
-        className="mt-2 text-sm font-semibold"
-        style={{ color: colors.text.primary }}
-        numberOfLines={2}
-      >
-        {itemName}
-      </Text>
-    </View>
-  );
+const toDate = (input: DateInput): Date | null => {
+  if (!input) return null;
+  const d = input instanceof Date ? input : new Date(input);
+  if (Number.isNaN(d.getTime())) return null;
+  return d;
 };
 
-// ─── buildCategories ─────────────────────────────────────────────────────────
+const formatDayLabel = (input: DateInput): string => {
+  const date = toDate(input);
+  if (!date) return "Unknown";
 
-const formatTimeGap = (days: number): string => {
-  if (days === 0) return "Same day";
-  return `${days} day${days > 1 ? "s" : ""} apart`;
+  return `${date.toLocaleString("en-US", { month: "short" })} ${date.getDate()}`;
 };
 
-const formatDistance = (meters?: number): string => {
-  if (meters == null) return "—";
-  if (meters < 1000) return `${Math.round(meters)} m`;
-  return `${(meters / 1000).toFixed(1)} km`;
+const formatCompactDate = (input: DateInput): string => {
+  const date = toDate(input);
+  if (!date) return FALLBACK_VALUE;
+
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yyyy = date.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
 };
 
-const buildCategories = (post1: Post, post2: SimilarPost): Category[] => {
+const formatIssueDate = (input: DateInput): string => {
+  const date = toDate(input);
+  if (!date) return FALLBACK_VALUE;
+
+  return `${date.toLocaleString("en-US", { month: "short" })} ${date.getFullYear()}`;
+};
+
+const formatEvidenceKey = (key: string): string => {
+  const normalized = key
+    .replaceAll(/[_-]/g, " ")
+    .replaceAll(/([a-z])([A-Z])/g, "$1 $2")
+    .trim();
+
+  return normalized.replaceAll(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const getCategoryLabel = (category?: string): string => {
+  if (!category) return "Unknown category";
+
+  if (category in CATEGORY_LABELS) {
+    return CATEGORY_LABELS[category as PostCategory];
+  }
+
+  return formatEvidenceKey(category);
+};
+
+const getPostTitle = (post: ComparePostLike): string => {
+  const candidates = [
+    post.cardDetail?.itemName,
+    post.personalBelongingDetail?.itemName,
+    post.electronicDetail?.itemName,
+    post.otherDetail?.itemIdentifier,
+    post.item?.itemName,
+    post.postTitle,
+  ];
+
+  for (const candidate of candidates) {
+    const text = safeText(candidate);
+    if (text !== FALLBACK_VALUE) return text;
+  }
+
+  return "Unknown item";
+};
+
+const hasCardIdentity = (post: ComparePostLike): boolean => {
+  const card = post.cardDetail;
+  if (!card) return false;
+
+  return [
+    card.holderName,
+    card.cardNumberMasked,
+    card.dateOfBirth,
+    card.issueDate,
+  ].some((value) => safeText(value) !== FALLBACK_VALUE);
+};
+
+const buildIdentityRows = (
+  leftPost: ComparePostLike,
+  rightPost: ComparePostLike,
+): CompareIdentityRow[] => {
+  const shouldUseCardRows =
+    hasCardIdentity(leftPost) || hasCardIdentity(rightPost);
+
+  if (shouldUseCardRows) {
+    return [
+      {
+        label: "Holder",
+        leftValue: safeText(leftPost.cardDetail?.holderName),
+        rightValue: safeText(rightPost.cardDetail?.holderName),
+      },
+      {
+        label: "DOB",
+        leftValue: formatCompactDate(leftPost.cardDetail?.dateOfBirth),
+        rightValue: formatCompactDate(rightPost.cardDetail?.dateOfBirth),
+      },
+      {
+        label: "Card no.",
+        leftValue: safeText(leftPost.cardDetail?.cardNumberMasked),
+        rightValue: safeText(rightPost.cardDetail?.cardNumberMasked),
+      },
+      {
+        label: "Issued",
+        leftValue: formatIssueDate(leftPost.cardDetail?.issueDate),
+        rightValue: formatIssueDate(rightPost.cardDetail?.issueDate),
+      },
+    ];
+  }
+
   return [
     {
-      id: "general",
-      title: "General Info",
-      icon: <TagIcon size={20} color={colors.hof[600]} weight="fill" />,
-      rows: [
-        {
-          attribute: "Name",
-          post1Value: post1.item.itemName,
-          post2Value: post2.item.itemName,
-        },
-        {
-          attribute: "Category",
-          post1Value: post1.item.category,
-          post2Value: post2.item.category,
-        },
-        {
-          attribute: "Type",
-          post1Value: post1.postType,
-          post2Value: post2.postType,
-        },
-        {
-          attribute: "Description",
-          post1Value: post1.description ?? "—",
-          post2Value: post2.description ?? "—",
-        },
-        {
-          attribute: "Address",
-          post1Value: post1.displayAddress ?? "—",
-          post2Value: post2.displayAddress ?? "—",
-        },
-        {
-          attribute: "Event Time",
-          post1Value: formatDateTime(post1.eventTime),
-          post2Value: formatDateTime(post2.eventTime),
-        },
-        {
-          attribute: "Time Gap",
-          post1Value: "—",
-          post2Value: formatTimeGap(post2.timeGapDays),
-        },
-      ],
+      label: "Name",
+      leftValue: getPostTitle(leftPost),
+      rightValue: getPostTitle(rightPost),
+    },
+    {
+      label: "Category",
+      leftValue: getCategoryLabel(leftPost.category ?? leftPost.item?.category),
+      rightValue: getCategoryLabel(
+        rightPost.category ?? rightPost.item?.category,
+      ),
+    },
+    {
+      label: "Event",
+      leftValue: formatDayLabel(leftPost.eventTime),
+      rightValue: formatDayLabel(rightPost.eventTime),
+    },
+    {
+      label: "Address",
+      leftValue: safeText(leftPost.displayAddress),
+      rightValue: safeText(rightPost.displayAddress),
     },
   ];
 };
 
-// ─── ComparePostsScreen ───────────────────────────────────────────────────────
+const getTimeGapLabel = (leftDate: DateInput, rightDate: DateInput): string => {
+  const left = toDate(leftDate);
+  const right = toDate(rightDate);
+
+  if (!left || !right) return "";
+
+  const diffInHours = Math.round(
+    Math.abs(left.getTime() - right.getTime()) / (1000 * 60 * 60),
+  );
+
+  if (diffInHours <= 1) return "Happened around the same time";
+
+  if (diffInHours < 24) {
+    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} apart`;
+  }
+
+  const diffInDays = Math.round(diffInHours / 24);
+  return `${diffInDays} day${diffInDays > 1 ? "s" : ""} apart`;
+};
+
+const mapEvidenceRows = (evidence: MatchEvidence[]): EvidenceRow[] => {
+  if (!evidence.length) {
+    return [
+      {
+        key: "pending",
+        title: "Evidence pending",
+        detail: "Matching signals are still being reviewed.",
+        strength: "Partial",
+      },
+    ];
+  }
+
+  return evidence.map((item) => {
+    const note = safeText(item.note);
+    const displayValue = safeText(item.displayValue);
+    let detail = "No extra details provided.";
+
+    if (note === FALLBACK_VALUE) {
+      if (displayValue !== FALLBACK_VALUE) {
+        detail = displayValue;
+      }
+    } else {
+      detail = note;
+    }
+
+    return {
+      key: item.key,
+      title: EVIDENCE_LABELS[item.key] ?? formatEvidenceKey(item.key),
+      detail,
+      strength: item.strength,
+    };
+  });
+};
+
+const getStrengthColor = (strength: MatchStrength): string => {
+  if (strength === "Strong") return colors.babu[500];
+  if (strength === "Partial") return colors.kazan[500];
+  if (strength === "Mismatch") return colors.error[500];
+  return colors.hof[500];
+};
+
+const renderStrengthIcon = (strength: MatchStrength) => {
+  if (strength === "Strong") {
+    return <CheckCircleIcon size={18} color={colors.babu[500]} weight="fill" />;
+  }
+
+  if (strength === "Partial") {
+    return (
+      <WarningCircleIcon size={18} color={colors.kazan[500]} weight="fill" />
+    );
+  }
+
+  if (strength === "Mismatch") {
+    return <XCircleIcon size={18} color={colors.error[500]} weight="fill" />;
+  }
+
+  return <CircleIcon size={18} color={colors.hof[500]} weight="fill" />;
+};
+
+const ComparePostCard = ({ post, title, rows }: CompareCardProps) => {
+  const isFound = post.postType === PostType.Found;
+  const tagBg = isFound ? colors.babu[100] : colors.accent;
+  const tagText = isFound ? colors.babu[600] : colors.primary;
+
+  return (
+    <View className="rounded-md border p-2.5" style={cardStyle}>
+      <View className="flex-row items-center gap-2">
+        <View
+          className="rounded-full px-2 py-1"
+          style={{ backgroundColor: tagBg }}
+        >
+          <Text className="text-xs font-semibold" style={{ color: tagText }}>
+            {title}
+          </Text>
+        </View>
+        <Text className="text-xs" style={{ color: colors.text.secondary }}>
+          {post.postType} · {formatDayLabel(post.eventTime)}
+        </Text>
+      </View>
+
+      <View
+        className="mt-2"
+        style={{
+          borderRadius: metrics.borderRadius.sm,
+          overflow: "hidden",
+          borderWidth: 1,
+          borderColor: colors.divider,
+          backgroundColor: colors.canvas,
+          aspectRatio: 1.25,
+        }}
+      >
+        <AppImage
+          source={post.imageUrls?.[0] ? { uri: post.imageUrls[0] } : undefined}
+          className="w-full h-full"
+          resizeMode="cover"
+        />
+        <View className="absolute top-2 left-2">
+          <PostStatusBadge status={post.postType} size="sm" />
+        </View>
+      </View>
+
+      <View className="mt-3 gap-1.5">
+        {rows.map((row) => (
+          <View key={row.label} className="flex-row items-start gap-2">
+            <Text className="text-sm" style={{ color: colors.text.secondary }}>
+              {row.label}
+            </Text>
+            <Text
+              className="flex-1 text-right text-sm font-semibold"
+              style={{ color: colors.text.primary }}
+              numberOfLines={1}
+            >
+              {row.value}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
 
 export const ComparePostsScreen = ({
   postId,
   otherPostId,
 }: ComparePostsScreenProps) => {
+  const insets = useSafeAreaInsets();
+
   const {
     similarPosts,
     isLoading: isLoadingMatch,
     error,
   } = useMatchingPost(postId);
+
   const { data: post1, isLoading: isLoadingPost1 } = useGetPostById({ postId });
-  const { create } = useCreateDirectConversation();
+  const { data: matchedPostDetail, isLoading: isLoadingMatchedPostDetail } =
+    useGetPostById({ postId: otherPostId });
+
+  const { create, isCreating } = useCreateDirectConversation();
 
   const matchedPost = useMemo(
     () => similarPosts.find((p) => p.id === otherPostId),
     [similarPosts, otherPostId],
   );
 
-  const categories = useMemo(
-    () => (post1 && matchedPost ? buildCategories(post1, matchedPost) : []),
+  const identityRows = useMemo(
+    () =>
+      post1 && matchedPost
+        ? buildIdentityRows(
+            post1 as ComparePostLike,
+            matchedPost as ComparePostLike,
+          )
+        : [],
     [post1, matchedPost],
   );
 
+  const evidenceRows = useMemo(
+    () => (matchedPost ? mapEvidenceRows(matchedPost.evidence ?? []) : []),
+    [matchedPost],
+  );
+
+  const leftRows = useMemo(
+    () =>
+      identityRows.map((row) => ({ label: row.label, value: row.leftValue })),
+    [identityRows],
+  );
+
+  const rightRows = useMemo(
+    () =>
+      identityRows.map((row) => ({ label: row.label, value: row.rightValue })),
+    [identityRows],
+  );
+
+  const scorePercent = useMemo(
+    () => (matchedPost ? Math.round((matchedPost.score ?? 0) * 100) : 0),
+    [matchedPost],
+  );
+
+  const matchMetaLabel = useMemo(() => {
+    const category = matchedPost?.category ?? post1?.category;
+    return getCategoryLabel(category);
+  }, [matchedPost, post1]);
+
+  const timeGapLabel = useMemo(
+    () =>
+      post1 && matchedPost
+        ? getTimeGapLabel(post1.eventTime, matchedPost.eventTime)
+        : "",
+    [post1, matchedPost],
+  );
+
+  const matchedAuthorId = matchedPostDetail?.author?.id;
+  const isContactDisabled =
+    !matchedAuthorId || isLoadingMatchedPostDetail || isCreating;
+
   const handleContactAuthor = async () => {
+    if (!matchedAuthorId) {
+      toast.error("Unable to contact this author right now.");
+      return;
+    }
+
     try {
-      const req = { memberId: "asfsadf" };
+      const req = { memberId: matchedAuthorId };
       const res = await create(req);
       if (!res.data?.conversation?.conversationId) {
-        console.log("Missing conversation ID in response:", res.data);
+        toast.error("Unable to start conversation. Please try again.");
         return;
       }
       router.push(CHAT_ROUTE.message(res.data?.conversation?.conversationId));
-    } catch (error) {
-      console.error("Failed to create conversation:", error);
+    } catch {
+      toast.error("Failed to start chat. Please try again.");
     }
   };
 
@@ -294,7 +497,7 @@ export const ComparePostsScreen = ({
 
   if (error || !matchedPost || !post1) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.canvas }}>
+      <View style={{ flex: 1, backgroundColor: colors.surface }}>
         <AppHeader
           left={<CloseButton />}
           center={
@@ -308,7 +511,7 @@ export const ComparePostsScreen = ({
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.canvas }}
+      style={{ flex: 1, backgroundColor: colors.surface }}
       edges={["top", "left", "right"]}
     >
       <AppHeader
@@ -318,159 +521,198 @@ export const ComparePostsScreen = ({
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-4 pb-8">
-          {/* ── Hero: Images + Item Names ── */}
-          <View className="flex-row gap-3 mb-4">
-            <MotiView
-              from={{ opacity: 0, translateY: 20, scale: 0.98 }}
-              animate={{ opacity: 1, translateY: 0, scale: 1 }}
-              transition={{ type: "spring", damping: 18, stiffness: 150 }}
-              style={{ flex: 1 }}
-            >
-              <HeroImage
-                imageUrl={post1.imageUrls[0]}
-                postType={post1.postType}
-                itemName={post1.item.itemName}
-              />
-            </MotiView>
-            <MotiView
-              from={{ opacity: 0, translateY: 20, scale: 0.98 }}
-              animate={{ opacity: 1, translateY: 0, scale: 1 }}
-              transition={{
-                type: "spring",
-                damping: 18,
-                stiffness: 150,
-                delay: 80,
-              }}
-              style={{ flex: 1 }}
-            >
-              <HeroImage
-                imageUrl={matchedPost.imageUrls[0]}
-                postType={matchedPost.postType}
-                itemName={matchedPost.item.itemName}
-              />
-            </MotiView>
-          </View>
-
-          {/* ── Assessment Summary ── */}
-          {matchedPost.assessmentSummary && (
-            <MotiView
-              from={{ opacity: 0, translateY: 16 }}
-              animate={{ opacity: 1, translateY: 0 }}
-              transition={{ type: "timing", duration: 280, delay: 160 }}
-            >
-              <View className="mb-3" style={cardStyle}>
-                {/* Header bar */}
-                <View
-                  className="flex-row items-center px-4 py-3 gap-2.5"
-                  style={{ backgroundColor: colors.info[50] }}
-                >
-                  <View
-                    className="w-8 h-8 rounded-full items-center justify-center"
-                    style={{ backgroundColor: colors.info[100] }}
-                  >
-                    <SparkleIcon
-                      size={16}
-                      color={colors.info[500]}
-                      weight="fill"
-                    />
-                  </View>
-                  <Text
-                    className="font-bold text-sm flex-1"
-                    style={{ color: colors.info[500] }}
-                  >
-                    AI Assessment
-                  </Text>
-                  <MotiView
-                    from={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{
-                      type: "spring",
-                      damping: 14,
-                      stiffness: 200,
-                      delay: 400,
-                    }}
-                  >
-                    <PostMatchingScoreBadge level={matchedPost.matchingLevel} />
-                  </MotiView>
-                </View>
-
-                {/* Body */}
-                <View
-                  className="px-4 py-3.5 border-t"
-                  style={{ borderColor: colors.info[100] }}
-                >
-                  <Text
-                    className="text-sm leading-6"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {matchedPost.assessmentSummary}
-                  </Text>
-                </View>
-              </View>
-            </MotiView>
-          )}
-
-          {/* ── Comparison Categories ── */}
-          {categories.map((category, index) => (
-            <MotiView
-              key={category.id}
-              from={{ opacity: 0, translateY: 16 }}
-              animate={{ opacity: 1, translateY: 0 }}
-              transition={{
-                type: "timing",
-                duration: 260,
-                delay: 200 + index * 60,
-              }}
-            >
-              <CategoryAppAccordion {...category} />
-            </MotiView>
-          ))}
-
-          {/* ── Location row ── */}
-          <MotiView
-            from={{ opacity: 0, translateY: 16 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 260, delay: 260 }}
-          >
-            <View className="mb-3" style={cardStyle}>
-              <View className="flex-row items-center px-4 py-3.5 gap-3">
-                <MapPinIcon
-                  size={20}
-                  color={colors.babu[400]}
-                  weight="fill"
-                />
+          <View className="mb-4 flex-row items-start justify-between gap-3">
+            <View className="flex-1">
+              <Text
+                className="text-2xl font-semibold"
+                style={{ color: colors.text.primary }}
+              >
+                Potential match found
+              </Text>
+              <Text
+                className="mt-1 text-sm"
+                style={{ color: colors.text.secondary }}
+              >
+                {matchMetaLabel} • Reviewed by you
+              </Text>
+              {!!timeGapLabel && (
                 <Text
-                  className="font-bold text-base flex-1"
-                  style={{ color: colors.text.primary }}
+                  className="mt-1 text-xs"
+                  style={{ color: colors.text.muted }}
                 >
-                  Location
+                  {timeGapLabel}
                 </Text>
-              </View>
+              )}
+            </View>
+
+            <View
+              className="flex-row items-center rounded-full px-2.5 py-1"
+              style={{
+                backgroundColor: colors.babu[100],
+                borderWidth: 1,
+                borderColor: colors.babu[200],
+              }}
+            >
               <View
                 style={{
-                  backgroundColor: colors.muted,
-                  borderTopWidth: 1,
-                  borderTopColor: colors.divider,
+                  width: 6,
+                  height: 6,
+                  borderRadius: 99,
+                  backgroundColor: colors.babu[500],
+                  marginRight: 6,
                 }}
+              />
+              <Text
+                className="text-xs font-semibold"
+                style={{ color: colors.babu[600] }}
               >
-                <ComparisonRowItem
-                  attribute="Address"
-                  post1Value={post1.displayAddress ?? "—"}
-                  post2Value={matchedPost.displayAddress ?? "—"}
-                />
-                <View className="mx-3 h-px" style={{ backgroundColor: colors.divider }} />
-                <ComparisonRowItem
-                  attribute="Distance"
-                  post1Value="—"
-                  post2Value={formatDistance(matchedPost.distanceInMeters)}
+                {scorePercent}% match
+              </Text>
+            </View>
+          </View>
+
+          <MotiView
+            from={{ opacity: 0, translateY: 20, scale: 0.98 }}
+            animate={{ opacity: 1, translateY: 0, scale: 1 }}
+            transition={{ type: "spring", damping: 18, stiffness: 150 }}
+          >
+            <View
+              className="relative flex-row"
+              style={{ gap: metrics.spacing.sm }}
+            >
+              <View style={{ flex: 1 }}>
+                <ComparePostCard
+                  post={post1 as ComparePostLike}
+                  title="Your post"
+                  rows={leftRows}
                 />
               </View>
+
+              <View style={{ flex: 1 }}>
+                <ComparePostCard
+                  post={matchedPost as ComparePostLike}
+                  title="Their post"
+                  rows={rightRows}
+                />
+              </View>
+
+              <View
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: 76,
+                  marginLeft: -13,
+                  width: 26,
+                  height: 26,
+                  borderRadius: 13,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.divider,
+                }}
+              >
+                <ArrowRightIcon
+                  size={14}
+                  color={colors.text.muted}
+                  weight="bold"
+                />
+              </View>
+            </View>
+          </MotiView>
+
+          <MotiView
+            className="mt-6"
+            from={{ opacity: 0, translateY: 16 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 260, delay: 120 }}
+          >
+            <Text
+              className="mb-3 text-base font-semibold"
+              style={{ color: colors.text.primary }}
+            >
+              Evidence breakdown
+            </Text>
+
+            <View
+              className="overflow-hidden rounded-md border"
+              style={cardStyle}
+            >
+              {evidenceRows.map((evidence, index) => (
+                <View key={`${evidence.key}-${index}`}>
+                  <View className="flex-row items-start gap-2 px-3 py-3">
+                    <View style={{ marginTop: 1 }}>
+                      {renderStrengthIcon(evidence.strength)}
+                    </View>
+
+                    <View className="flex-1">
+                      <Text
+                        className="text-sm font-semibold"
+                        style={{ color: colors.text.primary }}
+                      >
+                        {evidence.title}
+                      </Text>
+                      <Text
+                        className="mt-0.5 text-xs"
+                        style={{ color: colors.text.secondary }}
+                      >
+                        {evidence.detail}
+                      </Text>
+                    </View>
+
+                    <Text
+                      className="text-sm font-semibold"
+                      style={{ color: getStrengthColor(evidence.strength) }}
+                    >
+                      {evidence.strength}
+                    </Text>
+                  </View>
+
+                  {index < evidenceRows.length - 1 && (
+                    <View
+                      className="h-px"
+                      style={{
+                        backgroundColor: colors.divider,
+                        marginHorizontal: 12,
+                      }}
+                    />
+                  )}
+                </View>
+              ))}
+            </View>
+          </MotiView>
+
+          <MotiView
+            className="mt-4"
+            from={{ opacity: 0, translateY: 16 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 260, delay: 180 }}
+          >
+            <View
+              className="flex-row items-start rounded-md border px-3 py-3"
+              style={{
+                borderColor: colors.info[300],
+                backgroundColor: colors.info[50],
+              }}
+            >
+              <InfoIcon
+                size={16}
+                weight="fill"
+                color={colors.info[600]}
+                style={{ marginTop: 1, marginRight: 8 }}
+              />
+              <Text
+                className="flex-1 text-xs"
+                style={{ color: colors.info[600] }}
+              >
+                Full card number and contact details are hidden until both
+                parties confirm this match. This protects everyone involved.
+              </Text>
             </View>
           </MotiView>
         </View>
       </ScrollView>
 
-      {/* ── Bottom Action Bar ── */}
       <MotiView
         from={{ opacity: 0, translateY: 20 }}
         animate={{ opacity: 1, translateY: 0 }}
@@ -481,15 +723,19 @@ export const ComparePostsScreen = ({
           style={{
             backgroundColor: colors.surface,
             borderColor: colors.divider,
+            paddingBottom: Math.max(insets.bottom, metrics.spacing.md),
           }}
         >
           <TouchableOpacity
             onPress={handleContactAuthor}
+            disabled={isContactDisabled}
             activeOpacity={0.8}
             className="items-center justify-center"
             style={{
               height: metrics.layout.controlHeight.xl,
-              backgroundColor: colors.primary,
+              backgroundColor: isContactDisabled
+                ? colors.hof[300]
+                : colors.primary,
               borderRadius: metrics.borderRadius.sm,
             }}
           >
@@ -497,9 +743,18 @@ export const ComparePostsScreen = ({
               className="text-base font-semibold"
               style={{ color: colors.primaryForeground }}
             >
-              Contact Author
+              {isCreating ? "Connecting..." : "Contact Author"}
             </Text>
           </TouchableOpacity>
+
+          {!matchedAuthorId && !isLoadingMatchedPostDetail && (
+            <Text
+              className="mt-2 text-center text-xs"
+              style={{ color: colors.text.muted }}
+            >
+              Author info is unavailable for this match.
+            </Text>
+          )}
         </View>
       </MotiView>
     </SafeAreaView>

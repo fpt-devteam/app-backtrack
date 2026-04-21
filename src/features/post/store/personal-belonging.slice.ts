@@ -16,7 +16,7 @@ const DEFAULT_PERSONAL_BELONGING_DETAIL: PersonalBelongingDetail = {
 
 export type PersonalBelongingSlice = {
   personalBelongingDetail: PersonalBelongingDetail;
-  setItemname: (itemName: string) => void;
+  setPersonalBelongingItemName: (itemName: string) => void;
   setPersonalBelongingDetail: (detail: PersonalBelongingDetail) => void;
   setPersonalBelongingColor: (color: Nullable<string>) => void;
   setPersonalBelongingBrand: (brand: Nullable<string>) => void;
@@ -40,7 +40,7 @@ export const createPersonalBelongingSlice: StateCreator<
 
   setPersonalBelongingDetail: (detail) => set({ personalBelongingDetail: detail }),
 
-  setItemname: (itemName) =>
+  setPersonalBelongingItemName: (itemName) =>
     set((state) => ({
       personalBelongingDetail: {
         ...state.personalBelongingDetail,

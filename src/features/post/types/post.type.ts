@@ -1,9 +1,9 @@
 import { AppUser } from "@/src/features/auth/types"
 import type { UserLocation } from "@/src/features/map/types"
+import { postOptionSchema } from "@/src/features/post/schemas"
 import { Nullable } from "@/src/shared/types"
 import type { LatLng } from "react-native-maps"
 import * as yup from "yup"
-import { postOptionSchema } from "../schemas"
 import { PostType } from "./post.enum"
 
 export type PostFilters = {
@@ -246,12 +246,64 @@ export type MatchStatus = typeof MATCH_STATUS[keyof typeof MATCH_STATUS];
 /**
  * 
  */
+export type SimilarPostPersonalBelongingDetail = {
+  itemName?: Nullable<string>;
+  color?: Nullable<string>;
+  brand?: Nullable<string>;
+  material?: Nullable<string>;
+  size?: Nullable<string>;
+  condition?: Nullable<string>;
+  distinctiveMarks?: Nullable<string>;
+  aiDescription?: Nullable<string>;
+  additionalDetails?: Nullable<string>;
+}
+
+export type SimilarPostCardDetail = {
+  itemName?: Nullable<string>;
+  cardNumberMasked?: Nullable<string>;
+  holderName?: Nullable<string>;
+  dateOfBirth?: Nullable<Date | string>;
+  issueDate?: Nullable<Date | string>;
+  expiryDate?: Nullable<Date | string>;
+  issuingAuthority?: Nullable<string>;
+  additionalDetails?: Nullable<string>;
+  aiDescription?: Nullable<string>;
+}
+
+export type SimilarPostElectronicDetail = {
+  itemName?: Nullable<string>;
+  brand?: Nullable<string>;
+  model?: Nullable<string>;
+  color?: Nullable<string>;
+  hasCase?: Nullable<boolean>;
+  caseDescription?: Nullable<string>;
+  screenCondition?: Nullable<string>;
+  lockScreenDescription?: Nullable<string>;
+  distinguishingFeatures?: Nullable<string>;
+  aiDescription?: Nullable<string>;
+  additionalDetails?: Nullable<string>;
+}
+
+export type SimilarPostOtherDetail = {
+  itemIdentifier?: Nullable<string>;
+  primaryColor?: Nullable<string>;
+  additionalDetails?: Nullable<string>;
+  aiDescription?: Nullable<string>;
+}
+
+/**
+ * 
+ */
 export type SimilarPost = {
   id: string
   postType: PostType
   postTitle: Nullable<string>
   category: PostCategory
   subcategoryId: string
+  personalBelongingDetail?: Nullable<SimilarPostPersonalBelongingDetail>
+  cardDetail?: Nullable<SimilarPostCardDetail>
+  electronicDetail?: Nullable<SimilarPostElectronicDetail>
+  otherDetail?: Nullable<SimilarPostOtherDetail>
   imageUrls: string[]
   eventTime: string
   score: number;

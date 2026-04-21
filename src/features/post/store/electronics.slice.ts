@@ -19,7 +19,7 @@ const DEFAULT_ELECTRONIC_DETAIL: ElectronicDetail = {
 
 export type ElectronicsSlice = {
   electronicDetail: ElectronicDetail;
-  setItemname: (itemName: string) => void;
+  setElectronicItemName: (itemName: string) => void;
   setElectronicDetail: (detail: ElectronicDetail) => void;
   setElectronicBrand: (brand: Nullable<string>) => void;
   setElectronicModel: (model: Nullable<string>) => void;
@@ -45,7 +45,7 @@ export const createElectronicsSlice: StateCreator<ElectronicsSlice> = (set) => (
 
   setElectronicDetail: (detail) => set({ electronicDetail: detail }),
 
-  setItemname: (itemName) =>
+  setElectronicItemName: (itemName) =>
     set((state) => ({
       electronicDetail: {
         ...state.electronicDetail,

@@ -46,6 +46,9 @@ const PostCreationStepperLayout = () => {
 
   const electronicDetail = usePostCreationStore((state) => state.electronicDetail);
   const cardDetail = usePostCreationStore((state) => state.cardDetail);
+  const personalBelongingDetail = usePostCreationStore(
+    (state) => state.personalBelongingDetail,
+  );
 
   const isIdentityStepInvalid = currentStep === 2 && images.length === 0;
   const isLocationStepInvalid = currentStep === 3 && !location.coords;
@@ -90,7 +93,10 @@ const PostCreationStepperLayout = () => {
 
       const req: PostCreateRequest = {
         postTitle:
-          electronicDetail?.itemName || cardDetail?.itemName || "Untitled Post",
+          electronicDetail?.itemName ||
+          cardDetail?.itemName ||
+          personalBelongingDetail?.itemName ||
+          "Untitled Post",
         postType,
         category,
         subcategoryCode: subCategory,
@@ -101,6 +107,7 @@ const PostCreationStepperLayout = () => {
         eventTime: timelineDate ?? new Date(),
         electronicDetail,
         cardDetail,
+        personalBelongingDetail,
       };
 
       const postDetails = await createPost(req);
