@@ -16,8 +16,8 @@ type HandoverCardProps = {
 };
 
 function deriveDisplayName(report: Handover): string {
-  const finderName = report.finderPost?.item.itemName;
-  const ownerName = report.ownerPost?.item.itemName;
+  const finderName = report.finderPost?.postTitle;
+  const ownerName = report.ownerPost?.postTitle;
   if (finderName && ownerName) return `${finderName} ↔ ${ownerName}`;
   if (finderName) return `Found: ${finderName}`;
   if (ownerName) return `Lost: ${ownerName}`;

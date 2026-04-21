@@ -1061,7 +1061,7 @@ const HandoverDetailScreen = () => {
 
       {/* ── Header ── */}
       <View
-        className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
+        className="flex-row items-center px-lg pt-sm pb-sm border-b border-divider"
         style={
           Platform.OS === "ios"
             ? { ...metrics.shadows.tabBar.ios }
@@ -1072,7 +1072,7 @@ const HandoverDetailScreen = () => {
           onPress={() => router.back()}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           className="items-center justify-center rounded-full"
-          style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
+          style={{ width: 44, height: 44 }}
         >
           <ArrowLeftIcon size={20} color={colors.text.primary} />
         </TouchableOpacity>
@@ -1090,7 +1090,7 @@ const HandoverDetailScreen = () => {
             disabled={isOpeningChat}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             className="items-center justify-center rounded-full"
-            style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
+            style={{ width: 44, height: 44 }}
           >
             {isOpeningChat ? (
               <ActivityIndicator size="small" color={colors.primary} />
@@ -1135,7 +1135,6 @@ const HandoverDetailScreen = () => {
 
               <View className="flex-row items-center gap-sm flex-wrap">
                 <HandoverStatusBadge status={report.status} />
-                <Text className="text-sm text-textMuted">{statusLabel}</Text>
               </View>
             </View>
 

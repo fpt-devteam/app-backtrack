@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type FilterParam = "in-progress" | "past";
+type FilterParam = "ongoing" | "past";
 
 const AllHandoversScreen = () => {
   const { filter } = useLocalSearchParams<{ filter: FilterParam }>();
@@ -28,20 +28,20 @@ const AllHandoversScreen = () => {
   const { data: handovers, isLoading, error } = useGetC2CReturnReports();
 
   const filtered = useMemo(() => {
-    if (filter === "in-progress") {
+    if (filter === "ongoing") {
       return handovers.filter(
-        (r) => r.status === "Draft" || r.status === "Active",
+        (r) => r.status === "Ongoing" || r.status === "Delivered",
       );
     }
     return handovers.filter(
       (r) =>
         r.status === "Confirmed" ||
-        r.status === "Expired" ||
+        r.status === "Closed" ||
         r.status === "Rejected",
     );
   }, [handovers, filter]);
 
-  const title = filter === "in-progress" ? "In Progress" : "Past Handovers";
+  const title = filter === "ongoing" ? "Ongoing" : "Past Handovers";
 
   return (
     <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
@@ -92,7 +92,10 @@ const AllHandoversScreen = () => {
             paddingBottom: metrics.spacing.xl,
           }}
           renderItem={({ item }) => (
-            <HandoverRequestCard handover={item} currentUserId={currentUserId} />
+            <HandoverRequestCard
+              handover={item}
+              currentUserId={currentUserId}
+            />
           )}
           ListEmptyComponent={
             <Text className="text-sm text-textMuted text-center mt-lg">

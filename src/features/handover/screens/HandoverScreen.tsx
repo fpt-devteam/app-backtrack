@@ -1,9 +1,7 @@
 // src/features/handover/screens/HandoverScreen.tsx
 
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
-import {
-  HandoverRequestCard,
-} from "@/src/features/handover/components";
+import { HandoverRequestCard } from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
 import { AppInlineError } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
@@ -12,7 +10,13 @@ import { colors, metrics } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
 import { CaretRightIcon, HandshakeIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 // ─── Section header ────────────────────────────────────────────────────────────
@@ -49,19 +53,19 @@ const SectionHeader = ({ title, subtitle, count }: SectionHeaderProps) => (
 
 type SeeAllRowProps = {
   count: number;
-  filter: "in-progress" | "past";
+  filter: "ongoing" | "past";
 };
 
 const SeeAllRow = ({ count, filter }: SeeAllRowProps) => (
   <TouchableOpacity
     onPress={() => router.push(HANDOVER_ROUTE.all(filter))}
     activeOpacity={0.75}
-    className="flex-row items-center justify-between px-md py-sm rounded-2xl bg-canvas border border-divider mb-sm"
+    className="flex-row items-center justify-center gap-xs py-xs mt-xs"
   >
     <Text className="text-sm font-semibold" style={{ color: colors.primary }}>
       See all {count}
     </Text>
-    <CaretRightIcon size={14} color={colors.primary} />
+    <CaretRightIcon size={13} color={colors.primary} />
   </TouchableOpacity>
 );
 
@@ -73,22 +77,20 @@ const HandoverScreen = () => {
 
   const { data: handovers, isLoading, error } = useGetC2CReturnReports();
 
-  // In-progress: Draft (coordinating) + Active (delivery pending confirmation)
+  // In-progress: Ongoing (coordinating) + Delivered (awaiting confirmation)
   const inProgressHandovers = useMemo(
     () =>
-      handovers.filter(
-        (r) => r.status === "Draft" || r.status === "Active",
-      ),
+      handovers.filter((r) => r.status === "Ongoing" || r.status === "Delivered"),
     [handovers],
   );
 
-  // Past: all completed, expired, or rejected
+  // Past: all completed or closed
   const pastHandovers = useMemo(
     () =>
       handovers.filter(
         (r) =>
           r.status === "Confirmed" ||
-          r.status === "Expired" ||
+          r.status === "Closed" ||
           r.status === "Rejected",
       ),
     [handovers],
@@ -107,18 +109,15 @@ const HandoverScreen = () => {
         }}
       >
         <View className="flex-row items-center gap-sm">
-          <HandshakeIcon size={24} color={colors.rausch[500]} weight="duotone" />
+          <HandshakeIcon
+            size={24}
+            color={colors.rausch[500]}
+            weight="duotone"
+          />
           <Text className="text-2xl font-semibold text-textPrimary">
             Handovers
           </Text>
         </View>
-        <Text className="text-sm text-textSecondary">
-          Track who is waiting, what happens next, and when a return is ready to
-          confirm.
-        </Text>
-        <Text className="text-xs text-textMuted">
-          {handovers.length} report{handovers.length !== 1 ? "s" : ""}
-        </Text>
       </View>
 
       {/* ── Loading ──────────────────────────────────────────────────── */}
@@ -173,7 +172,10 @@ const HandoverScreen = () => {
                     />
                   ))}
                   {inProgressHandovers.length > 3 && (
-                    <SeeAllRow count={inProgressHandovers.length} filter="in-progress" />
+                    <SeeAllRow
+                      count={inProgressHandovers.length}
+                      filter="ongoing"
+                    />
                   )}
                 </View>
               )}
@@ -185,7 +187,9 @@ const HandoverScreen = () => {
             <SectionHeader
               title="Past"
               subtitle="Completed or closed handovers you may want to reference later."
-              count={pastHandovers.length > 0 ? pastHandovers.length : undefined}
+              count={
+                pastHandovers.length > 0 ? pastHandovers.length : undefined
+              }
             />
 
             <View className="px-lg">

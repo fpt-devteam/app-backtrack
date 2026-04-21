@@ -14,11 +14,18 @@ export const useGetC2CReturnReportById = (id: string) => {
   const query = useQuery({
     // Include the current user's ID in the key so the query re-runs if
     // the logged-in account changes (e.g. during development).
-    queryKey: [...C2C_RETURN_REPORT_DETAIL_QUERY_KEY, id, currentUser?.id ?? null],
+    queryKey: [
+      ...C2C_RETURN_REPORT_DETAIL_QUERY_KEY,
+      id,
+      currentUser?.id ?? null,
+    ],
     enabled: !!id,
     queryFn: async () => {
       if (IS_HANDOVER_MOCK) {
-        const mock = getMockHandoverByIdForUser(id, currentUser?.id ?? undefined);
+        const mock = getMockHandoverByIdForUser(
+          id,
+          currentUser?.id ?? undefined,
+        );
         if (!mock) throw new Error("Return report not found");
         return mock;
       }
