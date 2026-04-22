@@ -2,6 +2,7 @@ import { useCreatePost, usePostCreationStore } from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
 import { CardDetail, PostCreateRequest } from "@/src/features/post/types";
 import {
+  AppBackButton,
   AppLink,
   AppLoader,
   TouchableIconButton,
@@ -14,6 +15,7 @@ import {
   RelativePathString,
   router,
   Stack,
+  useNavigation,
 } from "expo-router";
 import { MotiView } from "moti";
 import { HeadCircuitIcon } from "phosphor-react-native";
@@ -166,8 +168,15 @@ const PostCreationStepperLayout = () => {
     }
   };
 
+  const navigation = useNavigation();
+
   const handleCancel = () => {
-    router.dismissAll();
+    const parent = navigation.getParent();
+    if (parent) {
+      parent.goBack();
+    } else {
+      router.back();
+    }
     resetForm();
   };
 
@@ -228,6 +237,9 @@ const PostCreationStepperLayout = () => {
               options={{
                 headerShown: true,
                 headerTitle: "Item Classification",
+                headerRight: () => (
+                  <AppBackButton onPress={handleCancel} type="xIcon" />
+                ),
                 headerTitleStyle: {
                   fontSize: typography.fontSize.lg,
                   fontWeight: typography.fontWeight
@@ -241,6 +253,9 @@ const PostCreationStepperLayout = () => {
               options={{
                 headerShown: true,
                 headerTitle: "Detailed Classification",
+                headerRight: () => (
+                  <AppBackButton onPress={handleCancel} type="xIcon" />
+                ),
                 headerBackVisible: false,
                 headerTitleStyle: {
                   fontSize: typography.fontSize.lg,
@@ -256,6 +271,9 @@ const PostCreationStepperLayout = () => {
                 headerShown: true,
                 headerTitle: "Visual Evidence",
                 headerBackVisible: false,
+                headerRight: () => (
+                  <AppBackButton onPress={handleCancel} type="xIcon" />
+                ),
                 headerTitleStyle: {
                   fontSize: typography.fontSize.lg,
                   fontWeight: typography.fontWeight
@@ -269,6 +287,9 @@ const PostCreationStepperLayout = () => {
               options={{
                 headerShown: true,
                 headerTitle: "Pinpoint location",
+                headerRight: () => (
+                  <AppBackButton onPress={handleCancel} type="xIcon" />
+                ),
                 headerBackVisible: false,
                 headerTitleStyle: {
                   fontSize: typography.fontSize.lg,
@@ -283,6 +304,9 @@ const PostCreationStepperLayout = () => {
               options={{
                 headerShown: true,
                 headerTitle: "Occurrence time",
+                headerRight: () => (
+                  <AppBackButton onPress={handleCancel} type="xIcon" />
+                ),
                 headerBackVisible: false,
                 headerTitleStyle: {
                   fontSize: typography.fontSize.lg,

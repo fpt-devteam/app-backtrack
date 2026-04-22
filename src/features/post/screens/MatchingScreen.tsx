@@ -7,7 +7,12 @@ import { POST_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors } from "@/src/shared/theme/colors";
 import { typography } from "@/src/shared/theme/typography";
 import { getErrorMessage } from "@/src/shared/utils";
-import { router, Stack, useLocalSearchParams } from "expo-router";
+import {
+  router,
+  Stack,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, TextStyle, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -43,6 +48,18 @@ export const MatchingScreen = () => {
       </>
     );
 
+  const navigation = useNavigation();
+
+  const handleCancel = () => {
+    const parent = navigation.getParent();
+
+    if (parent) {
+      parent.goBack();
+    } else {
+      router.back();
+    }
+  };
+
   if (error)
     return <MatchingErrorScreen errorMessage={getErrorMessage(error)} />;
 
@@ -59,7 +76,9 @@ export const MatchingScreen = () => {
             fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
             color: colors.text.primary,
           },
-          headerRight: () => <AppBackButton type="xIcon" />,
+          headerRight: () => (
+            <AppBackButton type="xIcon" onPress={handleCancel} />
+          ),
         }}
       />
       <View className="flex-1 bg-surface">
