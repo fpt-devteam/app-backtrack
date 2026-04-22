@@ -1,67 +1,17 @@
-import { PostStatusBadge } from "@/src/features/post/components";
+import { MyPostCard } from "@/src/features/post/components";
 import { useGetAllMyPost } from "@/src/features/post/hooks";
-import type { Post } from "@/src/features/post/types";
-import { AppBackButton, AppImage, AppLoader } from "@/src/shared/components";
+import { AppBackButton, AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
-import { POST_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
-import * as Haptics from "expo-haptics";
-import { router, Stack } from "expo-router";
+import { colors, metrics, typography } from "@/src/shared/theme";
+import { Stack } from "expo-router";
 import { PackageIcon } from "phosphor-react-native";
-import React, { useMemo } from "react";
-import {
-  FlatList,
-  Pressable,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
-
-const GRID_COLUMNS = 3;
-const GRID_GAP = 2;
-const GRID_PADDING = 8;
-
-const GridSeparator = () => <View style={{ height: GRID_GAP }} />;
-
-const PostGridItem = ({ post, size }: { post: Post; size: number }) => {
-  const imageUrl = post.imageUrls?.[0];
-
-  const handleOpenPost = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(POST_ROUTE.details(post.id));
-  };
-
-  return (
-    <TouchableOpacity
-      onPress={handleOpenPost}
-      style={{ width: size, height: size }}
-      className="aspect-square"
-    >
-      <AppImage
-        source={{ uri: imageUrl }}
-        style={{ width: size, height: size }}
-        resizeMode="cover"
-      />
-
-      <View className="absolute top-0 right-0 p-1">
-        <PostStatusBadge status={post.postType} size="sm" />
-      </View>
-    </TouchableOpacity>
-  );
-};
+import React from "react";
+import { FlatList, Pressable, Text, TextStyle, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const UserPostScreen = () => {
-  const { width } = useWindowDimensions();
+  const inset = useSafeAreaInsets();
   const { data: posts, isLoading, error, refetch } = useGetAllMyPost();
-  
-  console.log("Posts: ", posts);
-
-  const itemSize = useMemo(() => {
-    const totalGap = GRID_GAP * (GRID_COLUMNS - 1);
-    const totalPadding = GRID_PADDING * 2;
-    return Math.floor((width - totalPadding - totalGap) / GRID_COLUMNS);
-  }, [width]);
 
   const renderBody = () => {
     if (isLoading) {
@@ -92,16 +42,17 @@ const UserPostScreen = () => {
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
-        numColumns={GRID_COLUMNS}
         showsVerticalScrollIndicator={false}
         className="flex-1 bg-surface"
         contentContainerStyle={{
-          paddingHorizontal: GRID_PADDING,
-          paddingVertical: GRID_PADDING,
+          paddingHorizontal: metrics.spacing.md,
+          paddingVertical: metrics.spacing.md,
+          paddingBottom: inset.bottom,
         }}
-        columnWrapperStyle={{ gap: GRID_GAP }}
-        ItemSeparatorComponent={GridSeparator}
-        renderItem={({ item }) => <PostGridItem post={item} size={itemSize} />}
+        ItemSeparatorComponent={() => (
+          <View className="my-md border-b border-border" />
+        )}
+        renderItem={({ item }) => <MyPostCard item={item} />}
         ListEmptyComponent={
           <EmptyList
             icon={
@@ -119,9 +70,12 @@ const UserPostScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,
-          headerTitle: "Your posts",
+          headerTitle: "What You've Posted",
           headerLeft: () => <AppBackButton />,
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
         }}
       />
       {renderBody()}

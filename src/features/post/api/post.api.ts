@@ -40,6 +40,7 @@ export async function analyzeImageApi(req: AnalyzeImageRequest) {
 
 export async function getAllMyPost() {
   const response = await privateClient.get<GetAllMyPostResponse>(POST_API.getAllMyPost);
+  console.log(response.data)
   return response.data;
 }
 

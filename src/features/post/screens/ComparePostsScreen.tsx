@@ -1,5 +1,5 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import { PostStatusBadge } from "@/src/features/post/components";
+import { PostTypeBadge } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import type {
   MatchEvidence,
@@ -7,7 +7,7 @@ import type {
   PostCategory,
   SimilarPost,
 } from "@/src/features/post/types";
-import { PostType } from "@/src/features/post/types";
+import { POST_CATEGORIES, PostType } from "@/src/features/post/types";
 
 import {
   AppHeader,
@@ -23,7 +23,6 @@ import { colors, metrics } from "@/src/shared/theme";
 import { router } from "expo-router";
 import { MotiView } from "moti";
 import {
-  ArrowRightIcon,
   CheckCircleIcon,
   CircleIcon,
   InfoIcon,
@@ -89,10 +88,10 @@ type CompareCardProps = {
 const FALLBACK_VALUE = "—";
 
 const CATEGORY_LABELS: Record<PostCategory, string> = {
-  electronics: "Electronics",
-  cards: "Cards",
-  personal_belongings: "Personal belongings",
-  other: "Other",
+  [POST_CATEGORIES.ELECTRONICS]: "Electronics",
+  [POST_CATEGORIES.CARD]: "Cards",
+  [POST_CATEGORIES.PERSONAL_BELONGINGS]: "Personal belongings",
+  [POST_CATEGORIES.OTHER]: "Other",
 };
 
 const EVIDENCE_LABELS: Record<string, string> = {
@@ -339,36 +338,17 @@ const renderStrengthIcon = (strength: MatchStrength) => {
   return <CircleIcon size={18} color={colors.hof[500]} weight="fill" />;
 };
 
-const ComparePostCard = ({ post, title, rows }: CompareCardProps) => {
-  const isFound = post.postType === PostType.Found;
-  const tagBg = isFound ? colors.babu[100] : colors.accent;
-  const tagText = isFound ? colors.babu[600] : colors.primary;
-
+const ComparePostCard = ({ post, rows }: CompareCardProps) => {
   return (
     <View className="rounded-md border p-2.5" style={cardStyle}>
-      <View className="flex-row items-center gap-2">
-        <View
-          className="rounded-full px-2 py-1"
-          style={{ backgroundColor: tagBg }}
-        >
-          <Text className="text-xs font-semibold" style={{ color: tagText }}>
-            {title}
-          </Text>
-        </View>
-        <Text className="text-xs" style={{ color: colors.text.secondary }}>
-          {post.postType} · {formatDayLabel(post.eventTime)}
-        </Text>
-      </View>
-
       <View
-        className="mt-2"
         style={{
           borderRadius: metrics.borderRadius.sm,
           overflow: "hidden",
           borderWidth: 1,
           borderColor: colors.divider,
           backgroundColor: colors.canvas,
-          aspectRatio: 1.25,
+          aspectRatio: 1,
         }}
       >
         <AppImage
@@ -377,7 +357,7 @@ const ComparePostCard = ({ post, title, rows }: CompareCardProps) => {
           resizeMode="cover"
         />
         <View className="absolute top-2 left-2">
-          <PostStatusBadge status={post.postType} size="sm" />
+          <PostTypeBadge status={post.postType} size="sm" />
         </View>
       </View>
 
@@ -515,36 +495,13 @@ export const ComparePostsScreen = ({
       edges={["top", "left", "right"]}
     >
       <AppHeader
-        left={<CloseButton />}
+        right={<CloseButton />}
         center={<HeaderTitle title="Compare Items" className="items-center" />}
       />
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-4 pb-8">
           <View className="mb-4 flex-row items-start justify-between gap-3">
-            <View className="flex-1">
-              <Text
-                className="text-2xl font-semibold"
-                style={{ color: colors.text.primary }}
-              >
-                Potential match found
-              </Text>
-              <Text
-                className="mt-1 text-sm"
-                style={{ color: colors.text.secondary }}
-              >
-                {matchMetaLabel} • Reviewed by you
-              </Text>
-              {!!timeGapLabel && (
-                <Text
-                  className="mt-1 text-xs"
-                  style={{ color: colors.text.muted }}
-                >
-                  {timeGapLabel}
-                </Text>
-              )}
-            </View>
-
             <View
               className="flex-row items-center rounded-full px-2.5 py-1"
               style={{
@@ -593,29 +550,6 @@ export const ComparePostsScreen = ({
                   post={matchedPost as ComparePostLike}
                   title="Their post"
                   rows={rightRows}
-                />
-              </View>
-
-              <View
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: 76,
-                  marginLeft: -13,
-                  width: 26,
-                  height: 26,
-                  borderRadius: 13,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: colors.surface,
-                  borderWidth: 1,
-                  borderColor: colors.divider,
-                }}
-              >
-                <ArrowRightIcon
-                  size={14}
-                  color={colors.text.muted}
-                  weight="bold"
                 />
               </View>
             </View>

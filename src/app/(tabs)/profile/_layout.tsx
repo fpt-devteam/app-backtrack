@@ -10,12 +10,8 @@ const ProfileLayout = () => {
   const isAuthReady = isAppReady && isLoggedIn;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="index" />
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
 
       <Stack.Screen
         name="menu-tab"
@@ -69,16 +65,7 @@ const ProfileLayout = () => {
         }}
       />
 
-      <Stack.Screen
-        name="user-posts"
-        options={{
-          headerShown: false,
-          title: "Your posts",
-          animation: "slide_from_right",
-          presentation: "card",
-          gestureDirection: "horizontal",
-        }}
-      />
+      <Stack.Screen name="user-posts" />
     </Stack>
   );
 };

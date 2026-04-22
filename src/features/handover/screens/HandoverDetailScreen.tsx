@@ -25,7 +25,7 @@ import type {
   HandoverPost,
   ReturnReportStatus,
 } from "@/src/features/handover/types";
-import { PostStatusBadge } from "@/src/features/post/components";
+import { PostTypeBadge } from "@/src/features/post/components";
 import {
   AppImage,
   AppInlineError,
@@ -290,7 +290,7 @@ const PostCard = ({ post, label }: { post: HandoverPost; label: string }) => {
           resizeMode="cover"
         />
         <View className="absolute top-2 left-2">
-          <PostStatusBadge status={post.postType} size="sm" />
+          <PostTypeBadge status={post.postType} size="sm" />
         </View>
       </View>
       <View className="px-3 py-2.5 gap-1 bg-surface">

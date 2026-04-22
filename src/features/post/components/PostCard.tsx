@@ -11,7 +11,7 @@ import { MotiPressable } from "moti/interactions";
 import { MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
-import { PostStatusBadge } from "./PostStatusBadge";
+import { PostTypeBadge } from "./PostTypeBadge";
 
 type PostCardProps = {
   item: Post;
@@ -87,7 +87,7 @@ export const PostCard = ({ item, size = "sm" }: PostCardProps) => {
 
         {/* Post Type badge */}
         <View className="absolute top-2 right-2">
-          <PostStatusBadge status={item.postType} />
+          <PostTypeBadge status={item.postType} />
         </View>
       </View>
 

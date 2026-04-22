@@ -2,17 +2,11 @@ import { getAllMyPost } from "@/src/features/post/api";
 import { MY_POSTS_QUERY_KEY } from "@/src/features/post/constants";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useAppUser } from "../../auth/providers";
 
 export const useGetAllMyPost = () => {
-  const { user } = useAppUser();
-
   const query = useQuery({
-    queryKey: [MY_POSTS_QUERY_KEY, user?.id],
-    enabled: !!user?.id,
+    queryKey: [MY_POSTS_QUERY_KEY],
     queryFn: async () => {
-      if (!user?.id) throw new Error("Missing User ID");
-
       const response = await getAllMyPost();
       if (!response.success) throw new Error("Failed to fetch your posts");
       return response.data;
@@ -26,7 +20,7 @@ export const useGetAllMyPost = () => {
   }, [query.error]);
 
   return {
-    data: query.data,
+    data: query.data?.items || [],
     isLoading: query.isLoading,
     error,
     refetch: query.refetch,

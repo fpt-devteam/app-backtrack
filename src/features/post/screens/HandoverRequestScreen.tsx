@@ -5,13 +5,13 @@ import {
 } from "@/src/features/chat/hooks";
 import { useCreateC2CReturnReport } from "@/src/features/handover/hooks";
 import { CreateC2CReturnReportRequest } from "@/src/features/handover/types";
-import { PostStatusBadge } from "@/src/features/post/components";
+import { PostTypeBadge } from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import {
   AppButton,
-  AppInlineError,
   AppImage,
+  AppInlineError,
   AppLoader,
   AppUserAvatar,
 } from "@/src/shared/components";
@@ -48,7 +48,11 @@ const HandoverRequestScreen = () => {
   const insets = useSafeAreaInsets();
   const { user } = useAppUser();
   const { postId } = useLocalSearchParams<Params>();
-  const { isLoading, data: post, error: postError } = useGetPostById({ postId });
+  const {
+    isLoading,
+    data: post,
+    error: postError,
+  } = useGetPostById({ postId });
   const { create: createConversation, isCreating: isCreatingConversation } =
     useCreateDirectConversation();
   const { sendMessage, isSendingMessage } = useSendMessage();
@@ -84,7 +88,9 @@ const HandoverRequestScreen = () => {
       }
 
       try {
-        const conversation = await createConversation({ memberId: post.author.id });
+        const conversation = await createConversation({
+          memberId: post.author.id,
+        });
         const conversationId = conversation.data?.conversation?.conversationId;
 
         if (!conversationId) throw new Error("Missing conversation ID");
@@ -116,7 +122,9 @@ const HandoverRequestScreen = () => {
     if (!post) {
       return (
         <View className="px-lg pt-lg">
-          <AppInlineError message={postError?.message ?? "Failed to load post details."} />
+          <AppInlineError
+            message={postError?.message ?? "Failed to load post details."}
+          />
         </View>
       );
     }
@@ -172,7 +180,7 @@ const HandoverRequestScreen = () => {
                     >
                       {post.item.itemName}
                     </Text>
-                    <PostStatusBadge status={post.postType} />
+                    <PostTypeBadge status={post.postType} />
                   </View>
 
                   <View className="gap-xxs">
@@ -303,7 +311,9 @@ const HandoverRequestScreen = () => {
               >
                 <TextInput
                   value={message}
-                  onChangeText={(t) => setMessage(t.slice(0, MAX_MESSAGE_LENGTH))}
+                  onChangeText={(t) =>
+                    setMessage(t.slice(0, MAX_MESSAGE_LENGTH))
+                  }
                   placeholder="Example: I can describe the keychain attached to these keys, and I’m available near F-Town after 5 PM."
                   placeholderTextColor={colors.mutedForeground}
                   multiline

@@ -1,45 +1,65 @@
-import { PostType } from "@/src/features/post/types";
-import { colors } from "@/src/shared/theme/colors";
-import { BinocularsIcon, HandHeartIcon } from "phosphor-react-native";
+import { POST_STATUS, PostStatus } from "@/src/features/post/types/post.type";
+import { colors } from "@/src/shared/theme";
 import React from "react";
-import { View } from "react-native";
-
-const SIZE = {
-  sm: 16,
-  md: 20,
-  lg: 24,
-};
+import { Text, View } from "react-native";
 
 type PostStatusBadgeProps = {
-  status: PostType;
-  size?: "sm" | "md" | "lg";
+  status: PostStatus;
 };
 
-export const PostStatusBadge = ({
-  status,
-  size = "sm",
-}: PostStatusBadgeProps) => {
-  const bgColor =
-    status === PostType.Lost ? colors.primary : colors.babu[300];
+type StatusTheme = {
+  label: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+};
+
+const STATUS_THEME: Record<PostStatus, StatusTheme> = {
+  [POST_STATUS.ACTIVE]: {
+    label: "Active",
+    color: colors.babu[500],
+    bgColor: colors.babu[100],
+    borderColor: colors.babu[200],
+  },
+  [POST_STATUS.RETURNED]: {
+    label: "Returned",
+    color: colors.babu[600],
+    bgColor: colors.babu[100],
+    borderColor: colors.babu[200],
+  },
+  [POST_STATUS.ARCHIVED]: {
+    label: "Archived",
+    color: colors.hof[600],
+    bgColor: colors.hof[100],
+    borderColor: colors.hof[300],
+  },
+  [POST_STATUS.EXPIRED]: {
+    label: "Expired",
+    color: colors.error[500],
+    bgColor: colors.error[100],
+    borderColor: colors.error[500],
+  },
+};
+
+export const PostStatusBadge = ({ status }: PostStatusBadgeProps) => {
+  const theme = STATUS_THEME[status];
 
   return (
     <View
-      className="flex-row items-center rounded-full p-1 shadow-xs border border-muted"
-      style={{ backgroundColor: bgColor }}
+      className="self-start mt-xs mb-xs px-sm py-0.5 rounded-full flex-row items-center gap-1"
+      style={{
+        backgroundColor: theme.bgColor,
+        borderColor: theme.borderColor,
+        borderWidth: 1,
+      }}
     >
-      {status === PostType.Lost ? (
-        <BinocularsIcon
-          size={SIZE[size]}
-          color={colors.white}
-          weight="duotone"
-        />
-      ) : (
-        <HandHeartIcon
-          size={SIZE[size]}
-          color={colors.white}
-          weight="duotone"
-        />
-      )}
+      <View
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ backgroundColor: theme.color }}
+      />
+      <Text className="text-xs font-normal" style={{ color: theme.color }}>
+        {theme.label}
+      </Text>
     </View>
   );
 };

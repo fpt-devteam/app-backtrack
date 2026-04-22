@@ -23,6 +23,19 @@ export type PostFeedSection = {
 
 const SECTION_ORDER: PostCategory[] = Object.values(POST_CATEGORIES);
 
+const mapCategoryToSectionKey = (category: PostCategory) => {
+  switch (category) {
+    case POST_CATEGORIES.ELECTRONICS:
+      return "electronics";
+    case POST_CATEGORIES.CARD:
+      return "cards";
+    case POST_CATEGORIES.PERSONAL_BELONGINGS:
+      return "personal_belongings";
+    default:
+      return "other";
+  }
+};
+
 export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
   const query = useQuery<PostFeedResponse>({
     queryKey: [...POSTS_QUERY_KEY, filters],
@@ -52,7 +65,7 @@ export const usePosts = ({ filters, enabled = true }: PostsFiltersOptions) => {
     return SECTION_ORDER.map((category) => ({
       key: category,
       title: category,
-      items: feedData[category] ?? [],
+      items: feedData[mapCategoryToSectionKey(category)] ?? [],
     })).filter((section) => section.items.length > 0);
   }, [query.data?.data]);
 

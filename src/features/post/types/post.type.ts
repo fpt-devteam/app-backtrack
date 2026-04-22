@@ -53,6 +53,34 @@ export type PostItem = {
   distinctiveMarks: Nullable<string>
   additionalDetails: Nullable<string>
 }
+/**
+ */
+export const POST_STATUS = {
+  ACTIVE: "Active",
+  RETURNED: "Returned",
+  ARCHIVED: "Archived",
+  EXPIRED: "Expired"
+} as const
+
+export type PostStatus = typeof POST_STATUS[keyof typeof POST_STATUS]
+
+/**
+ */
+export type MyPost = {
+  id: string
+  postType: PostType
+  author: Pick<AppUser, "id" | "displayName" | "avatarUrl">
+  status: PostStatus
+  category: PostCategory
+  subcategoryId: string
+  postTitle: Nullable<string>
+  imageUrls: string[]
+  eventTime: Date
+  createdAt: Date
+  location: LatLng
+  externalPlaceId: string
+  displayAddress: string
+}
 
 /**
  * Post - This type defines the structure of a post. 
@@ -128,10 +156,10 @@ export type PostSearchOptions = yup.InferType<typeof postOptionSchema>
  * This constant defines the categories of posts that can be created. 
  */
 export const POST_CATEGORIES = {
-  ELECTRONICS: "electronics",
-  CARD: "cards",
-  PERSONAL_BELONGINGS: "personal_belongings",
-  OTHER: "other",
+  ELECTRONICS: "Electronics",
+  CARD: "Cards",
+  PERSONAL_BELONGINGS: "PersonalBelongings",
+  OTHER: "Other",
 } as const;
 
 export type PostCategory = typeof POST_CATEGORIES[keyof typeof POST_CATEGORIES]

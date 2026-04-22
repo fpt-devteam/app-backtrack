@@ -1,9 +1,7 @@
+import { useAppUser } from "@/src/features/auth/providers";
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
 import { UserPlaceMarker } from "@/src/features/map/components";
-import {
-  PostStatusBadge,
-  SimilarPostCard,
-} from "@/src/features/post/components";
+import { PostTypeBadge, SimilarPostCard } from "@/src/features/post/components";
 import { CATEGORY_REGISTRY } from "@/src/features/post/constants";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import { PostItem, PostType } from "@/src/features/post/types";
@@ -57,7 +55,6 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAppUser } from "@/src/features/auth/providers";
 
 /**
  * Generates Airbnb-style descriptions (approx. 10-15 words).
@@ -694,7 +691,9 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           onPress={handleHandover}
           className="px-xl py-3 rounded-full bg-primary"
         >
-          <Text className="text-base font-semibold text-white">Start handover</Text>
+          <Text className="text-base font-semibold text-white">
+            Start handover
+          </Text>
         </TouchableOpacity>
       </View>
     </>
@@ -734,7 +733,7 @@ const VibeTagsRow = ({ postType, category }: VibeTagsRowProps) => {
   return (
     <View className="flex-row flex-wrap gap-xs">
       {/* Status badge (existing) */}
-      <PostStatusBadge status={postType} size="sm" />
+      <PostTypeBadge status={postType} size="sm" />
 
       {/* Category pill — icon + label */}
       <View
