@@ -102,26 +102,7 @@ export default function HandoverRequestScreen() {
         ownerPostId,
       };
 
-      let existingHandoverId: string | null = null;
-
-      try {
-        const existingHandover = await getC2CHandoverPost(req);
-        existingHandoverId = existingHandover.id;
-      } catch (lookupError) {
-        if (!isNotFoundError(lookupError)) {
-          throw lookupError;
-        }
-      }
-
-      if (existingHandoverId) {
-        router.push(HANDOVER_ROUTE.detail(existingHandoverId));
-        return;
-      }
-
       const res = await createC2CReturnReport(req);
-
-      console.log("UserId", user.id);
-      console.log("PartnerId: ", otherPost.author.id);
 
       const conversation = await create({
         memberId: otherPost.author.id,
@@ -136,6 +117,9 @@ export default function HandoverRequestScreen() {
       });
 
       if (res) {
+        console.log("here");
+        router.dismissAll();
+        router.push(HANDOVER_ROUTE.index);
         router.push(HANDOVER_ROUTE.detail(res.id));
         toast.success("Handover request sent successfully!");
         return;

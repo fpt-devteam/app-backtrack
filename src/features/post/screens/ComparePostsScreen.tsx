@@ -14,8 +14,7 @@ import {
   AppInlineError,
   AppSplashScreen,
 } from "@/src/shared/components";
-import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
+import { HANDOVER_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { router } from "expo-router";
 import { MotiView } from "moti";
@@ -35,6 +34,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useGetc2cHandoverPost } from "../../handover/hooks";
 
 interface ComparePostsScreenProps {
   postId: string;
@@ -361,11 +361,18 @@ export const ComparePostsScreen = ({
 }: ComparePostsScreenProps) => {
   const insets = useSafeAreaInsets();
 
+  const { getC2CHandoverPost, isLoading } = useGetc2cHandoverPost();
+
   const {
     similarPosts,
     isLoading: isLoadingMatch,
     error,
   } = useMatchingPost(postId);
+
+  const isNotFoundError = (error: unknown) => {
+    if (!(error instanceof Error)) return false;
+    return /404|not found/i.test(error.message);
+  };
 
   const { data: post1, isLoading: isLoadingPost1 } = useGetPostById({ postId });
   const { data: matchedPostDetail, isLoading: isLoadingMatchedPostDetail } =
@@ -410,29 +417,33 @@ export const ComparePostsScreen = ({
   const isContactDisabled =
     !matchedAuthorId || isLoadingMatchedPostDetail || isCreating;
 
-  const handleContactAuthor = async () => {
-    if (!matchedAuthorId) {
-      toast.error("Unable to contact this author right now.");
+  const handleContactPress = async () => {
+    if (isContactDisabled) return;
+    if (!post1 || !matchedPostDetail) return;
+
+    const isFoundPost = matchedPostDetail.postType === PostType.Found;
+    const finderPostId = isFoundPost ? otherPostId : postId;
+    const ownerPostId = isFoundPost ? postId : otherPostId;
+
+    const req = {
+      finderPostId,
+      ownerPostId,
+    };
+
+    let existingHandoverId: string | null = null;
+
+    try {
+      const existingHandover = await getC2CHandoverPost(req);
+      existingHandoverId = existingHandover.id;
+    } catch (lookupError) {
+      if (!isNotFoundError(lookupError)) throw lookupError;
+    }
+
+    if (existingHandoverId) {
+      router.push(HANDOVER_ROUTE.detail(existingHandoverId));
       return;
     }
 
-    try {
-      const req = { memberId: matchedAuthorId };
-      const res = await create(req);
-
-      if (!res.data?.conversation?.conversationId) {
-        toast.error("Unable to start conversation. Please try again.");
-        return;
-      }
-
-      router.push(CHAT_ROUTE.message(res.data?.conversation?.conversationId));
-    } catch {
-      toast.error("Failed to start chat. Please try again.");
-    }
-  };
-
-  const handleContactPress = () => {
-    if (isContactDisabled) return;
     router.push(PROFILE_ROUTE.handoverRequest(postId, otherPostId));
   };
 
