@@ -22,6 +22,7 @@ export const MatchingScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { isMatching, similarPosts, error } = useMatchingPost(postId);
+  const navigation = useNavigation();
 
   const insets = useSafeAreaInsets();
 
@@ -48,16 +49,8 @@ export const MatchingScreen = () => {
       </>
     );
 
-  const navigation = useNavigation();
-
   const handleCancel = () => {
-    const parent = navigation.getParent();
-
-    if (parent) {
-      parent.goBack();
-    } else {
-      router.back();
-    }
+    router.replace(POST_ROUTE.index);
   };
 
   if (error)

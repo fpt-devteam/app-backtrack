@@ -49,7 +49,6 @@ const PostCreationStepperLayout = () => {
   const [isCreating, setIsCreating] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(0);
-  const postTitle = usePostCreationStore((state) => state.postTitle);
 
   const draftImages = usePostCreationStore((state) => state.draftImages);
   const uploadImages = usePostCreationStore((state) => state.uploadImages);
@@ -159,6 +158,8 @@ const PostCreationStepperLayout = () => {
       }
 
       resetForm();
+
+      router.navigate(POST_ROUTE.index);
       router.push(POST_ROUTE.matching(postId));
     } catch (e) {
       console.log("Submit failed", e);
