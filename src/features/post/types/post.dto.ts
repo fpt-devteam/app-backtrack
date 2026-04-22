@@ -71,18 +71,9 @@ export type MatchingPostsData = {
 
 export type MatchingPostsResponse = ApiResponse<MatchingPostsData>;
 
-export type AnalyzeImageRequest = {
-  imageUrls: string[];
-  subcategoryCode: PostSubcategoryCode;
-};
-export type AnalyzeImageData = {
-  category: PostCategory,
-  electronic?: ElectronicDetail,
-  card?: CardDetail,
-  personalBelonging?: PersonalBelongingDetail,
-};
 
-export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
+
+
 
 /**
  * 
@@ -150,11 +141,12 @@ export type CardDetail = {
   cardNumberMasked: Nullable<string>;
   holderName: Nullable<string>;
   holderNameNormalized: Nullable<string>;
-  dateOfBirth: Date | null;
-  issueDate: Date | null;
-  expiryDate: Date | null;
+  dateOfBirth: Nullable<string>;
+  issueDate: Nullable<string>;
+  expiryDate: Nullable<string>;
   issuingAuthority: Nullable<string>;
   ocrText: Nullable<string>;
+  aiDescription: Nullable<string>;
 };
 
 /**

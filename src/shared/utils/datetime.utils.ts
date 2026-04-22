@@ -266,3 +266,21 @@ export function getDateLabel(input: Date | string): string {
   }
   return `${weekday}, ${formatted}`;
 }
+
+
+
+import { format } from 'date-fns';
+
+type DateFormatPattern = "yyyy-MM-dd" | "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy/MM/dd";
+
+export const formatDateByPattern = (input: Date | string | number, pattern: DateFormatPattern) => {
+  const result = format(input, pattern);
+  return result;
+}
+
+import { parseISO } from 'date-fns';
+
+export const parseStringToDate = (dateString?: string | null) => {
+  if (!dateString) return null;
+  return parseISO(dateString);
+};

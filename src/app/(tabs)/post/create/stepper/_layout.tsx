@@ -1,6 +1,6 @@
 import { useCreatePost, usePostCreationStore } from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
-import { PostCreateRequest } from "@/src/features/post/types";
+import { CardDetail, PostCreateRequest } from "@/src/features/post/types";
 import {
   AppLink,
   AppLoader,
@@ -134,7 +134,7 @@ const PostCreationStepperLayout = () => {
         draftAnalyzeResult?.data?.personalBelonging?.itemName;
 
       const req: PostCreateRequest = {
-        postTitle: title || "Untitled Post",
+        postTitle: title ?? "Untitled Post",
         postType,
         category,
         subcategoryCode: subCategoryCode,
@@ -180,11 +180,29 @@ const PostCreationStepperLayout = () => {
       console.log("AI Analyze Result:", result);
 
       const electronicDetail = result?.data?.electronic;
-      const cardDetail = result?.data?.card;
       const personalBelongingDetail = result?.data?.personalBelonging;
 
       if (electronicDetail) usePostCreationStore.setState({ electronicDetail });
-      if (cardDetail) usePostCreationStore.setState({ cardDetail });
+
+      const cardDetail = result?.data?.card;
+      if (cardDetail) {
+        const mappedDetail: CardDetail = {
+          itemName: cardDetail.itemName,
+          cardNumberHash: cardDetail.cardNumber,
+          cardNumberMasked: cardDetail.cardNumber,
+          holderName: cardDetail.holderName,
+          holderNameNormalized: cardDetail.holderNameNormalized,
+          dateOfBirth: cardDetail.dateOfBirth,
+          issueDate: cardDetail.issueDate,
+          expiryDate: cardDetail.expiryDate,
+          issuingAuthority: cardDetail.issuingAuthority,
+          ocrText: cardDetail.ocrText,
+          aiDescription: cardDetail.aiDescription,
+        };
+
+        usePostCreationStore.setState({ cardDetail: mappedDetail });
+      }
+
       if (personalBelongingDetail)
         usePostCreationStore.setState({ personalBelongingDetail });
     } catch (error) {
@@ -311,7 +329,7 @@ const PostCreationStepperLayout = () => {
             title="Back"
             onPress={handleBack}
             size="base"
-            disabled={isNextDisabled}
+            disabled={isLoading}
           />
 
           <TouchableOpacity

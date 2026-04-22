@@ -1,80 +1,54 @@
-import { formatDateTime } from "@/src/shared/utils";
 import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { CalendarBlankIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
+import { Nullable } from "../../types";
+import { formatDateByPattern, parseStringToDate } from "../../utils";
 
 type Props = Readonly<{
   label?: string;
-  value: Date | null;
-  onChange: (next: Date | null) => void;
+  value: Nullable<string>;
+  onChange: (next: Nullable<string>) => void;
   placeholder?: string;
   disabled?: boolean;
 }>;
 
 const MIN_DATE = new Date(2000, 0, 1);
 
-const FUTURE_TOLERANCE_MS = 1000;
-
-const validateDateTime = (d: Date) => {
-  const now = new Date();
-
-  if (d.getTime() > now.getTime() + FUTURE_TOLERANCE_MS) {
-    return "Date and time cannot be in the future.";
-  }
-
-  if (d.getTime() < MIN_DATE.getTime()) {
-    return "Date and time cannot be before Jan 1, 2000.";
-  }
-
-  return null;
-};
-
-export const DateTimePickerField = ({
+export const DatePickerField = ({
   value,
   onChange,
-  placeholder = "mm/dd/yyyy, --:--",
+  placeholder = "MM/dd/yyyy",
   disabled = false,
 }: Props) => {
   const [open, setOpen] = useState(false);
-  const [temp, setTemp] = useState<Date>(value ?? new Date());
-  const [error, setError] = useState<string | null>(null);
+
+  const safeDate = useMemo(() => {
+    const parsed = parseStringToDate(value);
+    if (!parsed) return new Date();
+    return parsed;
+  }, [value]);
 
   const displayText = useMemo(() => {
     if (!value) return placeholder;
-    return formatDateTime(value);
-  }, [value, placeholder]);
+    return formatDateByPattern(value, "MM/dd/yyyy");
+  }, [value]);
 
   const openModal = () => {
     if (disabled) return;
-
-    const now = new Date();
-    const initial = value ?? now;
-
-    setTemp(initial.getTime() > now.getTime() ? now : initial);
     setOpen(true);
   };
 
   const onPressClose = () => {
     setOpen(false);
-    setError(null);
   };
 
   const onPressClear = () => {
     onChange(null);
-    onPressClose();
   };
 
   const onPressDone = () => {
-    const err = validateDateTime(temp);
-    if (err) {
-      setError(err);
-      return;
-    }
-
-    setError(null);
-    onChange(temp);
     onPressClose();
   };
 
@@ -83,29 +57,8 @@ export const DateTimePickerField = ({
     picked: Date | undefined,
   ) => {
     if (!picked) return;
-
-    setTemp((prev) => {
-      const next = new Date(prev);
-      next.setFullYear(
-        picked.getFullYear(),
-        picked.getMonth(),
-        picked.getDate(),
-      );
-      return next;
-    });
-  };
-
-  const onChangeTime = (
-    event: DateTimePickerEvent,
-    picked: Date | undefined,
-  ) => {
-    if (!picked) return;
-
-    setTemp((prev) => {
-      const next = new Date(prev);
-      next.setHours(picked.getHours(), picked.getMinutes(), 0, 0);
-      return next;
-    });
+    const dateOnlyStr = formatDateByPattern(picked, "yyyy-MM-dd");
+    onChange(dateOnlyStr);
   };
 
   return (
@@ -134,12 +87,6 @@ export const DateTimePickerField = ({
           className="flex-1 bg-[rgba(15,23,42,0.35)]"
           onPress={onPressClose}
         />
-
-        {error && (
-          <View className="absolute top-[50px] left-5 right-5 bg-red-400 p-2.5 rounded-lg z-[1000]">
-            <Text className="text-white font-bold text-center">{error}</Text>
-          </View>
-        )}
 
         <View className="absolute left-3.5 right-3.5 bottom-4 rounded-[18px] bg-surface border border-[rgba(15,23,42,0.10)] p-3">
           {/* Header */}
@@ -179,39 +126,19 @@ export const DateTimePickerField = ({
 
           {/* Date Picker */}
           <View className="px-1.5 pb-2.5">
-            <Text className="text-[13px] font-extrabold text-textSecondary mb-1.5">
+            <Text className="text-[13px] font-extrabold text-textSecondary mb-xs">
               Date
             </Text>
-            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-surface">
+
+            <View className="rounded-md border border-border overflow-hidden bg-surface">
               <DateTimePicker
-                value={temp}
+                value={safeDate}
                 mode="date"
                 display="spinner"
                 onChange={onChangeDate}
-                style={{ width: "100%", backgroundColor: "#FFFFFF" }}
-                themeVariant="light"
-                textColor="#334155"
+                style={{ width: "100%" }}
                 minimumDate={MIN_DATE}
                 maximumDate={new Date()}
-              />
-            </View>
-          </View>
-
-          {/* Time Picker */}
-          <View className="px-1.5 pb-2.5">
-            <Text className="text-[13px] font-extrabold text-textSecondary mb-1.5">
-              Time
-            </Text>
-            <View className="rounded-[14px] border border-[rgba(15,23,42,0.10)] overflow-hidden bg-surface">
-              <DateTimePicker
-                value={temp}
-                mode="time"
-                display="spinner"
-                is24Hour
-                onChange={onChangeTime}
-                style={{ width: "100%", backgroundColor: "#FFFFFF" }}
-                themeVariant="light"
-                textColor="#334155"
               />
             </View>
           </View>

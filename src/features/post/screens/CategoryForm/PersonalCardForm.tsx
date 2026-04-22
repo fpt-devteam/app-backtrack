@@ -1,6 +1,6 @@
 import { PostFormField } from "@/src/features/post/components";
 import { usePostCreationStore } from "@/src/features/post/hooks";
-import { DateTimePickerField } from "@/src/shared/components";
+import { DatePickerField } from "@/src/shared/components";
 import React from "react";
 import {
   Keyboard,
@@ -20,7 +20,9 @@ const PersonalCardForm = () => {
   const setCardHolderName = usePostCreationStore(
     (state) => state.setCardHolderName,
   );
-  const setCardIssueDate = usePostCreationStore((state) => state.setCardIssueDate);
+  const setCardIssueDate = usePostCreationStore(
+    (state) => state.setCardIssueDate,
+  );
   const setCardExpiryDate = usePostCreationStore(
     (state) => state.setCardExpiryDate,
   );
@@ -79,7 +81,7 @@ const PersonalCardForm = () => {
             <Text className="text-textPrimary font-normal text-lg tracking-tight">
               Issue Date
             </Text>
-            <DateTimePickerField
+            <DatePickerField
               value={cardDetail.issueDate}
               onChange={setCardIssueDate}
               placeholder="mm/dd/yyyy"
@@ -90,7 +92,7 @@ const PersonalCardForm = () => {
             <Text className="text-textPrimary font-normal text-lg tracking-tight">
               Expiry Date
             </Text>
-            <DateTimePickerField
+            <DatePickerField
               value={cardDetail.expiryDate}
               onChange={setCardExpiryDate}
               placeholder="mm/dd/yyyy"

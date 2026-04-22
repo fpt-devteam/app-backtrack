@@ -1,6 +1,6 @@
 import { PostFormField } from "@/src/features/post/components";
 import { usePostCreationStore } from "@/src/features/post/hooks";
-import { DateTimePickerField } from "@/src/shared/components";
+import { DatePickerField } from "@/src/shared/components";
 import React from "react";
 import {
   Keyboard,
@@ -20,10 +20,10 @@ const StudentCardForm = () => {
   const setCardHolderName = usePostCreationStore(
     (state) => state.setCardHolderName,
   );
-  const setCardDateOfBirth = usePostCreationStore(
-    (state) => state.setCardDateOfBirth,
+
+  const setCardIssueDate = usePostCreationStore(
+    (state) => state.setCardIssueDate,
   );
-  const setCardIssueDate = usePostCreationStore((state) => state.setCardIssueDate);
   const setCardExpiryDate = usePostCreationStore(
     (state) => state.setCardExpiryDate,
   );
@@ -80,23 +80,11 @@ const StudentCardForm = () => {
 
           <View className="gap-sm">
             <Text className="text-textPrimary font-normal text-lg tracking-tight">
-              Date of Birth
-            </Text>
-            <DateTimePickerField
-              value={cardDetail.dateOfBirth}
-              onChange={setCardDateOfBirth}
-              placeholder="mm/dd/yyyy"
-            />
-          </View>
-
-          <View className="gap-sm">
-            <Text className="text-textPrimary font-normal text-lg tracking-tight">
               Issue Date
             </Text>
-            <DateTimePickerField
+            <DatePickerField
               value={cardDetail.issueDate}
               onChange={setCardIssueDate}
-              placeholder="mm/dd/yyyy"
             />
           </View>
 
@@ -104,10 +92,9 @@ const StudentCardForm = () => {
             <Text className="text-textPrimary font-normal text-lg tracking-tight">
               Expiry Date
             </Text>
-            <DateTimePickerField
+            <DatePickerField
               value={cardDetail.expiryDate}
               onChange={setCardExpiryDate}
-              placeholder="mm/dd/yyyy"
             />
           </View>
         </ScrollView>

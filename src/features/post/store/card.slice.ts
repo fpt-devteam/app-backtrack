@@ -13,6 +13,7 @@ const DEFAULT_CARD_DETAIL: CardDetail = {
   expiryDate: null,
   issuingAuthority: null,
   ocrText: null,
+  aiDescription: null,
 };
 
 export type CardSlice = {
@@ -25,11 +26,12 @@ export type CardSlice = {
   setCardHolderNameNormalized: (
     holderNameNormalized: Nullable<string>,
   ) => void;
-  setCardDateOfBirth: (dateOfBirth: Date | null) => void;
-  setCardIssueDate: (issueDate: Date | null) => void;
-  setCardExpiryDate: (expiryDate: Date | null) => void;
+  setCardDateOfBirth: (dateOfBirth: Nullable<string>) => void;
+  setCardIssueDate: (issueDate: Nullable<string>) => void;
+  setCardExpiryDate: (expiryDate: Nullable<string>) => void;
   setCardIssuingAuthority: (issuingAuthority: Nullable<string>) => void;
   setCardOcrText: (ocrText: Nullable<string>) => void;
+  setCardAiDescription: (aiDescription: Nullable<string>) => void;
   resetCardDetail: () => void;
 };
 
@@ -37,6 +39,14 @@ export const createCardSlice: StateCreator<CardSlice> = (set) => ({
   cardDetail: DEFAULT_CARD_DETAIL,
 
   setCardDetail: (detail) => set({ cardDetail: detail }),
+
+  setCardAiDescription: (aiDescription) =>
+    set((state) => ({
+      cardDetail: {
+        ...state.cardDetail,
+        aiDescription,
+      },
+    })),
 
   setCardItemName: (itemName) =>
     set((state) => ({
