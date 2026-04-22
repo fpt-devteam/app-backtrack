@@ -1,4 +1,5 @@
 import { UserSubscriptionPlan } from "@/src/features/qr/types";
+import { colors } from "@/src/shared/theme/colors";
 import * as Haptics from "expo-haptics";
 import { SealCheckIcon } from "phosphor-react-native";
 import React, { useCallback } from "react";
@@ -24,7 +25,7 @@ export function SubscriptionPlanPressableCard({
     <Pressable
       onPress={handlePress}
       className={`relative rounded-2xl border px-5 py-4 ${
-        selected ? "border-primary bg-sky-50" : "border-divider bg-surface"
+        selected ? "border-primary bg-accent" : "border-divider bg-surface"
       }`}
     >
       <View className="flex-row items-start justify-between gap-3">
@@ -55,7 +56,11 @@ export function SubscriptionPlanPressableCard({
               key={`${plan.id}-feature-${index}`}
               className="flex-row items-center gap-2"
             >
-              <SealCheckIcon size={16} />
+              <SealCheckIcon
+                size={16}
+                color={selected ? colors.primary : colors.hof[400]}
+                weight="thin"
+              />
               <Text className="flex-1 text-sm text-textSecondary">{feature}</Text>
             </View>
           ))}

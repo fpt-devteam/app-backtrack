@@ -6,7 +6,6 @@ import {
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
 import {
-  CheckCircleIcon,
   EnvelopeSimpleIcon,
   MapPinIcon,
   MegaphoneSimpleIcon,
@@ -16,15 +15,24 @@ import {
   XIcon,
 } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { ViewStyle } from "react-native";
+
+const CARD_SHADOW: ViewStyle = {
+  shadowColor: colors.black,
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
+};
 
 const SafetyBanner = ({ onDismiss }: { onDismiss: () => void }) => (
-  <View className="flex-row items-start gap-3 bg-sky-50 border border-sky-100 rounded-2xl px-4 py-3">
+  <View className="flex-row items-start gap-3 bg-canvas border border-divider rounded-xl px-4 py-3">
     <ShieldCheckIcon
       size={20}
       color={colors.primary}
-      weight="fill"
+      weight="thin"
       style={{ marginTop: 1 }}
     />
     <View className="flex-1">
@@ -35,7 +43,7 @@ const SafetyBanner = ({ onDismiss }: { onDismiss: () => void }) => (
       </Text>
     </View>
     <Pressable onPress={onDismiss} hitSlop={10}>
-      <XIcon size={16} color={colors.slate[400]} weight="bold" />
+      <XIcon size={16} color={colors.hof[400]} weight="bold" />
     </Pressable>
   </View>
 );
@@ -67,136 +75,115 @@ const QRProfileScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-surface">
       {/* Header */}
-      <View className="flex-row items-center px-4 py-3">
+      <View className="flex-row items-center px-lg py-md">
         <Pressable onPress={() => router.back()} hitSlop={10}>
-          <XIcon size={22} color={colors.black} weight="bold" />
+          <XIcon size={22} color={colors.hof[900]} weight="bold" />
         </Pressable>
-        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
+        <Text className="flex-1 text-center text-base font-semibold text-textPrimary">
           Owner Profile
         </Text>
-        {/* Spacer to balance the close button */}
         <View style={{ width: 22 }} />
       </View>
 
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingBottom: 32,
-          gap: 24,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
+      <View className="flex-1 px-lg pt-sm pb-lg gap-md">
         {/* Safety Banner */}
         {showSafetyBanner && (
           <SafetyBanner onDismiss={() => setShowSafetyBanner(false)} />
         )}
 
-        {/* Profile Section */}
-        <View className="items-center gap-2 mt-2">
-          {/* Avatar with verification badge */}
+        {/* Profile Card — horizontal row */}
+        <View
+          className="bg-surface rounded-xl border border-divider flex-row items-center gap-md px-lg py-md"
+          style={CARD_SHADOW}
+        >
           <View>
             {user?.avatarUrl ? (
               <Image
                 source={{ uri: user.avatarUrl }}
-                className="w-24 h-24 rounded-full"
+                className="w-16 h-16 rounded-full"
               />
             ) : (
-              <View className="w-24 h-24 rounded-full bg-slate-200 items-center justify-center">
-                <Text className="text-3xl font-bold text-slate-400">
+              <View className="w-16 h-16 rounded-full bg-canvas items-center justify-center">
+                <Text className="text-2xl font-bold text-textSecondary">
                   {user?.displayName?.[0]?.toUpperCase() ?? "?"}
                 </Text>
               </View>
             )}
             <View className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5">
-              <SealCheckIcon size={24} color={colors.primary} weight="fill" />
+              <SealCheckIcon size={20} color={colors.primary} weight="thin" />
             </View>
           </View>
 
-          {/* Name & member since */}
-          <View className="items-center gap-1 mt-2">
-            <Text className="text-xl font-bold text-textPrimary">
+          <View className="flex-1 gap-1">
+            <Text className="text-base font-semibold text-textPrimary">
               {user?.displayName ?? "Unknown"}
             </Text>
-            <Text className="text-sm text-slate-400">
+            <Text className="text-xs text-textSecondary">
               Member since {memberSince}
             </Text>
-          </View>
-
-          {/* Verified Owner pill */}
-          <View className="flex-row items-center gap-1.5 bg-emerald-50 border border-emerald-100 rounded-full px-3 py-1 mt-1">
-            <CheckCircleIcon
-              size={14}
-              color={colors.status.success}
-              weight="fill"
-            />
-            <Text className="text-xs font-semibold text-emerald-600">
-              Verified Owner
-            </Text>
-          </View>
-
-          {/* Contact info */}
-          <View className="w-full mt-2 bg-canvas rounded-2xl border border-divider overflow-hidden">
-            <View className="flex-row items-center gap-3 px-4 py-3">
-              <View className="w-8 h-8 rounded-full bg-sky-100 items-center justify-center">
-                <EnvelopeSimpleIcon
-                  size={15}
-                  color={colors.primary}
-                  weight="fill"
-                />
-              </View>
-              <View className="flex-1">
-                <Text className="text-xs text-slate-400 mb-0.5">Email</Text>
-                <Text className="text-sm font-medium text-slate-700">
-                  {user?.email ?? "—"}
-                </Text>
-              </View>
+            <View className="flex-row items-center gap-1.5 rounded-full px-2.5 py-1 bg-[#E6F4EA] self-start mt-1">
+              <SealCheckIcon size={12} color={colors.status.success} weight="thin" />
+              <Text className="text-xs font-semibold text-[#008A05]">
+                Verified Owner
+              </Text>
             </View>
-            <View className="h-px bg-slate-100 mx-4" />
-            <View className="flex-row items-center gap-3 px-4 py-3">
-              <View className="w-8 h-8 rounded-full bg-sky-100 items-center justify-center">
-                <PhoneIcon size={15} color={colors.primary} weight="fill" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-xs text-slate-400 mb-0.5">Phone</Text>
-                <Text className="text-sm font-medium text-slate-700">
-                  {phone}
-                </Text>
-              </View>
+          </View>
+        </View>
+
+        {/* Contact Info Card */}
+        <View
+          className="bg-surface rounded-xl border border-divider"
+          style={CARD_SHADOW}
+        >
+          <View className="flex-row items-center gap-3 px-lg py-md">
+            <View className="w-9 h-9 rounded-full bg-accent items-center justify-center">
+              <EnvelopeSimpleIcon size={16} color={colors.primary} weight="thin" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-xs text-textSecondary mb-0.5">Email</Text>
+              <Text className="text-sm font-medium text-textPrimary">
+                {user?.email ?? "—"}
+              </Text>
+            </View>
+          </View>
+          <View className="h-px bg-divider mx-lg" />
+          <View className="flex-row items-center gap-3 px-lg py-md">
+            <View className="w-9 h-9 rounded-full bg-accent items-center justify-center">
+              <PhoneIcon size={16} color={colors.primary} weight="thin" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-xs text-textSecondary mb-0.5">Phone</Text>
+              <Text className="text-sm font-medium text-textPrimary">
+                {phone}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Owner's Note Card */}
-        <View className="bg-surface rounded-2xl border border-divider flex-row overflow-hidden">
-          {/* Left accent bar */}
-          <View className="w-1 bg-primary" />
-          <View className="flex-1 px-4 py-4 gap-3">
-            {/* Title */}
-            <View className="flex-row items-center gap-2">
-              <MegaphoneSimpleIcon
-                size={18}
-                color={colors.primary}
-                weight="fill"
-              />
-              <Text className="text-sm font-bold text-textPrimary">
-                Owner&apos;s Note
-              </Text>
+        <View
+          className="bg-surface rounded-xl border border-divider"
+          style={CARD_SHADOW}
+        >
+          <View className="flex-row items-center gap-3 px-lg py-md">
+            <View className="w-9 h-9 rounded-full bg-accent items-center justify-center">
+              <MegaphoneSimpleIcon size={16} color={colors.primary} weight="thin" />
             </View>
-            {/* Note text */}
-            <Text className="text-sm text-textSecondary leading-6">
-              {ownerNote}
+            <Text className="text-sm font-semibold text-textPrimary">
+              Owner&apos;s Note
             </Text>
-            {/* Drop-off location chip */}
-            <View className="self-start flex-row items-center gap-1.5 bg-slate-100 rounded-full px-3 py-1.5">
-              <MapPinIcon size={13} color={colors.slate[500]} weight="fill" />
-              <Text className="text-xs font-medium text-textSecondary">
-                {dropOffLocation}
-              </Text>
-            </View>
+          </View>
+          <View className="h-px bg-divider mx-lg" />
+          <Text className="text-sm text-textSecondary leading-6 px-lg py-md">
+            {ownerNote}
+          </Text>
+          <View className="h-px bg-divider mx-lg" />
+          <View className="flex-row items-center gap-3 px-lg py-md">
+            <MapPinIcon size={16} color={colors.hof[500]} weight="thin" />
+            <Text className="text-sm text-textSecondary">{dropOffLocation}</Text>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };
