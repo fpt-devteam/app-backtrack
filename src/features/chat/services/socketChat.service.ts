@@ -66,8 +66,6 @@ export class SocketChatService {
   }
 
   joinConversation(conversationId: string): void {
-    console.log("herhe")
-    
     if (!this.socket?.connected) {
       console.warn("Socket not connected, cannot join conversation");
       return;

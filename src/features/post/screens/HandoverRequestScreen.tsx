@@ -17,6 +17,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils/datetime.utils";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -50,12 +51,15 @@ type Params = {
 export default function HandoverRequestScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAppUser();
+
   const { postId, otherPostId } = useLocalSearchParams<Params>();
+
   const {
     isLoading,
     data: post,
     error: postError,
-  } = useGetPostById({ postId });
+  } = useGetPostById({ postId: otherPostId });
+
   const { create: createConversation, isCreating: isCreatingConversation } =
     useCreateDirectConversation();
   const { sendMessage, isSendingMessage } = useSendMessage();
@@ -78,23 +82,14 @@ export default function HandoverRequestScreen() {
       const isFoundPost = post.postType === PostType.Found;
 
       const req: CreateC2CReturnReportRequest = {
-        finderPostId: isFoundPost ? post.id : otherPostId,
-        ownerPostId: isFoundPost ? otherPostId : post.id,
+        finderPostId: !isFoundPost ? postId : otherPostId,
+        ownerPostId: !isFoundPost ? otherPostId : postId,
       };
 
-      if (!hasCreatedReturnReport) {
-        const res = await createC2CReturnReport(req);
-        setHasCreatedReturnReport(true);
+      const res = await createC2CReturnReport(req);
+      setHasCreatedReturnReport(true);
 
-        console.log("handover: ", res);
-        // if (res) {
-        //   router.dismissAll();
-        //   router.navigate(HANDOVER_ROUTE.detail(res.id));
-        //   toast.success("Handover request sent successfully!");
-        // } else {
-        //   toast.error("Failed to create handover request.");
-        // }
-      }
+      console.log("handover: ", res);
 
       console.log("UserId", user.id);
       console.log("PartnerId: ", post.author.id);
@@ -110,6 +105,13 @@ export default function HandoverRequestScreen() {
         conversationId,
         request: { conversationId, type: "text", content: trimmedMessage },
       });
+
+      if (res) {
+        router.push(HANDOVER_ROUTE.detail(res.id));
+        toast.success("Handover request sent successfully!");
+      } else {
+        toast.error("Failed to create handover request.");
+      }
 
       toast.success("Send handover request successfully!");
     } catch {
