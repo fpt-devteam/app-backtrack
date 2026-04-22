@@ -39,7 +39,7 @@ const IOSGlassToast = ({
   const IconComponent = config.Icon;
 
   return (
-    <BlurView intensity={80} tint="light" style={styles.container}>
+    <BlurView intensity={100} tint="prominent" style={styles.container}>
       <View style={styles.iconContainer}>
         <IconComponent size={26} color={config.color} weight="regular" />
       </View>

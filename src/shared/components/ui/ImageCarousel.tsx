@@ -8,12 +8,14 @@ type ImageCarouselProps = {
   imageUrls: string[];
   height: number;
   width: number;
+  blurRadius?: number;
 };
 
 export const ImageCarousel = ({
   imageUrls,
   height,
   width,
+  blurRadius = 0,
 }: ImageCarouselProps) => {
   if (imageUrls.length === 0) {
     return (
@@ -39,6 +41,7 @@ export const ImageCarousel = ({
             source={{ uri: item }}
             style={{ width, height }}
             resizeMode="cover"
+            blurRadius={blurRadius}
           />
         )}
       />

@@ -1,6 +1,6 @@
 import { useLocationSelectionStore } from "@/src/features/map/store";
 import { PostCard } from "@/src/features/post/components";
-import { usePosts } from "@/src/features/post/hooks";
+import { useMatchedPostIds, usePosts } from "@/src/features/post/hooks";
 import type { PostFeedSection } from "@/src/features/post/hooks/usePosts";
 import type {
   Post,
@@ -212,10 +212,18 @@ const ExploreHeader = ({
   );
 };
 
-const ExploreSectionRow = ({ section }: { section: PostFeedSection }) => {
+const ExploreSectionRow = ({
+  section,
+  matchedPostIds,
+}: {
+  section: PostFeedSection;
+  matchedPostIds: Set<string>;
+}) => {
   const renderCard = useCallback(
-    ({ item }: { item: Post }) => <PostCard item={item} />,
-    [],
+    ({ item }: { item: Post }) => (
+      <PostCard item={item} isBlurred={!matchedPostIds.has(item.id)} />
+    ),
+    [matchedPostIds],
   );
 
   return (
@@ -266,11 +274,13 @@ export const PostScreen = () => {
     filters: feedFilters,
   });
 
+  const { matchedPostIds } = useMatchedPostIds();
+
   const renderSection = useCallback(
     ({ item }: { item: PostFeedSection }) => (
-      <ExploreSectionRow section={item} />
+      <ExploreSectionRow section={item} matchedPostIds={matchedPostIds} />
     ),
-    [],
+    [matchedPostIds],
   );
 
   const listEmpty = useMemo(() => {

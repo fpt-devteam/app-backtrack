@@ -4,7 +4,7 @@ import {
   PostCategoryBadge,
   PostTypeIconBadge,
 } from "@/src/features/post/components";
-import { useMatchingPost } from "@/src/features/post/hooks";
+import { useMatchedPostIds, useMatchingPost } from "@/src/features/post/hooks";
 import { AppUserAvatar, ImageCarousel } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
@@ -113,6 +113,8 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
 
   const { user } = useAppUser();
   const { similarPosts } = useMatchingPost(post.id);
+  const { matchedPostIds } = useMatchedPostIds();
+  const isBlurred = !matchedPostIds.has(post.id);
 
   const { create: createConversation, isCreating } =
     useCreateDirectConversation();
@@ -221,6 +223,7 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
             imageUrls={postImageUrls}
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
+            blurRadius={isBlurred ? 20 : 0}
           />
         </Animated.View>
 
