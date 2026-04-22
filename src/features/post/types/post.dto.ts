@@ -6,10 +6,10 @@ import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
-  MyPost,
   PostCategory,
   PostSubcategory,
   PostSubcategoryCode,
+  UserPost,
   type Post,
   type PostSearchOptions,
   type PostSuggestion,
@@ -59,7 +59,7 @@ export type PostGetByIdRequest = {
   postId: string;
 };
 
-export type PostGetByIdResponse = ApiResponse<Post>;
+export type PostGetByIdResponse = ApiResponse<UserPost>;
 
 export type MatchingPostsRequest = {
   postId: string;
@@ -89,7 +89,7 @@ export type AnalyzeImageResponse = ApiResponse<AnalyzeImageData>;
  */
 export type GetAllMyPostResponse = ApiResponse<{
   total: number;
-  items: MyPost[];
+  items: UserPost[];
 }>;
 
 // Post Matching Status Check

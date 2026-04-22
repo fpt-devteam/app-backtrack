@@ -38,22 +38,7 @@ export const ITEM_CATEGORIES = {
 
 export type ItemCategory = typeof ITEM_CATEGORIES[keyof typeof ITEM_CATEGORIES]
 
-/**
- * PostItem - This type defines the structure of an item that can be associated with a post.
- * It includes details such as the item's name, category, color, brand, condition, material, size, distinctive marks, and additional details.
- */
-export type PostItem = {
-  itemName: string
-  category: ItemCategory
-  color: Nullable<string>
-  brand: Nullable<string>
-  condition: Nullable<string>
-  material: Nullable<string>
-  size: Nullable<string>
-  distinctiveMarks: Nullable<string>
-  additionalDetails: Nullable<string>
-}
-/**
+/*
  */
 export const POST_STATUS = {
   ACTIVE: "Active",
@@ -66,20 +51,30 @@ export type PostStatus = typeof POST_STATUS[keyof typeof POST_STATUS]
 
 /**
  */
-export type MyPost = {
+export type UserPost = {
   id: string
   postType: PostType
-  author: Pick<AppUser, "id" | "displayName" | "avatarUrl">
   status: PostStatus
   category: PostCategory
-  subcategoryId: string
   postTitle: Nullable<string>
+  author: AppUser
+  subcategoryId: string
   imageUrls: string[]
-  eventTime: Date
-  createdAt: Date
+
+  // 
   location: LatLng
   externalPlaceId: string
   displayAddress: string
+
+  // 
+  personalBelongingDetail?: Nullable<SimilarPostPersonalBelongingDetail>
+  cardDetail?: Nullable<SimilarPostCardDetail>
+  electronicDetail?: Nullable<SimilarPostElectronicDetail>
+  otherDetail?: Nullable<SimilarPostOtherDetail>
+
+  // 
+  eventTime: Date
+  createdAt: Date
 }
 
 /**
@@ -89,7 +84,7 @@ export type Post = {
   id: string
   postType: PostType
   postTitle: Nullable<string>
-  item: PostItem
+  status: PostStatus
   category: PostCategory
   subcategoryId: string
   imageUrls: string[]

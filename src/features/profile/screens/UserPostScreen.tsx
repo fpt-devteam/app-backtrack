@@ -2,8 +2,8 @@ import { MyPostCard } from "@/src/features/post/components";
 import { useGetAllMyPost } from "@/src/features/post/hooks";
 import {
   POST_STATUS,
-  type MyPost,
   type PostStatus,
+  type UserPost,
 } from "@/src/features/post/types/post.type";
 import { AppBackButton, AppChipsRow, AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
@@ -55,7 +55,7 @@ const UserPostScreen = () => {
   const [selectedTab, setSelectedTab] = useState<UserPostFilter>("all");
   const { data: posts, isLoading, error, refetch } = useGetAllMyPost();
 
-  const filteredPosts = useMemo<MyPost[]>(
+  const filteredPosts = useMemo<UserPost[]>(
     () =>
       selectedTab === "all"
         ? posts
@@ -78,9 +78,7 @@ const UserPostScreen = () => {
           paddingVertical: metrics.spacing.md,
           paddingBottom: Math.max(inset.bottom, metrics.spacing.md),
         }}
-        ItemSeparatorComponent={() => (
-          <View className="my-md border-b border-border" />
-        )}
+        ItemSeparatorComponent={() => <View className="mt-md" />}
         renderItem={({ item }) => <MyPostCard item={item} />}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center">
@@ -134,7 +132,9 @@ const UserPostScreen = () => {
       <Stack.Screen
         options={{
           headerTitle: "What You've Posted",
-          headerLeft: () => <AppBackButton />,
+          headerLeft: () => (
+            <AppBackButton type="arrowLeftIcon" showBackground={false} />
+          ),
           headerTitleStyle: {
             fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],

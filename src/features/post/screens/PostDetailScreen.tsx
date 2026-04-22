@@ -1,21 +1,16 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import { UserPlaceMarker } from "@/src/features/map/components";
-import { PostTypeBadge, SimilarPostCard } from "@/src/features/post/components";
-import { CATEGORY_REGISTRY } from "@/src/features/post/constants";
-import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
-import { PostItem, PostType } from "@/src/features/post/types";
 import {
-  AppInlineError,
-  AppLoader,
-  AppUserAvatar,
-  ImageCarousel,
-} from "@/src/shared/components";
+  PostCategoryBadge,
+  PostTypeIconBadge,
+  SimilarPostCard,
+} from "@/src/features/post/components";
+import { useMatchingPost } from "@/src/features/post/hooks";
+import { AppUserAvatar, ImageCarousel } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE, POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { Nullable } from "@/src/shared/types";
-import { formatIsoDate, getSafeText, toTitleCase } from "@/src/shared/utils";
+import { formatIsoDate, toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { BlurView } from "expo-blur";
 import { router, Stack } from "expo-router";
@@ -24,22 +19,13 @@ import {
   ArrowLeftIcon,
   ChatCircleDotsIcon,
   ClockIcon,
-  CubeIcon,
-  DotsThreeCircleIcon,
-  EnvelopeIcon,
   ExportIcon,
   IconProps,
   MapPinIcon,
-  PaletteIcon,
-  PhoneIcon,
-  RulerIcon,
   SealCheckIcon,
-  ShoppingBagIcon,
-  TagIcon,
 } from "phosphor-react-native";
 import React, { ComponentType, useCallback, useMemo, useState } from "react";
 import {
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -47,7 +33,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import Animated, {
   interpolate,
   useAnimatedScrollHandler,
@@ -55,41 +41,9 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { UserPost } from "../types";
 
-/**
- * Generates Airbnb-style descriptions (approx. 10-15 words).
- * Balanced between minimalist snippets and long narratives.
- */
-export const generateRandomDescription = (data: PostItem): string => {
-  const {
-    itemName,
-    category,
-    color,
-    brand,
-    condition,
-    material,
-    size,
-    distinctiveMarks,
-  } = data;
-
-  const val = (field: Nullable<string>, fallback = "") => field ?? fallback;
-
-  const templates = [
-    () =>
-      `A ${val(size).toLowerCase()} ${val(brand)} ${val(itemName)} in ${val(color).toLowerCase()}, featuring a durable ${val(material).toLowerCase()} construction and ${val(condition).toLowerCase()} finish.`,
-
-    () =>
-      `This ${val(color).toLowerCase()} ${val(brand)} ${category.toLowerCase()} is easily identified by its ${val(size).toLowerCase()} frame and ${val(distinctiveMarks, "unique design details")}.`,
-
-    () =>
-      `${val(condition)} ${val(brand)} ${val(itemName)} made of ${val(material).toLowerCase()}, characterized by its ${val(color).toLowerCase()} palette and ${val(size).toLowerCase()} scale.`,
-  ];
-
-  const randomIndex = Math.floor(Math.random() * templates.length);
-  return templates[randomIndex]();
-};
-
-const AirbnbHeaderIcon = ({
+const HeaderIcon = ({
   icon: Icon,
   onPress,
 }: {
@@ -97,36 +51,23 @@ const AirbnbHeaderIcon = ({
   onPress: () => void;
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} className="">
-      <Animated.View
-        style={[
-          {
-            width: 34,
-            height: 34,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(255,255,255,0.2)",
-            overflow: "hidden",
-            borderRadius: 17,
-            borderColor: "rgba(0,0,0,0.1)",
-          },
-        ]}
-      >
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <Animated.View className="w-12 aspect-square rounded-full items-center justify-center overflow-hidden">
         <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
-        <Icon size={18} color={colors.text.primary} weight="bold" />
+        <Icon size={20} color={colors.text.primary} weight="bold" />
       </Animated.View>
     </TouchableOpacity>
   );
 };
 
 type PostDetailScreenProps = {
-  postId: string;
+  post: UserPost;
 };
 
-export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
+export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
   const insets = useSafeAreaInsets();
-  const { height, width } = useWindowDimensions();
   const headerHeight = useHeaderHeight();
+  const { height, width } = useWindowDimensions();
 
   const CAROUSEL_HEIGHT = height * 0.5;
   const CAROUSEL_WIDTH = width;
@@ -172,26 +113,22 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     return { opacity };
   });
 
-  const { isLoading, data: post } = useGetPostById({ postId });
   const { user } = useAppUser();
-  const { similarPosts } = useMatchingPost(postId);
+  const { similarPosts } = useMatchingPost(post.id);
 
   const { create: createConversation, isCreating } =
     useCreateDirectConversation();
 
   const [isDismissing, setIsDismissing] = useState(false);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [descriptionIsTruncatable, setDescriptionIsTruncatable] =
-    useState(false);
 
   const handleStartChat = useCallback(async () => {
-    if (!post?.author?.id) return;
+    if (!post) return;
+    const authorId = post.author.id;
 
     try {
-      const response = await createConversation({
-        memberId: post.author.id,
-      });
+      const response = await createConversation({ memberId: authorId });
       const conversationId = response.data?.conversation?.conversationId;
+
       if (conversationId) {
         setIsDismissing(true);
 
@@ -205,20 +142,13 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     } catch {
       toast.error("Failed to start chat. Please try again.");
     }
-  }, [post?.author?.id, createConversation]);
-
-  const handleShowHostProfile = useCallback(() => {
-    if (!post?.author?.id) return;
-    router.push(SHARED_ROUTE.publicProfile(post.author.id));
   }, [post]);
 
   const {
     postImageUrls,
-    displayDescription,
     displayAddress,
     displayName,
     displayEventTime,
-    itemDetailRows,
     isMyPost,
   } = useMemo(() => {
     if (!post) {
@@ -233,38 +163,56 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
       };
     }
 
-    const { item, author } = post;
+    const { author } = post;
 
     return {
       postImageUrls: post.imageUrls ?? [],
-      displayDescription: generateRandomDescription(item),
-
       displayAddress: toTitleCase(
         post.displayAddress || "Location not specified",
       ),
       displayName: author?.displayName || "Anonymous",
       displayEventTime:
         formatIsoDate(post.eventTime) || "Event time not specified",
-      itemDetailRows: [
-        { label: "Category", value: toTitleCase(item.category) },
-        { label: "Brand", value: getSafeText(item.brand) },
-        { label: "Color", value: getSafeText(item.color) },
-        { label: "Condition", value: getSafeText(item.condition) },
-        { label: "Material", value: getSafeText(item.material) },
-        { label: "Size", value: getSafeText(item.size) },
-      ],
       hasEmail: !!author?.showEmail && !!author?.email,
       hasPhone: !!author?.showPhone && !!author?.phone,
       isMyPost: author.id === user?.id,
     };
   }, [post, user]);
 
-  if (!postId) return <AppInlineError message="Failed to load post details." />;
+  const displayPostTitle = useMemo(() => {
+    return post?.postTitle || "Untitled item";
+  }, [post]);
+
+  const formatEventDate = (dateStringOrObject: string | Date | undefined) => {
+    if (!dateStringOrObject) {
+      return { formattedDate: "Unknown Date", formattedTime: "Unknown Time" };
+    }
+
+    const date = new Date(dateStringOrObject);
+
+    if (isNaN(date.getTime())) {
+      return { formattedDate: "Invalid Date", formattedTime: "Invalid Time" };
+    }
+
+    const formattedDate = date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    const formattedTime = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return { formattedDate, formattedTime };
+  };
+
+  const { formattedDate, formattedTime } = formatEventDate(post.eventTime);
 
   const renderBody = () => {
-    const isScreenLoading = isLoading || !post;
-    if (isScreenLoading) return <AppLoader />;
-
     return (
       <>
         {/* Carousel */}
@@ -283,129 +231,54 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           className="flex-1 bg-surface rounded-t-4xl z-10 gap-xl"
           style={{ marginTop: -insets.top }}
         >
-          {/* Title Block */}
+          {/* Post Title */}
           <MotiView
             from={{ opacity: 0, translateY: 8 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 280, delay: 80 }}
           >
             <View className="pt-xl gap-xs px-lg">
-              <Text
-                className="text-textPrimary font-semibold text-2xl"
-                numberOfLines={2}
-              >
-                {post.item.itemName}
+              <Text className="text-textPrimary font-normal text-2xl">
+                {displayPostTitle}
               </Text>
 
-              {/* Vibe Tags */}
-              <View className="mt-xs">
-                <VibeTagsRow
-                  postType={post.postType}
-                  category={post.item.category}
-                  status={post.postType}
-                />
+              {/* Badges */}
+              <View className="flex-row gap-xs items-center justify-start">
+                <PostTypeIconBadge status={post.postType} size="xs" />
+                <PostCategoryBadge category={post.category} />
               </View>
             </View>
           </MotiView>
 
-          {/* Divider */}
           <View className="border-t border-muted mx-lg" />
 
-          {/* About this item */}
+          {/* When it's happening */}
           <MotiView
             from={{ opacity: 0, translateY: 8 }}
             animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 240, delay: 140 }}
+            transition={{ type: "timing", duration: 240, delay: 260 }}
           >
             <View className="gap-sm px-lg">
-              <Text className="text-lg font-semibold text-textPrimary">
-                About this item
+              <Text className="text-lg font-normal text-textPrimary">
+                When it&apos;s happening
               </Text>
 
-              {/* Hidden measurer — same styles, no line cap — detects true line count */}
-              <View
-                pointerEvents="none"
-                style={{ position: "absolute", width: "100%", opacity: 0 }}
-              >
-                <Text
-                  className="text-md text-textSecondary leading-6 font-thin"
-                  onTextLayout={(e) =>
-                    setDescriptionIsTruncatable(e.nativeEvent.lines.length > 3)
-                  }
-                >
-                  {displayDescription}
-                </Text>
-              </View>
+              <View className="gap-xs mb-sm">
+                <View className="flex-row gap-xs">
+                  <ClockIcon
+                    size={14}
+                    color={colors.mutedForeground}
+                    weight="regular"
+                  />
 
-              <Text
-                className="text-md text-textSecondary leading-6"
-                numberOfLines={isDescriptionExpanded ? undefined : 3}
-              >
-                {displayDescription}
-              </Text>
-
-              {descriptionIsTruncatable && (
-                <TouchableOpacity
-                  onPress={() => setIsDescriptionExpanded((v) => !v)}
-                  className="self-start rounded-sm px-sm py-xs bg-canvas"
-                >
-                  <Text className="text-base text-textPrimary font-medium">
-                    {isDescriptionExpanded ? "Show less" : "Show more"}
+                  <Text
+                    className="flex-1 text-sm text-textSecondary"
+                    numberOfLines={2}
+                  >
+                    {formattedTime}, {formattedDate}
                   </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </MotiView>
-
-          {/* Divider */}
-          <View className="border-t border-muted mx-lg" />
-
-          {/* Item Details */}
-          <MotiView
-            from={{ opacity: 0, translateY: 8 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 240, delay: 200 }}
-          >
-            <View className="gap-sm px-lg">
-              <Text className="text-lg font-semibold text-textPrimary">
-                Item Details
-              </Text>
-
-              <FeatureBulletRow
-                icon={TagIcon}
-                label="Category"
-                value={itemDetailRows[0]?.value ?? "—"}
-              />
-              <View className="h-px bg-divider" />
-              <FeatureBulletRow
-                icon={ShoppingBagIcon}
-                label="Brand"
-                value={itemDetailRows[1]?.value ?? "—"}
-              />
-              <View className="h-px bg-divider" />
-              <FeatureBulletRow
-                icon={PaletteIcon}
-                label="Color"
-                value={itemDetailRows[2]?.value ?? "—"}
-              />
-              <View className="h-px bg-divider" />
-              <FeatureBulletRow
-                icon={SealCheckIcon}
-                label="Condition"
-                value={itemDetailRows[3]?.value ?? "—"}
-              />
-              <View className="h-px bg-divider" />
-              <FeatureBulletRow
-                icon={CubeIcon}
-                label="Material"
-                value={itemDetailRows[4]?.value ?? "—"}
-              />
-              <View className="h-px bg-divider" />
-              <FeatureBulletRow
-                icon={RulerIcon}
-                label="Size"
-                value={itemDetailRows[5]?.value ?? "—"}
-              />
+                </View>
+              </View>
             </View>
           </MotiView>
 
@@ -419,7 +292,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
             transition={{ type: "timing", duration: 240, delay: 260 }}
           >
             <View className="gap-sm px-lg">
-              <Text className="text-lg font-semibold text-textPrimary">
+              <Text className="text-lg font-normal text-textPrimary">
                 Where it&apos;s happening
               </Text>
 
@@ -442,7 +315,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
 
               <View
                 className="overflow-hidden rounded-xl"
-                style={{ height: 180 }}
+                style={{ height: 280 }}
               >
                 <MapView
                   style={{ flex: 1 }}
@@ -452,17 +325,12 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                   }}
-                  provider="google"
                   scrollEnabled={false}
                   zoomEnabled={false}
                   pitchEnabled={false}
                   rotateEnabled={false}
                 >
-                  <UserPlaceMarker
-                    coordinate={post.location}
-                    disabled={false}
-                    onPress={() => {}}
-                  />
+                  <Marker coordinate={post.location} />
                 </MapView>
               </View>
             </View>
@@ -471,81 +339,64 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           {/* Divider */}
           <View className="border-t border-muted mx-lg" />
 
-          {/* Your host */}
+          {/* Post Owner Information */}
           <MotiView
             from={{ opacity: 0, translateY: 8 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 240, delay: 320 }}
           >
             <View className="gap-md px-lg">
-              <Text className="text-lg font-semibold text-textPrimary">
+              <Text className="text-lg font-normal text-textPrimary">
                 Your host
               </Text>
 
-              {/* Host card */}
-              <View
-                className="bg-surface border border-divider rounded-xl"
-                style={{
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.12,
-                  shadowRadius: 6,
-                }}
-              >
-                {/* Avatar + name + message icon */}
-                <Pressable
-                  className="flex-row items-center gap-md p-md"
-                  onPress={handleShowHostProfile}
-                >
-                  <View className="relative">
-                    <AppUserAvatar
-                      avatarUrl={post.author?.avatarUrl}
-                      size={60}
+              {/* Avatar + name + message icon */}
+              <View className="flex-row items-center gap-md">
+                <AppUserAvatar
+                  avatarUrl={post.author?.avatarUrl}
+                  size={metrics.spacing["2xl"]}
+                />
+
+                {/* Host info */}
+                <View className="flex-1 flex-col gap-xs justify-between">
+                  <Text
+                    className="text-base text-textPrimary"
+                    numberOfLines={1}
+                  >
+                    {displayName}
+                  </Text>
+
+                  {/* Verified rows*/}
+                  <View
+                    className="flex-row items-center self-start gap-xs rounded-full px-sm py-xs"
+                    style={{
+                      backgroundColor: colors.babu[100],
+                    }}
+                  >
+                    <SealCheckIcon
+                      size={12}
+                      color={colors.babu[500]}
+                      weight="fill"
                     />
-
-                    <View className="absolute bottom-[-4] right-0 bg-primary rounded-full p-1 border border-divider">
-                      <SealCheckIcon
-                        size={12}
-                        color={colors.white}
-                        weight="fill"
-                      />
-                    </View>
-                  </View>
-
-                  {/* Host info */}
-                  <View className="flex-1 flex-col gap-xs">
-                    <Text className="text-base font-normal text-textPrimary">
-                      {displayName}
-                    </Text>
-
-                    {/* Contact rows*/}
-                    <View className="flex-1 flex-col gap-xs">
-                      <View className="flex-row items-center gap-sm">
-                        <EnvelopeIcon size={16} color={colors.hof[600]} />
-                        <Text className="flex-1 text-sm text-textSecondary">
-                          {post.author?.email ?? "Email not available"}
-                        </Text>
-                      </View>
-
-                      <View className="flex-row items-center gap-sm">
-                        <PhoneIcon size={16} color={colors.hof[600]} />
-                        <Text className="flex-1 text-sm text-textSecondary">
-                          {post.author?.phone ?? "Phone not available"}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-
-                  {/* Chat icon button */}
-                  {isMyPost ? null : (
-                    <TouchableOpacity
-                      onPress={handleStartChat}
-                      disabled={isCreating}
-                      className="p-2 rounded-full border"
+                    <Text
+                      className="text-xs font-normal"
+                      style={{ color: colors.babu[600] }}
                     >
-                      <ChatCircleDotsIcon size={24} weight="regular" />
-                    </TouchableOpacity>
-                  )}
-                </Pressable>
+                      Verified
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Chat icon button */}
+                {isMyPost ? null : (
+                  <TouchableOpacity
+                    onPress={handleStartChat}
+                    disabled={isCreating}
+                    className="p-2 rounded-full border"
+                  >
+                    <ChatCircleDotsIcon size={24} weight="regular" />
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
           </MotiView>
@@ -562,7 +413,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
             {!!similarPosts?.length && (
               <View className="gap-sm">
                 <View className="flex-row items-center justify-between px-lg">
-                  <Text className="text-lg font-semibold text-textPrimary">
+                  <Text className="text-lg font-normal text-textPrimary">
                     Potential matches
                   </Text>
                   {similarPosts.length > 3 && (
@@ -592,7 +443,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
                         ),
                       }}
                     >
-                      <SimilarPostCard postId={post.id} matchPost={p} />
+                      <SimilarPostCard matchPost={p} onPress={() => {}} />
                     </View>
                   ))}
                 </ScrollView>
@@ -605,7 +456,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   };
 
   const handleHandover = () => {
-    router.push(POST_ROUTE.handoverRequest(postId));
+    router.push(POST_ROUTE.handoverRequest(post.id));
   };
 
   return (
@@ -631,15 +482,12 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           ),
 
           headerLeft: () => (
-            <AirbnbHeaderIcon
-              icon={ArrowLeftIcon}
-              onPress={() => router.back()}
-            />
+            <HeaderIcon icon={ArrowLeftIcon} onPress={() => router.back()} />
           ),
 
           headerRight: () => (
             <View>
-              <AirbnbHeaderIcon
+              <HeaderIcon
                 icon={ExportIcon}
                 onPress={() => console.log("Export")}
               />
@@ -691,64 +539,11 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           onPress={handleHandover}
           className="px-xl py-3 rounded-full bg-primary"
         >
-          <Text className="text-base font-semibold text-white">
+          <Text className="text-base font-normal text-white">
             Start handover
           </Text>
         </TouchableOpacity>
       </View>
     </>
-  );
-};
-
-type FeatureBulletRowProps = {
-  icon: ComponentType<IconProps>;
-  label: string;
-  value: string;
-};
-
-const FeatureBulletRow = ({
-  icon: Icon,
-  label,
-  value,
-}: FeatureBulletRowProps) => (
-  <View className="flex-row items-center gap-sm py-sm">
-    <Icon size={20} weight="regular" />
-    <Text className="flex-1 text-md font-medium text-textPrimary">{label}</Text>
-    <Text className="text-sm text-textSecondary">{value}</Text>
-  </View>
-);
-
-type VibeTagsRowProps = {
-  postType: PostType;
-  category: string;
-  status: PostType;
-};
-
-const VibeTagsRow = ({ postType, category }: VibeTagsRowProps) => {
-  const categoryInfo =
-    CATEGORY_REGISTRY[category as keyof typeof CATEGORY_REGISTRY];
-  const CategoryIcon = categoryInfo?.icon ?? DotsThreeCircleIcon;
-  const categoryLabel = categoryInfo?.label ?? toTitleCase(category);
-
-  return (
-    <View className="flex-row flex-wrap gap-xs">
-      {/* Status badge (existing) */}
-      <PostTypeBadge status={postType} size="sm" />
-
-      {/* Category pill — icon + label */}
-      <View
-        className="flex-row rounded-full px-sm py-xs items-center gap-xs"
-        style={{
-          borderWidth: 1,
-          borderColor: colors.border.DEFAULT,
-          backgroundColor: colors.canvas,
-        }}
-      >
-        <CategoryIcon size={14} weight="regular" />
-        <Text className="text-sm font-medium text-textPrimary">
-          {categoryLabel}
-        </Text>
-      </View>
-    </View>
   );
 };

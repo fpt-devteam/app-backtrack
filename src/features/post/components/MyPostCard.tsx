@@ -1,12 +1,10 @@
-import {
-  PostCategoryBadge,
-  PostStatusBadge,
-  PostTypeBadge,
-} from "@/src/features/post/components";
-import { type MyPost } from "@/src/features/post/types/post.type";
+import { PostCategoryBadge } from "@/src/features/post/components/PostCategoryBadge";
+import { PostStatusBadge } from "@/src/features/post/components/PostStatusBadge";
+import { PostTypeIconBadge } from "@/src/features/post/components/PostTypeIconBadge";
+import { type UserPost } from "@/src/features/post/types/post.type";
 import { AppImage } from "@/src/shared/components";
-import { POST_ROUTE } from "@/src/shared/constants/route.constant";
-import { colors } from "@/src/shared/theme";
+import { PROFILE_ROUTE } from "@/src/shared/constants/route.constant";
+import { colors, metrics } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils/datetime.utils";
 import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
@@ -15,7 +13,7 @@ import React, { useCallback, useMemo } from "react";
 import { Text, View } from "react-native";
 
 type MyPostCardProps = {
-  item: MyPost;
+  item: UserPost;
 };
 
 export const MyPostCard = ({ item }: MyPostCardProps) => {
@@ -44,7 +42,7 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
   }, [item.eventTime]);
 
   const handleOpenDetail = useCallback(() => {
-    router.push(POST_ROUTE.details(item.id));
+    router.push(PROFILE_ROUTE.userPostDetail(item.id));
   }, [item.id]);
 
   return (
@@ -60,11 +58,12 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
       transition={{ type: "spring", damping: 18, stiffness: 250 }}
       style={{
         width: "100%",
-        overflow: "hidden",
         backgroundColor: colors.surface,
+        borderRadius: metrics.borderRadius.lg,
+        padding: metrics.spacing.md2,
 
         shadowColor: colors.black,
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
       }}
@@ -93,7 +92,7 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
           {/* Badges row */}
           <View className="flex-row gap-xs items-center justify-start">
             {/* Post Type  */}
-            <PostTypeBadge status={item.postType} size="xs" />
+            <PostTypeIconBadge status={item.postType} size="xs" />
 
             {/* Post Category */}
             <PostCategoryBadge category={categoryLabel} />

@@ -1,5 +1,5 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import { PostTypeBadge } from "@/src/features/post/components";
+import { PostTypeIconBadge } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import type {
   MatchEvidence,
@@ -357,7 +357,7 @@ const ComparePostCard = ({ post, rows }: CompareCardProps) => {
           resizeMode="cover"
         />
         <View className="absolute top-2 left-2">
-          <PostTypeBadge status={post.postType} size="sm" />
+          <PostTypeIconBadge status={post.postType} size="sm" />
         </View>
       </View>
 

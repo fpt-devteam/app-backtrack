@@ -5,7 +5,7 @@ import {
 } from "@/src/features/chat/hooks";
 import { useCreateC2CReturnReport } from "@/src/features/handover/hooks";
 import { CreateC2CReturnReportRequest } from "@/src/features/handover/types";
-import { PostTypeBadge } from "@/src/features/post/components";
+import { PostTypeIconBadge } from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import {
@@ -178,9 +178,9 @@ const HandoverRequestScreen = () => {
                       className="flex-1 text-base font-semibold text-textPrimary"
                       numberOfLines={2}
                     >
-                      {post.item.itemName}
+                      {post.postTitle}
                     </Text>
-                    <PostTypeBadge status={post.postType} />
+                    <PostTypeIconBadge status={post.postType} />
                   </View>
 
                   <View className="gap-xxs">

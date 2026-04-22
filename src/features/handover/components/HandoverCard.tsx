@@ -1,5 +1,5 @@
 import type { Handover } from "@/src/features/handover/types";
-import { PostTypeBadge } from "@/src/features/post/components";
+import { PostTypeIconBadge } from "@/src/features/post/components";
 import { AppImage } from "@/src/shared/components";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
@@ -56,7 +56,10 @@ export const HandoverCard = ({ report, width }: HandoverCardProps) => {
 
           {report.finderPost && (
             <View className="absolute bottom-2 left-2">
-              <PostTypeBadge status={report.finderPost.postType} size="sm" />
+              <PostTypeIconBadge
+                status={report.finderPost.postType}
+                size="sm"
+              />
             </View>
           )}
         </View>

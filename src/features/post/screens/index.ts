@@ -5,6 +5,7 @@ export { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoRe
 export { MatchingScreen } from "@/src/features/post/screens/MatchingScreen";
 export { MatchingWaitingScreen } from "@/src/features/post/screens/MatchingWaitingScreen";
 
+export { MyPostDetailScreen } from "@/src/features/post/screens/MyPostDetailScreen";
 export { PostDetailScreen } from "@/src/features/post/screens/PostDetailScreen";
 export { PostScreen } from "@/src/features/post/screens/PostScreen";
 export { default as PostSearchFilterScreen } from "@/src/features/post/screens/PostSearchFilterScreen";

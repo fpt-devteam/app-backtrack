@@ -17,6 +17,8 @@ export const PROFILE_ROUTE = {
   setting: "/(tabs)/profile/setting" as ExternalPathString | RelativePathString,
   menuTab: "/(tabs)/profile/menu-tab" as ExternalPathString | RelativePathString,
   userPosts: "/(tabs)/profile/user-posts" as ExternalPathString | RelativePathString,
+  userPostDetail: (postId: string) => `/(tabs)/profile/user-posts/${postId}` as ExternalPathString | RelativePathString,
+  userPostDetailEdit: (postId: string) => `/(tabs)/profile/user-posts/${postId}/edit` as ExternalPathString | RelativePathString,
 } as const;
 
 export const POST_ROUTE = {
