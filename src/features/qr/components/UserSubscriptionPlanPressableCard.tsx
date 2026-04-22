@@ -10,8 +10,8 @@ import { formatDate } from "@/src/shared/utils";
 import { router } from "expo-router";
 import {
   ArrowRightIcon,
-  CheckCircleIcon,
   LockKeyIcon,
+  StarIcon,
   WarningIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
@@ -32,24 +32,23 @@ function CardBody({ isLoading, isActive, subscription }: CardBodyProps) {
     return (
       <View className="gap-1">
         <View className="flex-row items-center gap-2">
+          <StarIcon size={16} color={colors.primary} weight="thin" />
           <Text className="text-base font-bold text-primary">
             {subscription.planType} Subscription
           </Text>
-          <CheckCircleIcon
-            size={18}
-            color={colors.status.success}
-            weight="fill"
-          />
+          <View className="rounded-full bg-[#E6F4EA] px-2 py-0.5">
+            <Text className="text-xs font-semibold text-[#008A05]">Active</Text>
+          </View>
           {subscription.cancelAtPeriodEnd && (
             <View className="flex-row items-center gap-1 ml-1">
-              <WarningIcon size={14} color={colors.amber[500]} weight="fill" />
-              <Text className="text-xs text-amber-500 font-medium">
+              <WarningIcon size={14} color={colors.status.warning} weight="thin" />
+              <Text className="text-xs font-medium" style={{ color: colors.status.warning }}>
                 Cancels soon
               </Text>
             </View>
           )}
         </View>
-        <Text className="text-sm text-slate-400">
+        <Text className="text-sm text-textSecondary">
           Renews on {formatDate(subscription.currentPeriodEnd)}
         </Text>
       </View>
@@ -58,18 +57,18 @@ function CardBody({ isLoading, isActive, subscription }: CardBodyProps) {
 
   return (
     <View className="flex-row items-center gap-3">
-      <View className="w-9 h-9 rounded-full bg-slate-100 items-center justify-center">
-        <LockKeyIcon size={16} color={colors.slate[500]} weight="fill" />
+      <View className="w-9 h-9 rounded-full bg-canvas items-center justify-center">
+        <LockKeyIcon size={16} color={colors.hof[500]} weight="thin" />
       </View>
       <View className="flex-1">
-        <Text className="text-sm font-semibold text-slate-700">
+        <Text className="text-sm font-semibold text-textPrimary">
           No active subscription
         </Text>
-        <Text className="text-xs text-slate-400 mt-0.5">
+        <Text className="text-xs text-textSecondary mt-0.5">
           Subscribe to unlock your QR
         </Text>
       </View>
-      <ArrowRightIcon size={16} color={colors.slate[400]} weight="bold" />
+      <ArrowRightIcon size={16} color={colors.hof[400]} weight="bold" />
     </View>
   );
 }

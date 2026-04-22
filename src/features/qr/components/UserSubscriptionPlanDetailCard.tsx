@@ -22,8 +22,16 @@ import {
   Text,
   View,
 } from "react-native";
-
 import * as Haptics from "expo-haptics";
+import type { ViewStyle } from "react-native";
+
+const CARD_SHADOW: ViewStyle = {
+  shadowColor: colors.black,
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
+};
 
 type CardBodyProps = {
   readonly isLoading: boolean;
@@ -40,61 +48,65 @@ function CardBody({
 }: CardBodyProps) {
   if (isLoading) {
     return (
-      <View className="rounded-3xl border border-[#1f335f] bg-[#0d1f45] px-6 py-8 items-center justify-center">
-        <ActivityIndicator size="small" color="#e5edff" />
+      <View
+        className="rounded-xl border border-divider bg-surface px-6 py-8 items-center justify-center"
+        style={CARD_SHADOW}
+      >
+        <ActivityIndicator size="small" color={colors.primary} />
       </View>
     );
   }
 
   if (isActive && subscription) {
     return (
-      <View className="overflow-hidden rounded-3xl border border-[#1f335f] bg-[#0d1f45] px-6 py-6">
-        <View className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-[#2f4872] opacity-35" />
-        <View className="absolute left-16 top-0 h-40 w-40 rounded-full bg-[#16346a] opacity-35" />
-
-        <View className="flex-row items-start justify-between">
+      <View
+        className="rounded-xl border border-divider bg-surface px-6 py-6"
+        style={CARD_SHADOW}
+      >
+        <View className="flex-row items-start justify-between mb-3">
           <View className="flex-1 pr-4">
-            <Text className="text-sm font-semibold text-slate-300 uppercase">
+            <Text className="text-xs font-semibold text-textSecondary uppercase tracking-widest">
               Current Plan
             </Text>
             <View className="mt-2 flex-row items-center gap-2">
-              <Text className="text-lg font-extrabold text-white leading-tight">
+              <Text className="text-lg font-extrabold text-textPrimary leading-tight">
                 {subscription.planType}
               </Text>
-              <View className="rounded-full bg-[#0c8b58]/30 px-3 py-1 border border-[#0fbf79]/35">
-                <Text className="text-[#20d489] text-xs font-semibold">
+              <View className="rounded-full bg-[#E6F4EA] px-3 py-1">
+                <Text className="text-[#008A05] text-xs font-semibold">
                   Active
                 </Text>
               </View>
             </View>
           </View>
 
-          <View className="h-16 w-16 rounded-full bg-[#30476f]/75 items-center justify-center">
-            <StarIcon size={28} color="#facc15" weight="fill" />
+          {/* Star in accent circle — thin, primary color */}
+          <View className="h-12 w-12 rounded-full bg-accent items-center justify-center">
+            <StarIcon size={24} color={colors.primary} weight="thin" />
           </View>
         </View>
 
-        <View className="flex-row items-center gap-3">
-          <CalendarBlankIcon size={22} color="#d9e4ff" weight="regular" />
-          <Text className="text-sm text-slate-200 font-medium">
+        <View className="flex-row items-center gap-3 mb-4">
+          <CalendarBlankIcon size={18} color={colors.hof[500]} weight="thin" />
+          <Text className="text-sm text-textSecondary font-medium">
             Renews on {formatDate(subscription.currentPeriodEnd)}
           </Text>
         </View>
 
         <Pressable
           onPress={onManageSubscription}
-          className="mt-4 h-12 rounded-full bg-surface flex-row items-center justify-center gap-2 active:opacity-85"
+          className="h-11 rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-2 active:opacity-80"
         >
-          <Text className="text-textPrimary font-semibold text-base">
+          <Text className="text-textPrimary font-semibold text-sm">
             Manage Subscription
           </Text>
-          <ArrowSquareOutIcon size={20} color="#0f172a" weight="bold" />
+          <ArrowSquareOutIcon size={16} color={colors.hof[900]} weight="thin" />
         </Pressable>
 
         {subscription.cancelAtPeriodEnd && (
           <View className="mt-3 flex-row items-center gap-1">
-            <WarningIcon size={14} color={colors.amber[500]} weight="fill" />
-            <Text className="text-xs text-amber-300 font-medium">
+            <WarningIcon size={14} color={colors.status.warning} weight="thin" />
+            <Text className="text-xs font-medium" style={{ color: colors.status.warning }}>
               Subscription will cancel at the end of this billing period
             </Text>
           </View>
@@ -104,10 +116,10 @@ function CardBody({
   }
 
   return (
-    <View className="rounded-3xl border border-divider bg-surface px-5 py-5">
+    <View className="rounded-xl border border-divider bg-surface px-5 py-5" style={CARD_SHADOW}>
       <View className="flex-row items-center gap-3">
-        <View className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center">
-          <LockKeyIcon size={18} color={colors.slate[500]} weight="fill" />
+        <View className="w-10 h-10 rounded-full bg-canvas items-center justify-center">
+          <LockKeyIcon size={18} color={colors.hof[500]} weight="thin" />
         </View>
         <View className="flex-1">
           <Text className="text-sm font-semibold text-textPrimary">
@@ -123,8 +135,8 @@ function CardBody({
         onPress={onManageSubscription}
         className="mt-4 h-11 rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-2 active:opacity-80"
       >
-        <Text className="text-slate-700 font-medium text-sm">View Plans</Text>
-        <ArrowSquareOutIcon size={18} color={colors.slate[700]} weight="bold" />
+        <Text className="text-textPrimary font-medium text-sm">View Plans</Text>
+        <ArrowSquareOutIcon size={16} color={colors.hof[900]} weight="thin" />
       </Pressable>
     </View>
   );

@@ -15,29 +15,29 @@ import { router } from "expo-router";
 import { LightbulbIcon, QrCodeIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
+  ScrollView,
   Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const TipCard = () => {
-  return (
-    <View className="bg-sky-50 rounded-xl border border-sky-100 px-4 py-3 flex-row items-center gap-3 mt-3">
-      <View className="bg-primary/10 rounded-full p-2">
-        <LightbulbIcon size={18} color={colors.primary} weight="fill" />
-      </View>
-      <Text className="flex-1 text-xs text-textSecondary leading-5">
-        <Text className="text-xs font-semibold text-slate-700">Tip: </Text>
-        Stick your QR on items for a higher chance of recovery.
-      </Text>
+const TipCard = () => (
+  <View className="bg-canvas rounded-xl border border-divider px-4 py-3 flex-row items-center gap-3 mt-3">
+    <View className="bg-accent rounded-full p-2">
+      <LightbulbIcon size={18} color={colors.primary} weight="thin" />
     </View>
-  );
-};
+    <Text className="flex-1 text-xs text-textSecondary leading-5">
+      <Text className="text-xs font-semibold text-textPrimary">Tip: </Text>
+      Stick your QR on items for a higher chance of recovery.
+    </Text>
+  </View>
+);
 
 const MyQRScreen = () => {
   const { data: subscription } = useGetMySubscription();
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
 
@@ -46,25 +46,21 @@ const MyQRScreen = () => {
     return !!subscription && subscription.status === SubscriptionStatus.Active;
   }, [subscription]);
 
-  const renderBody = () => {
-    if (!isAuthReady) {
-      return (
+  if (!isAuthReady) {
+    return (
+      <SafeAreaView className="flex-1 bg-surface">
         <View
-          className="flex-1 bg-surface px-10 gap-10"
-          style={{
-            paddingTop: height * 0.15,
-            paddingBottom: height * 0.1,
-          }}
+          className="flex-1 px-10 gap-10"
+          style={{ paddingTop: height * 0.15, paddingBottom: height * 0.1 }}
         >
           <View className="flex-row justify-center">
-            <QrCodeIcon size={128} color={colors.primary} />
+            <QrCodeIcon size={128} color={colors.primary} weight="thin" />
           </View>
 
           <View className="gap-y-2">
             <Text className="text-xl font-normal text-textPrimary text-center">
               Log in to see your QR code
             </Text>
-
             <Text className="text-base font-thin text-textSecondary text-center leading-6">
               Once you log in, you will find your QR code here.
             </Text>
@@ -80,31 +76,32 @@ const MyQRScreen = () => {
             </Text>
           </TouchableOpacity>
         </View>
-      );
-    } else {
-      return (
-        <View className="px-4 mt-4">
-          {/*  User QRCode */}
-          <View className="w-full items-center">
-            <UserQRCodePressableCard isSubscripted={isSubscripted} />
-            <TipCard />
-          </View>
-
-          {/* Subscription Plan Card */}
-          {isSubscripted && (
-            <View className="mt-6">
-              <UserSubscriptionPlanPressableCard />
-            </View>
-          )}
-        </View>
-      );
-    }
-  };
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <View className="flex-1 bg-surface">
-      <>{renderBody()}</>
-    </View>
+    <SafeAreaView className="flex-1 bg-surface">
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="px-lg pt-md pb-xl"
+        contentContainerStyle={{ paddingBottom: height * 0.1 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* QR Card */}
+        <View className="w-full items-center">
+          <UserQRCodePressableCard isSubscripted={isSubscripted} />
+          <TipCard />
+        </View>
+
+        {/* Subscription Plan Card */}
+        {isSubscripted && (
+          <View className="mt-6">
+            <UserSubscriptionPlanPressableCard />
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

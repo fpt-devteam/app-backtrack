@@ -10,7 +10,16 @@ import { LockKeyIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
+import type { ViewStyle } from "react-native";
 import { PremiumCTAButton } from "./PremiumCTAButton";
+
+const CARD_SHADOW: ViewStyle = {
+  shadowColor: colors.black,
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
+};
 
 type UserQRCodePressableCardProps = {
   isSubscripted: boolean;
@@ -46,7 +55,10 @@ export const UserQRCodePressableCard = ({
 
   if (isQRLoading || !qrCode) {
     return (
-      <View className="bg-surface rounded-3xl items-center justify-center border border-divider w-full">
+      <View
+        className="bg-surface rounded-xl items-center justify-center border border-divider w-full"
+        style={CARD_SHADOW}
+      >
         <AppLoader />
       </View>
     );
@@ -55,42 +67,41 @@ export const UserQRCodePressableCard = ({
   if (!isSubscripted) {
     return (
       <View
-        className="bg-surface rounded-3xl border border-divider w-full items-center p-6 gap-4"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.05,
-          shadowRadius: 10,
-          elevation: 2,
-        }}
+        className="bg-surface rounded-xl border border-divider w-full items-center p-6 gap-4"
+        style={CARD_SHADOW}
       >
         <View className="relative items-center justify-center mb-6 mt-2">
           <View style={{ opacity: 0.08 }}>
             <QRCode
               value="https://backtrack.vn/locked"
               size={180}
-              color={colors.slate[900]}
+              color={colors.hof[900]}
             />
           </View>
 
           <View
-            className="absolute z-10 w-20 h-20 rounded-full bg-surface items-center justify-center shadow-xl"
-            style={{ borderWidth: 4, borderColor: colors.slate[50] }}
+            className="absolute z-10 w-20 h-20 rounded-full bg-surface items-center justify-center"
+            style={{
+              borderWidth: 3,
+              borderColor: colors.divider,
+              shadowColor: colors.black,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.10,
+              shadowRadius: 8,
+              elevation: 3,
+            }}
           >
-            <LockKeyIcon size={36} color={colors.primary} weight="fill" />
+            <LockKeyIcon size={36} color={colors.primary} weight="thin" />
           </View>
         </View>
 
         <View className="items-center px-4">
-          <View className="flex-row items-center mb-1">
-            <Text className="text-xl font-bold text-textPrimary">QR Locked</Text>
-          </View>
+          <Text className="text-xl font-bold text-textPrimary mb-1">QR Locked</Text>
           <Text className="text-sm text-textSecondary text-center leading-5">
             Upgrade to Backtrack Pro to create your personalized QR code
           </Text>
         </View>
 
-        {/* Upgrade Button */}
         <PremiumCTAButton onPress={handleUpgrade} />
       </View>
     );
@@ -99,7 +110,8 @@ export const UserQRCodePressableCard = ({
   return (
     <Pressable
       onPress={handlePreviewProfile}
-      className="bg-surface rounded-3xl items-center justify-center shadow-sm border border-divider p-8"
+      className="bg-surface rounded-xl items-center justify-center border border-divider p-8 w-full"
+      style={CARD_SHADOW}
     >
       <View className="items-center">
         <QRCode
@@ -112,7 +124,7 @@ export const UserQRCodePressableCard = ({
           logoMargin={4}
           quietZone={10}
         />
-        <Text className="mt-6 text-xs font-medium  tracking-widest text-primary">
+        <Text className="mt-6 text-xs font-medium tracking-widest text-primary uppercase">
           Tap to preview your public profile
         </Text>
       </View>
