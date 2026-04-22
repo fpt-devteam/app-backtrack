@@ -1,4 +1,8 @@
-import { useCreatePost, usePostCreationStore } from "@/src/features/post/hooks";
+import {
+  useAnalyzeImage,
+  useCreatePost,
+  usePostCreationStore,
+} from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
 import { CardDetail, PostCreateRequest } from "@/src/features/post/types";
 import {
@@ -7,14 +11,14 @@ import {
   AppLoader,
   TouchableIconButton,
 } from "@/src/shared/components";
-import { toast } from "@/src/shared/components/ui/toast";
 import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
+import { toast } from "@/src/shared/components/ui/toast";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { ensureMediaPermission } from "@/src/shared/services";
 import { colors, typography } from "@/src/shared/theme";
 import {
-  launchImageLibraryAsync,
   launchCameraAsync,
+  launchImageLibraryAsync,
   requestCameraPermissionsAsync,
   type ImagePickerOptions,
 } from "expo-image-picker";
@@ -26,7 +30,7 @@ import {
   useNavigation,
 } from "expo-router";
 import { MotiView } from "moti";
-import { HeadCircuitIcon, ImageIcon, CameraIcon } from "phosphor-react-native";
+import { CameraIcon, HeadCircuitIcon, ImageIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
 import { Text, TextStyle, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -71,10 +75,12 @@ const PostCreationStepperLayout = () => {
 
   const draftImages = usePostCreationStore((state) => state.draftImages);
   const uploadImages = usePostCreationStore((state) => state.uploadImages);
-  const analyzeByAI = usePostCreationStore((state) => state.analyzeByAI);
   const getUploadedImageUrls = usePostCreationStore(
     (state) => state.getUploadedImageUrls,
   );
+
+  const { analyzeImage, isAnalyzing } = useAnalyzeImage();
+
   const addMulti = usePostCreationStore((state) => state.addImages);
   const isPickerSheetVisible = usePostCreationStore(
     (state) => state.isPickerSheetVisible,
@@ -100,8 +106,6 @@ const PostCreationStepperLayout = () => {
   const personalBelongingDetail = usePostCreationStore(
     (state) => state.personalBelongingDetail,
   );
-
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const openGallery = async () => {
     closePickerSheet();
@@ -230,18 +234,19 @@ const PostCreationStepperLayout = () => {
 
   const handleAIAnalyze = async () => {
     try {
-      setIsAnalyzing(true);
+      const imageUrls = await getUploadedImageUrls();
 
-      const minimumDelay = new Promise((resolve) => setTimeout(resolve, 3000));
-      const [result] = await Promise.all([analyzeByAI(), minimumDelay]);
-      console.log("AI Analyze Result:", result);
+      const result = await analyzeImage({
+        imageUrls,
+        subcategoryCode: subCategoryCode,
+      });
 
-      const electronicDetail = result?.data?.electronic;
-      const personalBelongingDetail = result?.data?.personalBelonging;
+      const electronicDetail = result?.electronic;
+      const personalBelongingDetail = result?.personalBelonging;
 
       if (electronicDetail) usePostCreationStore.setState({ electronicDetail });
 
-      const cardDetail = result?.data?.card;
+      const cardDetail = result?.card;
       if (cardDetail) {
         const mappedDetail: CardDetail = {
           itemName: cardDetail.itemName,
@@ -263,9 +268,8 @@ const PostCreationStepperLayout = () => {
       if (personalBelongingDetail)
         usePostCreationStore.setState({ personalBelongingDetail });
     } catch (error) {
+      toast.error("AI analysis failed. Please try again.");
       console.log("Error during AI analysis:", error);
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 

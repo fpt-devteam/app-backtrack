@@ -1,12 +1,8 @@
-import { POST_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme";
-import { RelativePathString, router } from "expo-router";
 import { MagnifyingGlass, Question } from "phosphor-react-native";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 
 export const MatchingNoResultScreen = () => {
-  const handleGoToHomepage = () => router.replace(POST_ROUTE.index as RelativePathString);
-
   return (
     <View className="flex-1 items-center justify-center px-6">
       {/* Icon */}
@@ -35,18 +31,6 @@ export const MatchingNoResultScreen = () => {
           Backtrack AI will keep scanning the network for new items. In the
           meantime, you can browse all recent posts.
         </Text>
-      </View>
-
-      {/* Actions */}
-      <View className="mt-7 w-full max-w-[360px]">
-        <TouchableOpacity
-          onPress={handleGoToHomepage}
-          className="mt-3 h-12 w-full items-center justify-center rounded-full bg-surface border border-black/10 active:opacity-90"
-        >
-          <Text className="text-[14px] font-semibold text-black/80">
-            Back to homepage
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );

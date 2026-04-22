@@ -1,8 +1,6 @@
-import { useAnalyzeImage } from "@/src/features/post/hooks";
 import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore";
 import { TextSearch, textSearchSchema } from "@/src/features/post/schemas";
 import { AppInlineError, AppSearchRow } from "@/src/shared/components";
-import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme";
 import { getErrorMessage } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
@@ -50,17 +48,6 @@ const PostKeywordFilter = ({
     },
     [measuredHeight],
   );
-
-  const { analyzeImage: _analyzeImage, isAnalyzing: _isAnalyzing } =
-    useAnalyzeImage({
-      onSuccess: (data) => {
-        updateKeyword(data.itemName);
-        toast.success("Image analyzed successfully!");
-      },
-      onError: () => {
-        toast.error("Failed to analyze image. Please try again.");
-      },
-    });
 
   const searchValidationError = useMemo(() => {
     try {
