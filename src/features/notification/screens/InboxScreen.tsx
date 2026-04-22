@@ -71,7 +71,7 @@ const InboxScreen = () => {
     { key: "chat", title: "Messages" },
     {
       key: "notification",
-      title: `Notifications ${displayCount ?? `(${displayCount})`}`,
+      title: `Notifications ${displayCount !== "" ? `(${displayCount})` : ""}`,
     },
   ]);
 

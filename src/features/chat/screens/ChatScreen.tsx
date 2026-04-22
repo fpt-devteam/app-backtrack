@@ -8,13 +8,12 @@ import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
 import { ChatCenteredTextIcon, WarningCircleIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef } from "react";
-import { FlatList, Text, useWindowDimensions, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { RefreshControl } from "react-native-gesture-handler";
 
 export const ChatScreen = () => {
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
 
   const {
     data,
@@ -151,50 +150,56 @@ export const ChatScreen = () => {
     }
 
     return (
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item.conversationId}
-        renderItem={({ item }) => <ConversationCard conversation={item} />}
-        contentContainerClassName="p-md flex-1"
-        showsVerticalScrollIndicator={false}
-        onEndReached={onLoadMore}
-        onEndReachedThreshold={0.35}
-        ItemSeparatorComponent={() => <View className="h-md" />}
-        ListEmptyComponent={
-          <View
-            className="flex-1"
-            style={{
-              justifyContent: "center",
-              gap: metrics.spacing.md,
-            }}
-          >
-            <View className="flex-row justify-center">
-              <ChatCenteredTextIcon
-                size={200}
-                weight="thin"
-                color={colors.primary}
-              />
-            </View>
+      <View className="flex-1">
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item.conversationId}
+          renderItem={({ item }) => <ConversationCard conversation={item} />}
+          contentContainerClassName="px-md"
+          contentContainerStyle={{
+            paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
+          }}
+          showsVerticalScrollIndicator={false}
+          onEndReached={onLoadMore}
+          onEndReachedThreshold={0.35}
+          className="flex-1"
+          ItemSeparatorComponent={() => <View className="h-md" />}
+          ListEmptyComponent={
+            <View
+              className="flex-1"
+              style={{
+                justifyContent: "center",
+                gap: metrics.spacing.md,
+              }}
+            >
+              <View className="flex-row justify-center">
+                <ChatCenteredTextIcon
+                  size={200}
+                  weight="thin"
+                  color={colors.primary}
+                />
+              </View>
 
-            <View className="gap-y-xs">
-              <Text className="text-xl font-normal text-textPrimary text-center">
-                You don't have any conversations yet.
-              </Text>
+              <View className="gap-y-xs">
+                <Text className="text-xl font-normal text-textPrimary text-center">
+                  You don't have any conversations yet.
+                </Text>
 
-              <Text className="text-base font-thin text-textSecondary text-center leading-6">
-                Once you receive messages, they will appear here.
-              </Text>
+                <Text className="text-base font-thin text-textSecondary text-center leading-6">
+                  Once you receive messages, they will appear here.
+                </Text>
+              </View>
             </View>
-          </View>
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefetch}
-            tintColor={colors.primary}
-          />
-        }
-      />
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefetch}
+              tintColor={colors.primary}
+            />
+          }
+        />
+      </View>
     );
   };
 

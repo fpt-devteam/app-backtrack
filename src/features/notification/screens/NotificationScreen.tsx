@@ -15,7 +15,7 @@ import {
 import { AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { AUTH_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
+import { colors, metrics } from "@/src/shared/theme";
 import { RelativePathString, router } from "expo-router";
 import { BellRingingIcon, BellSimpleSlashIcon } from "phosphor-react-native";
 import React from "react";
@@ -132,15 +132,20 @@ const NotificationScreen = () => {
   };
 
   return (
-    <FlatList
-      data={items}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      ListEmptyComponent={renderEmpty}
-      ListFooterComponent={renderFooter}
-      onEndReached={handleEndReached}
-      onEndReachedThreshold={0.5}
-    />
+    <View className="flex-1 bg-surface">
+      <FlatList
+        data={items}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={0.5}
+        contentContainerStyle={{
+          paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
+        }}
+      />
+    </View>
   );
 };
 
