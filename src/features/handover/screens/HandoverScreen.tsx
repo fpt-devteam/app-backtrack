@@ -10,6 +10,7 @@ import { CaretRightIcon, HandshakeIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -73,7 +74,13 @@ const HandoverScreen = () => {
   const { user } = useAppUser();
   const currentUserId = user?.id ?? "";
 
-  const { data: handovers, isLoading, error } = useGetC2CReturnReports();
+  const {
+    data: handovers,
+    isLoading,
+    isRefetching,
+    error,
+    refetch,
+  } = useGetC2CReturnReports();
 
   // In-progress: Ongoing (coordinating) + Delivered (awaiting confirmation)
   const inProgressHandovers = useMemo(
@@ -139,6 +146,16 @@ const HandoverScreen = () => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: metrics.spacing.xl }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={() => {
+                void refetch();
+              }}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
         >
           {/* ── In Progress section (Draft + Active) ───────────────────── */}
           <View

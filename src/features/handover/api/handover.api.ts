@@ -4,6 +4,8 @@ import type {
   C2CHandoversResponse,
   C2CReturnReportResponse,
   CreateC2CReturnReportRequest,
+  GetC2CHandoverPostRequest,
+  GetC2CHandoverPostResponse,
   GetC2CHandoverRequest,
 } from "@/src/features/handover/types";
 import { privateClient } from "@/src/shared/api";
@@ -17,6 +19,7 @@ export const RETURN_REPORT_API = {
   c2cConfirm: (id: string) => `/api/core/return-reports/c2c/${id}/confirm`,
   c2cReject: (id: string) => `/api/core/return-reports/c2c/${id}/reject`,
   c2cByPartner: (partnerId: string) => `/api/core/return-reports/c2c/partner/${partnerId}`,
+  c2cPosts: `/api/core/return-reports/c2c/posts`,
 } as const;
 
 // ─── C2C ─────────────────────────────────────────────────────────────────────
@@ -25,6 +28,14 @@ export async function getC2CReturnReportsApi(params?: GetC2CHandoverRequest) {
   const response = await privateClient.get<C2CHandoversResponse>(
     RETURN_REPORT_API.c2cList,
     { params },
+  );
+  return response.data;
+}
+
+export async function getC2CHandoverPostApi(params: GetC2CHandoverPostRequest) {
+  const response = await privateClient.get<GetC2CHandoverPostResponse>(
+    RETURN_REPORT_API.c2cPosts,
+    { params }
   );
   return response.data;
 }

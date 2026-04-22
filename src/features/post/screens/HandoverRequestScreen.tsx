@@ -3,8 +3,10 @@ import {
   useCreateDirectConversation,
   useSendMessage,
 } from "@/src/features/chat/hooks";
-import { useCreateC2CReturnReport } from "@/src/features/handover/hooks";
-import { CreateC2CReturnReportRequest } from "@/src/features/handover/types";
+import {
+  useCreateC2CReturnReport,
+  useGetc2cHandoverPost,
+} from "@/src/features/handover/hooks";
 import { PostTypeIconBadge } from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
@@ -51,26 +53,38 @@ type Params = {
 export default function HandoverRequestScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAppUser();
-
   const { postId, otherPostId } = useLocalSearchParams<Params>();
+
+  const { getC2CHandoverPost, isLoading: isCheckingExistingHandover } =
+    useGetc2cHandoverPost();
 
   const {
     isLoading,
-    data: post,
+    data: otherPost,
     error: postError,
   } = useGetPostById({ postId: otherPostId });
 
-  const { create: createConversation, isCreating: isCreatingConversation } =
+  const { isCreating, createC2CReturnReport } = useCreateC2CReturnReport();
+
+  const { create, isCreating: isCreatingConversation } =
     useCreateDirectConversation();
   const { sendMessage, isSendingMessage } = useSendMessage();
-  const { isCreating, createC2CReturnReport } = useCreateC2CReturnReport();
   const [message, setMessage] = useState("");
-  const [hasCreatedReturnReport, setHasCreatedReturnReport] = useState(false);
-  const isSubmitting = isCreating || isCreatingConversation || isSendingMessage;
+
+  const isSubmitting =
+    isCheckingExistingHandover ||
+    isCreating ||
+    isCreatingConversation ||
+    isSendingMessage;
   const isSubmitDisabled = isSubmitting || !message.trim();
 
+  const isNotFoundError = (error: unknown) => {
+    if (!(error instanceof Error)) return false;
+    return /404|not found/i.test(error.message);
+  };
+
   const handleCreateReturnReport = async () => {
-    if (!post || !user) return;
+    if (!otherPost || !user) return;
 
     const trimmedMessage = message.trim();
     if (!trimmedMessage) {
@@ -79,23 +93,38 @@ export default function HandoverRequestScreen() {
     }
 
     try {
-      const isFoundPost = post.postType === PostType.Found;
+      const isFoundPost = otherPost.postType === PostType.Found;
+      const finderPostId = isFoundPost ? otherPostId : postId;
+      const ownerPostId = isFoundPost ? postId : otherPostId;
 
-      const req: CreateC2CReturnReportRequest = {
-        finderPostId: !isFoundPost ? postId : otherPostId,
-        ownerPostId: !isFoundPost ? otherPostId : postId,
+      const req = {
+        finderPostId,
+        ownerPostId,
       };
 
-      const res = await createC2CReturnReport(req);
-      setHasCreatedReturnReport(true);
+      let existingHandoverId: string | null = null;
 
-      console.log("handover: ", res);
+      try {
+        const existingHandover = await getC2CHandoverPost(req);
+        existingHandoverId = existingHandover.id;
+      } catch (lookupError) {
+        if (!isNotFoundError(lookupError)) {
+          throw lookupError;
+        }
+      }
+
+      if (existingHandoverId) {
+        router.push(HANDOVER_ROUTE.detail(existingHandoverId));
+        return;
+      }
+
+      const res = await createC2CReturnReport(req);
 
       console.log("UserId", user.id);
-      console.log("PartnerId: ", post.author.id);
+      console.log("PartnerId: ", otherPost.author.id);
 
-      const conversation = await createConversation({
-        memberId: post.author.id,
+      const conversation = await create({
+        memberId: otherPost.author.id,
       });
 
       const conversationId = conversation.data?.conversation?.conversationId;
@@ -109,23 +138,20 @@ export default function HandoverRequestScreen() {
       if (res) {
         router.push(HANDOVER_ROUTE.detail(res.id));
         toast.success("Handover request sent successfully!");
+        return;
       } else {
         toast.error("Failed to create handover request.");
       }
-
-      toast.success("Send handover request successfully!");
     } catch {
       toast.error("Failed to send handover request.");
       return;
     }
-
-    router.back();
   };
 
   const renderContent = () => {
     if (isLoading) return <AppLoader />;
 
-    if (!post) {
+    if (!otherPost) {
       return (
         <View className="px-lg pt-lg">
           <AppInlineError
@@ -173,7 +199,7 @@ export default function HandoverRequestScreen() {
                 }}
               >
                 <AppImage
-                  source={{ uri: post.imageUrls[0] }}
+                  source={{ uri: otherPost.imageUrls[0] }}
                   className="w-24 rounded-xl aspect-square"
                   resizeMode="cover"
                 />
@@ -184,9 +210,9 @@ export default function HandoverRequestScreen() {
                       className="flex-1 text-base font-semibold text-textPrimary"
                       numberOfLines={2}
                     >
-                      {post.postTitle}
+                      {otherPost.postTitle}
                     </Text>
-                    <PostTypeIconBadge status={post.postType} />
+                    <PostTypeIconBadge status={otherPost.postType} />
                   </View>
 
                   <View className="gap-xxs">
@@ -200,7 +226,7 @@ export default function HandoverRequestScreen() {
                         className="flex-1 text-sm text-textSecondary"
                         numberOfLines={1}
                       >
-                        {post.displayAddress}
+                        {otherPost.displayAddress}
                       </Text>
                     </View>
 
@@ -214,7 +240,7 @@ export default function HandoverRequestScreen() {
                         className="flex-1 text-sm text-textSecondary"
                         numberOfLines={1}
                       >
-                        {formatIsoDate(post.eventTime)}
+                        {formatIsoDate(otherPost.eventTime)}
                       </Text>
                     </View>
                   </View>
@@ -243,7 +269,7 @@ export default function HandoverRequestScreen() {
                 <View className="flex-row items-center gap-md p-md">
                   <View className="relative">
                     <AppUserAvatar
-                      avatarUrl={post.author?.avatarUrl}
+                      avatarUrl={otherPost.author?.avatarUrl}
                       size={60}
                     />
                     <View className="absolute bottom-[-4] right-0 bg-primary rounded-full p-1 border border-surface">
@@ -257,7 +283,7 @@ export default function HandoverRequestScreen() {
 
                   <View className="flex-1 gap-xs">
                     <Text className="text-base font-semibold text-textPrimary">
-                      {post.author?.displayName ?? "Anonymous"}
+                      {otherPost.author?.displayName ?? "Anonymous"}
                     </Text>
 
                     <View className="gap-xxs">
@@ -270,8 +296,9 @@ export default function HandoverRequestScreen() {
                           className="flex-1 text-sm text-textSecondary"
                           numberOfLines={1}
                         >
-                          {post.author?.showEmail && post.author?.email
-                            ? post.author.email
+                          {otherPost.author?.showEmail &&
+                          otherPost.author?.email
+                            ? otherPost.author.email
                             : "Email not available"}
                         </Text>
                       </View>
@@ -282,8 +309,9 @@ export default function HandoverRequestScreen() {
                           className="flex-1 text-sm text-textSecondary"
                           numberOfLines={1}
                         >
-                          {post.author?.showPhone && post.author?.phone
-                            ? post.author.phone
+                          {otherPost.author?.showPhone &&
+                          otherPost.author?.phone
+                            ? otherPost.author.phone
                             : "Phone not available"}
                         </Text>
                       </View>

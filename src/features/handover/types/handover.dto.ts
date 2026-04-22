@@ -18,6 +18,9 @@ export type GetC2CHandoverRequest = {
   status?: ReturnReportStatus
 } & PagedRequest
 
+
+
+
 // Single report response
 export type C2CReturnReportResponse = ApiResponse<Handover>
 
@@ -43,3 +46,13 @@ export type OrgReturnReportResponse = ApiResponse<Handover>
 
 // Paged list of org reports
 export type OrgHandoversResponse = ApiResponse<PagedResponse<Handover>>
+
+/**
+ * 
+ */
+export type GetC2CHandoverPostRequest = {
+  finderPostId: string
+  ownerPostId: string
+}
+
+export type GetC2CHandoverPostResponse = ApiResponse<Handover>

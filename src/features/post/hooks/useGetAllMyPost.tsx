@@ -22,6 +22,7 @@ export const useGetAllMyPost = () => {
   return {
     data: query.data?.items || [],
     isLoading: query.isLoading,
+    isRefetching: query.isRefetching,
     error,
     refetch: query.refetch,
   };

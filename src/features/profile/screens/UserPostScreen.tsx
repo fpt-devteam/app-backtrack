@@ -53,9 +53,13 @@ const EMPTY_STATE_COPY: Record<
 const UserPostScreen = () => {
   const inset = useSafeAreaInsets();
   const [selectedTab, setSelectedTab] = useState<UserPostFilter>("all");
-  const { data: posts, isLoading, error, refetch } = useGetAllMyPost();
-
-  console.log("data", posts);
+  const {
+    data: posts,
+    isLoading,
+    isRefetching,
+    error,
+    refetch,
+  } = useGetAllMyPost();
 
   const filteredPosts = useMemo<UserPost[]>(
     () =>
@@ -80,6 +84,10 @@ const UserPostScreen = () => {
           paddingVertical: metrics.spacing.md,
           paddingBottom: Math.max(inset.bottom, metrics.spacing.md),
         }}
+        onRefresh={() => {
+          void refetch();
+        }}
+        refreshing={isRefetching}
         ItemSeparatorComponent={() => <View className="mt-md" />}
         renderItem={({ item }) => <MyPostCard item={item} />}
         ListEmptyComponent={

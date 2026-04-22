@@ -50,6 +50,7 @@ export const useGetC2CReturnReports = (params?: GetC2CHandoverRequest) => {
   return {
     data: query.data ?? [],
     isLoading: query.isLoading,
+    isRefetching: query.isRefetching,
     error: !query.error
       ? null
       : query.error instanceof Error
