@@ -85,7 +85,7 @@ const CATEGORY_LABELS: Record<PostCategory, string> = {
   [POST_CATEGORIES.ELECTRONICS]: "Electronics",
   [POST_CATEGORIES.CARD]: "Cards",
   [POST_CATEGORIES.PERSONAL_BELONGINGS]: "Personal belongings",
-  [POST_CATEGORIES.OTHER]: "Other",
+  [POST_CATEGORIES.OTHERS]: "Other",
 };
 
 const EVIDENCE_LABELS: Record<string, string> = {

@@ -40,7 +40,7 @@ const CATEGORIES = [
     title: "Others",
     description: "Items that don't fit into the above categories",
     icon: OTHERS_ICON,
-    value: POST_CATEGORIES.OTHER,
+    value: POST_CATEGORIES.OTHERS,
   },
 ];
 

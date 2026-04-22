@@ -31,8 +31,8 @@ export type PostFeedRequest = {
 type PostFeedResult = {
   electronics: Post[];
   cards: Post[];
-  personal_belongings: Post[];
-  other: Post[];
+  personalBelongings: Post[];
+  others: Post[];
 };
 
 export type PostFeedResponse = ApiResponse<PostFeedResult>;

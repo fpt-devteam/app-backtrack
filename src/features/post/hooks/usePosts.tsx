@@ -30,9 +30,9 @@ const mapCategoryToSectionKey = (category: PostCategory) => {
     case POST_CATEGORIES.CARD:
       return "cards";
     case POST_CATEGORIES.PERSONAL_BELONGINGS:
-      return "personal_belongings";
+      return "personalBelongings";
     default:
-      return "other";
+      return "others";
   }
 };
 

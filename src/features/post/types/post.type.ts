@@ -154,7 +154,7 @@ export const POST_CATEGORIES = {
   ELECTRONICS: "Electronics",
   CARD: "Cards",
   PERSONAL_BELONGINGS: "PersonalBelongings",
-  OTHER: "Other",
+  OTHERS: "Others",
 } as const;
 
 export type PostCategory = typeof POST_CATEGORIES[keyof typeof POST_CATEGORIES]

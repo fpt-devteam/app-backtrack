@@ -54,7 +54,7 @@ const SECTION_TITLES: Record<PostCategory, string> = {
   [POST_CATEGORIES.ELECTRONICS]: "Electronics",
   [POST_CATEGORIES.CARD]: "Card",
   [POST_CATEGORIES.PERSONAL_BELONGINGS]: "Personal Belongings",
-  [POST_CATEGORIES.OTHER]: "Other",
+  [POST_CATEGORIES.OTHERS]: "Other",
 };
 
 const ExploreHeader = ({

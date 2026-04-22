@@ -204,7 +204,7 @@ const SUBCATEGORIES: Record<PostCategory, SubCategoryItem[]> = {
       value: PERSONAL_BELONGING_SUBCATEGORY.WALLETS,
     },
   ],
-  [POST_CATEGORIES.OTHER]: [
+  [POST_CATEGORIES.OTHERS]: [
     {
       id: "other",
       title: "Something Else",

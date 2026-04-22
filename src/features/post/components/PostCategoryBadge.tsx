@@ -21,7 +21,7 @@ const CATEGORY_STYLE_MAP: Record<
     bgClass: "bg-emerald-100",
     textClass: "text-emerald-800",
   },
-  [POST_CATEGORIES.OTHER]: {
+  [POST_CATEGORIES.OTHERS]: {
     label: "Other",
     bgClass: "bg-gray-100",
     textClass: "text-gray-800",
@@ -34,7 +34,7 @@ type PostCategoryBadgeProps = {
 
 export const PostCategoryBadge = ({ category }: PostCategoryBadgeProps) => {
   const config =
-    CATEGORY_STYLE_MAP[category] || CATEGORY_STYLE_MAP[POST_CATEGORIES.OTHER];
+    CATEGORY_STYLE_MAP[category] || CATEGORY_STYLE_MAP[POST_CATEGORIES.OTHERS];
 
   return (
     <View className={`px-2.5 py-1 rounded-md ${config.bgClass}`}>
