@@ -67,7 +67,7 @@ type PostCreateActions = {
 };
 
 const initialState: PostCreationState = {
-  postTitle: "Unknown item",
+  postTitle: "",
   postType: PostType.Lost,
   category: POST_CATEGORIES.ELECTRONICS,
   subCategoryCode: ELECTRONICS_SUBCATEGORY.PHONE,

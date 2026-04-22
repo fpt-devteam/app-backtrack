@@ -38,6 +38,10 @@ const DriverLicenseForm = () => {
   const setCardAiDescription = usePostCreationStore(
     (state) => state.setCardAiDescription,
   );
+  const postTitle = usePostCreationStore((state) => state.postTitle);
+  const updatePostTitle = usePostCreationStore(
+    (state) => state.updatePostTitle,
+  );
 
   return (
     <KeyboardAvoidingView
@@ -63,6 +67,14 @@ const DriverLicenseForm = () => {
           </View>
 
           <View className="border rounded-md overflow-hidden">
+            <PostFormField
+              label="Post Title"
+              value={postTitle}
+              onChange={updatePostTitle}
+            />
+
+            <View className="border-t" />
+
             <PostFormField
               label="License Number"
               value={cardDetail.cardNumberMasked ?? ""}

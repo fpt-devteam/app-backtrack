@@ -89,6 +89,8 @@ const PostCreationStepperLayout = () => {
     (state) => state.closePickerSheet,
   );
 
+  const postTitle = usePostCreationStore((state) => state.postTitle);
+
   const postType = usePostCreationStore((state) => state.postType);
   const category = usePostCreationStore((state) => state.category);
   const subCategoryCode = usePostCreationStore(
@@ -188,7 +190,7 @@ const PostCreationStepperLayout = () => {
         draftAnalyzeResult?.data?.personalBelonging?.itemName;
 
       const req: PostCreateRequest = {
-        postTitle: title ?? "Untitled Post",
+        postTitle: postTitle || title || "Untitled Post",
         postType,
         category,
         subcategoryCode: subCategoryCode,

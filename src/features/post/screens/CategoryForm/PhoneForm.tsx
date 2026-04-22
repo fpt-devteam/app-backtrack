@@ -45,6 +45,10 @@ const PhoneForm = () => {
   const setElectronicDistinguishingFeatures = usePostCreationStore(
     (state) => state.setElectronicDistinguishingFeatures,
   );
+  const postTitle = usePostCreationStore((state) => state.postTitle);
+  const updatePostTitle = usePostCreationStore(
+    (state) => state.updatePostTitle,
+  );
 
   const hasCase = electronicDetail.hasCase ?? false;
 
@@ -73,6 +77,14 @@ const PhoneForm = () => {
 
           {/* Identification */}
           <View className="border rounded-md overflow-hidden">
+            <PostFormField
+              label="Post Title"
+              value={postTitle}
+              onChange={updatePostTitle}
+            />
+
+            <View className="border-t" />
+
             <PostFormField
               label="Device Brand"
               value={electronicDetail.brand ?? ""}

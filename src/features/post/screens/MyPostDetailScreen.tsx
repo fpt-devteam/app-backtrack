@@ -324,6 +324,8 @@ export const MyPostDetailScreen = () => {
     return rows;
   }, [post]);
 
+  console.log("itemDetailRows", itemDetailRows);
+
   const formatEventDate = (dateStringOrObject: string | Date | undefined) => {
     if (!dateStringOrObject) {
       return { formattedDate: "Unknown Date", formattedTime: "Unknown Time" };
