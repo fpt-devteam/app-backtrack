@@ -11,7 +11,7 @@ type ChipProps = {
 
 export const AppChipsRow = ({ chips }: { chips: ChipProps[] }) => {
   return (
-    <View className="flex-row" style={{ gap: 8 }}>
+    <View className="flex-row gap-sm">
       {chips.map((chip) => (
         <Chip
           key={chip.label}
@@ -30,15 +30,15 @@ const Chip = ({ label, selected, onPress, disabled }: ChipProps) => {
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className="mr-2 h-9 px-4 rounded-full items-center justify-center"
+      className="px-md2 py-sm rounded-full items-center justify-center"
       style={{
-        backgroundColor: selected ? colors.blue[500] : colors.slate[100],
+        backgroundColor: selected ? colors.secondary : colors.muted,
         opacity: disabled ? 0.5 : 1,
       }}
     >
       <Text
-        className="text-sm font-semibold"
-        style={{ color: selected ? "#fff" : colors.slate[900] }}
+        className="text-sm font-normal"
+        style={{ color: selected ? colors.white : colors.text.main }}
       >
         {label}
       </Text>
