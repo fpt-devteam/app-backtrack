@@ -7,9 +7,10 @@ import type { Handover, ReturnReportStatus } from "./handover.type"
 export type CreateC2CReturnReportRequest = {
   finderPostId?: string
   ownerPostId?: string
-  finderId?: string
-  ownerId?: string
-  status: ReturnReportStatus
+}
+
+export type CreateC2CReturnReportResponse = {
+  handoverId: string
 }
 
 // GET /return-reports/c2c  (query params)

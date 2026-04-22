@@ -5,11 +5,12 @@ import type {
   PostMatchingStatusCheckResponse,
 } from "@/src/features/post/types";
 import { PostMatchingStatus } from "@/src/features/post/types";
+import { Optional } from "@/src/shared/types/global.type";
 import { useQuery } from "@tanstack/react-query";
 
 const TIME_INTERVAL_MS = 3000;
 
-export const useCheckPostMatchingStatus = (postId: string) => {
+export const useCheckPostMatchingStatus = (postId: Optional<string>) => {
   const isPostMatchingCompleted = (status: PostMatchingStatus | undefined) => {
     if (!status) return false;
     return status === PostMatchingStatus.Completed;
@@ -17,7 +18,9 @@ export const useCheckPostMatchingStatus = (postId: string) => {
 
   const query = useQuery<PostMatchingStatusCheckResponse>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "status", postId],
+    enabled: !!postId,
     queryFn: async () => {
+      if (!postId) throw new Error("Post ID is required");
       const request: PostMatchingStatusCheckRequest = { postId };
       const response = await checkPostMatchingStatusApi(request);
 

@@ -2,20 +2,28 @@ import {
   PostCategoryBadge,
   PostSubcategoryBadge,
   PostTypeIconBadge,
+  SimilarPostCard,
 } from "@/src/features/post/components";
-import { useGetPostById } from "@/src/features/post/hooks";
-import { ELECTRONICS_SUBCATEGORY } from "@/src/features/post/types";
-import { AppLoader, ImageCarousel } from "@/src/shared/components";
 import {
-  ELECTRONICS_ICON,
-  ELECTRONICS_SUB_CATEGORY_ICONS,
-} from "@/src/shared/constants/assets.constant";
-import { colors } from "@/src/shared/theme";
+  useDeletePost,
+  useGetPostById,
+  useMatchingPost,
+} from "@/src/features/post/hooks";
+import { usePostSubcategoryStore } from "@/src/features/post/store";
+import { ELECTRONICS_SUBCATEGORY } from "@/src/features/post/types";
+import {
+  AppLoader,
+  ImageCarousel,
+  MenuBottomSheet,
+  type MenuOption,
+} from "@/src/shared/components";
+import { PROFILE_ROUTE } from "@/src/shared/constants";
+import { colors, metrics } from "@/src/shared/theme";
 import { formatIsoDate, toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { BlurView } from "expo-blur";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { MotiView } from "moti";
+import { MotiView, ScrollView } from "moti";
 import {
   ArrowLeftIcon,
   ArrowsOutCardinalIcon,
@@ -40,15 +48,17 @@ import {
   MapPinIcon,
   NotebookIcon,
   PaletteIcon,
+  PencilSimpleIcon,
   TagIcon,
   TrademarkIcon,
+  TrashIcon,
   UsbIcon,
   UserCircleIcon,
   WatchIcon,
 } from "phosphor-react-native";
-import React, { ComponentType, useCallback, useMemo } from "react";
+import React, { ComponentType, useCallback, useMemo, useState } from "react";
 import {
-  Image,
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -63,15 +73,21 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { usePostSubcategoryStore } from "@/src/features/post/store";
 
 export const MyPostDetailScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const { isLoading, data: post } = useGetPostById({ postId });
+  const {
+    deletePost,
+    error: deletePostError,
+    isDeletingPost,
+  } = useDeletePost();
+  const { similarPosts } = useMatchingPost(post?.id);
 
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { height, width } = useWindowDimensions();
+  const [isActionSheetVisible, setIsActionSheetVisible] = useState(false);
 
   const CAROUSEL_HEIGHT = height * 0.5;
   const CAROUSEL_WIDTH = width;
@@ -126,8 +142,64 @@ export const MyPostDetailScreen = () => {
   }, []);
 
   const handleMorePress = useCallback(() => {
-    // TODO: Open bottom sheet with options like Edit Post, Delete Post, etc.
+    setIsActionSheetVisible(true);
   }, []);
+
+  const handleCloseActionSheet = useCallback(() => {
+    setIsActionSheetVisible(false);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(() => {
+    if (!postId || isDeletingPost) return;
+
+    void (async () => {
+      try {
+        await deletePost({ postId });
+        router.back();
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : deletePostError?.message || "Delete post failed";
+
+        Alert.alert("Delete Failed", message);
+      }
+    })();
+  }, [deletePost, deletePostError?.message, isDeletingPost, postId]);
+
+  const handleDeletePress = useCallback(() => {
+    if (isDeletingPost) return;
+
+    handleCloseActionSheet();
+    Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: handleDeleteConfirm,
+      },
+    ]);
+  }, [handleCloseActionSheet, handleDeleteConfirm, isDeletingPost]);
+
+  const actionMenuOptions = useMemo<MenuOption[]>(
+    () => [
+      {
+        id: "edit-post",
+        label: "Edit",
+        description: "Update this post later",
+        icon: PencilSimpleIcon,
+        onPress: handleCloseActionSheet,
+      },
+      {
+        id: "delete-post",
+        label: "Delete",
+        description: "Remove this post permanently",
+        icon: TrashIcon,
+        onPress: handleDeletePress,
+      },
+    ],
+    [handleCloseActionSheet, handleDeletePress],
+  );
 
   const { displayAddress } = useMemo(() => {
     if (!post) {
@@ -320,39 +392,17 @@ export const MyPostDetailScreen = () => {
               </Text>
 
               {/* Badges */}
-              <View className="flex-row items-center justify-evenly">
-                {/* Category Badge */}
-                <View className="flex-col items-center justify-center gap-sm ">
-                  <View className="border bg-surface overflow-hidden rounded-full">
-                    <Image
-                      source={ELECTRONICS_ICON}
-                      className="w-12 h-12 rounded-full"
-                      resizeMode="cover"
-                    />
-                  </View>
-                  <PostCategoryBadge category={post.category} />
-                </View>
-
+              <View className="flex-row items-center gap-sm">
                 {/* Post Type Badge */}
-                <View>
-                  <PostTypeIconBadge status={post.postType} size="xs" />
-                </View>
+                <PostTypeIconBadge status={post.postType} size="xs" />
+
+                {/* Category Badge */}
+                <PostCategoryBadge category={post.category} />
 
                 {/* Subcategory Badge */}
-                <View>
-                  <View className="flex-col items-center justify-center gap-sm ">
-                    <View className="border bg-surface overflow-hidden rounded-full">
-                      <Image
-                        source={ELECTRONICS_SUB_CATEGORY_ICONS.PHONE}
-                        className="w-12 h-12 rounded-full"
-                        resizeMode="cover"
-                      />
-                    </View>
-                    {subcategoryCode && (
-                      <PostSubcategoryBadge subcategory={subcategoryCode} />
-                    )}
-                  </View>
-                </View>
+                {subcategoryCode && (
+                  <PostSubcategoryBadge subcategory={subcategoryCode} />
+                )}
               </View>
             </View>
           </MotiView>
@@ -476,6 +526,61 @@ export const MyPostDetailScreen = () => {
               </View>
             </View>
           </MotiView>
+
+          {/* Divider */}
+          <View className="border-t border-muted mx-lg" />
+
+          {/* Potential matches*/}
+          <MotiView
+            from={{ opacity: 0, translateY: 8 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 240, delay: 380 }}
+          >
+            {!!similarPosts?.length && (
+              <View className="gap-sm">
+                <View className="flex-row items-center justify-between px-lg">
+                  <Text className="text-lg font-normal text-textPrimary">
+                    Potential matches
+                  </Text>
+                  {similarPosts.length > 3 && (
+                    <TouchableOpacity
+                      onPress={() => console.log("See all similar posts")}
+                      hitSlop={8}
+                    >
+                      <Text className="text-sm text-primary">See all →</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
+                    gap: metrics.spacing.md,
+                    paddingHorizontal: metrics.spacing.lg,
+                  }}
+                >
+                  {similarPosts.map((p) => (
+                    <View
+                      key={p.id}
+                      style={{
+                        width: Math.round(
+                          (width - metrics.spacing.lg - 12) / 1.5,
+                        ),
+                      }}
+                    >
+                      <SimilarPostCard
+                        matchPost={p}
+                        onPress={() => {
+                          router.push(PROFILE_ROUTE.detailMatch(post.id, p.id));
+                        }}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </MotiView>
         </View>
       </Animated.ScrollView>
     );
@@ -519,6 +624,11 @@ export const MyPostDetailScreen = () => {
         }}
       />
       {renderContent()}
+      <MenuBottomSheet
+        isVisible={isActionSheetVisible}
+        onClose={handleCloseActionSheet}
+        options={actionMenuOptions}
+      />
     </>
   );
 };

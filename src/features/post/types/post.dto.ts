@@ -71,8 +71,12 @@ export type MatchingPostsData = {
 
 export type MatchingPostsResponse = ApiResponse<MatchingPostsData>;
 
-
-
+/**
+ * 
+ */
+export type PostDeleteByIdRequest = {
+  postId: string;
+};
 
 
 /**

@@ -10,15 +10,12 @@ import type {
 import { POST_CATEGORIES, PostType } from "@/src/features/post/types";
 
 import {
-  AppHeader,
   AppImage,
   AppInlineError,
   AppSplashScreen,
-  CloseButton,
-  HeaderTitle,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { router } from "expo-router";
 import { MotiView } from "moti";
@@ -37,10 +34,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ComparePostsScreenProps {
   postId: string;
@@ -259,26 +253,6 @@ const buildIdentityRows = (
   ];
 };
 
-const getTimeGapLabel = (leftDate: DateInput, rightDate: DateInput): string => {
-  const left = toDate(leftDate);
-  const right = toDate(rightDate);
-
-  if (!left || !right) return "";
-
-  const diffInHours = Math.round(
-    Math.abs(left.getTime() - right.getTime()) / (1000 * 60 * 60),
-  );
-
-  if (diffInHours <= 1) return "Happened around the same time";
-
-  if (diffInHours < 24) {
-    return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} apart`;
-  }
-
-  const diffInDays = Math.round(diffInHours / 24);
-  return `${diffInDays} day${diffInDays > 1 ? "s" : ""} apart`;
-};
-
 const mapEvidenceRows = (evidence: MatchEvidence[]): EvidenceRow[] => {
   if (!evidence.length) {
     return [
@@ -432,24 +406,6 @@ export const ComparePostsScreen = ({
     [identityRows],
   );
 
-  const scorePercent = useMemo(
-    () => (matchedPost ? Math.round((matchedPost.score ?? 0) * 100) : 0),
-    [matchedPost],
-  );
-
-  const matchMetaLabel = useMemo(() => {
-    const category = matchedPost?.category ?? post1?.category;
-    return getCategoryLabel(category);
-  }, [matchedPost, post1]);
-
-  const timeGapLabel = useMemo(
-    () =>
-      post1 && matchedPost
-        ? getTimeGapLabel(post1.eventTime, matchedPost.eventTime)
-        : "",
-    [post1, matchedPost],
-  );
-
   const matchedAuthorId = matchedPostDetail?.author?.id;
   const isContactDisabled =
     !matchedAuthorId || isLoadingMatchedPostDetail || isCreating;
@@ -463,14 +419,21 @@ export const ComparePostsScreen = ({
     try {
       const req = { memberId: matchedAuthorId };
       const res = await create(req);
+
       if (!res.data?.conversation?.conversationId) {
         toast.error("Unable to start conversation. Please try again.");
         return;
       }
+
       router.push(CHAT_ROUTE.message(res.data?.conversation?.conversationId));
     } catch {
       toast.error("Failed to start chat. Please try again.");
     }
+  };
+
+  const handleContactPress = () => {
+    if (isContactDisabled) return;
+    router.push(PROFILE_ROUTE.handoverRequest(postId, otherPostId));
   };
 
   if (isLoadingMatch || isLoadingPost1) return <AppSplashScreen />;
@@ -478,56 +441,15 @@ export const ComparePostsScreen = ({
   if (error || !matchedPost || !post1) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.surface }}>
-        <AppHeader
-          left={<CloseButton />}
-          center={
-            <HeaderTitle title="Compare Items" className="items-center" />
-          }
-        />
         <AppInlineError message="Could not load comparison details." />
       </View>
     );
   }
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: colors.surface }}
-      edges={["top", "left", "right"]}
-    >
-      <AppHeader
-        right={<CloseButton />}
-        center={<HeaderTitle title="Compare Items" className="items-center" />}
-      />
-
+    <View style={{ flex: 1, backgroundColor: colors.surface }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-4 pb-8">
-          <View className="mb-4 flex-row items-start justify-between gap-3">
-            <View
-              className="flex-row items-center rounded-full px-2.5 py-1"
-              style={{
-                backgroundColor: colors.babu[100],
-                borderWidth: 1,
-                borderColor: colors.babu[200],
-              }}
-            >
-              <View
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 99,
-                  backgroundColor: colors.babu[500],
-                  marginRight: 6,
-                }}
-              />
-              <Text
-                className="text-xs font-semibold"
-                style={{ color: colors.babu[600] }}
-              >
-                {scorePercent}% match
-              </Text>
-            </View>
-          </View>
-
           <MotiView
             from={{ opacity: 0, translateY: 20, scale: 0.98 }}
             animate={{ opacity: 1, translateY: 0, scale: 1 }}
@@ -661,7 +583,7 @@ export const ComparePostsScreen = ({
           }}
         >
           <TouchableOpacity
-            onPress={handleContactAuthor}
+            onPress={handleContactPress}
             disabled={isContactDisabled}
             activeOpacity={0.8}
             className="items-center justify-center"
@@ -680,17 +602,8 @@ export const ComparePostsScreen = ({
               {isCreating ? "Connecting..." : "Contact Author"}
             </Text>
           </TouchableOpacity>
-
-          {!matchedAuthorId && !isLoadingMatchedPostDetail && (
-            <Text
-              className="mt-2 text-center text-xs"
-              style={{ color: colors.text.muted }}
-            >
-              Author info is unavailable for this match.
-            </Text>
-          )}
         </View>
       </MotiView>
-    </SafeAreaView>
+    </View>
   );
 };

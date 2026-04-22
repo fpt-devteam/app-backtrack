@@ -1,5 +1,3 @@
-// src/features/handover/screens/HandoverScreen.tsx
-
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { HandoverRequestCard } from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
@@ -80,7 +78,9 @@ const HandoverScreen = () => {
   // In-progress: Ongoing (coordinating) + Delivered (awaiting confirmation)
   const inProgressHandovers = useMemo(
     () =>
-      handovers.filter((r) => r.status === "Ongoing" || r.status === "Delivered"),
+      handovers.filter(
+        (r) => r.status === "Ongoing" || r.status === "Delivered",
+      ),
     [handovers],
   );
 

@@ -55,6 +55,8 @@ const UserPostScreen = () => {
   const [selectedTab, setSelectedTab] = useState<UserPostFilter>("all");
   const { data: posts, isLoading, error, refetch } = useGetAllMyPost();
 
+  console.log("data", posts);
+
   const filteredPosts = useMemo<UserPost[]>(
     () =>
       selectedTab === "all"

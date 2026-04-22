@@ -9,6 +9,7 @@ import { PostTypeIconBadge } from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
 import {
+  AppBackButton,
   AppButton,
   AppImage,
   AppInlineError,
@@ -16,7 +17,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { colors, metrics } from "@/src/shared/theme";
+import { colors, metrics, typography } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils/datetime.utils";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
@@ -34,6 +35,7 @@ import {
   ScrollView,
   Text,
   TextInput,
+  TextStyle,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -42,12 +44,13 @@ const MAX_MESSAGE_LENGTH = 300;
 
 type Params = {
   postId: string;
+  otherPostId: string;
 };
 
-const HandoverRequestScreen = () => {
+export default function HandoverRequestScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAppUser();
-  const { postId } = useLocalSearchParams<Params>();
+  const { postId, otherPostId } = useLocalSearchParams<Params>();
   const {
     isLoading,
     data: post,
@@ -75,39 +78,40 @@ const HandoverRequestScreen = () => {
       const isFoundPost = post.postType === PostType.Found;
 
       const req: CreateC2CReturnReportRequest = {
-        finderId: isFoundPost ? post.author.id : user.id,
-        ownerId: isFoundPost ? user.id : post.author.id,
-        finderPostId: isFoundPost ? post.id : undefined,
-        ownerPostId: isFoundPost ? undefined : post.id,
-        status: "Ongoing",
+        finderPostId: isFoundPost ? post.id : otherPostId,
+        ownerPostId: isFoundPost ? otherPostId : post.id,
       };
 
       if (!hasCreatedReturnReport) {
-        await createC2CReturnReport(req);
+        const res = await createC2CReturnReport(req);
         setHasCreatedReturnReport(true);
+
+        console.log("handover: ", res);
+        // if (res) {
+        //   router.dismissAll();
+        //   router.navigate(HANDOVER_ROUTE.detail(res.id));
+        //   toast.success("Handover request sent successfully!");
+        // } else {
+        //   toast.error("Failed to create handover request.");
+        // }
       }
 
-      try {
-        const conversation = await createConversation({
-          memberId: post.author.id,
-        });
-        const conversationId = conversation.data?.conversation?.conversationId;
+      console.log("UserId", user.id);
+      console.log("PartnerId: ", post.author.id);
 
-        if (!conversationId) throw new Error("Missing conversation ID");
+      const conversation = await createConversation({
+        memberId: post.author.id,
+      });
 
-        await sendMessage({
-          conversationId,
-          request: { conversationId, type: "text", content: trimmedMessage },
-        });
+      const conversationId = conversation.data?.conversation?.conversationId;
+      if (!conversationId) throw new Error("Missing conversation ID");
 
-        toast.success("Send handover request successfully!");
-      } catch {
-        toast.warning(
-          "Handover request sent",
-          "Your message could not be delivered in chat. Try sending it again.",
-        );
-        return;
-      }
+      await sendMessage({
+        conversationId,
+        request: { conversationId, type: "text", content: trimmedMessage },
+      });
+
+      toast.success("Send handover request successfully!");
     } catch {
       toast.error("Failed to send handover request.");
       return;
@@ -372,13 +376,17 @@ const HandoverRequestScreen = () => {
     <>
       <Stack.Screen
         options={{
-          title: "Request handover",
-          headerBackTitle: "Back",
+          headerTitle: "Handover Request",
+          headerRight: () => (
+            <AppBackButton type="xIcon" showBackground={false} />
+          ),
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
         }}
       />
       <View className="flex-1 bg-surface">{renderContent()}</View>
     </>
   );
-};
-
-export default HandoverRequestScreen;
+}

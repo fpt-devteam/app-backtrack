@@ -3,7 +3,6 @@ import { useCreateDirectConversation } from "@/src/features/chat/hooks";
 import {
   PostCategoryBadge,
   PostTypeIconBadge,
-  SimilarPostCard,
 } from "@/src/features/post/components";
 import { useMatchingPost } from "@/src/features/post/hooks";
 import { AppUserAvatar, ImageCarousel } from "@/src/shared/components";
@@ -26,7 +25,6 @@ import {
 } from "phosphor-react-native";
 import React, { ComponentType, useCallback, useMemo, useState } from "react";
 import {
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -400,63 +398,9 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
               </View>
             </View>
           </MotiView>
-
-          {/* Divider */}
-          <View className="border-t border-muted mx-lg" />
-
-          {/* Potential matches*/}
-          <MotiView
-            from={{ opacity: 0, translateY: 8 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 240, delay: 380 }}
-          >
-            {!!similarPosts?.length && (
-              <View className="gap-sm">
-                <View className="flex-row items-center justify-between px-lg">
-                  <Text className="text-lg font-normal text-textPrimary">
-                    Potential matches
-                  </Text>
-                  {similarPosts.length > 3 && (
-                    <TouchableOpacity
-                      onPress={() => console.log("See all similar posts")}
-                      hitSlop={8}
-                    >
-                      <Text className="text-sm text-primary">See all →</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{
-                    gap: metrics.spacing.md,
-                    paddingHorizontal: metrics.spacing.lg,
-                  }}
-                >
-                  {similarPosts.map((p) => (
-                    <View
-                      key={p.id}
-                      style={{
-                        width: Math.round(
-                          (width - metrics.spacing.lg - 12) / 1.5,
-                        ),
-                      }}
-                    >
-                      <SimilarPostCard matchPost={p} onPress={() => {}} />
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-          </MotiView>
         </View>
       </>
     );
-  };
-
-  const handleHandover = () => {
-    router.push(POST_ROUTE.handoverRequest(post.id));
   };
 
   return (
@@ -505,45 +449,6 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
       >
         {renderBody()}
       </Animated.ScrollView>
-
-      {/* Footer */}
-      <View
-        className="flex-row items-center justify-between bg-surface p-md border-t border-muted"
-        style={{ paddingBottom: insets.bottom }}
-      >
-        {/* Summary Info */}
-        <View className="flex-col items-center flex-1 pr-md">
-          <View className="flex-row items-center gap-xs">
-            <ClockIcon size={16} color={colors.secondary} weight="regular" />
-            <Text
-              className="flex-1 text-sm font-normal text-textPrimary"
-              numberOfLines={1}
-            >
-              {displayEventTime}
-            </Text>
-          </View>
-
-          <View className="mt-xs flex-row items-center gap-xs">
-            <MapPinIcon size={16} color={colors.secondary} weight="regular" />
-            <Text
-              className="flex-1 text-sm font-normal text-textPrimary"
-              numberOfLines={1}
-            >
-              {displayAddress}
-            </Text>
-          </View>
-        </View>
-
-        {/* Handover Button */}
-        <TouchableOpacity
-          onPress={handleHandover}
-          className="px-xl py-3 rounded-full bg-primary"
-        >
-          <Text className="text-base font-normal text-white">
-            Start handover
-          </Text>
-        </TouchableOpacity>
-      </View>
     </>
   );
 };

@@ -4,17 +4,20 @@ import type {
   MatchingPostsData,
   MatchingPostsRequest,
 } from "@/src/features/post/types";
+import { Optional } from "@/src/shared/types";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useCheckPostMatchingStatus } from "./useCheckPostMatchingStatus";
 
-export const useMatchingPost = (postId: string) => {
+export const useMatchingPost = (postId: Optional<string>) => {
   const { isMatching } = useCheckPostMatchingStatus(postId);
 
   const query = useQuery<MatchingPostsData>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
     enabled: !isMatching && !!postId,
     queryFn: async () => {
+      if (!postId) throw new Error("Post ID is required for matching");
+
       const request: MatchingPostsRequest = { postId };
       const response = await matchingPostsApi(request);
 

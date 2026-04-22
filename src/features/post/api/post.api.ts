@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -56,5 +56,10 @@ export async function searchPost(req: PostSearchRequest) {
 
 export async function getPostSubcategoriesApi() {
   const response = await publicClient.get<PostSubcategoryResponse>(POST_API.getSubcategories);
+  return response.data;
+}
+
+export async function deletePostApi(req: PostDeleteByIdRequest) {
+  const response = await privateClient.delete(POST_API.detail(req.postId));
   return response.data;
 } 

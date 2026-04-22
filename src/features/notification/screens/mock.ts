@@ -11,7 +11,7 @@ import {
   SHARED_ROUTE,
 } from "@/src/shared/constants";
 
-export const IS_NOTIFICATIONS_MOCK = true;
+export const IS_NOTIFICATIONS_MOCK = false;
 
 export const MOCK_NOTIFICATIONS: UserNotification[] = [
   {

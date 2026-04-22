@@ -18,7 +18,11 @@ export const PROFILE_ROUTE = {
   menuTab: "/(tabs)/profile/menu-tab" as ExternalPathString | RelativePathString,
   userPosts: "/(tabs)/profile/user-posts" as ExternalPathString | RelativePathString,
   userPostDetail: (postId: string) => `/(tabs)/profile/user-posts/${postId}` as ExternalPathString | RelativePathString,
+  detailMatch: (postId: string, otherPostId: string) =>
+    `/(tabs)/profile/user-posts/${postId}/${otherPostId}` as ExternalPathString | RelativePathString,
+
   userPostDetailEdit: (postId: string) => `/(tabs)/profile/user-posts/${postId}/edit` as ExternalPathString | RelativePathString,
+  handoverRequest: (postId: string, otherPostId: string) => `/(tabs)/profile/user-posts/${postId}/${otherPostId}/handover-request` as ExternalPathString | RelativePathString,
 } as const;
 
 export const POST_ROUTE = {
@@ -33,7 +37,6 @@ export const POST_ROUTE = {
   itemDetail: "/(tabs)/post/create/stepper/detail" as ExternalPathString | RelativePathString,
 
   details: (postId: string) => `/(tabs)/post/${postId}` as ExternalPathString | RelativePathString,
-  handoverRequest: (postId: string) => `/(tabs)/post/${postId}/handover-request` as ExternalPathString | RelativePathString,
   matching: (postId: string) => `/(tabs)/post/${postId}/matching` as ExternalPathString | RelativePathString,
   detailMatch: (postId: string, otherPostId: string) =>
     `/(tabs)/post/${postId}/compare/${otherPostId}` as ExternalPathString | RelativePathString,

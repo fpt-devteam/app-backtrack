@@ -65,7 +65,7 @@ const ProfileLayout = () => {
         }}
       />
 
-      <Stack.Screen name="user-posts" />
+      <Stack.Screen name="user-posts" options={{ headerShown: false }} />
     </Stack>
   );
 };
