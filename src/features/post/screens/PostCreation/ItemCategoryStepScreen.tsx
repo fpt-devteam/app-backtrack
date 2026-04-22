@@ -23,7 +23,7 @@ const CATEGORIES = [
   },
   {
     id: "cards",
-    title: "Wallets & Cards",
+    title: "Cards",
     description: "Credit cards, IDs, or personal wallets",
     icon: CARD_ICON,
     value: POST_CATEGORIES.CARD,
