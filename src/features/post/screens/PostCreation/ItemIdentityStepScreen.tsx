@@ -5,10 +5,13 @@ import { colors } from "@/src/shared/theme/colors";
 import { Nullable } from "@/src/shared/types";
 import {
   launchImageLibraryAsync,
+  launchCameraAsync,
+  requestCameraPermissionsAsync,
   type ImagePickerAsset,
   type ImagePickerOptions,
 } from "expo-image-picker";
-import { ImageIcon, XIcon } from "phosphor-react-native";
+import { ImageIcon, CameraIcon, XIcon } from "phosphor-react-native";
+import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
 import React from "react";
 import {
   Image,
@@ -26,6 +29,11 @@ const PICKER_OPTIONS: ImagePickerOptions = {
   allowsMultipleSelection: true,
 };
 
+const CAMERA_OPTIONS: ImagePickerOptions = {
+  mediaTypes: ["images"],
+  quality: 1,
+};
+
 const ItemIdentityStepScreen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const secondarySize = 0.4 * screenWidth;
@@ -35,7 +43,10 @@ const ItemIdentityStepScreen = () => {
   const removeImage = usePostCreationStore((state) => state.removeImage);
   const maxImages = usePostCreationStore((state) => state.maxImages);
 
+  const [isPickerSheetVisible, setIsPickerSheetVisible] = React.useState(false);
+
   const openGallery = async () => {
+    setIsPickerSheetVisible(false);
     const granted = await ensureMediaPermission();
     if (!granted) {
       toast.error("Media library permission is required to pick photos.");
@@ -43,6 +54,18 @@ const ItemIdentityStepScreen = () => {
     }
 
     const result = await launchImageLibraryAsync(PICKER_OPTIONS);
+    if (result.canceled || result.assets.length === 0) return;
+    addMulti(result.assets);
+  };
+
+  const takePhoto = async () => {
+    setIsPickerSheetVisible(false);
+    const { status } = await requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      toast.error("Camera permission is required to take photos.");
+      return;
+    }
+    const result = await launchCameraAsync(CAMERA_OPTIONS);
     if (result.canceled || result.assets.length === 0) return;
     addMulti(result.assets);
   };
@@ -66,7 +89,7 @@ const ItemIdentityStepScreen = () => {
         <View className="">
           <HeroSlot
             image={images[0]}
-            onPress={openGallery}
+            onPress={() => setIsPickerSheetVisible(true)}
             onRemove={() => removeImage(0)}
           />
         </View>
@@ -80,7 +103,7 @@ const ItemIdentityStepScreen = () => {
                 <SecondarySlot
                   image={image}
                   size={secondarySize}
-                  onPress={openGallery}
+                  onPress={() => setIsPickerSheetVisible(true)}
                   onRemove={() => removeImage(storeIndex)}
                 />
               </View>
@@ -96,7 +119,7 @@ const ItemIdentityStepScreen = () => {
                   <SecondarySlot
                     image={null}
                     size={secondarySize}
-                    onPress={openGallery}
+                    onPress={() => setIsPickerSheetVisible(true)}
                     onRemove={() => removeImage(storeIndex)}
                   />
                 </View>
@@ -104,6 +127,26 @@ const ItemIdentityStepScreen = () => {
             })}
         </View>
       </View>
+      <MenuBottomSheet
+        isVisible={isPickerSheetVisible}
+        onClose={() => setIsPickerSheetVisible(false)}
+        options={[
+          {
+            id: "gallery",
+            label: "Open Gallery",
+            description: "Pick from your photo library",
+            icon: ImageIcon,
+            onPress: openGallery,
+          },
+          {
+            id: "camera",
+            label: "Take Photo",
+            description: "Use your camera",
+            icon: CameraIcon,
+            onPress: takePhoto,
+          },
+        ]}
+      />
     </SafeAreaView>
   );
 };
