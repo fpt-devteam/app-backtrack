@@ -1,3 +1,4 @@
+import { analyzeImageApi } from "@/src/features/post/api";
 import { eventTimeSchema, type EventTime } from "@/src/features/post/schemas";
 import {
   CardSlice,
@@ -27,7 +28,6 @@ import {
 } from "@/src/shared/store";
 import { Nullable } from "@/src/shared/types";
 import { create } from "zustand";
-import { analyzeImageApi } from "../api";
 
 const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategoryCode> = {
   [POST_CATEGORIES.ELECTRONICS]: ELECTRONICS_SUBCATEGORY.PHONE,
@@ -122,7 +122,23 @@ export const usePostCreationStore = create<
     return get().aiAnalyzeDraft;
   },
 
-  resetForm: () => set(initialState),
+  resetForm: () => {
+    set(initialState);
+
+    const {
+      resetPhotoSlice,
+      resetLocationSlice,
+      resetElectronicDetail,
+      resetCardDetail,
+      resetPersonalBelongingDetail,
+    } = get();
+
+    resetPhotoSlice();
+    resetLocationSlice();
+    resetElectronicDetail();
+    resetCardDetail();
+    resetPersonalBelongingDetail();
+  },
 
   openPickerSheet: () => set({ isPickerSheetVisible: true }),
   closePickerSheet: () => set({ isPickerSheetVisible: false }),

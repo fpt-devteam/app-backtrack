@@ -209,13 +209,12 @@ const PostCreationStepperLayout = () => {
         toast.error("Failed to create post. Please try again.");
         return;
       }
-
-      resetForm();
       router.push(POST_ROUTE.matching(postId));
     } catch (e) {
       console.log("Submit failed", e);
       toast.error("Failed to create post. Please try again.");
     } finally {
+      resetForm();
       setIsCreating(false);
     }
   };
@@ -223,13 +222,14 @@ const PostCreationStepperLayout = () => {
   const navigation = useNavigation();
 
   const handleCancel = () => {
+    resetForm();
+
     const parent = navigation.getParent();
     if (parent) {
       parent.goBack();
     } else {
       router.back();
     }
-    resetForm();
   };
 
   const handleAIAnalyze = async () => {
@@ -279,7 +279,6 @@ const PostCreationStepperLayout = () => {
         <View className="flex-1">
           <Stack
             screenOptions={{
-              headerShown: false,
               animation: "slide_from_right",
               contentStyle: { backgroundColor: "transparent" },
             }}
@@ -287,7 +286,6 @@ const PostCreationStepperLayout = () => {
             <Stack.Screen
               name="category"
               options={{
-                headerShown: true,
                 headerTitle: "Item Classification",
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
@@ -303,7 +301,6 @@ const PostCreationStepperLayout = () => {
             <Stack.Screen
               name="sub-category"
               options={{
-                headerShown: true,
                 headerTitle: "Detailed Classification",
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
@@ -320,7 +317,6 @@ const PostCreationStepperLayout = () => {
             <Stack.Screen
               name="identity"
               options={{
-                headerShown: true,
                 headerTitle: "Visual Evidence",
                 headerBackVisible: false,
                 headerRight: () => (
@@ -337,7 +333,6 @@ const PostCreationStepperLayout = () => {
             <Stack.Screen
               name="location"
               options={{
-                headerShown: true,
                 headerTitle: "Pinpoint location",
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
@@ -354,7 +349,6 @@ const PostCreationStepperLayout = () => {
             <Stack.Screen
               name="timeline"
               options={{
-                headerShown: true,
                 headerTitle: "Occurrence time",
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />

@@ -27,6 +27,8 @@ export const PROFILE_ROUTE = {
 
 export const POST_ROUTE = {
   index: "/(tabs)/post" as ExternalPathString | RelativePathString,
+
+  // 
   create: "/(tabs)/post/create" as ExternalPathString | RelativePathString,
   stepper: "/(tabs)/post/create/stepper" as ExternalPathString | RelativePathString,
   category: "/(tabs)/post/create/stepper/category" as ExternalPathString | RelativePathString,
@@ -35,9 +37,10 @@ export const POST_ROUTE = {
   location: "/(tabs)/post/create/stepper/location" as ExternalPathString | RelativePathString,
   timeline: "/(tabs)/post/create/stepper/timeline" as ExternalPathString | RelativePathString,
   itemDetail: "/(tabs)/post/create/stepper/detail" as ExternalPathString | RelativePathString,
-
+  matching: (postId: string) => `/(tabs)/post/create/${postId}` as ExternalPathString | RelativePathString,
+  detailMatching: (postId: string, otherPostId: string) => `/(tabs)/post/create/${postId}/${otherPostId}` as ExternalPathString | RelativePathString,
+  // 
   details: (postId: string) => `/(tabs)/post/${postId}` as ExternalPathString | RelativePathString,
-  matching: (postId: string) => `/(tabs)/post/${postId}/matching` as ExternalPathString | RelativePathString,
   detailMatch: (postId: string, otherPostId: string) =>
     `/(tabs)/post/${postId}/compare/${otherPostId}` as ExternalPathString | RelativePathString,
   search: "/(tabs)/post/search" as ExternalPathString | RelativePathString,

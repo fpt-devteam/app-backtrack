@@ -22,9 +22,8 @@ export const MatchingScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { isMatching, similarPosts, error } = useMatchingPost(postId);
-  const navigation = useNavigation();
-
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
 
   useEffect(() => {
     setApplyingInterval(true);
@@ -50,7 +49,13 @@ export const MatchingScreen = () => {
     );
 
   const handleCancel = () => {
-    router.dismissTo(POST_ROUTE.index);
+    const parent = navigation.getParent();
+    if (parent) {
+      console.log("parent", parent?.getId());
+      parent.getParent()?.goBack();
+    } else {
+      router.back();
+    }
   };
 
   if (error)
@@ -74,6 +79,7 @@ export const MatchingScreen = () => {
           ),
         }}
       />
+
       <View className="flex-1 bg-surface">
         {/* Results */}
         <FlatList
@@ -83,7 +89,7 @@ export const MatchingScreen = () => {
             <SimilarPostCard
               matchPost={item}
               onPress={() => {
-                router.push(POST_ROUTE.detailMatch(postId, item.id));
+                router.push(POST_ROUTE.detailMatching(postId, item.id));
               }}
             />
           )}
