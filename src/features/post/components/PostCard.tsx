@@ -16,9 +16,10 @@ import { PostTypeIconBadge } from "./PostTypeIconBadge";
 type PostCardProps = {
   item: Post;
   size?: "sm" | "md";
+  isBlurred?: boolean;
 };
 
-export const PostCard = ({ item, size = "sm" }: PostCardProps) => {
+export const PostCard = ({ item, size = "sm", isBlurred = true }: PostCardProps) => {
   const { width } = useWindowDimensions();
 
   const cardWidth = width * (size === "sm" ? 0.43 : 0.9);
@@ -73,7 +74,11 @@ export const PostCard = ({ item, size = "sm" }: PostCardProps) => {
       {/* IMAGE */}
       <View className="w-full overflow-hidden" style={{ aspectRatio: 1.18 }}>
         <View className="">
-          <AppImage className="w-full h-full" source={{ uri: imageUrl }} />
+          <AppImage
+              className="w-full h-full"
+              source={{ uri: imageUrl }}
+              blurRadius={isBlurred ? 20 : 0}
+            />
         </View>
 
         {/* Status badge */}
