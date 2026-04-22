@@ -139,7 +139,6 @@ export function formatDate(input: string): string {
  *   formatShortEventTime(new Date())              // → "Apr  1 · 09:05"
  */
 export function formatShortEventTime(input: Date | string): string {
-  console.log(input);
   const d = toDate(typeof input === "string" ? input : input.toISOString());
   if (!d) return "Unknown";
   const month = MONTH_NAMES[d.getMonth()];

@@ -59,13 +59,7 @@ export const ChatScreen = () => {
   const renderBody = () => {
     if (isLoading) {
       return (
-        <View
-          className="flex-1 px-md"
-          style={{
-            justifyContent: "center",
-            marginBottom: metrics.tabBar.height,
-          }}
-        >
+        <View className="flex-1 items-center justify-center">
           <AppLoader />
         </View>
       );

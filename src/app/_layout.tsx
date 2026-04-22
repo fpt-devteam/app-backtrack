@@ -45,7 +45,7 @@ Notifications.setNotificationHandler({
 });
 
 export default function RootLayout() {
-  const [isInitializing, setIsInitializing] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const isLoaded = usePostSubcategoryStore((state) => state.isLoaded);
   const loadAllSubcategories = usePostSubcategoryStore(
     (state) => state.loadAllSubcategories,
@@ -55,7 +55,6 @@ export default function RootLayout() {
   useEffect(() => {
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.screenPath;
-      console.log("Url: ", url);
       router.push(url as RelativePathString | ExternalPathString);
     }
 

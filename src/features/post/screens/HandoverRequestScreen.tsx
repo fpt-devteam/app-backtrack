@@ -3,10 +3,7 @@ import {
   useCreateDirectConversation,
   useSendMessage,
 } from "@/src/features/chat/hooks";
-import {
-  useCreateC2CReturnReport,
-  useGetc2cHandoverPost,
-} from "@/src/features/handover/hooks";
+import { useCreateC2CReturnReport } from "@/src/features/handover/hooks";
 import { PostTypeIconBadge } from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
@@ -55,9 +52,6 @@ export default function HandoverRequestScreen() {
   const { user } = useAppUser();
   const { postId, otherPostId } = useLocalSearchParams<Params>();
 
-  const { getC2CHandoverPost, isLoading: isCheckingExistingHandover } =
-    useGetc2cHandoverPost();
-
   const {
     isLoading,
     data: otherPost,
@@ -70,18 +64,8 @@ export default function HandoverRequestScreen() {
     useCreateDirectConversation();
   const { sendMessage, isSendingMessage } = useSendMessage();
   const [message, setMessage] = useState("");
-
-  const isSubmitting =
-    isCheckingExistingHandover ||
-    isCreating ||
-    isCreatingConversation ||
-    isSendingMessage;
+  const isSubmitting = isCreating || isCreatingConversation || isSendingMessage;
   const isSubmitDisabled = isSubmitting || !message.trim();
-
-  const isNotFoundError = (error: unknown) => {
-    if (!(error instanceof Error)) return false;
-    return /404|not found/i.test(error.message);
-  };
 
   const handleCreateReturnReport = async () => {
     if (!otherPost || !user) return;
@@ -117,10 +101,12 @@ export default function HandoverRequestScreen() {
       });
 
       if (res) {
-        console.log("here");
         router.dismissAll();
-        router.push(HANDOVER_ROUTE.index);
-        router.push(HANDOVER_ROUTE.detail(res.id));
+        router.navigate(HANDOVER_ROUTE.index);
+
+        setTimeout(() => {
+          router.push(HANDOVER_ROUTE.detail(res.id));
+        }, 100);
         toast.success("Handover request sent successfully!");
         return;
       } else {

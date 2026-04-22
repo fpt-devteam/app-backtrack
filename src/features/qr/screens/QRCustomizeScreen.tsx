@@ -145,8 +145,6 @@ const QRCustomizeScreen = () => {
       },
     };
 
-    console.log("payload", payload);
-
     // try {
     //   await updateDesign(payload);
     //   router.back();

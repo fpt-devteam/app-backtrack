@@ -51,7 +51,6 @@ export const MatchingScreen = () => {
   const handleCancel = () => {
     const parent = navigation.getParent();
     if (parent) {
-      console.log("parent", parent?.getId());
       parent.getParent()?.goBack();
     } else {
       router.back();

@@ -542,14 +542,6 @@ export const MyPostDetailScreen = () => {
                   <Text className="text-lg font-normal text-textPrimary">
                     Potential matches
                   </Text>
-                  {similarPosts.length > 3 && (
-                    <TouchableOpacity
-                      onPress={() => console.log("See all similar posts")}
-                      hitSlop={8}
-                    >
-                      <Text className="text-sm text-primary">See all →</Text>
-                    </TouchableOpacity>
-                  )}
                 </View>
 
                 <ScrollView
