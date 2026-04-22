@@ -47,6 +47,7 @@ type PostCreationState = {
   };
 
   aiAnalyzeDraft: Promise<Nullable<AnalyzeImageResponse>>;
+  isPickerSheetVisible: boolean;
 };
 
 type PostCreateActions = {
@@ -55,8 +56,11 @@ type PostCreateActions = {
   selectSubCategory: (subCategory: PostSubcategoryCode) => void;
   updateEventDate: (date: EventTime) => void;
   updatePostTitle: (title: string) => void;
-  analyzeByAI: () => Promise<void>;
+  analyzeByAI: () => Promise<Nullable<AnalyzeImageResponse>>;
   getAnalyzeResult: () => Promise<Nullable<AnalyzeImageResponse>>;
+
+  openPickerSheet: () => void;
+  closePickerSheet: () => void;
 
   debug: () => void;
   resetForm: () => void;
@@ -71,6 +75,7 @@ const initialState: PostCreationState = {
     date: eventTimeSchema.getDefault(),
   },
   aiAnalyzeDraft: Promise.resolve(null),
+  isPickerSheetVisible: false,
 };
 
 export const usePostCreationStore = create<
@@ -114,10 +119,14 @@ export const usePostCreationStore = create<
     };
 
     set({ aiAnalyzeDraft: analyzeImageApi(req) });
+    return get().aiAnalyzeDraft;
   },
 
   resetForm: () => set(initialState),
-  
+
+  openPickerSheet: () => set({ isPickerSheetVisible: true }),
+  closePickerSheet: () => set({ isPickerSheetVisible: false }),
+
   getAnalyzeResult: () => get().aiAnalyzeDraft,
 
   debug: () => {

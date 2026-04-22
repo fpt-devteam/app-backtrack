@@ -50,7 +50,7 @@ export const MatchingScreen = () => {
     );
 
   const handleCancel = () => {
-    router.replace(POST_ROUTE.index);
+    router.dismissTo(POST_ROUTE.index);
   };
 
   if (error)

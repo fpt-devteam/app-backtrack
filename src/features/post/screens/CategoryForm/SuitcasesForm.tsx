@@ -105,7 +105,7 @@ const SuitcasesForm = () => {
 
           <View className="gap-sm">
             <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
-              Distinctive marks
+              Unique marks & traits
             </Text>
 
             <PostFormTextArea

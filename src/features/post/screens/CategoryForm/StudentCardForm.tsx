@@ -1,4 +1,7 @@
-import { PostFormField } from "@/src/features/post/components";
+import {
+  PostFormField,
+  PostFormTextArea,
+} from "@/src/features/post/components";
 import { usePostCreationStore } from "@/src/features/post/hooks";
 import { DatePickerField } from "@/src/shared/components";
 import React from "react";
@@ -29,6 +32,9 @@ const StudentCardForm = () => {
   );
   const setCardIssuingAuthority = usePostCreationStore(
     (state) => state.setCardIssuingAuthority,
+  );
+  const setCardAiDescription = usePostCreationStore(
+    (state) => state.setCardAiDescription,
   );
 
   return (
@@ -95,6 +101,17 @@ const StudentCardForm = () => {
             <DatePickerField
               value={cardDetail.expiryDate}
               onChange={setCardExpiryDate}
+            />
+          </View>
+
+          <View className="gap-sm">
+            <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
+              Unique marks & traits
+            </Text>
+
+            <PostFormTextArea
+              value={cardDetail.aiDescription ?? ""}
+              onChange={setCardAiDescription}
             />
           </View>
         </ScrollView>

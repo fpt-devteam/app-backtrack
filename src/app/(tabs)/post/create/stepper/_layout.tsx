@@ -8,8 +8,16 @@ import {
   TouchableIconButton,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
+import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
 import { POST_ROUTE } from "@/src/shared/constants";
+import { ensureMediaPermission } from "@/src/shared/services";
 import { colors, typography } from "@/src/shared/theme";
+import {
+  launchImageLibraryAsync,
+  launchCameraAsync,
+  requestCameraPermissionsAsync,
+  type ImagePickerOptions,
+} from "expo-image-picker";
 import {
   ExternalPathString,
   RelativePathString,
@@ -18,10 +26,21 @@ import {
   useNavigation,
 } from "expo-router";
 import { MotiView } from "moti";
-import { HeadCircuitIcon } from "phosphor-react-native";
+import { HeadCircuitIcon, ImageIcon, CameraIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
 import { Text, TextStyle, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const PICKER_OPTIONS: ImagePickerOptions = {
+  mediaTypes: ["images"],
+  quality: 1,
+  allowsMultipleSelection: true,
+};
+
+const CAMERA_OPTIONS: ImagePickerOptions = {
+  mediaTypes: ["images"],
+  quality: 1,
+};
 
 const STEP_KEY = {
   CATEGORY: "category",
@@ -56,6 +75,13 @@ const PostCreationStepperLayout = () => {
   const getUploadedImageUrls = usePostCreationStore(
     (state) => state.getUploadedImageUrls,
   );
+  const addMulti = usePostCreationStore((state) => state.addImages);
+  const isPickerSheetVisible = usePostCreationStore(
+    (state) => state.isPickerSheetVisible,
+  );
+  const closePickerSheet = usePostCreationStore(
+    (state) => state.closePickerSheet,
+  );
 
   const postType = usePostCreationStore((state) => state.postType);
   const category = usePostCreationStore((state) => state.category);
@@ -76,6 +102,30 @@ const PostCreationStepperLayout = () => {
   );
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const openGallery = async () => {
+    closePickerSheet();
+    const granted = await ensureMediaPermission();
+    if (!granted) {
+      toast.error("Media library permission is required to pick photos.");
+      return;
+    }
+    const result = await launchImageLibraryAsync(PICKER_OPTIONS);
+    if (result.canceled || result.assets.length === 0) return;
+    addMulti(result.assets);
+  };
+
+  const takePhoto = async () => {
+    closePickerSheet();
+    const { status } = await requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      toast.error("Camera permission is required to take photos.");
+      return;
+    }
+    const result = await launchCameraAsync(CAMERA_OPTIONS);
+    if (result.canceled || result.assets.length === 0) return;
+    addMulti(result.assets);
+  };
 
   const getAnalyzeResult = usePostCreationStore(
     (state) => state.getAnalyzeResult,
@@ -102,7 +152,6 @@ const PostCreationStepperLayout = () => {
   const handleNext = async () => {
     if (STEPS[currentStep].key === STEP_KEY.IDENTITY) {
       uploadImages();
-      analyzeByAI();
     }
 
     if (currentStep >= STEPS.length - 1) {
@@ -158,8 +207,6 @@ const PostCreationStepperLayout = () => {
       }
 
       resetForm();
-
-      router.navigate(POST_ROUTE.index);
       router.push(POST_ROUTE.matching(postId));
     } catch (e) {
       console.log("Submit failed", e);
@@ -186,7 +233,7 @@ const PostCreationStepperLayout = () => {
       setIsAnalyzing(true);
 
       const minimumDelay = new Promise((resolve) => setTimeout(resolve, 3000));
-      const [result] = await Promise.all([getAnalyzeResult(), minimumDelay]);
+      const [result] = await Promise.all([analyzeByAI(), minimumDelay]);
       console.log("AI Analyze Result:", result);
 
       const electronicDetail = result?.data?.electronic;
@@ -379,6 +426,27 @@ const PostCreationStepperLayout = () => {
           <AppLoader />
         </View>
       )}
+
+      <MenuBottomSheet
+        isVisible={isPickerSheetVisible}
+        onClose={closePickerSheet}
+        options={[
+          {
+            id: "gallery",
+            label: "Open Gallery",
+            description: "Pick from your photo library",
+            icon: ImageIcon,
+            onPress: openGallery,
+          },
+          {
+            id: "camera",
+            label: "Take Photo",
+            description: "Use your camera",
+            icon: CameraIcon,
+            onPress: takePhoto,
+          },
+        ]}
+      />
     </>
   );
 };
