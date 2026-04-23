@@ -189,6 +189,8 @@ const PostCreationStepperLayout = () => {
         draftAnalyzeResult?.data?.card?.itemName ||
         draftAnalyzeResult?.data?.personalBelonging?.itemName;
 
+      console.log("Title: ", title);
+
       const req: PostCreateRequest = {
         postTitle: postTitle || title || "Untitled Post",
         postType,
