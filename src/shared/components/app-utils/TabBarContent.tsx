@@ -1,6 +1,7 @@
+import { useAppUser } from "@/src/features/auth/providers";
 import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
-import { POST_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
@@ -19,6 +20,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { toast } from "../ui/toast";
 
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
@@ -30,6 +32,8 @@ const TAB_ICONS: Record<string, TabIcon> = {
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
+  const { user } = useAppUser();
+
   const leadingRoutes = state.routes.slice(0, 2); // -> post, handover
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
 
@@ -108,6 +112,16 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   };
 
   const handleAddPress = () => {
+    if (!user) {
+      router.push(AUTH_ROUTE.onboarding);
+      return;
+    }
+
+    if (!user.phone) {
+      toast.error("You need to verify your phone number.");
+      return;
+    }
+
     router.push(POST_ROUTE.create);
   };
 
