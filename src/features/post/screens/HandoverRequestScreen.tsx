@@ -16,7 +16,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE, HANDOVER_ROUTE } from "@/src/shared/constants";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { formatIsoDate } from "@/src/shared/utils/datetime.utils";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -40,7 +40,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSendNotification } from "../../notification/hooks";
-import { NotificationSendRequest } from "../../notification/types";
 
 const MAX_MESSAGE_LENGTH = 300;
 
@@ -103,26 +102,26 @@ export default function HandoverRequestScreen() {
         request: { conversationId, type: "text", content: trimmedMessage },
       });
 
-      const notiReq: NotificationSendRequest = {
-        target: {
-          userId: otherPost.author.id,
-        },
-        source: {
-          name:
-            "Hi, " +
-            (user.displayName || "Unknown User") +
-            " want to coordinate a handover with you",
-          eventId: new Date().toString(),
-        },
-        title: "Handover Request",
-        body: trimmedMessage,
-        type: "HandoverRequest",
-        data: {
-          screenPath: CHAT_ROUTE.information(conversationId),
-        },
-      };
+      // const notiReq: NotificationSendRequest = {
+      //   target: {
+      //     userId: otherPost.author.id,
+      //   },
+      //   source: {
+      //     name:
+      //       "Hi, " +
+      //       (user.displayName || "Unknown User") +
+      //       " want to coordinate a handover with you",
+      //     eventId: new Date().toString(),
+      //   },
+      //   title: "Handover Request",
+      //   body: trimmedMessage,
+      //   type: "HandoverRequest",
+      //   data: {
+      //     screenPath: CHAT_ROUTE.information(conversationId),
+      //   },
+      // };
 
-      await sendNotification(notiReq);
+      // await sendNotification(notiReq);
 
       if (res) {
         router.dismissAll();

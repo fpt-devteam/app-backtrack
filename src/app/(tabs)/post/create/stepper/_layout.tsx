@@ -94,6 +94,7 @@ const PostCreationStepperLayout = () => {
   );
 
   const postTitle = usePostCreationStore((state) => state.postTitle);
+  const patchPostTitle = usePostCreationStore((state) => state.updatePostTitle);
 
   const postType = usePostCreationStore((state) => state.postType);
   const category = usePostCreationStore((state) => state.category);
@@ -186,15 +187,17 @@ const PostCreationStepperLayout = () => {
 
     try {
       const imageUrls = await getUploadedImageUrls();
-      const draftAnalyzeResult = await getAnalyzeResult();
+      await getAnalyzeResult();
 
-      const title =
-        draftAnalyzeResult?.data?.electronic?.itemName ||
-        draftAnalyzeResult?.data?.card?.itemName ||
-        draftAnalyzeResult?.data?.personalBelonging?.itemName;
+      const titleData =
+        category === POST_CATEGORIES.CARD
+          ? cardDetail.itemName
+          : category === POST_CATEGORIES.ELECTRONICS
+            ? electronicDetail.itemName
+            : personalBelongingDetail.itemName;
 
       const req: PostCreateRequest = {
-        postTitle: postTitle || title || "Untitled Post",
+        postTitle: postTitle || titleData,
         postType,
         category,
         subcategoryCode: subCategoryCode,
@@ -280,7 +283,14 @@ const PostCreationStepperLayout = () => {
       if (personalBelongingDetail)
         usePostCreationStore.setState({ personalBelongingDetail });
 
-      console.log("AI Result: ", result);
+      const titleData =
+        category === POST_CATEGORIES.CARD
+          ? cardDetail?.itemName
+          : category === POST_CATEGORIES.ELECTRONICS
+            ? electronicDetail?.itemName
+            : personalBelongingDetail?.itemName;
+
+      if (titleData) patchPostTitle(titleData);
     } catch (error) {
       toast.error("AI analysis got error. Please try again.");
       console.log("Error during AI analysis:", error);
