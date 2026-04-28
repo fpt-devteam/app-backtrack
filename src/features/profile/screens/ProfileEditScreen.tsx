@@ -4,6 +4,7 @@ import { usePatchProfile } from "@/src/features/profile/hooks";
 import type { UpdateProfileRequest } from "@/src/features/profile/types";
 import { AppBackButton, AppButton, AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
+import { colors } from "@/src/shared/theme";
 import { getErrorMessage } from "@/src/shared/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, Stack } from "expo-router";
@@ -14,6 +15,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Switch,
   Text,
   View,
 } from "react-native";
@@ -23,6 +25,8 @@ import * as yup from "yup";
 type ProfileEditSchema = {
   displayName: string;
   phone: string;
+  showEmail: boolean;
+  showPhone: boolean;
 };
 
 const profileEditSchema = yup
@@ -40,6 +44,8 @@ const profileEditSchema = yup
         excludeEmptyString: true,
       })
       .required(),
+    showEmail: yup.boolean().required(),
+    showPhone: yup.boolean().required(),
   })
   .required();
 
@@ -52,6 +58,8 @@ const ProfileEditScreen = () => {
     () => ({
       displayName: profile?.displayName?.trim() ?? "",
       phone: profile?.phone?.trim() ?? "",
+      showEmail: profile?.showEmail ?? false,
+      showPhone: profile?.showPhone ?? false,
     }),
     [profile],
   );
@@ -74,10 +82,12 @@ const ProfileEditScreen = () => {
   const isSaveDisabled = !isDirty || isPatchingProfile;
 
   const onSubmit: SubmitHandler<ProfileEditSchema> = async (data) => {
-    // ... (Giữ nguyên logic onSubmit của bạn)
     const payload: UpdateProfileRequest = {};
     if (dirtyFields.displayName) payload.displayName = data.displayName.trim();
     if (dirtyFields.phone) payload.phone = data.phone.trim();
+    if (dirtyFields.showEmail) payload.showEmail = data.showEmail;
+    if (dirtyFields.showPhone) payload.showPhone = data.showPhone;
+
     if (Object.keys(payload).length === 0) return;
 
     try {
@@ -161,6 +171,64 @@ const ProfileEditScreen = () => {
                     onChange={onChange}
                     placeholder="Your phone number"
                     error={errors.phone?.message}
+                  />
+                )}
+              />
+            </View>
+          </View>
+
+          <View className="px-sm mb-lg gap-xs mt-xl">
+            <Text className="text-xl font-bold text-textPrimary">
+              Privacy Settings
+            </Text>
+            <Text className="text-sm font-normal text-textSecondary leading-5">
+              Control which contact information is visible to other users on
+              your public profile.
+            </Text>
+          </View>
+
+          <View className="bg-surface rounded-2xl border border-divider overflow-hidden">
+            {/* Show Email Toggle */}
+            <View className="px-md py-md flex-row items-center justify-between border-b border-divider">
+              <View className="flex-1 mr-md">
+                <Text className="text-base font-normal text-textPrimary">
+                  Show Email
+                </Text>
+                <Text className="text-xs text-textSecondary">
+                  Allow others to see your email address
+                </Text>
+              </View>
+              <Controller
+                control={control}
+                name="showEmail"
+                render={({ field: { onChange, value } }) => (
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    trackColor={{ true: colors.primary }}
+                  />
+                )}
+              />
+            </View>
+
+            {/* Show Phone Toggle */}
+            <View className="px-md py-md flex-row items-center justify-between">
+              <View className="flex-1 mr-md">
+                <Text className="text-base font-normal text-textPrimary">
+                  Show Phone Number
+                </Text>
+                <Text className="text-xs text-textSecondary">
+                  Allow others to see your phone number
+                </Text>
+              </View>
+              <Controller
+                control={control}
+                name="showPhone"
+                render={({ field: { onChange, value } }) => (
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    trackColor={{ true: colors.primary }}
                   />
                 )}
               />
