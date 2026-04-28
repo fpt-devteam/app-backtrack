@@ -1,3 +1,10 @@
+import {
+  format,
+  formatDuration,
+  intervalToDuration,
+  parseISO,
+} from "date-fns";
+
 export type TimeSincePastOptions = {
   /** "just now" if within this many seconds */
   justNowSeconds?: number;
@@ -265,19 +272,67 @@ export function getDateLabel(input: Date | string): string {
   }
   return `${weekday}, ${formatted}`;
 }
-
-
-
-import { format } from 'date-fns';
-
 type DateFormatPattern = "yyyy-MM-dd" | "MM/dd/yyyy" | "dd/MM/yyyy" | "yyyy/MM/dd";
+
+const TIME_GAP_REGEX =
+  /^(?:(\d+)\.)?(\d{1,2}):(\d{2}):(\d{2})(?:\.(\d+))?$/;
 
 export const formatDateByPattern = (input: Date | string | number, pattern: DateFormatPattern) => {
   const result = format(input, pattern);
   return result;
 }
 
-import { parseISO } from 'date-fns';
+const parseTimeGapToMilliseconds = (input?: string | null): number | null => {
+  if (!input) return null;
+
+  const match = TIME_GAP_REGEX.exec(input.trim());
+  if (!match) return null;
+
+  const [, daysRaw, hoursRaw, minutesRaw, secondsRaw, fractionRaw] = match;
+
+  const days = Number(daysRaw ?? 0);
+  const hours = Number(hoursRaw ?? 0);
+  const minutes = Number(minutesRaw ?? 0);
+  const seconds = Number(secondsRaw ?? 0);
+
+  if (
+    Number.isNaN(days) ||
+    Number.isNaN(hours) ||
+    Number.isNaN(minutes) ||
+    Number.isNaN(seconds)
+  ) {
+    return null;
+  }
+
+  const milliseconds = Number(`0.${fractionRaw ?? "0"}`) * 1000;
+
+  return (
+    (((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000 +
+    milliseconds
+  );
+};
+
+export const formatCompareTimeGap = (input?: string | null): string => {
+  const diffInMs = parseTimeGapToMilliseconds(input);
+
+  if (diffInMs === null) return "Time gap unavailable";
+  if (diffInMs < 60_000) return "Less than a minute apart";
+
+  const duration = intervalToDuration({ start: 0, end: diffInMs });
+
+  if ((duration.days ?? 0) >= 1) {
+    const label = formatDuration(duration, { format: ["days", "hours"] });
+    return label ? `About ${label} apart` : "About 1 day apart";
+  }
+
+  if ((duration.hours ?? 0) >= 1) {
+    const label = formatDuration(duration, { format: ["hours", "minutes"] });
+    return label ? `About ${label} apart` : "About 1 hour apart";
+  }
+
+  const label = formatDuration(duration, { format: ["minutes"] });
+  return label ? `About ${label} apart` : "Less than a minute apart";
+};
 
 export const parseStringToDate = (dateString?: string | null) => {
   if (!dateString) return null;

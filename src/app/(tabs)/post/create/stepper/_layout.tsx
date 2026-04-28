@@ -4,7 +4,11 @@ import {
   usePostCreationStore,
 } from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
-import { CardDetail, PostCreateRequest } from "@/src/features/post/types";
+import {
+  CardDetail,
+  POST_CATEGORIES,
+  PostCreateRequest,
+} from "@/src/features/post/types";
 import {
   AppBackButton,
   AppLink,
@@ -189,8 +193,6 @@ const PostCreationStepperLayout = () => {
         draftAnalyzeResult?.data?.card?.itemName ||
         draftAnalyzeResult?.data?.personalBelonging?.itemName;
 
-      console.log("Title: ", title);
-
       const req: PostCreateRequest = {
         postTitle: postTitle || title || "Untitled Post",
         postType,
@@ -201,9 +203,13 @@ const PostCreationStepperLayout = () => {
         externalPlaceId: location.placeId,
         displayAddress: location.address,
         eventTime: timelineDate ?? new Date(),
-        electronicDetail,
-        cardDetail,
-        personalBelongingDetail,
+        ...(category === POST_CATEGORIES.ELECTRONICS
+          ? { electronicDetail }
+          : {}),
+        ...(category === POST_CATEGORIES.CARD ? { cardDetail } : {}),
+        ...(category === POST_CATEGORIES.PERSONAL_BELONGINGS
+          ? { personalBelongingDetail }
+          : {}),
       };
 
       const postDetails = await createPost(req);
@@ -237,6 +243,8 @@ const PostCreationStepperLayout = () => {
   };
 
   const handleAIAnalyze = async () => {
+    toast.error("AI analysis failed. Please try again.");
+
     try {
       const imageUrls = await getUploadedImageUrls();
 

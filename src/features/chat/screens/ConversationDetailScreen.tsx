@@ -25,6 +25,8 @@ import { CHAT_ROUTE } from "@/src/shared/constants";
 import { router, Stack } from "expo-router";
 import { useMemo } from "react";
 import { Text } from "react-native";
+import { useSendNotification } from "../../notification/hooks";
+import { NotificationSendRequest } from "../../notification/types";
 
 type Props = {
   conversationId: string;
@@ -35,6 +37,7 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
   const { sendMessage, isSendingMessage } = useSendMessage();
   const { data: conversationDetail, isLoading: isLoadingConversation } =
     useConversationDetail(conversationId);
+  const { sendNotification } = useSendNotification();
 
   const isLoading = isLoadingConversation || !conversationDetail;
   const partner = conversationDetail?.partner;
@@ -54,13 +57,31 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
   const handleSendMessage = useCallback(
     async (messageText: string) => {
       if (!conversationId || !user) return;
-      if (!conversationDetail) return;
+      if (!conversationDetail || !conversationDetail.partner) return;
 
       try {
         await sendMessage({
           conversationId,
           request: { conversationId, type: "text", content: messageText },
         });
+
+        const req: NotificationSendRequest = {
+          target: {
+            userId: conversationDetail.partner.id,
+          },
+          source: {
+            name: "Message from " + (user.displayName || "Unknown User"),
+            eventId: new Date().toString(),
+          },
+          title: "Message from " + (user.displayName || "Unknown User"),
+          body: messageText,
+          type: "ChatEvent",
+          data: {
+            screenPath: CHAT_ROUTE.information(conversationId),
+          },
+        };
+
+        await sendNotification(req);
       } catch (error) {
         toast.error("Failed to send message. Please try again.");
       }

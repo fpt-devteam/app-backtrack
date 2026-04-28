@@ -221,7 +221,12 @@ const ExploreSectionRow = ({
 }) => {
   const renderCard = useCallback(
     ({ item }: { item: Post }) => (
-      <PostCard item={item} isBlurred={!matchedPostIds.has(item.id)} />
+      <PostCard
+        item={item}
+        isBlurred={
+          !matchedPostIds.has(item.id) || item.category === POST_CATEGORIES.CARD
+        }
+      />
     ),
     [matchedPostIds],
   );

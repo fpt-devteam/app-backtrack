@@ -2,8 +2,8 @@ import { PushTokenDeviceUpdateRequest } from "@/src/features/notification/types"
 import { privateClient } from "@/src/shared/api";
 
 const DEVICE_API = {
-  SYNC_DEVICE: "/api/notification/device/register",
-  UNSYNC_DEVICE: "/api/notification/device/unregister",
+  SYNC_DEVICE: "/api/core/devices/register",
+  UNSYNC_DEVICE: "/api/core/devices/unregister",
 } as const;
 
 export const registerDeviceApi = async (req: PushTokenDeviceUpdateRequest) => {

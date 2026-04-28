@@ -8,10 +8,10 @@ import {
 import { privateClient } from "@/src/shared/api";
 
 const NOTIFICATION_API = {
-  FILTER: "/api/notification",
-  UPDATE_STATUS: "/api/notification",
-  SEND: "/api/notification",
-  UNREAD_COUNT: "/api/notification/unread-count",
+  FILTER: "/api/core/notifications",
+  UPDATE_STATUS: "/api/core/notifications",
+  SEND: "/api/core/notifications",
+  UNREAD_COUNT: "/api/core/notifications/unread-count",
 } as const;
 
 export const filterNotificationsApi = async (

@@ -251,8 +251,9 @@ export type MatchStrength = typeof MATCH_STRENGTH[keyof typeof MATCH_STRENGTH];
 export type MatchEvidence = {
   key: string;
   strength: MatchStrength;
-  displayValue?: string;
-  note?: string;
+  lostValue: string;
+  foundValue: string;
+  note: string;
 }
 
 /**
@@ -332,4 +333,17 @@ export type SimilarPost = {
   score: number;
   evidence: MatchEvidence[];
   status: MatchStatus;
+  timeGap: string;
+  locationDistance: number;
 } & Omit<UserLocation, "radiusInKm">
+
+
+export type BasePost = {
+  postType: PostType
+  postTitle: Nullable<string>
+  location: LatLng
+  externalPlaceId: string
+  displayAddress: string
+  category: PostCategory
+  imageUrls: string[]
+}

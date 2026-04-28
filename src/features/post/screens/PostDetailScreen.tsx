@@ -1,29 +1,25 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { useCreateDirectConversation } from "@/src/features/chat/hooks";
 import {
   PostCategoryBadge,
   PostTypeIconBadge,
 } from "@/src/features/post/components";
-import { useMatchedPostIds, useMatchingPost } from "@/src/features/post/hooks";
+import { useMatchedPostIds } from "@/src/features/post/hooks";
 import { AppUserAvatar, ImageCarousel } from "@/src/shared/components";
-import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { formatIsoDate, toTitleCase } from "@/src/shared/utils";
+import { toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { BlurView } from "expo-blur";
 import { router, Stack } from "expo-router";
 import { MotiView } from "moti";
 import {
   ArrowLeftIcon,
-  ChatCircleDotsIcon,
   ClockIcon,
   ExportIcon,
   IconProps,
   MapPinIcon,
   SealCheckIcon,
 } from "phosphor-react-native";
-import React, { ComponentType, useCallback, useMemo, useState } from "react";
+import React, { ComponentType, useMemo } from "react";
 import {
   StyleSheet,
   Text,
@@ -39,7 +35,7 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { UserPost } from "../types";
+import { POST_CATEGORIES, UserPost } from "../types";
 
 const HeaderIcon = ({
   icon: Icon,
@@ -112,54 +108,18 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
   });
 
   const { user } = useAppUser();
-  const { similarPosts } = useMatchingPost(post.id);
   const { matchedPostIds } = useMatchedPostIds();
-  const isBlurred = !matchedPostIds.has(post.id);
+  const isBlurred =
+    !matchedPostIds.has(post.id) || post.category === POST_CATEGORIES.CARD;
 
-  const { create: createConversation, isCreating } =
-    useCreateDirectConversation();
-
-  const [isDismissing, setIsDismissing] = useState(false);
-
-  const handleStartChat = useCallback(async () => {
-    if (!post) return;
-    const authorId = post.author.id;
-
-    try {
-      const response = await createConversation({ memberId: authorId });
-      const conversationId = response.data?.conversation?.conversationId;
-
-      if (conversationId) {
-        setIsDismissing(true);
-
-        if (router.canDismiss()) {
-          router.dismissTo(POST_ROUTE.index);
-        }
-
-        const path = CHAT_ROUTE.message(conversationId);
-        router.navigate(path);
-      }
-    } catch {
-      toast.error("Failed to start chat. Please try again.");
-    }
-  }, [post]);
-
-  const {
-    postImageUrls,
-    displayAddress,
-    displayName,
-    displayEventTime,
-    isMyPost,
-  } = useMemo(() => {
+  const { postImageUrls, displayAddress, displayName } = useMemo(() => {
     if (!post) {
       return {
         postImageUrls: [] as string[],
         displayDescription: "",
         displayAddress: "Location not specified",
         displayName: "Anonymous",
-        displayEventTime: "Event time not specified",
         itemDetailRows: [] as { label: string; value: string }[],
-        isMyPost: true,
       };
     }
 
@@ -171,11 +131,8 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
         post.displayAddress || "Location not specified",
       ),
       displayName: author?.displayName || "Anonymous",
-      displayEventTime:
-        formatIsoDate(post.eventTime) || "Event time not specified",
       hasEmail: !!author?.showEmail && !!author?.email,
       hasPhone: !!author?.showPhone && !!author?.phone,
-      isMyPost: author.id === user?.id,
     };
   }, [post, user]);
 
@@ -387,17 +344,6 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
                     </Text>
                   </View>
                 </View>
-
-                {/* Chat icon button */}
-                {isMyPost ? null : (
-                  <TouchableOpacity
-                    onPress={handleStartChat}
-                    disabled={isCreating}
-                    className="p-2 rounded-full border"
-                  >
-                    <ChatCircleDotsIcon size={24} weight="regular" />
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
           </MotiView>
@@ -410,7 +356,6 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
     <>
       <Stack.Screen
         options={{
-          animation: isDismissing ? "none" : "default",
           headerTitle: "",
           headerTransparent: true,
           presentation: "card",

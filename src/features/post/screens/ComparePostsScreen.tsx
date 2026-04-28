@@ -1,31 +1,37 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import { PostTypeIconBadge } from "@/src/features/post/components";
+import { PostTypeIconBadge, ScoreBadge } from "@/src/features/post/components";
 import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
 import type {
+  BasePost,
   MatchEvidence,
   MatchStrength,
-  PostCategory,
   SimilarPost,
 } from "@/src/features/post/types";
-import { POST_CATEGORIES, PostType } from "@/src/features/post/types";
+import { PostType } from "@/src/features/post/types";
 
+import { useGetc2cHandoverPost } from "@/src/features/handover/hooks";
 import {
+  AppAccordion,
   AppImage,
   AppInlineError,
   AppSplashScreen,
 } from "@/src/shared/components";
 import { HANDOVER_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
+import { formatCompareTimeGap } from "@/src/shared/utils/datetime.utils";
+import { formatLocationGap } from "@/src/shared/utils/location.utils";
 import { router } from "expo-router";
 import { MotiView } from "moti";
 import {
-  CheckCircleIcon,
-  CircleIcon,
+  CalendarIcon,
+  ClockIcon,
   InfoIcon,
-  WarningCircleIcon,
-  XCircleIcon,
+  MapPinIcon,
+  NoteIcon,
+  SparkleIcon,
+  TextAaIcon,
 } from "phosphor-react-native";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Platform,
   ScrollView,
@@ -33,8 +39,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { LatLng } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useGetc2cHandoverPost } from "../../handover/hooks";
 
 interface ComparePostsScreenProps {
   postId: string;
@@ -60,6 +66,7 @@ type ComparePostLike = {
     itemName?: string;
     category?: string;
   };
+  location: LatLng;
   cardDetail?: SimilarPost["cardDetail"];
   personalBelongingDetail?: SimilarPost["personalBelongingDetail"];
   electronicDetail?: SimilarPost["electronicDetail"];
@@ -69,24 +76,18 @@ type ComparePostLike = {
 type EvidenceRow = {
   key: string;
   title: string;
-  detail: string;
+  note?: string;
+  leftValue: string;
+  rightValue: string;
   strength: MatchStrength;
 };
 
 type CompareCardProps = {
-  post: ComparePostLike;
+  post: BasePost;
   title: string;
-  rows: { label: string; value: string }[];
 };
 
 const FALLBACK_VALUE = "—";
-
-const CATEGORY_LABELS: Record<PostCategory, string> = {
-  [POST_CATEGORIES.ELECTRONICS]: "Electronics",
-  [POST_CATEGORIES.CARD]: "Cards",
-  [POST_CATEGORIES.PERSONAL_BELONGINGS]: "Personal belongings",
-  [POST_CATEGORIES.OTHERS]: "Other",
-};
 
 const EVIDENCE_LABELS: Record<string, string> = {
   card_number: "Card number matches exactly",
@@ -129,23 +130,6 @@ const formatDayLabel = (input: DateInput): string => {
   return `${date.toLocaleString("en-US", { month: "short" })} ${date.getDate()}`;
 };
 
-const formatCompactDate = (input: DateInput): string => {
-  const date = toDate(input);
-  if (!date) return FALLBACK_VALUE;
-
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
-};
-
-const formatIssueDate = (input: DateInput): string => {
-  const date = toDate(input);
-  if (!date) return FALLBACK_VALUE;
-
-  return `${date.toLocaleString("en-US", { month: "short" })} ${date.getFullYear()}`;
-};
-
 const formatEvidenceKey = (key: string): string => {
   const normalized = key
     .replaceAll(/[_-]/g, " ")
@@ -153,34 +137,6 @@ const formatEvidenceKey = (key: string): string => {
     .trim();
 
   return normalized.replaceAll(/\b\w/g, (char) => char.toUpperCase());
-};
-
-const getCategoryLabel = (category?: string): string => {
-  if (!category) return "Unknown category";
-
-  if (category in CATEGORY_LABELS) {
-    return CATEGORY_LABELS[category as PostCategory];
-  }
-
-  return formatEvidenceKey(category);
-};
-
-const getPostTitle = (post: ComparePostLike): string => {
-  const candidates = [
-    post.cardDetail?.itemName,
-    post.personalBelongingDetail?.itemName,
-    post.electronicDetail?.itemName,
-    post.otherDetail?.itemIdentifier,
-    post.item?.itemName,
-    post.postTitle,
-  ];
-
-  for (const candidate of candidates) {
-    const text = safeText(candidate);
-    if (text !== FALLBACK_VALUE) return text;
-  }
-
-  return "Unknown item";
 };
 
 const hasCardIdentity = (post: ComparePostLike): boolean => {
@@ -195,71 +151,15 @@ const hasCardIdentity = (post: ComparePostLike): boolean => {
   ].some((value) => safeText(value) !== FALLBACK_VALUE);
 };
 
-const buildIdentityRows = (
-  leftPost: ComparePostLike,
-  rightPost: ComparePostLike,
-): CompareIdentityRow[] => {
-  const shouldUseCardRows =
-    hasCardIdentity(leftPost) || hasCardIdentity(rightPost);
-
-  if (shouldUseCardRows) {
-    return [
-      {
-        label: "Holder",
-        leftValue: safeText(leftPost.cardDetail?.holderName),
-        rightValue: safeText(rightPost.cardDetail?.holderName),
-      },
-      {
-        label: "DOB",
-        leftValue: formatCompactDate(leftPost.cardDetail?.dateOfBirth),
-        rightValue: formatCompactDate(rightPost.cardDetail?.dateOfBirth),
-      },
-      {
-        label: "Card no.",
-        leftValue: safeText(leftPost.cardDetail?.cardNumberMasked),
-        rightValue: safeText(rightPost.cardDetail?.cardNumberMasked),
-      },
-      {
-        label: "Issued",
-        leftValue: formatIssueDate(leftPost.cardDetail?.issueDate),
-        rightValue: formatIssueDate(rightPost.cardDetail?.issueDate),
-      },
-    ];
-  }
-
-  return [
-    {
-      label: "Name",
-      leftValue: getPostTitle(leftPost),
-      rightValue: getPostTitle(rightPost),
-    },
-    {
-      label: "Category",
-      leftValue: getCategoryLabel(leftPost.category ?? leftPost.item?.category),
-      rightValue: getCategoryLabel(
-        rightPost.category ?? rightPost.item?.category,
-      ),
-    },
-    {
-      label: "Event",
-      leftValue: formatDayLabel(leftPost.eventTime),
-      rightValue: formatDayLabel(rightPost.eventTime),
-    },
-    {
-      label: "Address",
-      leftValue: safeText(leftPost.displayAddress),
-      rightValue: safeText(rightPost.displayAddress),
-    },
-  ];
-};
-
 const mapEvidenceRows = (evidence: MatchEvidence[]): EvidenceRow[] => {
   if (!evidence.length) {
     return [
       {
         key: "pending",
         title: "Evidence pending",
-        detail: "Matching signals are still being reviewed.",
+        note: "Matching signals are still being reviewed.",
+        leftValue: FALLBACK_VALUE,
+        rightValue: FALLBACK_VALUE,
         strength: "Partial",
       },
     ];
@@ -267,21 +167,13 @@ const mapEvidenceRows = (evidence: MatchEvidence[]): EvidenceRow[] => {
 
   return evidence.map((item) => {
     const note = safeText(item.note);
-    const displayValue = safeText(item.displayValue);
-    let detail = "No extra details provided.";
-
-    if (note === FALLBACK_VALUE) {
-      if (displayValue !== FALLBACK_VALUE) {
-        detail = displayValue;
-      }
-    } else {
-      detail = note;
-    }
 
     return {
       key: item.key,
       title: EVIDENCE_LABELS[item.key] ?? formatEvidenceKey(item.key),
-      detail,
+      note: note === FALLBACK_VALUE ? undefined : note,
+      leftValue: safeText(item.lostValue),
+      rightValue: safeText(item.foundValue),
       strength: item.strength,
     };
   });
@@ -294,32 +186,23 @@ const getStrengthColor = (strength: MatchStrength): string => {
   return colors.hof[500];
 };
 
-const renderStrengthIcon = (strength: MatchStrength) => {
-  if (strength === "Strong") {
-    return <CheckCircleIcon size={18} color={colors.babu[500]} weight="fill" />;
-  }
+const ComparePostCard = ({ post }: CompareCardProps) => {
+  const displayTitle = useMemo(() => {
+    if (post.postTitle?.trim()) return post.postTitle;
+    return "Untitled item";
+  }, [post.postTitle]);
 
-  if (strength === "Partial") {
-    return (
-      <WarningCircleIcon size={18} color={colors.kazan[500]} weight="fill" />
-    );
-  }
+  const displayAddress = useMemo(() => {
+    if (post.displayAddress?.trim()) return post.displayAddress;
+    return "Unknown location";
+  }, [post.displayAddress]);
 
-  if (strength === "Mismatch") {
-    return <XCircleIcon size={18} color={colors.error[500]} weight="fill" />;
-  }
-
-  return <CircleIcon size={18} color={colors.hof[500]} weight="fill" />;
-};
-
-const ComparePostCard = ({ post, rows }: CompareCardProps) => {
   return (
-    <View className="rounded-md border p-2.5" style={cardStyle}>
+    <View className="rounded-md border p-md2 gap-sm" style={cardStyle}>
       <View
         style={{
           borderRadius: metrics.borderRadius.sm,
           overflow: "hidden",
-          borderWidth: 1,
           borderColor: colors.divider,
           backgroundColor: colors.canvas,
           aspectRatio: 1,
@@ -335,21 +218,20 @@ const ComparePostCard = ({ post, rows }: CompareCardProps) => {
         </View>
       </View>
 
-      <View className="mt-3 gap-1.5">
-        {rows.map((row) => (
-          <View key={row.label} className="flex-row items-start gap-2">
-            <Text className="text-sm" style={{ color: colors.text.secondary }}>
-              {row.label}
-            </Text>
-            <Text
-              className="flex-1 text-right text-sm font-semibold"
-              style={{ color: colors.text.primary }}
-              numberOfLines={1}
-            >
-              {row.value}
-            </Text>
-          </View>
-        ))}
+      {/* Post Title */}
+      <Text className="text-md text-textPrimary text-center">
+        {displayTitle}
+      </Text>
+
+      {/* Informations */}
+      <View className="flex-row items-center gap-xs">
+        <MapPinIcon size={12} color={colors.primary} weight="fill" />
+        <Text
+          numberOfLines={1}
+          className="text-xs leading-5 font-normal text-textMuted"
+        >
+          {displayAddress}
+        </Text>
       </View>
     </View>
   );
@@ -360,8 +242,11 @@ export const ComparePostsScreen = ({
   otherPostId,
 }: ComparePostsScreenProps) => {
   const insets = useSafeAreaInsets();
+  const [expandedEvidenceKeys, setExpandedEvidenceKeys] = useState<string[]>(
+    [],
+  );
 
-  const { getC2CHandoverPost, isLoading } = useGetc2cHandoverPost();
+  const { getC2CHandoverPost } = useGetc2cHandoverPost();
 
   const {
     similarPosts,
@@ -378,42 +263,48 @@ export const ComparePostsScreen = ({
   const { data: matchedPostDetail, isLoading: isLoadingMatchedPostDetail } =
     useGetPostById({ postId: otherPostId });
 
-  const { create, isCreating } = useCreateDirectConversation();
+  const { isCreating } = useCreateDirectConversation();
 
   const matchedPost = useMemo(
     () => similarPosts.find((p) => p.id === otherPostId),
     [similarPosts, otherPostId],
   );
 
-  const identityRows = useMemo(
-    () =>
-      post1 && matchedPost
-        ? buildIdentityRows(
-            post1 as ComparePostLike,
-            matchedPost as ComparePostLike,
-          )
-        : [],
-    [post1, matchedPost],
-  );
+  console.log("matchedPost", matchedPost);
 
   const evidenceRows = useMemo(
     () => (matchedPost ? mapEvidenceRows(matchedPost.evidence ?? []) : []),
     [matchedPost],
   );
 
-  const leftRows = useMemo(
-    () =>
-      identityRows.map((row) => ({ label: row.label, value: row.leftValue })),
-    [identityRows],
+  const toggleEvidenceRow = (key: string) => {
+    setExpandedEvidenceKeys((current) =>
+      current.includes(key)
+        ? current.filter((item) => item !== key)
+        : [...current, key],
+    );
+  };
+
+  const isEvidenceExpanded = (key: string) =>
+    expandedEvidenceKeys.includes(key);
+
+  const formattedTimeGap = useMemo(
+    () => formatCompareTimeGap(matchedPost?.timeGap),
+    [matchedPost?.timeGap],
   );
 
-  const rightRows = useMemo(
-    () =>
-      identityRows.map((row) => ({ label: row.label, value: row.rightValue })),
-    [identityRows],
+  const formattedLocationGap = useMemo(
+    () => formatLocationGap(matchedPost?.locationDistance),
+    [matchedPost?.locationDistance],
   );
+
+  const safeScore = useMemo(() => {
+    if (matchedPost?.score == null) return 0;
+    return Math.round(matchedPost.score * 100);
+  }, [matchedPost]);
 
   const matchedAuthorId = matchedPostDetail?.author?.id;
+
   const isContactDisabled =
     !matchedAuthorId || isLoadingMatchedPostDetail || isCreating;
 
@@ -460,7 +351,19 @@ export const ComparePostsScreen = ({
   return (
     <View style={{ flex: 1, backgroundColor: colors.surface }}>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="px-4 pt-4 pb-8">
+        <View className="px-4 pt-4 pb-8 gap-md">
+          {/* Matching Rate */}
+          <View className="flex-row justify-between">
+            <Text
+              className="mb-sm text-lg font-normal"
+              style={{ color: colors.text.primary }}
+            >
+              Matching Rate
+            </Text>
+            <ScoreBadge value={safeScore} />
+          </View>
+
+          {/* Post Information */}
           <MotiView
             from={{ opacity: 0, translateY: 20, scale: 0.98 }}
             animate={{ opacity: 1, translateY: 0, scale: 1 }}
@@ -471,86 +374,236 @@ export const ComparePostsScreen = ({
               style={{ gap: metrics.spacing.sm }}
             >
               <View style={{ flex: 1 }}>
-                <ComparePostCard
-                  post={post1 as ComparePostLike}
-                  title="Your post"
-                  rows={leftRows}
-                />
+                <ComparePostCard post={post1 as BasePost} title="Your post" />
               </View>
 
               <View style={{ flex: 1 }}>
                 <ComparePostCard
-                  post={matchedPost as ComparePostLike}
+                  post={matchedPost as BasePost}
                   title="Their post"
-                  rows={rightRows}
                 />
               </View>
             </View>
           </MotiView>
 
+          {/* Evidences */}
           <MotiView
-            className="mt-6"
             from={{ opacity: 0, translateY: 16 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 260, delay: 120 }}
           >
             <Text
-              className="mb-3 text-base font-semibold"
+              className="mb-sm text-lg font-normal"
               style={{ color: colors.text.primary }}
             >
-              Evidence breakdown
+              Matching Evidences
             </Text>
 
-            <View
-              className="overflow-hidden rounded-md border"
-              style={cardStyle}
-            >
+            <View className="overflow-hidden gap-md2">
               {evidenceRows.map((evidence, index) => (
-                <View key={`${evidence.key}-${index}`}>
-                  <View className="flex-row items-start gap-2 px-3 py-3">
-                    <View style={{ marginTop: 1 }}>
-                      {renderStrengthIcon(evidence.strength)}
-                    </View>
+                <View key={`${evidence.key}-${index}`} style={cardStyle}>
+                  <AppAccordion
+                    isExpanded={isEvidenceExpanded(evidence.key)}
+                    onToggle={() => toggleEvidenceRow(evidence.key)}
+                    collapsedContent={
+                      <View className="flex-row items-center p-md2 ">
+                        <Text className="flex-1 text-sm font-normal text-textPrimary">
+                          {evidence.title}
+                        </Text>
 
-                    <View className="flex-1">
-                      <Text
-                        className="text-sm font-semibold"
-                        style={{ color: colors.text.primary }}
-                      >
-                        {evidence.title}
-                      </Text>
-                      <Text
-                        className="mt-0.5 text-xs"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        {evidence.detail}
-                      </Text>
-                    </View>
+                        <Text
+                          className="text-xs font-semibold"
+                          style={{ color: getStrengthColor(evidence.strength) }}
+                        >
+                          {evidence.strength}
+                        </Text>
+                      </View>
+                    }
+                    expandedContent={
+                      <View className="">
+                        <View className="overflow-hidden p-md2 gap-sm">
+                          <View className="flex-row gap-sm">
+                            <Text className="flex-1 text-sm font-normal text-textPrimary ">
+                              Lost post
+                            </Text>
 
-                    <Text
-                      className="text-sm font-semibold"
-                      style={{ color: getStrengthColor(evidence.strength) }}
-                    >
-                      {evidence.strength}
-                    </Text>
-                  </View>
+                            <Text className="flex-1 text-sm font-normal text-textPrimary ">
+                              Found post
+                            </Text>
+                          </View>
 
-                  {index < evidenceRows.length - 1 && (
-                    <View
-                      className="h-px"
-                      style={{
-                        backgroundColor: colors.divider,
-                        marginHorizontal: 12,
-                      }}
-                    />
-                  )}
+                          <View className="flex-row gap-sm">
+                            <Text className="flex-1 text-sm font-thin text-textSecondary ">
+                              {evidence.leftValue}
+                            </Text>
+
+                            <Text className="flex-1 text-sm font-thin text-textSecondary ">
+                              {evidence.rightValue}
+                            </Text>
+                          </View>
+
+                          {evidence.note ? (
+                            <View className="flex-row items-center gap-xs mt-xs">
+                              <NoteIcon size={20} weight="thin" />
+
+                              <Text className="flex-1 text-xs font-thin text-textSecondary ">
+                                {evidence.note}
+                              </Text>
+                            </View>
+                          ) : null}
+                        </View>
+                      </View>
+                    }
+                  />
                 </View>
               ))}
             </View>
           </MotiView>
 
+          {/* Time & Location Gap */}
           <MotiView
-            className="mt-4"
+            from={{ opacity: 0, translateY: 16 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 260, delay: 90 }}
+          >
+            <Text
+              className="mb-sm text-lg font-normal"
+              style={{ color: colors.text.primary }}
+            >
+              Match Proximity
+            </Text>
+
+            {/*  */}
+            <View
+              className="overflow-hidden rounded-md border px-sm"
+              style={cardStyle}
+            >
+              {/* Time Difference */}
+              <View className="flex-row items-center gap-sm py-sm">
+                <ClockIcon size={20} weight="regular" />
+                <Text className="flex-1 text-sm font-normal text-textPrimary">
+                  Time Difference
+                </Text>
+                <Text className="text-xs text-textSecondary font-thin">
+                  {formattedTimeGap}
+                </Text>
+              </View>
+
+              <View className="h-px px-sm bg-divider" />
+
+              {/* Location Gap */}
+              <View className="flex-row items-center gap-sm py-sm">
+                <MapPinIcon size={20} weight="regular" />
+                <Text className="flex-1 text-sm font-normal text-textPrimary">
+                  Distance
+                </Text>
+                <Text className="text-xs text-textSecondary font-thin">
+                  {formattedLocationGap}
+                </Text>
+              </View>
+            </View>
+          </MotiView>
+
+          {/* Match Calculation Breakdown */}
+          <MotiView
+            from={{ opacity: 0, translateY: 16 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 260, delay: 130 }}
+          >
+            <Text
+              className="mb-sm text-lg font-normal"
+              style={{ color: colors.text.primary }}
+            >
+              Match Confidence Factors
+            </Text>
+
+            <View
+              className="overflow-hidden rounded-md border px-sm py-xs"
+              style={cardStyle}
+            >
+              {/* Step 1: Location */}
+              <View className="flex-row items-start gap-sm py-sm">
+                <MapPinIcon
+                  size={16}
+                  weight="duotone"
+                  color={colors.status.info}
+                  style={{ marginTop: 2 }}
+                />
+                <View className="flex-1">
+                  <Text className="text-sm font-normal text-textPrimary">
+                    Location Proximity
+                  </Text>
+                  <Text className="text-xs font-thin text-textSecondary mt-xs">
+                    Found within a 20 km radius of the reported area.
+                  </Text>
+                </View>
+              </View>
+
+              <View className="h-px w-full bg-divider" />
+
+              {/* Step 2: Time */}
+              <View className="flex-row items-start gap-sm py-sm">
+                <CalendarIcon
+                  size={16}
+                  weight="duotone"
+                  color={colors.accentForeground}
+                  style={{ marginTop: 2 }}
+                />
+                <View className="flex-1">
+                  <Text className="text-sm font-normal text-textPrimary">
+                    Timeframe Alignment
+                  </Text>
+                  <Text className="text-xs font-thin text-textSecondary mt-xs">
+                    Reported within a 10-day window of the event.
+                  </Text>
+                </View>
+              </View>
+
+              <View className="h-px w-full bg-divider" />
+
+              {/* Step 3: Description */}
+              <View className="flex-row items-start gap-sm py-sm">
+                <TextAaIcon
+                  size={16}
+                  weight="duotone"
+                  color={colors.primary}
+                  style={{ marginTop: 2 }}
+                />
+                <View className="flex-1">
+                  <Text className="text-sm font-normal text-textPrimary">
+                    Description Similarity
+                  </Text>
+                  <Text className="text-xs font-thin text-textSecondary mt-xs">
+                    Visual traits and item details closely align.
+                  </Text>
+                </View>
+              </View>
+
+              <View className="h-px w-full bg-divider" />
+
+              {/* Step 4: AI */}
+              <View className="flex-row items-start gap-sm py-sm">
+                <SparkleIcon
+                  size={16}
+                  weight="duotone"
+                  color={colors.status.success}
+                  style={{ marginTop: 2 }}
+                />
+                <View className="flex-1">
+                  <Text className="text-sm font-normal text-textPrimary">
+                    Smart AI Verification
+                  </Text>
+                  <Text className="text-xs font-thin text-textSecondary mt-xs">
+                    Our AI system analyzed the data to confirm a high-confidence
+                    match.
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </MotiView>
+
+          {/* Tooltip */}
+          <MotiView
             from={{ opacity: 0, translateY: 16 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 260, delay: 180 }}
@@ -569,7 +622,7 @@ export const ComparePostsScreen = ({
                 style={{ marginTop: 1, marginRight: 8 }}
               />
               <Text
-                className="flex-1 text-xs"
+                className="flex-1 text-xs leading-relaxed"
                 style={{ color: colors.info[600] }}
               >
                 Full card number and contact details are hidden until both
