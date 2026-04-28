@@ -4,6 +4,7 @@ import {
   UserSettingSectionCard,
   UserSettingToggleRow,
 } from "@/src/features/qr/components";
+import { AppLoader } from "@/src/shared/components";
 import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme/colors";
@@ -17,10 +18,14 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useGetMyQR } from "../hooks";
 
 const QRProfileSettingScreen = () => {
-  const { user: profile, refetch } = useAppUser();
   const { patchProfile } = usePatchProfile();
+  const { user: profile, refetch } = useAppUser();
+  const { data: qrData, isLoading } = useGetMyQR();
+
+  const showLoading = isLoading;
 
   const [showPhoneNumber, setShowPhoneNumber] = useState(
     profile?.showPhone ?? false,
@@ -28,7 +33,7 @@ const QRProfileSettingScreen = () => {
   const [showEmailAddress, setShowEmailAddress] = useState(
     profile?.showEmail ?? false,
   );
-  const [customMessage, setCustomMessage] = useState("");
+  const [customMessage, setCustomMessage] = useState(qrData?.note ?? "");
 
   useEffect(() => {
     if (profile) {
@@ -73,29 +78,17 @@ const QRProfileSettingScreen = () => {
     router.back();
   };
 
-  return (
-    <SafeAreaView className="flex-1 bg-canvas">
-      {/* Header */}
-      <View className="flex-row items-center px-4 py-3 bg-canvas">
-        <TouchableIconButton
-          onPress={handleBack}
-          icon={<CaretLeftIcon size={22} color={colors.black} weight="bold" />}
-        />
+  const renderContent = () => {
+    if (showLoading) {
+      return (
+        <View className="flex-1 items-center justify-center">
+          <AppLoader />
+        </View>
+      );
+    }
 
-        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
-          Public Profile Settings
-        </Text>
-        {/* Spacer to balance the back button */}
-        <View style={{ width: 22 }} />
-      </View>
-
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 16, gap: 16 }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Contact Visibility */}
+    return (
+      <>
         <UserSettingSectionCard
           icon={<EyeIcon size={18} color={colors.primary} weight="fill" />}
           title="Contact Visibility"
@@ -142,6 +135,32 @@ const QRProfileSettingScreen = () => {
             className="bg-canvas border border-divider rounded-xl p-3 text-sm text-slate-700"
           />
         </UserSettingSectionCard>
+      </>
+    );
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-canvas">
+      {/* Header */}
+      <View className="flex-row items-center px-4 py-3 bg-canvas">
+        <TouchableIconButton
+          onPress={handleBack}
+          icon={<CaretLeftIcon size={22} color={colors.black} weight="bold" />}
+        />
+
+        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
+          Public Profile Settings
+        </Text>
+        <View style={{ width: 22 }} />
+      </View>
+
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ padding: 16, gap: 16 }}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {renderContent()}
       </ScrollView>
     </SafeAreaView>
   );
