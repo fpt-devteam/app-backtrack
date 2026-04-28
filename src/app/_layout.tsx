@@ -1,5 +1,6 @@
 import "@/global.css";
 import { AppUserProvider, AuthProvider } from "@/src/features/auth/providers";
+import { usePostSubcategoryStore } from "@/src/features/post/store";
 import { toastConfig } from "@/src/shared/components/ui/toast/toast-config";
 import {
   CARD_SUB_CATEGORY_ICONS,
@@ -16,14 +17,14 @@ import {
   router,
   Stack,
 } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { usePostSubcategoryStore } from "../features/post/store";
-import { AppSplashScreen } from "../shared/components";
+import { FALLBACK_AVATAR_SOURCE } from "../shared/data";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,9 +45,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
-  const [isInitializing, setIsInitializing] = useState(true);
-  const isLoaded = usePostSubcategoryStore((state) => state.isLoaded);
   const loadAllSubcategories = usePostSubcategoryStore(
     (state) => state.loadAllSubcategories,
   );
@@ -74,35 +75,36 @@ export default function RootLayout() {
     };
   }, []);
 
-  // Preload icons
+  // Prepare App
   useEffect(() => {
-    async function preloadImages() {
+    async function prepareApp() {
       try {
-        setIsInitializing(true);
-
         const images = [
           ...Object.values(CARD_SUB_CATEGORY_ICONS),
           ...Object.values(ELECTRONICS_SUB_CATEGORY_ICONS),
           ...Object.values(PERSONAL_BELONGING_SUB_CATEGORY_ICONS),
         ];
 
-        const cacheImages = images.map((image) =>
+        const cacheImagePromises = images.map((image) =>
           Asset.fromModule(image).downloadAsync(),
         );
 
-        await Promise.all(cacheImages);
+        await Promise.all([
+          ...cacheImagePromises,
+          Asset.loadAsync(FALLBACK_AVATAR_SOURCE),
+
+          //
+          loadAllSubcategories(),
+        ]);
       } catch (e) {
         console.warn("Preload failed", e);
       } finally {
-        setIsInitializing(false);
+        await SplashScreen.hideAsync();
       }
     }
 
-    preloadImages();
-    loadAllSubcategories();
+    prepareApp();
   }, []);
-
-  if (isInitializing || !isLoaded) return <AppSplashScreen />;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

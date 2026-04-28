@@ -55,10 +55,9 @@ export const AppUserProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      const idToken = await firebaseUser.getIdToken();
-
       await syncExpoToken();
 
+      const idToken = await firebaseUser.getIdToken();
       const response = await syncUser({ idToken });
 
       if (mountedRef.current) {
@@ -66,10 +65,7 @@ export const AppUserProvider: React.FC<{ children: React.ReactNode }> = ({
         lastUidRef.current = firebaseUser.uid;
       }
     } catch (e) {
-      console.error("[AppUserProvider] Sync failed:", e);
-      if (mountedRef.current) {
-      }
-      throw e;
+      console.log("Sync failed:", e);
     }
   }, [syncUser, syncExpoToken, clearUser]);
 

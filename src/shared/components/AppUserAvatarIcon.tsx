@@ -1,22 +1,21 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { RelativePathString, router } from "expo-router";
+import { Image } from "expo-image";
+import { router } from "expo-router";
 import React, { useMemo } from "react";
-import { Image, Pressable, View } from "react-native";
-
-const FALLBACK_SOURCE = {
-  uri: "https://firebasestorage.googleapis.com/v0/b/backtrack-sep490.firebasestorage.app/o/avatars%2Ffallbacks%2Fuser.jpg?alt=media&token=8b9db7ec-7cfb-47a3-81d4-8eccbe121e84",
-};
+import { Pressable, View } from "react-native";
+import { PROFILE_ROUTE } from "../constants";
+import { FALLBACK_AVATAR_SOURCE } from "../data";
 
 export const AppUserAvatarIcon = () => {
   const { user } = useAppUser();
 
   const source = useMemo(() => {
     const url = user?.avatarUrl?.trim();
-    return url ? { uri: url } : FALLBACK_SOURCE;
+    return { uri: url || FALLBACK_AVATAR_SOURCE };
   }, [user?.avatarUrl]);
 
   const handlePress = () => {
-    router.push("/profile" as RelativePathString);
+    router.navigate(PROFILE_ROUTE.index);
   };
 
   return (
@@ -24,8 +23,13 @@ export const AppUserAvatarIcon = () => {
       <View className="relative">
         <Image
           source={source}
-          resizeMode="cover"
-          className="w-8 h-8 rounded-full bg-gray-200"
+          contentFit="cover"
+          style={{
+            width: 28,
+            aspectRatio: 1,
+            borderRadius: 999,
+          }}
+          transition={1000}
         />
       </View>
     </Pressable>
