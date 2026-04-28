@@ -1,1 +1,1 @@
-export const DEFAULT_RADIUS_KM = 10;
+export const DEFAULT_RADIUS_KM = 20;
