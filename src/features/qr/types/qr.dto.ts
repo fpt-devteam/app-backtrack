@@ -13,6 +13,10 @@ export type GetMyQrDesignResponse = ApiResponse<UserQrDesign>;
 
 export type UpdateMyQrDesignPayload = UpdateMyQrDesignRequest;
 
+export type UpdateMyQrNotePayload = {
+  note: string;
+};
+
 export type UpdateMyQrDesignResponse = ApiResponse<UserQrDesign>;
 
 export type GetMySubscriptionResponse = ApiResponse<UserSubscription>;

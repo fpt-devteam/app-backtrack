@@ -1,5 +1,6 @@
 export const QR_CODES_ME_QUERY_KEY = ["qr-codes-", "me"] as const;
 export const QR_CODES_ME_DESIGN_QUERY_KEY = ["qr-codes", "me", "design"] as const;
+export const QR_CODES_ME_NOTE_QUERY_KEY = ["qr-codes", "me", "note"] as const;
 
 export const QR_SUBSCRIPTION_ME_QUERY_KEY = ["qr-subscription", "me"] as const;
 

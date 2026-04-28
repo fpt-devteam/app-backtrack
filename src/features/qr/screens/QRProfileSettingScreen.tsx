@@ -4,6 +4,7 @@ import {
   UserSettingSectionCard,
   UserSettingToggleRow,
 } from "@/src/features/qr/components";
+import { useGetMyQR, useUpdateQRNote } from "@/src/features/qr/hooks";
 import { AppLoader } from "@/src/shared/components";
 import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 import { toast } from "@/src/shared/components/ui/toast";
@@ -18,14 +19,14 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useGetMyQR } from "../hooks";
 
 const QRProfileSettingScreen = () => {
   const { patchProfile } = usePatchProfile();
   const { user: profile, refetch } = useAppUser();
   const { data: qrData, isLoading } = useGetMyQR();
+  const { updateNote, isUpdatingNote } = useUpdateQRNote();
 
-  const showLoading = isLoading;
+  const showLoading = isLoading || isUpdatingNote;
 
   const [showPhoneNumber, setShowPhoneNumber] = useState(
     profile?.showPhone ?? false,
@@ -33,14 +34,31 @@ const QRProfileSettingScreen = () => {
   const [showEmailAddress, setShowEmailAddress] = useState(
     profile?.showEmail ?? false,
   );
+
   const [customMessage, setCustomMessage] = useState(qrData?.note ?? "");
+
+  // const handleUpdateNote = useCallback(
+  //   async (value: string) => {
+  //     setShowPhoneNumber(value);
+  //     try {
+  //       await patchProfile({ showPhone: value });
+  //       toast.success("Settings updated");
+  //     } catch (err) {
+  //       setShowPhoneNumber(!value);
+  //       toast.error("Failed to update", getErrorMessage(err));
+  //     } finally {
+  //       refetch();
+  //     }
+  //   },
+  //   [patchProfile],
+  // );
 
   useEffect(() => {
     if (profile) {
       setShowPhoneNumber(profile.showPhone);
       setShowEmailAddress(profile.showEmail);
     }
-  }, [profile?.showPhone, profile?.showEmail]);
+  }, [profile]);
 
   const handleTogglePhone = useCallback(
     async (value: boolean) => {

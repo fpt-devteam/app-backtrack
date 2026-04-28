@@ -5,12 +5,14 @@ import type {
   GetMySubscriptionResponse,
   UpdateMyQrDesignPayload,
   UpdateMyQrDesignResponse,
+  UpdateMyQrNotePayload,
 } from "@/src/features/qr/types";
 import { privateClient } from "@/src/shared/api";
 
 export const QR_API = {
   me: "/api/core/qr/me",
   design: "/api/core/me/design",
+  patchNote: "/api/core/me/note",
   getMySubscription: "/api/core/subscriptions/me",
   getAllSubscriptionPlans: "/api/core/subscription-plans",
 } as const;
@@ -33,6 +35,14 @@ export async function getMyQrDesign() {
 export async function updateMyQrDesign(request: UpdateMyQrDesignPayload) {
   const response = await privateClient.put<UpdateMyQrDesignResponse>(
     QR_API.design,
+    request,
+  );
+  return response.data;
+}
+
+export async function updateMyQrNote(request: UpdateMyQrNotePayload) {
+  const response = await privateClient.patch<UpdateMyQrDesignResponse>(
+    QR_API.patchNote,
     request,
   );
   return response.data;
