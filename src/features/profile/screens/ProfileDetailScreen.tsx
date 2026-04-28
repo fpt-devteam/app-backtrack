@@ -20,7 +20,7 @@ const InfoRow = ({ icon: Icon, value }: Props) => (
 );
 
 const ProfileDetailScreen = () => {
-  const { user } = useAppUser();
+  const { user, refetch } = useAppUser();
 
   const displayName = user?.displayName?.trim() || user?.email || "User";
 
