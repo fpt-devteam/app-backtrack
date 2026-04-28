@@ -1,9 +1,9 @@
 import { useAppUser } from "@/src/features/auth/providers";
+import { usePatchProfile } from "@/src/features/profile/hooks";
 import {
   UserSettingSectionCard,
   UserSettingToggleRow,
 } from "@/src/features/qr/components";
-import { usePatchProfile } from "@/src/features/profile/hooks";
 import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme/colors";
@@ -19,12 +19,15 @@ import { ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const QRProfileSettingScreen = () => {
-  const { user: profile } = useAppUser();
+  const { user: profile, refetch } = useAppUser();
   const { patchProfile } = usePatchProfile();
 
-  const [showFullName, setShowFullName] = useState(true);
-  const [showPhoneNumber, setShowPhoneNumber] = useState(profile?.showPhone ?? false);
-  const [showEmailAddress, setShowEmailAddress] = useState(profile?.showEmail ?? false);
+  const [showPhoneNumber, setShowPhoneNumber] = useState(
+    profile?.showPhone ?? false,
+  );
+  const [showEmailAddress, setShowEmailAddress] = useState(
+    profile?.showEmail ?? false,
+  );
   const [customMessage, setCustomMessage] = useState("");
 
   useEffect(() => {
@@ -43,6 +46,8 @@ const QRProfileSettingScreen = () => {
       } catch (err) {
         setShowPhoneNumber(!value);
         toast.error("Failed to update", getErrorMessage(err));
+      } finally {
+        refetch();
       }
     },
     [patchProfile],
@@ -57,6 +62,8 @@ const QRProfileSettingScreen = () => {
       } catch (err) {
         setShowEmailAddress(!value);
         toast.error("Failed to update", getErrorMessage(err));
+      } finally {
+        refetch();
       }
     },
     [patchProfile],
@@ -93,13 +100,6 @@ const QRProfileSettingScreen = () => {
           icon={<EyeIcon size={18} color={colors.primary} weight="fill" />}
           title="Contact Visibility"
         >
-          <UserSettingToggleRow
-            label="Show Full Name"
-            subtitle="Visible to anyone who scans"
-            value={showFullName}
-            onValueChange={setShowFullName}
-          />
-
           <View className="h-px bg-slate-100" />
 
           <UserSettingToggleRow
