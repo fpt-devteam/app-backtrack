@@ -212,6 +212,8 @@ const PostCreationStepperLayout = () => {
           : {}),
       };
 
+      console.log("req:", req);
+
       const postDetails = await createPost(req);
       const postId = postDetails?.id;
 
@@ -243,8 +245,6 @@ const PostCreationStepperLayout = () => {
   };
 
   const handleAIAnalyze = async () => {
-    toast.error("AI analysis failed. Please try again.");
-
     try {
       const imageUrls = await getUploadedImageUrls();
 
@@ -279,8 +279,10 @@ const PostCreationStepperLayout = () => {
 
       if (personalBelongingDetail)
         usePostCreationStore.setState({ personalBelongingDetail });
+
+      console.log("AI Result: ", result);
     } catch (error) {
-      toast.error("AI analysis failed. Please try again.");
+      toast.error("AI analysis got error. Please try again.");
       console.log("Error during AI analysis:", error);
     }
   };
