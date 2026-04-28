@@ -1,44 +1,66 @@
+import { useAppUser } from "@/src/features/auth/providers";
 import {
   UserSettingSectionCard,
   UserSettingToggleRow,
 } from "@/src/features/qr/components";
-import {
-  IS_QR_FEATURE_MOCK,
-  MOCK_QR_PROFILE_SETTINGS,
-} from "@/src/features/qr/constants";
+import { usePatchProfile } from "@/src/features/profile/hooks";
 import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
+import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme/colors";
+import { getErrorMessage } from "@/src/shared/utils";
 import { router } from "expo-router";
 import {
   CaretLeftIcon,
   ChatTeardropTextIcon,
   EyeIcon,
 } from "phosphor-react-native";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const QRProfileSettingScreen = () => {
-  const defaults = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PROFILE_SETTINGS;
-    return MOCK_QR_PROFILE_SETTINGS; // replace with real data when available
-  }, []);
+  const { user: profile } = useAppUser();
+  const { patchProfile } = usePatchProfile();
 
-  const [showFullName, setShowFullName] = useState(defaults.showFullName);
+  const [showFullName, setShowFullName] = useState(true);
+  const [showPhoneNumber, setShowPhoneNumber] = useState(profile?.showPhone ?? false);
+  const [showEmailAddress, setShowEmailAddress] = useState(profile?.showEmail ?? false);
+  const [customMessage, setCustomMessage] = useState("");
 
-  const [showPhoneNumber, setShowPhoneNumber] = useState(
-    defaults.showPhoneNumber,
+  useEffect(() => {
+    if (profile) {
+      setShowPhoneNumber(profile.showPhone);
+      setShowEmailAddress(profile.showEmail);
+    }
+  }, [profile?.showPhone, profile?.showEmail]);
+
+  const handleTogglePhone = useCallback(
+    async (value: boolean) => {
+      setShowPhoneNumber(value);
+      try {
+        await patchProfile({ showPhone: value });
+        toast.success("Settings updated");
+      } catch (err) {
+        setShowPhoneNumber(!value);
+        toast.error("Failed to update", getErrorMessage(err));
+      }
+    },
+    [patchProfile],
   );
 
-  const [showEmailAddress, setShowEmailAddress] = useState(
-    defaults.showEmailAddress,
+  const handleToggleEmail = useCallback(
+    async (value: boolean) => {
+      setShowEmailAddress(value);
+      try {
+        await patchProfile({ showEmail: value });
+        toast.success("Settings updated");
+      } catch (err) {
+        setShowEmailAddress(!value);
+        toast.error("Failed to update", getErrorMessage(err));
+      }
+    },
+    [patchProfile],
   );
-
-  const [customMessage, setCustomMessage] = useState(defaults.customMessage);
-
-  const handleSave = () => {
-    // Implement save logic when API is ready
-  };
 
   const handleBack = () => {
     router.back();
@@ -84,7 +106,7 @@ const QRProfileSettingScreen = () => {
             label="Show Phone Number"
             subtitle="Allow direct calls"
             value={showPhoneNumber}
-            onValueChange={setShowPhoneNumber}
+            onValueChange={handleTogglePhone}
           />
 
           <View className="h-px bg-slate-100" />
@@ -92,7 +114,7 @@ const QRProfileSettingScreen = () => {
           <UserSettingToggleRow
             label="Show Email Address"
             value={showEmailAddress}
-            onValueChange={setShowEmailAddress}
+            onValueChange={handleToggleEmail}
           />
         </UserSettingSectionCard>
 
