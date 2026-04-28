@@ -102,27 +102,6 @@ export default function HandoverRequestScreen() {
         request: { conversationId, type: "text", content: trimmedMessage },
       });
 
-      // const notiReq: NotificationSendRequest = {
-      //   target: {
-      //     userId: otherPost.author.id,
-      //   },
-      //   source: {
-      //     name:
-      //       "Hi, " +
-      //       (user.displayName || "Unknown User") +
-      //       " want to coordinate a handover with you",
-      //     eventId: new Date().toString(),
-      //   },
-      //   title: "Handover Request",
-      //   body: trimmedMessage,
-      //   type: "HandoverRequest",
-      //   data: {
-      //     screenPath: CHAT_ROUTE.information(conversationId),
-      //   },
-      // };
-
-      // await sendNotification(notiReq);
-
       if (res) {
         router.dismissAll();
         router.navigate(HANDOVER_ROUTE.index);
