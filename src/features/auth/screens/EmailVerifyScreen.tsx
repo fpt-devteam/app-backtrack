@@ -1,17 +1,12 @@
 import { AppBackButton, AppButton, AppLink } from "@/src/shared/components";
+import { toast } from "@/src/shared/components/ui/toast";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { resendVerificationEmail } from "@/src/shared/services";
 import { colors, typography } from "@/src/shared/theme";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { EnvelopeOpenIcon } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Text,
-  TextStyle,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Text, TextStyle, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const COOLDOWN_TIME_SECOND = 60;
@@ -40,11 +35,7 @@ const EmailVerifyScreen = () => {
       await resendVerificationEmail();
       setCountdown(COOLDOWN_TIME_SECOND);
     } catch (error) {
-      console.log("Error: ", error);
-      Alert.alert(
-        "Error",
-        "Failed to resend verification email. Please try again later.",
-      );
+      toast.error("Failed to resend verification email. Please try again.");
     } finally {
       setIsLoading(false);
     }

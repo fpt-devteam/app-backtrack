@@ -8,10 +8,8 @@ import {
 } from "@/src/shared/components";
 import { AppGoogleLogo } from "@/src/shared/components/AppGoogleLogo";
 import { AUTH_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router } from "expo-router";
-import { PhoneIcon } from "phosphor-react-native";
 import React from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
@@ -82,13 +80,12 @@ const OnboardingScreen = () => {
     <KeyboardAvoidingView
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
-            paddingTop: 16,
-            paddingBottom: 24,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -136,54 +133,18 @@ const OnboardingScreen = () => {
               </View>
 
               {/* Divider */}
-              <View className="flex-row items-center my-10 gap-md2">
-                <View
-                  className="flex-1 h-px "
-                  style={{
-                    backgroundColor: colors.divider,
-                  }}
-                />
+              <View className="flex-row items-center my-lg gap-md2">
+                <View className="flex-1 h-px bg-divider" />
                 <Text className="text-xs text-textMuted font-medium">or</Text>
-                <View
-                  className="flex-1 h-px "
-                  style={{
-                    backgroundColor: colors.divider,
-                  }}
-                />
+                <View className="flex-1 h-px bg-divider" />
               </View>
 
               {/* Social Buttons */}
               <View className="gap-md2 flex-row justify-center">
                 <TouchableIconButton
                   icon={
-                    <View
-                      className="p-md items-center justify-center rounded-sm bg-surface"
-                      style={{
-                        borderWidth: 1,
-                        borderColor: colors.border.DEFAULT,
-                      }}
-                    >
+                    <View className="p-md items-center justify-center rounded-sm bg-surface border border-border">
                       <AppGoogleLogo />
-                    </View>
-                  }
-                  onPress={() => {}}
-                  disabled={loading}
-                />
-
-                <TouchableIconButton
-                  icon={
-                    <View
-                      className="p-md items-center justify-center rounded-sm bg-surface"
-                      style={{
-                        borderWidth: 1,
-                        borderColor: colors.border.DEFAULT,
-                      }}
-                    >
-                      <PhoneIcon
-                        size={20}
-                        color={colors.text.primary}
-                        weight="fill"
-                      />
                     </View>
                   }
                   onPress={() => {}}

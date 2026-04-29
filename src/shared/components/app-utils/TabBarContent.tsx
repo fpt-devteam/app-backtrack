@@ -1,7 +1,8 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
-import { AUTH_ROUTE, POST_ROUTE } from "@/src/shared/constants";
+import { BottomSheet } from "@/src/shared/components/ui/BottomSheet";
+import { AUTH_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
@@ -13,14 +14,16 @@ import {
   MagnifyingGlassIcon,
   PlusIcon,
 } from "phosphor-react-native";
-import React, { useEffect } from "react";
-import { Pressable, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { toast } from "../ui/toast";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AppLink } from "../AppLink";
+import { AppButton } from "../ui/AppButton";
 
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
@@ -32,7 +35,9 @@ const TAB_ICONS: Record<string, TabIcon> = {
 };
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
+  const insets = useSafeAreaInsets();
   const { user } = useAppUser();
+  const [isPhoneSheetVisible, setIsPhoneSheetVisible] = useState(false);
 
   const leadingRoutes = state.routes.slice(0, 2); // -> post, handover
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
@@ -117,36 +122,75 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
       return;
     }
 
-    if (!user.phone) {
-      toast.error("You need to verify your phone number.");
+    // if (!user.phone)
+    {
+      setIsPhoneSheetVisible(true);
       return;
     }
 
-    router.push(POST_ROUTE.create);
+    // router.push(POST_ROUTE.create);
   };
 
   return (
-    <Animated.View
-      className="absolute left-0 right-0 bottom-0 bg-surface border-t flex-1 flex-row"
-      style={[
-        { borderColor: colors.muted, height: metrics.tabBar.height },
-        tabBarAnimatedStyle,
-      ]}
-    >
-      {leadingRoutes.map((route) => renderTabButton(route))}
+    <>
+      <Animated.View
+        className="absolute left-0 right-0 bottom-0 bg-surface border-t flex-1 flex-row"
+        style={[
+          { borderColor: colors.muted, height: metrics.tabBar.height },
+          tabBarAnimatedStyle,
+        ]}
+      >
+        {leadingRoutes.map((route) => renderTabButton(route))}
 
-      {/* Add Button */}
-      <View className="w-[72px] items-center justify-center">
-        <Pressable
-          onPress={handleAddPress}
-          className="w-14 h-14 rounded-full bg-primary items-center justify-center -translate-y-[16px]"
+        {/* Add Button */}
+        <View className="w-[72px] items-center justify-center">
+          <Pressable
+            onPress={handleAddPress}
+            className="w-14 h-14 rounded-full bg-primary items-center justify-center -translate-y-[16px]"
+          >
+            <PlusIcon size={24} color={colors.white} weight="bold" />
+          </Pressable>
+        </View>
+
+        {trailingRoutes.map((route) => renderTabButton(route))}
+      </Animated.View>
+
+      <BottomSheet
+        isVisible={isPhoneSheetVisible}
+        onClose={() => setIsPhoneSheetVisible(false)}
+      >
+        <View
+          className="px-md pt-sm pb-lg gap-md"
+          style={{ paddingBottom: insets.bottom }}
         >
-          <PlusIcon size={24} color={colors.white} weight="bold" />
-        </Pressable>
-      </View>
+          <View>
+            <Text className="text-xl font-bold text-textPrimary">
+              One quick step before you post
+            </Text>
+            <Text className="mt-2 text-sm leading-6 text-textSecondary">
+              To keep the Backtrack community safe and prevent fake posts, we
+              require all users to verify their phone number.
+            </Text>
+          </View>
 
-      {trailingRoutes.map((route) => renderTabButton(route))}
-    </Animated.View>
+          <View className="gap-md2">
+            <AppButton
+              onPress={() => {
+                setIsPhoneSheetVisible(false);
+                router.push(SHARED_ROUTE.verifyPhoneInput);
+              }}
+              title="Verify phone number"
+              variant="secondary"
+            />
+
+            <AppLink
+              onPress={() => setIsPhoneSheetVisible(false)}
+              title="Maybe later"
+            />
+          </View>
+        </View>
+      </BottomSheet>
+    </>
   );
 };
 

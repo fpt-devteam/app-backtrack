@@ -9,6 +9,7 @@ type PostFormFieldProps = {
   onChange: (value: string) => void;
   onBlur?: () => void;
   onFocus?: () => void;
+  type?: "default" | "email" | "phone";
 };
 
 export const PostFormField = ({
@@ -17,6 +18,7 @@ export const PostFormField = ({
   onChange,
   onBlur,
   onFocus,
+  type = "default",
 }: PostFormFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const isActive = isFocused || value.length > 0;
@@ -89,6 +91,13 @@ export const PostFormField = ({
             onBlur={handleBlur}
             cursorColor={colors.black}
             selectionColor={colors.black}
+            keyboardType={
+              type === "email"
+                ? "email-address"
+                : type === "phone"
+                  ? "phone-pad"
+                  : "default"
+            }
           />
         </Animated.View>
       </View>

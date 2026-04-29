@@ -83,6 +83,8 @@ export const MAP_ROUTE = {
 export const SHARED_ROUTE = {
   notAvailable: "/(shared)/not-available" as ExternalPathString | RelativePathString,
   publicProfile: (userId: string) => `/(shared)/${userId}` as ExternalPathString | RelativePathString,
+  verifyPhone: "/(shared)/verify-phone" as ExternalPathString | RelativePathString,
+  verifyPhoneInput: "/(shared)/verify-phone-input" as ExternalPathString | RelativePathString,
 } as const;
 
 export const AUTH_ROUTE = {

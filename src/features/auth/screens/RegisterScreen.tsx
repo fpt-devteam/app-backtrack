@@ -40,14 +40,6 @@ const registerFormSchema = yup
       .trim()
       .min(2, "Last name must contain at least 2 characters.")
       .required("Last name is required."),
-    phone: yup
-      .string()
-      .trim()
-      .matches(/^[0-9+()\-\s]{7,20}$/, {
-        message: "Phone format is invalid.",
-        excludeEmptyString: true,
-      })
-      .required("Phone number is required."),
     password: passwordSchema,
   })
   .required();
@@ -90,7 +82,6 @@ const RegisterScreen = () => {
     defaultValues: {
       firstName: "",
       lastName: "",
-      phone: "",
       password: "",
     },
     resolver: yupResolver(registerFormSchema),
@@ -100,7 +91,6 @@ const RegisterScreen = () => {
 
   const firstNameValue = watch("firstName");
   const lastNameValue = watch("lastName");
-  const phoneValue = watch("phone");
   const passwordValue = watch("password");
 
   const isSubmitting = loading;
@@ -108,26 +98,13 @@ const RegisterScreen = () => {
   const isFormReady = useMemo(() => {
     const hasFirstName = firstNameValue.trim().length > 0;
     const hasLastName = lastNameValue.trim().length > 0;
-    const hasPhone = phoneValue.trim().length > 0;
     const hasPassword = passwordValue.trim().length > 0;
     const hasEmail = email.length > 0;
 
     return (
-      hasFirstName &&
-      hasLastName &&
-      hasPhone &&
-      hasPassword &&
-      hasEmail &&
-      !isSubmitting
+      hasFirstName && hasLastName && hasPassword && hasEmail && !isSubmitting
     );
-  }, [
-    email,
-    firstNameValue,
-    isSubmitting,
-    lastNameValue,
-    passwordValue,
-    phoneValue,
-  ]);
+  }, [email, firstNameValue, isSubmitting, lastNameValue, passwordValue]);
 
   const onSubmit: SubmitHandler<RegisterFormSchema> = async (data) => {
     if (!email) return;
@@ -200,28 +177,6 @@ const RegisterScreen = () => {
           Make sure it matches the name on your government ID. If you go by a
           different name, you can update it.
         </Text>
-      </View>
-
-      {/* Phone */}
-      <View className="gap-md2">
-        <Text className="text-base font-normal text-on-surface">Phone</Text>
-        <Controller
-          control={control}
-          name="phone"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <BaseInputField
-              label="Phone number"
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              error={errors.phone?.message}
-              keyboardType="phone-pad"
-              autoComplete="tel"
-              textContentType="telephoneNumber"
-              autoCapitalize="none"
-            />
-          )}
-        />
       </View>
 
       {/* Password */}

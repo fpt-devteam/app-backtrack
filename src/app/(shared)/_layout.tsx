@@ -20,6 +20,9 @@ const SharedScreensLayout = () => {
           animation: "slide_from_bottom",
         }}
       />
+
+      <Stack.Screen name="verify-phone-input" options={{ headerShown: true }} />
+      <Stack.Screen name="verify-phone" options={{ headerShown: true }} />
     </Stack>
   );
 };
