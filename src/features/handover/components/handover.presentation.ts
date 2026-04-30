@@ -49,7 +49,7 @@ export function getViewerRoleContext(
 export function getHandoverStatusLabel(status: Handover["status"]): string {
   switch (status) {
     case "Ongoing":
-      return "On going";
+      return "Ongoing";
     case "Delivered":
       return "Awaiting confirmation";
     case "Confirmed":

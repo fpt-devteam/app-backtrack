@@ -1,87 +1,153 @@
-import type { Handover } from "@/src/features/handover/types";
-import { PostTypeIconBadge } from "@/src/features/post/components";
-import { AppImage } from "@/src/shared/components";
+import { useAppUser } from "@/src/features/auth/providers/user.provider";
+import {
+  getHandoverCounterpart,
+  getHandoverNextStep,
+  getHandoverStatusLabel,
+  getHandoverTitle,
+  getViewerRoleContext,
+} from "@/src/features/handover/components/handover.presentation";
+import type {
+  Handover,
+  ReturnReportStatus,
+} from "@/src/features/handover/types";
+import { AppImage, AppUserAvatar } from "@/src/shared/components";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
-import { colors } from "@/src/shared/theme";
-import { formatDate } from "@/src/shared/utils";
-import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
-import { CalendarBlankIcon } from "phosphor-react-native";
-import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback } from "react";
+import { InteractionManager, Text, View } from "react-native";
 
-type HandoverCardProps = {
-  report: Handover;
-  width: number;
+import { colors, metrics } from "@/src/shared/theme";
+import { router } from "expo-router";
+import { MotiPressable } from "moti/interactions";
+
+const STATUS_THEME: Record<ReturnReportStatus, { bg: string; text: string }> = {
+  Ongoing: { bg: colors.kazan[100], text: colors.kazan[600] },
+  Delivered: { bg: colors.info[100], text: colors.info[500] },
+  Confirmed: { bg: colors.babu[100], text: colors.babu[500] },
+  Rejected: { bg: colors.error[100], text: colors.error[500] },
+  Closed: { bg: colors.hof[100], text: colors.hof[400] },
 };
 
-function deriveDisplayName(report: Handover): string {
-  const finderName = report.finderPost?.postTitle;
-  const ownerName = report.ownerPost?.postTitle;
-  if (finderName && ownerName) return `${finderName} ↔ ${ownerName}`;
-  if (finderName) return `Found: ${finderName}`;
-  if (ownerName) return `Lost: ${ownerName}`;
-  return "Return Report";
-}
+export const HandoverCard = ({ handover }: { handover: Handover }) => {
+  const { user } = useAppUser();
+  const currentUserId = user?.id;
 
-export const HandoverCard = ({ report, width }: HandoverCardProps) => {
-  const imageHeight = Math.floor(width * 0.75);
+  const counterpart = getHandoverCounterpart(handover, currentUserId);
+  const title = getHandoverTitle(handover);
+  const statusLabel = getHandoverStatusLabel(handover.status);
+  const nextStep = getHandoverNextStep(handover, currentUserId);
+  const roleContext = getViewerRoleContext(handover, currentUserId);
+
   const imageUrl =
-    report.finderPost?.imageUrls?.[0] || report.ownerPost?.imageUrls?.[0];
+    handover.finderPost?.imageUrls?.[0] ?? handover.ownerPost?.imageUrls?.[0];
 
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(HANDOVER_ROUTE.detail(report.id));
-  };
+  const handlePress = useCallback(() => {
+    router.dismissAll();
+    InteractionManager.runAfterInteractions(() => {
+      router.navigate(HANDOVER_ROUTE.detail(handover.id));
+    });
+  }, [handover.id]);
 
   return (
-    <TouchableOpacity
+    <MotiPressable
       onPress={handlePress}
-      activeOpacity={0.85}
-      style={{ width }}
-      className="overflow-hidden rounded-xs"
+      animate={({ pressed }) => {
+        "worklet";
+        return {
+          scale: pressed ? 0.96 : 1,
+          opacity: pressed ? 0.92 : 1,
+        };
+      }}
+      transition={{ type: "spring", damping: 18, stiffness: 250 }}
+      style={{
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+
+        gap: metrics.spacing.md,
+        borderRadius: metrics.borderRadius.lg,
+        backgroundColor: colors.surface,
+
+        padding: metrics.spacing.md,
+
+        borderWidth: 1,
+        borderColor: colors.divider,
+
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      }}
     >
-      {/* Image area */}
-      <View
-        className="rounded-2xl overflow-hidden flex-row"
-        style={{ width, height: imageHeight }}
-      >
-        {/* Left half — finder post */}
-        <View style={{ width, height: imageHeight }}>
+      {/* Image Section */}
+      <View className="relative bg-surface">
+        <View className="overflow-hidden">
           <AppImage
             source={{ uri: imageUrl }}
-            style={{ width, height: imageHeight }}
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: metrics.borderRadius.md,
+            }}
             resizeMode="cover"
           />
-
-          {report.finderPost && (
-            <View className="absolute bottom-2 left-2">
-              <PostTypeIconBadge
-                status={report.finderPost.postType}
-                size="sm"
-              />
-            </View>
-          )}
         </View>
+
+        {counterpart && (
+          <View className="absolute bottom-[-4] right-[-4] border border-white rounded-full">
+            <AppUserAvatar size={26} avatarUrl={counterpart.avatarUrl} />
+          </View>
+        )}
       </View>
 
-      {/* Footer */}
-      <View className="pt-sm gap-xs">
-        <Text
-          className="text-sm font-semibold text-textPrimary"
-          numberOfLines={1}
-        >
-          {deriveDisplayName(report)}
-        </Text>
-        <View className="flex-row items-center gap-sm">
-          <View className="flex-row items-center gap-xs">
-            <CalendarBlankIcon size={12} color={colors.text.muted} />
-            <Text className="text-xs text-textMuted">
-              {formatDate(report.createdAt)}
+      <View className="flex-1">
+        {/* Title */}
+        <View>
+          <Text
+            className="text-sm font-normal text-textPrimary"
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+        </View>
+
+        {/* Status Badge */}
+        <View className="flex-row items-center gap-xs">
+          <View
+            className="p-xs rounded-full"
+            style={{ backgroundColor: STATUS_THEME[handover.status].bg }}
+          >
+            <Text
+              className="text-xs font-semibold"
+              style={{ color: STATUS_THEME[handover.status].text }}
+            >
+              {statusLabel}
             </Text>
           </View>
+
+          {counterpart?.displayName ? (
+            <Text
+              className="text-xs font-thin text-textSecondary"
+              numberOfLines={1}
+            >
+              with {counterpart.displayName}
+            </Text>
+          ) : null}
+        </View>
+
+        {/* Next Step */}
+        <View className="mt-sm">
+          <Text
+            className="text-sm font-normal text-textPrimary"
+            numberOfLines={1}
+          >
+            {nextStep}
+          </Text>
+
+          <Text className="text-xs font-thin text-textMuted" numberOfLines={1}>
+            {roleContext}
+          </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </MotiPressable>
   );
 };
