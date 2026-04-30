@@ -116,20 +116,6 @@ const safeText = (value: unknown): string => {
   return FALLBACK_VALUE;
 };
 
-const toDate = (input: DateInput): Date | null => {
-  if (!input) return null;
-  const d = input instanceof Date ? input : new Date(input);
-  if (Number.isNaN(d.getTime())) return null;
-  return d;
-};
-
-const formatDayLabel = (input: DateInput): string => {
-  const date = toDate(input);
-  if (!date) return "Unknown";
-
-  return `${date.toLocaleString("en-US", { month: "short" })} ${date.getDate()}`;
-};
-
 const formatEvidenceKey = (key: string): string => {
   const normalized = key
     .replaceAll(/[_-]/g, " ")
@@ -137,18 +123,6 @@ const formatEvidenceKey = (key: string): string => {
     .trim();
 
   return normalized.replaceAll(/\b\w/g, (char) => char.toUpperCase());
-};
-
-const hasCardIdentity = (post: ComparePostLike): boolean => {
-  const card = post.cardDetail;
-  if (!card) return false;
-
-  return [
-    card.holderName,
-    card.cardNumberMasked,
-    card.dateOfBirth,
-    card.issueDate,
-  ].some((value) => safeText(value) !== FALLBACK_VALUE);
 };
 
 const mapEvidenceRows = (evidence: MatchEvidence[]): EvidenceRow[] => {
