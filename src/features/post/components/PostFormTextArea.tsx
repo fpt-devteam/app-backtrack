@@ -5,11 +5,13 @@ import { TextInput, View } from "react-native";
 type PostFormTextAreaProps = {
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 };
 
 export const PostFormTextArea = ({
   value,
   onChange,
+  placeholder = "Think of anything unique: a specific dent, a phone charm, or a custom engraving.",
 }: PostFormTextAreaProps) => {
   return (
     <View
@@ -23,9 +25,10 @@ export const PostFormTextArea = ({
         className="flex-1 p-md2 text-textPrimary font-thin"
         value={value}
         onChangeText={onChange}
-        placeholder="Think of anything unique: a specific dent, a phone charm, or a custom engraving."
+        placeholder={placeholder}
         placeholderTextColor={colors.text.muted}
         cursorColor={colors.primary}
+        selectionColor={colors.secondary}
       />
     </View>
   );
