@@ -41,7 +41,7 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
     handover.finderPost?.imageUrls?.[0] ?? handover.ownerPost?.imageUrls?.[0];
 
   const handlePress = useCallback(() => {
-    router.dismissAll();
+    if (router.canDismiss()) router.dismissAll();
     InteractionManager.runAfterInteractions(() => {
       router.navigate(HANDOVER_ROUTE.detail(handover.id));
     });

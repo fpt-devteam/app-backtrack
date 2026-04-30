@@ -1,5 +1,3 @@
-// src/features/handover/screens/HandoverDetailScreen.tsx
-
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import type { AppUser } from "@/src/features/auth/types";
 import {
@@ -9,7 +7,6 @@ import {
 import {
   getHandoverCounterpart,
   getHandoverDetailGuidance,
-  getHandoverNextStep,
   getHandoverStatusLabel,
   getHandoverTitle,
   getHandoverViewerRole,
@@ -22,32 +19,34 @@ import {
 } from "@/src/features/handover/hooks";
 import type {
   Handover,
-  HandoverPost,
   ReturnReportStatus,
 } from "@/src/features/handover/types";
-import { PostTypeIconBadge } from "@/src/features/post/components";
+import { PostCard } from "@/src/features/post/components";
 import {
-  AppImage,
+  AppBackButton,
+  AppButton,
   AppInlineError,
   AppUserAvatar,
+  TouchableIconButton,
 } from "@/src/shared/components";
-import { CHAT_ROUTE, POST_ROUTE } from "@/src/shared/constants";
-import { colors, metrics } from "@/src/shared/theme";
-import { formatDate, formatShortEventTime } from "@/src/shared/utils";
+import { toast } from "@/src/shared/components/ui/toast";
+import { CHAT_ROUTE } from "@/src/shared/constants";
+import { colors, metrics, typography } from "@/src/shared/theme";
+import { formatDate } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import { MotiView } from "moti";
 import {
   ArrowLeftIcon,
-  CalendarBlankIcon,
   CalendarCheckIcon,
   ChatCenteredTextIcon,
   CheckCircleIcon,
   ClockCountdownIcon,
   HandshakeIcon,
   HourglassIcon,
-  MapPinIcon,
+  InfoIcon,
   PackageIcon,
-  UserIcon,
+  PhoneIcon,
   WarningCircleIcon,
   XCircleIcon,
 } from "phosphor-react-native";
@@ -60,12 +59,10 @@ import {
   Platform,
   ScrollView,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-// ─── Status badge ─────────────────────────────────────────────────────────────
 
 type StatusTheme = { color: string; bgColor: string };
 
@@ -91,8 +88,6 @@ const HandoverStatusBadge = ({ status }: { status: ReturnReportStatus }) => {
     </View>
   );
 };
-
-// ─── Progress stepper ─────────────────────────────────────────────────────────
 
 type StepState = "done" | "active" | "pending";
 
@@ -148,20 +143,20 @@ const StepDot = ({ state }: { state: StepState }) => {
   if (state === "done") {
     return (
       <View
-        className="w-8 h-8 rounded-full items-center justify-center"
+        className="w-8 aspect-square rounded-full border items-center justify-center"
         style={{ backgroundColor: colors.babu[400] }}
       >
         <CheckCircleIcon size={18} color={colors.white} weight="fill" />
       </View>
     );
   }
+
   if (state === "active") {
     return (
       <View
-        className="w-8 h-8 rounded-full items-center justify-center"
+        className="w-8 aspect-square rounded-full border items-center justify-center"
         style={{
           backgroundColor: colors.primary,
-          borderWidth: 2,
           borderColor: colors.rausch[100],
         }}
       >
@@ -171,10 +166,9 @@ const StepDot = ({ state }: { state: StepState }) => {
   }
   return (
     <View
-      className="w-8 h-8 rounded-full items-center justify-center"
+      className="w-8 aspect-square rounded-full border items-center justify-center"
       style={{
         backgroundColor: colors.hof[100],
-        borderWidth: 1.5,
         borderColor: colors.hof[300],
       }}
     >
@@ -216,14 +210,15 @@ const ProgressStepper = ({
   }, [steps, viewerRole]);
 
   return (
-    <View className="flex-row items-start justify-between px-2 py-4">
+    <View className="flex-row items-start justify-between">
       {stepsWithViewerCopy.map((step, i) => (
         <React.Fragment key={step.label}>
           {/* Step */}
           <View className="items-center flex-1">
             <StepDot state={step.state} />
+
             <Text
-              className="text-xs font-semibold mt-1.5 text-center"
+              className="text-xs font-normal mt-1.5 text-center"
               style={{
                 color:
                   step.state === "done"
@@ -235,8 +230,9 @@ const ProgressStepper = ({
             >
               {step.label}
             </Text>
+
             <Text
-              className="text-xs mt-0.5 text-center"
+              className="text-xs font-thin mt-0.5 text-center"
               style={{ color: colors.hof[400] }}
             >
               {step.sublabel}
@@ -262,65 +258,6 @@ const ProgressStepper = ({
   );
 };
 
-// ─── Post card ────────────────────────────────────────────────────────────────
-
-const PostCard = ({ post, label }: { post: HandoverPost; label: string }) => {
-  const imageUrl = post.imageUrls?.[0];
-
-  const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push(POST_ROUTE.details(post.id));
-  }, [post.id]);
-
-  return (
-    <TouchableOpacity
-      onPress={handlePress}
-      activeOpacity={0.8}
-      className="flex-1 overflow-hidden rounded-2xl border border-divider"
-      style={
-        Platform.OS === "ios"
-          ? metrics.shadows.level1.ios
-          : metrics.shadows.level1.android
-      }
-    >
-      <View style={{ aspectRatio: 1 }}>
-        <AppImage
-          source={{ uri: imageUrl }}
-          style={{ width: "100%", height: "100%" }}
-          resizeMode="cover"
-        />
-        <View className="absolute top-2 left-2">
-          <PostTypeIconBadge status={post.postType} size="sm" />
-        </View>
-      </View>
-      <View className="px-3 py-2.5 gap-1 bg-surface">
-        <Text className="text-xs font-semibold text-textMuted uppercase tracking-wide">
-          {label}
-        </Text>
-        <Text className="text-sm font-bold text-textPrimary" numberOfLines={2}>
-          {post.postTitle}
-        </Text>
-        <View className="flex-row items-center gap-1">
-          <MapPinIcon size={11} color={colors.text.muted} weight="fill" />
-          <Text className="flex-1 text-xs text-textMuted" numberOfLines={1}>
-            {post.displayAddress ?? "—"}
-          </Text>
-        </View>
-        <View className="flex-row items-center gap-1">
-          <CalendarBlankIcon
-            size={11}
-            color={colors.text.muted}
-            weight="regular"
-          />
-          <Text className="flex-1 text-xs text-textMuted" numberOfLines={1}>
-            {formatShortEventTime(post.eventTime)}
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
 const EmptyPostCard = ({ label }: { label: string }) => (
   <View
     className="flex-1 rounded-2xl border border-divider items-center justify-center bg-canvas"
@@ -330,8 +267,6 @@ const EmptyPostCard = ({ label }: { label: string }) => (
     <Text className="text-xs text-textMuted mt-1">Not linked yet</Text>
   </View>
 );
-
-// ─── Party row ────────────────────────────────────────────────────────────────
 
 const PartyRow = ({
   user,
@@ -346,32 +281,32 @@ const PartyRow = ({
   const roleBg = role === "Finder" ? colors.babu[100] : colors.rausch[100];
 
   return (
-    <View className="flex-row items-center gap-md py-sm px-md">
-      {user ? (
-        <AppUserAvatar avatarUrl={user.avatarUrl} size={44} />
-      ) : (
-        <View
-          className="rounded-full items-center justify-center"
-          style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
-        >
-          <UserIcon size={22} color={colors.hof[400]} />
-        </View>
-      )}
-      <View className="flex-1">
-        <View className="flex-row items-center gap-1.5">
-          <Text className="text-sm font-semibold">
+    <View className="flex-row items-center gap-md">
+      {user && <AppUserAvatar avatarUrl={user.avatarUrl} size={36} />}
+
+      <View className="flex-1 gap-xs">
+        <View className="flex-row items-center gap-xs">
+          <Text className="text-md font-normal">
             {user?.displayName ?? "Not assigned"}
           </Text>
+
           {isCurrentUser && (
-            <Text className="text-xs text-textMuted">(You)</Text>
+            <Text className="text-xs font-thin text-textMuted">(You)</Text>
           )}
         </View>
+
         {user?.phone && (
-          <Text className="text-xs text-textMuted">{user.phone}</Text>
+          <View className="flex-row items-center gap-xs">
+            <PhoneIcon size={12} color={colors.primary} />
+            <Text className="text-xs font-thin text-textMuted">
+              {user.phone}
+            </Text>
+          </View>
         )}
       </View>
+
       <View
-        className="px-2.5 py-1 rounded-full"
+        className="px-md2 py-xs rounded-full"
         style={{ backgroundColor: roleBg }}
       >
         <Text className="text-xs font-semibold" style={{ color: roleColor }}>
@@ -381,8 +316,6 @@ const PartyRow = ({
     </View>
   );
 };
-
-// ─── Timeline ─────────────────────────────────────────────────────────────────
 
 type TimelineEventData = {
   key: string;
@@ -397,7 +330,6 @@ const VerticalTimelineEvent = ({
   label,
   value,
   state,
-  isFirst = false,
   isLast = false,
   connectorDone = false,
 }: {
@@ -409,17 +341,7 @@ const VerticalTimelineEvent = ({
   isLast?: boolean;
   connectorDone?: boolean;
 }) => {
-  const DOT_OUTER = 44;
-  const DOT_INNER = 34;
-  const PAD_H = metrics.spacing.md;
-  const PAD_V = metrics.spacing.sm;
-
-  const ringBg =
-    state === "done"
-      ? colors.babu[100]
-      : state === "active"
-        ? colors.rausch[100]
-        : colors.hof[100];
+  const DOT_INNER = 36;
 
   const innerBorder =
     state === "done"
@@ -431,52 +353,30 @@ const VerticalTimelineEvent = ({
   const lineColor = connectorDone ? colors.babu[300] : colors.divider;
 
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "stretch",
-        paddingHorizontal: PAD_H,
-        paddingTop: isFirst ? PAD_V : 0,
-        paddingBottom: isLast ? PAD_V : 0,
-      }}
-    >
+    <View className="flex-row gap-md">
       {/* Left column: ring dot + connector rail */}
-      <View style={{ width: DOT_OUTER, alignItems: "center" }}>
-        {/* Outer colored ring */}
+      <View className="items-center">
         <View
           style={{
-            width: DOT_OUTER,
-            height: DOT_OUTER,
-            borderRadius: DOT_OUTER / 2,
-            backgroundColor: ringBg,
+            width: DOT_INNER,
+            height: DOT_INNER,
+            borderRadius: DOT_INNER / 2,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: innerBorder,
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          {/* Inner white dot */}
-          <View
-            style={{
-              width: DOT_INNER,
-              height: DOT_INNER,
-              borderRadius: DOT_INNER / 2,
-              backgroundColor: colors.surface,
-              borderWidth: 1,
-              borderColor: innerBorder,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {icon}
-          </View>
+          {icon}
         </View>
 
-        {/* Connector: fills remaining row height, hidden on last item */}
+        {/* Connector*/}
         {!isLast && (
           <View
             style={{
-              width: 2,
-              flex: 1,
-              minHeight: 8,
+              width: 1,
+              minHeight: metrics.spacing.md,
               backgroundColor: lineColor,
             }}
           />
@@ -484,60 +384,16 @@ const VerticalTimelineEvent = ({
       </View>
 
       {/* Right column: label + value */}
-      <View
-        style={{
-          flex: 1,
-          paddingLeft: PAD_H,
-          paddingTop: PAD_V,
-          paddingBottom: !isLast ? metrics.spacing.lg : 0,
-        }}
-      >
-        {value ? (
-          <>
-            <Text className="text-xs text-textMuted">{label}</Text>
-            <Text className="text-sm font-semibold text-textPrimary">
-              {value}
-            </Text>
-          </>
-        ) : (
-          <Text className="text-sm font-semibold text-textPrimary">
-            {label}
-          </Text>
+      <View className="flex-1 gap-xs">
+        <Text className="text-md  font-normal text-textPrimary">{label}</Text>
+
+        {value && (
+          <Text className="text-xs font-thin text-textSecondary">{value}</Text>
         )}
       </View>
     </View>
   );
 };
-
-// ─── Section card ─────────────────────────────────────────────────────────────
-
-const SectionCard = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <View className="mb-4">
-    <Text className="text-xs font-bold text-textMuted uppercase tracking-wide mb-2 px-1">
-      {title}
-    </Text>
-    <View
-      className="bg-surface rounded-2xl overflow-hidden border border-divider"
-      style={
-        Platform.OS === "ios"
-          ? metrics.shadows.level1.ios
-          : metrics.shadows.level1.android
-      }
-    >
-      {children}
-    </View>
-  </View>
-);
-
-const Separator = () => <View className="h-px bg-divider mx-md" />;
-
-// ─── Action panel ─────────────────────────────────────────────────────────────
 
 type ActionPanelProps = {
   report: Handover;
@@ -565,7 +421,6 @@ const ActionPanel = ({
   isRejecting,
 }: ActionPanelProps) => {
   const { status } = report;
-  const hasMarkedDelivery = !!report.activatedByRole;
 
   // ── Confirmed ──
   if (status === "Confirmed") {
@@ -637,27 +492,13 @@ const ActionPanel = ({
           Once you hand the item back, mark it here so the owner can confirm
           receipt.
         </Text>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          disabled={isActivating}
+
+        <AppButton
+          title="I've Delivered the Item"
           onPress={onActivate}
-          className="flex-row items-center justify-center gap-sm rounded-xl"
-          style={{
-            height: metrics.layout.controlHeight.xl,
-            backgroundColor: isActivating ? colors.hof[300] : colors.primary,
-          }}
-        >
-          {isActivating ? (
-            <ActivityIndicator size="small" color={colors.white} />
-          ) : (
-            <>
-              <PackageIcon size={18} color={colors.white} weight="bold" />
-              <Text className="text-base font-semibold text-white">
-                I&apos;ve Delivered the Item
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
+          loading={isActivating}
+          variant="secondary"
+        />
       </View>
     );
   }
@@ -731,60 +572,33 @@ const ActionPanel = ({
           The finder marked this handover as delivered. Confirm once you have
           the item in hand.
         </Text>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          disabled={isConfirming || isRejecting}
+
+        {/* Confirm Receipt Button */}
+        <AppButton
+          title="I've Received the Item"
           onPress={onConfirm}
-          className="flex-row items-center justify-center gap-sm rounded-xl mb-2"
-          style={{
-            height: metrics.layout.controlHeight.xl,
-            backgroundColor:
-              isConfirming || isRejecting ? colors.hof[300] : colors.babu[400],
-          }}
-        >
-          {isConfirming ? (
-            <ActivityIndicator size="small" color={colors.white} />
-          ) : (
-            <>
-              <CheckCircleIcon size={18} color={colors.white} weight="bold" />
-              <Text className="text-base font-semibold text-white">
-                I&apos;ve Received the Item
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.85}
           disabled={isConfirming || isRejecting}
+          loading={isConfirming}
+          variant="primary"
+        />
+
+        {/* Reject Handover Button */}
+        <AppButton
+          title="Reject Handover"
           onPress={onReject}
-          className="flex-row items-center justify-center gap-sm rounded-xl border border-error"
-          style={{
-            height: metrics.layout.controlHeight.xl,
-            backgroundColor: isRejecting ? colors.error[100] : colors.surface,
-          }}
-        >
-          {isRejecting ? (
-            <ActivityIndicator size="small" color={colors.error[500]} />
-          ) : (
-            <>
-              <XCircleIcon size={18} color={colors.error[500]} weight="bold" />
-              <Text
-                className="text-base font-semibold"
-                style={{ color: colors.error[500] }}
-              >
-                Reject Handover
-              </Text>
-            </>
-          )}
-        </TouchableOpacity>
+          disabled={isConfirming || isRejecting}
+          loading={isRejecting}
+          variant="secondary"
+          icon={
+            <XCircleIcon size={18} color={colors.error[500]} weight="bold" />
+          }
+        />
       </View>
     );
   }
 
   return null;
 };
-
-// ─── Main screen ──────────────────────────────────────────────────────────────
 
 const HandoverDetailScreen = () => {
   const { handoverId } = useLocalSearchParams<{ handoverId: string }>();
@@ -814,7 +628,6 @@ const HandoverDetailScreen = () => {
     [currentUser, report],
   );
 
-  // ID of the other party (used for chat navigation)
   const counterpartId = useMemo(() => {
     if (isFinder) return report?.owner?.id;
     if (isOwner) return report?.finder?.id;
@@ -833,15 +646,9 @@ const HandoverDetailScreen = () => {
     () => (report ? getHandoverTitle(report) : "Handover"),
     [report],
   );
-  const statusLabel = useMemo(
-    () => (report ? getHandoverStatusLabel(report.status) : "Handover"),
-    [report],
-  );
+
   const hasMarkedDelivery = !!report?.activatedByRole;
-  const nextStep = useMemo(() => {
-    if (!report) return "Review handover details";
-    return getHandoverNextStep(report, currentUser?.id);
-  }, [report, currentUser?.id]);
+
   const detailGuidance = useMemo(() => {
     if (!report) return "";
     return getHandoverDetailGuidance(report, currentUser?.id);
@@ -947,21 +754,18 @@ const HandoverDetailScreen = () => {
       }
 
       if (conversationId) {
-        // Two-step navigation to avoid the jarring combined "tab switch + screen
-        // push" animation. First switch to the chat tab (tab animation only),
-        // then push the specific conversation once that transition settles.
         router.navigate(CHAT_ROUTE.index);
         InteractionManager.runAfterInteractions(() => {
           router.navigate(CHAT_ROUTE.message(conversationId));
         });
       } else {
-        Alert.alert(
+        toast.error(
           "Chat not found",
           "No conversation exists with this person yet.",
         );
       }
     } catch {
-      Alert.alert("Error", "Could not open the chat. Please try again.");
+      toast.error("Error", "Could not open the chat. Please try again.");
     } finally {
       setIsOpeningChat(false);
     }
@@ -984,7 +788,7 @@ const HandoverDetailScreen = () => {
                 Haptics.NotificationFeedbackType.Success,
               );
             } catch {
-              Alert.alert(
+              toast.error(
                 "Error",
                 "Could not mark as delivered. Please try again.",
               );
@@ -1012,7 +816,7 @@ const HandoverDetailScreen = () => {
                 Haptics.NotificationFeedbackType.Success,
               );
             } catch {
-              Alert.alert(
+              toast.error(
                 "Error",
                 "Could not confirm receipt. Please try again.",
               );
@@ -1038,7 +842,7 @@ const HandoverDetailScreen = () => {
               await ownerReject(report.id);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
             } catch {
-              Alert.alert(
+              toast.error(
                 "Error",
                 "Could not reject the handover. Please try again.",
               );
@@ -1049,167 +853,97 @@ const HandoverDetailScreen = () => {
     );
   }, [report, ownerReject]);
 
-  // ── Loading ──
-  if (isLoading) {
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <View className="flex-1 bg-surface">
+          <View
+            className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
+            style={
+              Platform.OS === "ios"
+                ? { ...metrics.shadows.tabBar.ios }
+                : metrics.shadows.tabBar.android
+            }
+          >
+            <TouchableOpacity
+              onPress={() => router.back()}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              className="items-center justify-center rounded-full"
+              style={{
+                width: 44,
+                height: 44,
+                backgroundColor: colors.hof[100],
+              }}
+            >
+              <ArrowLeftIcon size={20} color={colors.text.primary} />
+            </TouchableOpacity>
+            <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
+              Handover
+            </Text>
+            <View style={{ width: 44, height: 44 }} />
+          </View>
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        </View>
+      );
+    }
+
+    // ── Error / Not found ──
+    if (error || !report) {
+      return (
+        <View className="flex-1 bg-surface">
+          <View
+            className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
+            style={
+              Platform.OS === "ios"
+                ? { ...metrics.shadows.tabBar.ios }
+                : metrics.shadows.tabBar.android
+            }
+          >
+            <TouchableOpacity
+              onPress={() => router.back()}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              className="items-center justify-center rounded-full"
+              style={{
+                width: 44,
+                height: 44,
+                backgroundColor: colors.hof[100],
+              }}
+            >
+              <ArrowLeftIcon size={20} color={colors.text.primary} />
+            </TouchableOpacity>
+            <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
+              Handover
+            </Text>
+            <View style={{ width: 44, height: 44 }} />
+          </View>
+          <AppInlineError message={error?.message ?? "Handover not found."} />
+        </View>
+      );
+    }
+
     return (
-      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
-        <Stack.Screen options={{ headerShown: false }} />
-        <View
-          className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
-          style={
-            Platform.OS === "ios"
-              ? { ...metrics.shadows.tabBar.ios }
-              : metrics.shadows.tabBar.android
-          }
-        >
-          <TouchableOpacity
-            onPress={() => router.back()}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            className="items-center justify-center rounded-full"
-            style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
-          >
-            <ArrowLeftIcon size={20} color={colors.text.primary} />
-          </TouchableOpacity>
-          <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
-            Handover
-          </Text>
-          <View style={{ width: 44, height: 44 }} />
-        </View>
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // ── Error / Not found ──
-  if (error || !report) {
-    return (
-      <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
-        <Stack.Screen options={{ headerShown: false }} />
-        <View
-          className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
-          style={
-            Platform.OS === "ios"
-              ? { ...metrics.shadows.tabBar.ios }
-              : metrics.shadows.tabBar.android
-          }
-        >
-          <TouchableOpacity
-            onPress={() => router.back()}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            className="items-center justify-center rounded-full"
-            style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
-          >
-            <ArrowLeftIcon size={20} color={colors.text.primary} />
-          </TouchableOpacity>
-          <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
-            Handover
-          </Text>
-          <View style={{ width: 44, height: 44 }} />
-        </View>
-        <AppInlineError message={error?.message ?? "Handover not found."} />
-      </SafeAreaView>
-    );
-  }
-
-  const hasActionPanel =
-    report.status === "Confirmed" ||
-    report.status === "Closed" ||
-    report.status === "Rejected" ||
-    ((report.status === "Ongoing" || report.status === "Delivered") &&
-      (isFinder || isOwner));
-
-  return (
-    <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      {/* ── Header ── */}
-      <View
-        className="flex-row items-center px-lg pt-sm pb-sm border-b border-divider"
-        style={
-          Platform.OS === "ios"
-            ? { ...metrics.shadows.tabBar.ios }
-            : metrics.shadows.tabBar.android
-        }
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          className="items-center justify-center rounded-full"
-          style={{ width: 44, height: 44 }}
-        >
-          <ArrowLeftIcon size={20} color={colors.text.primary} />
-        </TouchableOpacity>
-
-        <Text
-          className="flex-1 text-base font-semibold text-textPrimary text-center"
-          numberOfLines={1}
-        >
-          Handover
-        </Text>
-
-        {counterpartId ? (
-          <TouchableOpacity
-            onPress={handleOpenChat}
-            disabled={isOpeningChat}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            className="items-center justify-center rounded-full"
-            style={{ width: 44, height: 44 }}
-          >
-            {isOpeningChat ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <ChatCenteredTextIcon
-                size={20}
-                color={colors.primary}
-                weight="duotone"
-              />
-            )}
-          </TouchableOpacity>
-        ) : (
-          <View style={{ width: 44, height: 44 }} />
-        )}
-      </View>
-
-      {/* ── Scrollable body ── */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: hasActionPanel ? actionPanelHeight + 16 : 32,
+          paddingHorizontal: metrics.spacing.lg,
+          paddingBottom: actionPanelHeight,
+          gap: metrics.spacing.xl,
         }}
       >
-        <View
-          className="mb-4 rounded-2xl border border-divider bg-surface px-lg py-lg"
-          style={
-            Platform.OS === "ios"
-              ? metrics.shadows.level1.ios
-              : metrics.shadows.level1.android
-          }
-        >
-          <View className="flex-row items-start justify-between gap-sm">
-            <View className="flex-1 gap-xs">
-              <Text
-                className="text-2xl font-semibold text-textPrimary"
-                numberOfLines={2}
-              >
-                {title}
-              </Text>
+        {/* Title and Status */}
+        <View className="flex-1 gap-xs">
+          <Text
+            className="text-2xl font-normal text-textPrimary"
+            numberOfLines={2}
+          >
+            {title}
+          </Text>
 
-              <View className="flex-row items-center gap-sm flex-wrap">
-                <HandoverStatusBadge status={report.status} />
-              </View>
-            </View>
-
-            {counterpart ? (
-              <AppUserAvatar avatarUrl={counterpart.avatarUrl} size={44} />
-            ) : null}
-          </View>
-
-          <View className="mt-md gap-xs">
-            <Text className="text-sm font-medium text-textPrimary">
+          <View className="flex-row items-center gap-sm">
+            <HandoverStatusBadge status={report.status} />
+            <Text className="text-sm font-thin text-textSecondary">
               {counterpart?.displayName
                 ? `With ${counterpart.displayName}`
                 : "Counterpart"}
@@ -1219,35 +953,41 @@ const HandoverDetailScreen = () => {
                   ? " · Finder"
                   : ""}
             </Text>
-            <Text className="text-sm text-textSecondary leading-5">
-              {detailGuidance}
-            </Text>
           </View>
         </View>
 
-        <View className="mb-4 rounded-2xl border border-divider bg-canvas px-lg py-md2">
-          <Text className="text-sm font-semibold text-textPrimary mb-xs">
-            What happens next
-          </Text>
-          <Text className="text-sm text-textSecondary leading-5">
-            {nextStep}
-          </Text>
-        </View>
-
-        <View className="mb-2 px-1">
-          <Text className="text-xs font-bold text-textMuted uppercase tracking-wide">
-            Progress
-          </Text>
-        </View>
-
-        <View
-          className="bg-surface rounded-2xl border border-divider mb-4 px-2"
-          style={
-            Platform.OS === "ios"
-              ? metrics.shadows.level1.ios
-              : metrics.shadows.level1.android
-          }
+        {/* Next Step Tooltip */}
+        <MotiView
+          from={{ opacity: 0, translateY: 16 }}
+          animate={{ opacity: 1, translateY: 0 }}
+          transition={{ type: "timing", duration: 260, delay: 180 }}
         >
+          <View
+            className="flex-row items-start rounded-md border p-md2"
+            style={{
+              borderColor: colors.info[300],
+              backgroundColor: colors.info[50],
+            }}
+          >
+            <InfoIcon
+              size={16}
+              weight="fill"
+              color={colors.info[600]}
+              style={{ marginTop: 1, marginRight: 8 }}
+            />
+            <Text
+              className="flex-1 text-xs leading-relaxed"
+              style={{ color: colors.info[600] }}
+            >
+              {detailGuidance}
+            </Text>
+          </View>
+        </MotiView>
+
+        {/* Progress */}
+        <View className="gap-md2">
+          <Text className="text-lg font-normal text-textPrimary">Progress</Text>
+
           <ProgressStepper
             status={report.status}
             isFinder={isFinder}
@@ -1256,55 +996,98 @@ const HandoverDetailScreen = () => {
           />
         </View>
 
-        {/* ── Items involved ── */}
-        <View className="mb-4">
-          <Text className="text-xs font-bold text-textMuted uppercase tracking-wide mb-2 px-1">
+        {/* Items involved  */}
+        <View className="gap-md2">
+          <Text className="text-lg font-normal text-textPrimary mb-sm">
             Items Involved
           </Text>
+
           <View className="flex-row gap-3">
             {report.finderPost ? (
-              <PostCard post={report.finderPost} label="Found by finder" />
+              <PostCard item={report.finderPost} />
             ) : (
               <EmptyPostCard label="Finder's Post" />
             )}
             {report.ownerPost ? (
-              <PostCard post={report.ownerPost} label="Lost by owner" />
+              <PostCard item={report.ownerPost} />
             ) : (
               <EmptyPostCard label="Owner's Post" />
             )}
           </View>
         </View>
 
-        {/* ── Parties ── */}
-        <SectionCard title="People involved">
-          <PartyRow
-            user={report.finder}
-            role="Finder"
-            isCurrentUser={isFinder}
-          />
-          <Separator />
-          <PartyRow user={report.owner} role="Owner" isCurrentUser={isOwner} />
-        </SectionCard>
+        {/* Parties  */}
+        <View className="gap-md2">
+          <Text className="text-lg font-normal text-textPrimary mb-sm">
+            People involved
+          </Text>
 
-        {/* ── Timeline ── */}
-        <SectionCard title="Timeline">
-          {timelineEvents.map((event, i) => (
-            <VerticalTimelineEvent
-              key={event.key}
-              icon={event.icon}
-              label={event.label}
-              value={event.value}
-              state={event.state}
-              isFirst={i === 0}
-              isLast={i === timelineEvents.length - 1}
-              connectorDone={event.state === "done"}
+          <View>
+            <PartyRow
+              user={report.finder}
+              role="Finder"
+              isCurrentUser={isFinder}
             />
-          ))}
-        </SectionCard>
-      </ScrollView>
+            <View className="h-px bg-divider my-md" />
+            <PartyRow
+              user={report.owner}
+              role="Owner"
+              isCurrentUser={isOwner}
+            />
+          </View>
+        </View>
 
-      {/* ── Action panel (fixed at bottom) ── */}
-      {hasActionPanel && (
+        {/* Timeline */}
+        <View className="gap-md2">
+          <Text className="text-lg font-normal text-textPrimary mb-sm">
+            Timeline
+          </Text>
+
+          <View>
+            {timelineEvents.map((event, i) => (
+              <VerticalTimelineEvent
+                key={event.key}
+                icon={event.icon}
+                label={event.label}
+                value={event.value}
+                state={event.state}
+                isFirst={i === 0}
+                isLast={i === timelineEvents.length - 1}
+                connectorDone={event.state === "done"}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  };
+
+  return (
+    <View className="flex-1 bg-surface">
+      <Stack.Screen
+        options={{
+          headerTitle: "Handover Details",
+          headerLeft: () => (
+            <AppBackButton type="arrowLeftIcon" showBackground={false} />
+          ),
+          headerRight: () => (
+            <TouchableIconButton
+              icon={<ChatCenteredTextIcon size={24} />}
+              onPress={handleOpenChat}
+              disabled={!counterpartId || isOpeningChat}
+              loading={isOpeningChat}
+            />
+          ),
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
+
+      <View className="flex-1 bg-surface py-md">{renderContent()}</View>
+
+      {report && (
         <View
           className="absolute left-0 right-0 bottom-0 bg-surface"
           onLayout={handleActionPanelLayout}
@@ -1327,7 +1110,7 @@ const HandoverDetailScreen = () => {
           />
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

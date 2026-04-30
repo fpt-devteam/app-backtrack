@@ -1,12 +1,15 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
-import { HandoverRequestCard } from "@/src/features/handover/components";
+import {
+  HandoverCard,
+  HandoverRequestCard,
+} from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
 import { AppInlineError } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
-import { CaretRightIcon, HandshakeIcon } from "phosphor-react-native";
+import { ArrowRightIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
@@ -26,50 +29,31 @@ type SectionHeaderProps = {
   count?: number;
 };
 
-const SectionHeader = ({ title, subtitle, count }: SectionHeaderProps) => (
-  <View className="px-lg pt-lg pb-sm">
-    <View className="flex-row items-center gap-xs mb-xs">
-      <Text className="text-lg font-semibold text-textPrimary">{title}</Text>
-      {count !== undefined && count > 0 && (
-        <View
-          className="px-2 py-0.5 rounded-full"
-          style={{ backgroundColor: colors.rausch[100] }}
-        >
-          <Text
-            className="text-xs font-semibold"
-            style={{ color: colors.rausch[500] }}
-          >
-            {count}
-          </Text>
-        </View>
-      )}
-    </View>
-    <Text className="text-sm text-textSecondary">{subtitle}</Text>
+const SectionHeader = ({ title, subtitle }: SectionHeaderProps) => (
+  <View className="px-lg py-md2 gap-xs">
+    <Text className="text-lg font-normal text-textPrimary">{title}</Text>
+    <Text className="text-sm font-thin text-textSecondary">{subtitle}</Text>
   </View>
 );
 
-// ─── See-all row ───────────────────────────────────────────────────────────────
-
 type SeeAllRowProps = {
-  count: number;
   filter: "ongoing" | "past";
 };
 
-const SeeAllRow = ({ count, filter }: SeeAllRowProps) => (
+const SeeAllRow = ({ filter }: SeeAllRowProps) => (
   <TouchableOpacity
     onPress={() => router.push(HANDOVER_ROUTE.all(filter))}
     activeOpacity={0.75}
-    className="flex-row items-center justify-center gap-xs py-xs mt-xs"
+    className="flex-row items-center justify-center gap-xs"
   >
-    <Text className="text-sm font-semibold" style={{ color: colors.primary }}>
-      See all {count}
+    <Text className="text-sm font-normal" style={{ color: colors.primary }}>
+      See all
     </Text>
-    <CaretRightIcon size={13} color={colors.primary} />
+    <ArrowRightIcon size={16} color={colors.primary} />
   </TouchableOpacity>
 );
 
 // ─── Main screen ───────────────────────────────────────────────────────────────
-
 const HandoverScreen = () => {
   const { user } = useAppUser();
   const currentUserId = user?.id ?? "";
@@ -108,21 +92,10 @@ const HandoverScreen = () => {
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* ── Page header ──────────────────────────────────────────────── */}
-      <View
-        className="px-lg pt-lg pb-md gap-xs bg-surface"
-        style={{
-          borderBottomWidth: 1,
-          borderBottomColor: colors.hof[200],
-        }}
-      >
+      <View className="px-lg pt-lg pb-md gap-xs bg-surface">
         <View className="flex-row items-center gap-sm">
-          <HandshakeIcon
-            size={24}
-            color={colors.rausch[500]}
-            weight="duotone"
-          />
-          <Text className="text-2xl font-semibold text-textPrimary">
-            Handovers
+          <Text className="text-3xl font-normal text-textPrimary">
+            Handover
           </Text>
         </View>
       </View>
@@ -141,11 +114,14 @@ const HandoverScreen = () => {
         </View>
       )}
 
-      {/* ── Content ──────────────────────────────────────────────────── */}
+      {/* Content */}
       {!isLoading && (!error || handovers.length > 0) && (
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: metrics.spacing.xl }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
+          }}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
@@ -157,14 +133,8 @@ const HandoverScreen = () => {
             />
           }
         >
-          {/* ── In Progress section (Draft + Active) ───────────────────── */}
-          <View
-            className="pt-sm"
-            style={{
-              borderBottomWidth: 8,
-              borderBottomColor: colors.hof[100],
-            }}
-          >
+          {/* In Progress section */}
+          <View className="border-b-4 pb-sm border-divider">
             <SectionHeader
               title="In Progress"
               subtitle="These handovers still need delivery, confirmation, or review."
@@ -173,40 +143,27 @@ const HandoverScreen = () => {
 
             <View className="px-lg">
               {inProgressHandovers.length === 0 ? (
-                <View className="pb-md">
-                  <EmptyList
-                    title="No handovers need attention"
-                    subtitle="When a chat turns into a return, the active handover will appear here."
-                  />
-                </View>
+                <EmptyList
+                  title="No handovers need attention"
+                  subtitle="When a chat turns into a return, the active handover will appear here."
+                />
               ) : (
-                <View style={{ paddingBottom: metrics.spacing.md }}>
-                  {inProgressHandovers.slice(0, 3).map((handover) => (
-                    <HandoverRequestCard
-                      key={handover.id}
-                      handover={handover}
-                      currentUserId={currentUserId}
-                    />
+                <View className="gap-md2">
+                  {inProgressHandovers.slice(0, 2).map((handover) => (
+                    <HandoverCard key={handover.id} handover={handover} />
                   ))}
-                  {inProgressHandovers.length > 3 && (
-                    <SeeAllRow
-                      count={inProgressHandovers.length}
-                      filter="ongoing"
-                    />
-                  )}
+
+                  <SeeAllRow filter="ongoing" />
                 </View>
               )}
             </View>
           </View>
 
-          {/* ── Past section ───────────────────────────────────────────── */}
-          <View>
+          {/* ── Past section */}
+          <View className="flex-1">
             <SectionHeader
               title="Past"
               subtitle="Completed or closed handovers you may want to reference later."
-              count={
-                pastHandovers.length > 0 ? pastHandovers.length : undefined
-              }
             />
 
             <View className="px-lg">
@@ -219,16 +176,15 @@ const HandoverScreen = () => {
                 </View>
               ) : (
                 <View style={{ paddingBottom: metrics.spacing.md }}>
-                  {pastHandovers.slice(0, 3).map((handover) => (
+                  {pastHandovers.slice(0, 2).map((handover) => (
                     <HandoverRequestCard
                       key={handover.id}
                       handover={handover}
                       currentUserId={currentUserId}
                     />
                   ))}
-                  {pastHandovers.length > 3 && (
-                    <SeeAllRow count={pastHandovers.length} filter="past" />
-                  )}
+
+                  <SeeAllRow filter="past" />
                 </View>
               )}
             </View>

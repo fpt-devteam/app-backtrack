@@ -1,5 +1,5 @@
 import { AppUser } from "@/src/features/auth/types"
-import type { PostType } from "@/src/features/post/types"
+import type { BasePost, Post, PostType } from "@/src/features/post/types"
 import { Nullable } from "@/src/shared/types"
 
 /**
@@ -30,8 +30,8 @@ export type Handover = {
   id: string
   finder: Nullable<AppUser>
   owner: Nullable<AppUser>
-  finderPost: Nullable<HandoverPost>
-  ownerPost: Nullable<HandoverPost>
+  finderPost: Nullable<Post>
+  ownerPost: Nullable<Post>
   status: ReturnReportStatus
   activatedByRole: Nullable<ReturnReportRole>
   confirmedAt: Nullable<string>

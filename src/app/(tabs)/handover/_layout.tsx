@@ -9,7 +9,7 @@ const HandoverLayout = () => {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="[handoverId]" options={{ headerShown: false }} />
+      <Stack.Screen name="[handoverId]" options={{ headerShown: true }} />
       <Stack.Screen name="all" options={{ headerShown: false }} />
       <Stack.Screen
         name="conversations/[conversationId]"
