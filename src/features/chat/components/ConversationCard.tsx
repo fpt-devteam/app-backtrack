@@ -59,12 +59,12 @@ export const ConversationCard = ({ conversation }: Props) => {
   }, [conversation.conversationId]);
 
   const nameTextClass = isLastMessageUnread
-    ? "text-base font-bold text-textPrimary"
-    : "text-base font-semibold text-textPrimary";
+    ? "text-base font-semibold text-textPrimary"
+    : "text-base font-base text-textPrimary";
 
   const subtitleTextClass = isLastMessageUnread
-    ? "text-sm font-semibold text-textPrimary"
-    : "text-sm text-textSecondary";
+    ? "text-sm font-base text-textPrimary"
+    : "text-sm font-thin text-textSecondary";
 
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -90,23 +90,32 @@ export const ConversationCard = ({ conversation }: Props) => {
           transform: [{ scale }],
         }}
       >
-        <View className="flex-row items-center">
+        <View className="flex-row items-center gap-md">
           {/* Avatar */}
           <AppUserAvatar
             avatarUrl={conversation.partner?.avatarUrl}
-            size={56}
+            size={52}
           />
 
           {/* Main */}
-          <View className="flex-1 ml-sm gap-xs">
+          <View className="flex-1 gap-xs">
             {/* Row 1: Name + unread dot */}
             <View className="flex-row items-center">
               <Text className={`flex-1 ${nameTextClass}`} numberOfLines={1}>
                 {displayPartnerName}
               </Text>
 
-              {isLastMessageUnread && (
-                <View className="w-2 h-2 rounded-full bg-primary ml-2" />
+              {/* Time */}
+              {displayTimeText && (
+                <View className="">
+                  <Text
+                    className="text-sm font-thin text-textSecondary"
+                    style={{ flexShrink: 0 }}
+                    numberOfLines={1}
+                  >
+                    {displayTimeText}
+                  </Text>
+                </View>
               )}
             </View>
 
@@ -116,17 +125,8 @@ export const ConversationCard = ({ conversation }: Props) => {
                 {displayLastMessage}
               </Text>
 
-              {/* Time */}
-              {displayTimeText && (
-                <View className="">
-                  <Text
-                    className="text-sm text-textSecondary"
-                    style={{ flexShrink: 0 }}
-                    numberOfLines={1}
-                  >
-                    {" · " + displayTimeText}
-                  </Text>
-                </View>
+              {isLastMessageUnread && (
+                <View className="w-2 h-2 rounded-full bg-primary" />
               )}
             </View>
           </View>
