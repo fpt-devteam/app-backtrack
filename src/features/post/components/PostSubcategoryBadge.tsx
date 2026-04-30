@@ -127,7 +127,7 @@ const SUBCATEGORY_STYLE_MAP: Record<
     bgClass: "bg-emerald-100",
     textClass: "text-emerald-800",
   },
-  [OTHER_SUBCATEGORY.OTHER]: {
+  [OTHER_SUBCATEGORY.OTHERS]: {
     label: "Other",
     bgClass: "bg-gray-100",
     textClass: "text-gray-800",
@@ -143,7 +143,7 @@ export const PostSubcategoryBadge = ({
 }: PostSubcategoryBadgeProps) => {
   const config =
     SUBCATEGORY_STYLE_MAP[subcategory] ||
-    SUBCATEGORY_STYLE_MAP[OTHER_SUBCATEGORY.OTHER];
+    SUBCATEGORY_STYLE_MAP[OTHER_SUBCATEGORY.OTHERS];
 
   return (
     <View className={`px-2.5 py-1 rounded-md ${config.bgClass}`}>

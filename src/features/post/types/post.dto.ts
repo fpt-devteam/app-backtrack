@@ -153,6 +153,13 @@ export type CardDetail = {
   aiDescription: Nullable<string>;
 };
 
+export type OtherDetail = {
+  itemName: string;
+  primaryColor: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};
+
 /**
  * Post Subcategory Response
  * This type defines the structure of the response when fetching post subcategories.

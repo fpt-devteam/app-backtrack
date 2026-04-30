@@ -316,7 +316,7 @@ export const MyPostDetailScreen = () => {
 
     if (post?.otherDetail) {
       const detail = post?.otherDetail;
-      pushRow(TagIcon, "Identifier", detail.itemIdentifier);
+      pushRow(TagIcon, "Name", detail.itemName);
       pushRow(PaletteIcon, "Color", detail.primaryColor);
       pushRow(ListBulletsIcon, "Details", detail.additionalDetails);
     }

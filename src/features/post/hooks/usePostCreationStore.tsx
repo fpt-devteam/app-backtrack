@@ -4,8 +4,10 @@ import {
   CardSlice,
   createCardSlice,
   createElectronicsSlice,
+  createOtherSlice,
   createPersonalBelongingSlice,
   ElectronicsSlice,
+  OtherSlice,
   PersonalBelongingSlice,
 } from "@/src/features/post/store";
 import {
@@ -34,7 +36,7 @@ const DEFAULT_SUBCATEGORY: Record<PostCategory, PostSubcategoryCode> = {
   [POST_CATEGORIES.CARD]: CARD_SUBCATEGORY.BANK_CARD,
   [POST_CATEGORIES.PERSONAL_BELONGINGS]:
     PERSONAL_BELONGING_SUBCATEGORY.BACKPACK,
-  [POST_CATEGORIES.OTHERS]: OTHER_SUBCATEGORY.OTHER,
+  [POST_CATEGORIES.OTHERS]: OTHER_SUBCATEGORY.OTHERS,
 };
 
 type PostCreationState = {
@@ -85,7 +87,8 @@ export const usePostCreationStore = create<
     LocationSlice &
     ElectronicsSlice &
     CardSlice &
-    PersonalBelongingSlice
+    PersonalBelongingSlice &
+    OtherSlice
 >((set, get, api) => ({
   ...initialState,
   ...createPhotoSlice(set, get, api),
@@ -93,6 +96,7 @@ export const usePostCreationStore = create<
   ...createElectronicsSlice(set, get, api),
   ...createCardSlice(set, get, api),
   ...createPersonalBelongingSlice(set, get, api),
+  ...createOtherSlice(set, get, api),
 
   selectPostType: (type) => set({ postType: type }),
   selectCategory: (category) =>
@@ -131,6 +135,7 @@ export const usePostCreationStore = create<
       resetElectronicDetail,
       resetCardDetail,
       resetPersonalBelongingDetail,
+      resetOtherDetail,
     } = get();
 
     resetPhotoSlice();
@@ -138,6 +143,7 @@ export const usePostCreationStore = create<
     resetElectronicDetail();
     resetCardDetail();
     resetPersonalBelongingDetail();
+    resetOtherDetail();
   },
 
   openPickerSheet: () => set({ isPickerSheetVisible: true }),

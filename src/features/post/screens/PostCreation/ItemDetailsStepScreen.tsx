@@ -1,34 +1,36 @@
 import { usePostCreationStore } from "@/src/features/post/hooks";
+import BackpackForm from "@/src/features/post/screens/CategoryForm/BackpackForm";
+import BankCardForm from "@/src/features/post/screens/CategoryForm/BankCardForm";
+import ChargerAdapterForm from "@/src/features/post/screens/CategoryForm/ChargerAdapterForm";
+import ClothingsForm from "@/src/features/post/screens/CategoryForm/ClothingsForm";
+import CompanyCardForm from "@/src/features/post/screens/CategoryForm/CompanyCardForm";
+import DriverLicenseForm from "@/src/features/post/screens/CategoryForm/DriverLicenseForm";
+import EarphoneForm from "@/src/features/post/screens/CategoryForm/EarphoneForm";
+import HeadphoneForm from "@/src/features/post/screens/CategoryForm/HeadphoneForm";
+import IdentificationCardForm from "@/src/features/post/screens/CategoryForm/IdentificationCardForm";
+import JewelryForm from "@/src/features/post/screens/CategoryForm/JewelryForm";
+import KeyboardForm from "@/src/features/post/screens/CategoryForm/KeyboardForm";
+import KeysForm from "@/src/features/post/screens/CategoryForm/KeysForm";
+import LaptopForm from "@/src/features/post/screens/CategoryForm/LaptopForm";
+import MouseForm from "@/src/features/post/screens/CategoryForm/MouseForm";
+import OtherForm from "@/src/features/post/screens/CategoryForm/OtherForm";
+import PassportForm from "@/src/features/post/screens/CategoryForm/PassportForm";
+import PersonalCardForm from "@/src/features/post/screens/CategoryForm/PersonalCardForm";
+import PhoneForm from "@/src/features/post/screens/CategoryForm/PhoneForm";
+import PowerbankForm from "@/src/features/post/screens/CategoryForm/PowerbankForm";
+import PowerOutletForm from "@/src/features/post/screens/CategoryForm/PowerOutletForm";
+import SmartwatchForm from "@/src/features/post/screens/CategoryForm/SmartwatchForm";
+import StudentCardForm from "@/src/features/post/screens/CategoryForm/StudentCardForm";
+import SuitcasesForm from "@/src/features/post/screens/CategoryForm/SuitcasesForm";
+import WalletsForm from "@/src/features/post/screens/CategoryForm/WalletsForm";
 import {
   CARD_SUBCATEGORY,
   ELECTRONICS_SUBCATEGORY,
+  OTHER_SUBCATEGORY,
   PERSONAL_BELONGING_SUBCATEGORY,
 } from "@/src/features/post/types";
 import React from "react";
 import { Text, View } from "react-native";
-import BackpackForm from "../CategoryForm/BackpackForm";
-import BankCardForm from "../CategoryForm/BankCardForm";
-import ChargerAdapterForm from "../CategoryForm/ChargerAdapterForm";
-import ClothingsForm from "../CategoryForm/ClothingsForm";
-import CompanyCardForm from "../CategoryForm/CompanyCardForm";
-import DriverLicenseForm from "../CategoryForm/DriverLicenseForm";
-import EarphoneForm from "../CategoryForm/EarphoneForm";
-import HeadphoneForm from "../CategoryForm/HeadphoneForm";
-import IdentificationCardForm from "../CategoryForm/IdentificationCardForm";
-import JewelryForm from "../CategoryForm/JewelryForm";
-import KeyboardForm from "../CategoryForm/KeyboardForm";
-import KeysForm from "../CategoryForm/KeysForm";
-import LaptopForm from "../CategoryForm/LaptopForm";
-import MouseForm from "../CategoryForm/MouseForm";
-import PassportForm from "../CategoryForm/PassportForm";
-import PersonalCardForm from "../CategoryForm/PersonalCardForm";
-import PhoneForm from "../CategoryForm/PhoneForm";
-import PowerbankForm from "../CategoryForm/PowerbankForm";
-import PowerOutletForm from "../CategoryForm/PowerOutletForm";
-import SmartwatchForm from "../CategoryForm/SmartwatchForm";
-import StudentCardForm from "../CategoryForm/StudentCardForm";
-import SuitcasesForm from "../CategoryForm/SuitcasesForm";
-import WalletsForm from "../CategoryForm/WalletsForm";
 
 const ItemDetailsStepScreen = () => {
   const subCategory = usePostCreationStore((state) => state.subCategoryCode);
@@ -81,6 +83,8 @@ const ItemDetailsStepScreen = () => {
         return <EarphoneForm />;
       case ELECTRONICS_SUBCATEGORY.PHONE:
         return <PhoneForm />;
+      case OTHER_SUBCATEGORY.OTHERS:
+        return <OtherForm />;
       default:
         return <Text>No form available for this category.</Text>;
     }

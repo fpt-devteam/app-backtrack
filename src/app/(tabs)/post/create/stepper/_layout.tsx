@@ -111,6 +111,7 @@ const PostCreationStepperLayout = () => {
     (state) => state.electronicDetail,
   );
   const cardDetail = usePostCreationStore((state) => state.cardDetail);
+  const otherDetail = usePostCreationStore((state) => state.otherDetail);
   const personalBelongingDetail = usePostCreationStore(
     (state) => state.personalBelongingDetail,
   );
@@ -214,6 +215,7 @@ const PostCreationStepperLayout = () => {
         ...(category === POST_CATEGORIES.PERSONAL_BELONGINGS
           ? { personalBelongingDetail }
           : {}),
+        ...(category === POST_CATEGORIES.OTHERS ? { otherDetail } : {}),
       };
 
       console.log("req:", req);
@@ -259,6 +261,7 @@ const PostCreationStepperLayout = () => {
 
       const electronicDetail = result?.electronic;
       const personalBelongingDetail = result?.personalBelonging;
+      const otherDetail = result?.other;
 
       if (electronicDetail) usePostCreationStore.setState({ electronicDetail });
 
@@ -284,13 +287,22 @@ const PostCreationStepperLayout = () => {
       if (personalBelongingDetail)
         usePostCreationStore.setState({ personalBelongingDetail });
 
-      const titleData =
-        category === POST_CATEGORIES.CARD
-          ? cardDetail?.itemName
-          : category === POST_CATEGORIES.ELECTRONICS
-            ? electronicDetail?.itemName
-            : personalBelongingDetail?.itemName;
+      if (otherDetail) usePostCreationStore.setState({ otherDetail });
 
+      const getCategoryDetail = () => {
+        switch (category) {
+          case POST_CATEGORIES.CARD:
+            return cardDetail;
+          case POST_CATEGORIES.ELECTRONICS:
+            return electronicDetail;
+          case POST_CATEGORIES.PERSONAL_BELONGINGS:
+            return personalBelongingDetail;
+          default:
+            return otherDetail;
+        }
+      };
+
+      const titleData = getCategoryDetail()?.itemName;
       if (titleData) patchPostTitle(titleData);
     } catch (error) {
       toast.error("AI analysis got error. Please try again.");

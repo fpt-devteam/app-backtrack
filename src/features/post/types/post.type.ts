@@ -214,7 +214,7 @@ export type PersonalBelongingSubcategory = typeof PERSONAL_BELONGING_SUBCATEGORY
  * This constant defines the subcategories of other items that can be associated with a post.
  */
 export const OTHER_SUBCATEGORY = {
-  OTHER: "other",
+  OTHERS: "others",
 } as const
 
 export type OtherSubcategory = typeof OTHER_SUBCATEGORY[keyof typeof OTHER_SUBCATEGORY]
@@ -309,10 +309,10 @@ export type SimilarPostElectronicDetail = {
 }
 
 export type SimilarPostOtherDetail = {
-  itemIdentifier?: Nullable<string>;
+  itemName?: Nullable<string>;
   primaryColor?: Nullable<string>;
-  additionalDetails?: Nullable<string>;
   aiDescription?: Nullable<string>;
+  additionalDetails?: Nullable<string>;
 }
 
 /**

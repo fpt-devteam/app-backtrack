@@ -20,6 +20,7 @@ export type AnalyzeImageData = {
   electronic?: ElectronicAIAnalyzeData,
   card?: CardAIAnalyzeData,
   personalBelonging?: PersonalBelongingAIAnalyzeData,
+  other?: OtherAIAnalyzeData,
 };
 
 /**
@@ -72,6 +73,17 @@ export type PersonalBelongingAIAnalyzeData = {
   condition: Nullable<string>;
   // 
   distinctiveMarks: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};
+
+
+/**
+ * 
+ */
+export type OtherAIAnalyzeData = {
+  itemName: string;
+  primaryColor: Nullable<string>;
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
 };

@@ -210,7 +210,7 @@ const SUBCATEGORIES: Record<PostCategory, SubCategoryItem[]> = {
       title: "Something Else",
       description: "Unique items, pets, or things not listed above.",
       icon: OTHERS_ICON,
-      value: OTHER_SUBCATEGORY.OTHER,
+      value: OTHER_SUBCATEGORY.OTHERS,
     },
   ],
 };
