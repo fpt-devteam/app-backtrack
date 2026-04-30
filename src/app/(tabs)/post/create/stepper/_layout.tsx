@@ -1,3 +1,4 @@
+import { PostTypeIconBadge } from "@/src/features/post/components/PostTypeIconBadge";
 import {
   useAnalyzeImage,
   useCreatePost,
@@ -311,6 +312,7 @@ const PostCreationStepperLayout = () => {
               name="category"
               options={{
                 headerTitle: "Item Classification",
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
                 ),
@@ -326,6 +328,7 @@ const PostCreationStepperLayout = () => {
               name="sub-category"
               options={{
                 headerTitle: "Detailed Classification",
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
                 ),
@@ -343,6 +346,7 @@ const PostCreationStepperLayout = () => {
               options={{
                 headerTitle: "Visual Evidence",
                 headerBackVisible: false,
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
                 ),
@@ -358,6 +362,7 @@ const PostCreationStepperLayout = () => {
               name="location"
               options={{
                 headerTitle: "Pinpoint location",
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
                 ),
@@ -374,6 +379,7 @@ const PostCreationStepperLayout = () => {
               name="timeline"
               options={{
                 headerTitle: "Occurrence time",
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
                 headerRight: () => (
                   <AppBackButton onPress={handleCancel} type="xIcon" />
                 ),
@@ -392,6 +398,7 @@ const PostCreationStepperLayout = () => {
                 headerShown: true,
                 headerTitle: "Detail Identification",
                 headerBackVisible: false,
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
                 headerTitleStyle: {
                   fontSize: typography.fontSize.lg,
                   fontWeight: typography.fontWeight
