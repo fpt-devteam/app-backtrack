@@ -12,10 +12,10 @@ import { SubscriptionStatus } from "@/src/features/qr/types";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
+import { MotiView } from "moti";
 import { LightbulbIcon, QrCodeIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
-  ScrollView,
   Text,
   TouchableOpacity,
   useWindowDimensions,
@@ -24,15 +24,32 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const TipCard = () => (
-  <View className="bg-canvas rounded-xl border border-divider px-4 py-3 flex-row items-center gap-3 mt-3">
-    <View className="bg-accent rounded-full p-2">
-      <LightbulbIcon size={18} color={colors.primary} weight="thin" />
+  <MotiView
+    from={{ opacity: 0, translateY: 16 }}
+    animate={{ opacity: 1, translateY: 0 }}
+    transition={{ type: "timing", duration: 260, delay: 180 }}
+  >
+    <View
+      className="flex-row items-start rounded-md border p-md2"
+      style={{
+        borderColor: colors.arches[300],
+        backgroundColor: colors.arches[50],
+      }}
+    >
+      <LightbulbIcon
+        size={16}
+        weight="fill"
+        color={colors.arches[600]}
+        style={{ marginTop: 1, marginRight: 8 }}
+      />
+      <Text
+        className="flex-1 text-xs leading-relaxed"
+        style={{ color: colors.arches[600] }}
+      >
+        Stick your QR on items for a higher chance of recovery.
+      </Text>
     </View>
-    <Text className="flex-1 text-xs text-textSecondary leading-5">
-      <Text className="text-xs font-semibold text-textPrimary">Tip: </Text>
-      Stick your QR on items for a higher chance of recovery.
-    </Text>
-  </View>
+  </MotiView>
 );
 
 const MyQRScreen = () => {
@@ -81,27 +98,18 @@ const MyQRScreen = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-surface">
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="px-lg pt-md pb-xl"
-        contentContainerStyle={{ paddingBottom: height * 0.1 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* QR Card */}
-        <View className="w-full items-center">
-          <UserQRCodePressableCard isSubscripted={isSubscripted} />
+    <View className="flex-1 bg-surface px-lg pt-md pb-xl gap-md">
+      {/* QR Card */}
+      <View className="w-full items-center gap-md ">
+        <UserQRCodePressableCard isSubscripted={isSubscripted} />
+        <View className="w-full">
           <TipCard />
         </View>
+      </View>
 
-        {/* Subscription Plan Card */}
-        {isSubscripted && (
-          <View className="mt-6">
-            <UserSubscriptionPlanPressableCard />
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+      {/* Subscription Plan Card */}
+      {isSubscripted && <UserSubscriptionPlanPressableCard />}
+    </View>
   );
 };
 

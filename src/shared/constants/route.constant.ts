@@ -6,7 +6,7 @@ const createPath = <T extends string>(path: T): RoutePath => path as RoutePath;
 const TAB = "/(tabs)" as const;
 const POST_BASE = `${TAB}/post` as const;
 const CHAT_BASE = `${TAB}/chat/conversations` as const;
-const QR_BASE = "/qr" as const;
+const QR_BASE = `${TAB}/profile/qr` as const;
 const HANDOVER_BASE = `${TAB}/handover` as const;
 
 export const PROFILE_ROUTE = {

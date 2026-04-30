@@ -10,6 +10,7 @@ import { formatDate } from "@/src/shared/utils";
 import { router } from "expo-router";
 import {
   ArrowRightIcon,
+  CalendarBlankIcon,
   LockKeyIcon,
   StarIcon,
   WarningIcon,
@@ -30,27 +31,43 @@ function CardBody({ isLoading, isActive, subscription }: CardBodyProps) {
 
   if (isActive && subscription) {
     return (
-      <View className="gap-1">
-        <View className="flex-row items-center gap-2">
-          <StarIcon size={16} color={colors.primary} weight="thin" />
-          <Text className="text-base font-bold text-primary">
-            {subscription.planType} Subscription
-          </Text>
-          <View className="rounded-full bg-[#E6F4EA] px-2 py-0.5">
-            <Text className="text-xs font-semibold text-[#008A05]">Active</Text>
+      <View className="gap-xs">
+        <View className="flex-row items-center gap-xs justify-between">
+          <View className="flex-row items-center gap-xs">
+            <StarIcon size={16} color={colors.primary} weight="thin" />
+            <Text className="text-base font-semibold text-primary">
+              {subscription.planType} Subscription
+            </Text>
           </View>
+
+          <View className="rounded-full bg-[#E6F4EA] px-2 py-0.5">
+            <Text className="text-xs font-normal text-[#008A05]">Active</Text>
+          </View>
+
           {subscription.cancelAtPeriodEnd && (
             <View className="flex-row items-center gap-1 ml-1">
-              <WarningIcon size={14} color={colors.status.warning} weight="thin" />
-              <Text className="text-xs font-medium" style={{ color: colors.status.warning }}>
+              <WarningIcon
+                size={14}
+                color={colors.status.warning}
+                weight="thin"
+              />
+              <Text
+                className="text-xs font-normal"
+                style={{ color: colors.status.warning }}
+              >
                 Cancels soon
               </Text>
             </View>
           )}
         </View>
-        <Text className="text-sm text-textSecondary">
-          Renews on {formatDate(subscription.currentPeriodEnd)}
-        </Text>
+
+        {/* Renewal Date */}
+        <View className="flex-row items-center gap-xs">
+          <CalendarBlankIcon size={18} color={colors.hof[500]} weight="thin" />
+          <Text className="text-sm text-textSecondary font-thin">
+            Renews on {formatDate(subscription.currentPeriodEnd)}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -94,7 +111,7 @@ export const UserSubscriptionPlanPressableCard = () => {
     <View>
       <Pressable onPress={handleNavigatePlanScreen} className="gap-2">
         <View className="flex-row items-center justify-between px-1">
-          <Text className="text-base font-bold text-textPrimary">
+          <Text className="text-base font-normal text-textPrimary">
             Current Plan
           </Text>
         </View>

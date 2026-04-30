@@ -24,25 +24,25 @@ export function SubscriptionPlanPressableCard({
   return (
     <Pressable
       onPress={handlePress}
-      className={`relative rounded-2xl border px-5 py-4 ${
+      className={`relative rounded-2xl border p-md ${
         selected ? "border-primary bg-accent" : "border-divider bg-surface"
       }`}
     >
-      <View className="flex-row items-start justify-between gap-3">
-        <View className="flex-1 gap-0.5">
+      <View className="flex-row items-start justify-between gap-md">
+        <View className="flex-1 gap-xs">
           <Text
-            className={`text-base font-extrabold ${selected ? "text-primary" : "text-textPrimary"}`}
+            className={`text-base font-semibold ${selected ? "text-primary" : "text-textPrimary"}`}
           >
             {plan.name}
           </Text>
         </View>
 
-        <View className="items-end gap-0.5">
+        <View className="items-end gap-xs">
           <Text
-            className={`text-xl font-extrabold ${selected ? "text-primary" : "text-textPrimary"}`}
+            className={`text-xl font-semibold ${selected ? "text-primary" : "text-textPrimary"}`}
           >
             {plan.price}{" "}
-            <Text className="text-sm text-textSecondary uppercase">
+            <Text className="text-sm text-textSecondary font-semibold uppercase">
               {plan.currency}
             </Text>
           </Text>
@@ -50,18 +50,20 @@ export function SubscriptionPlanPressableCard({
       </View>
 
       {!!plan.features?.length && (
-        <View className="mt-4 gap-2">
+        <View className="gap-sm mt-sm">
           {plan.features.map((feature, index) => (
             <View
               key={`${plan.id}-feature-${index}`}
-              className="flex-row items-center gap-2"
+              className="flex-row items-center gap-xs"
             >
               <SealCheckIcon
                 size={16}
                 color={selected ? colors.primary : colors.hof[400]}
                 weight="thin"
               />
-              <Text className="flex-1 text-sm text-textSecondary">{feature}</Text>
+              <Text className="flex-1 text-sm font-thin text-textSecondary">
+                {feature}
+              </Text>
             </View>
           ))}
         </View>

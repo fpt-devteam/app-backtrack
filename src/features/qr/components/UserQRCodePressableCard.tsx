@@ -8,9 +8,9 @@ import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { LockKeyIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
-import QRCode from "react-native-qrcode-svg";
 import type { ViewStyle } from "react-native";
+import { Pressable, Text, useWindowDimensions, View } from "react-native";
+import QRCode from "react-native-qrcode-svg";
 import { PremiumCTAButton } from "./PremiumCTAButton";
 
 const CARD_SHADOW: ViewStyle = {
@@ -28,6 +28,7 @@ type UserQRCodePressableCardProps = {
 export const UserQRCodePressableCard = ({
   isSubscripted,
 }: UserQRCodePressableCardProps) => {
+  const { width } = useWindowDimensions();
   const { data: qrCode, isLoading: isQRLoading } = useGetMyQR();
   const { user } = useAppUser();
 
@@ -86,7 +87,7 @@ export const UserQRCodePressableCard = ({
               borderColor: colors.divider,
               shadowColor: colors.black,
               shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.10,
+              shadowOpacity: 0.1,
               shadowRadius: 8,
               elevation: 3,
             }}
@@ -96,7 +97,9 @@ export const UserQRCodePressableCard = ({
         </View>
 
         <View className="items-center px-4">
-          <Text className="text-xl font-bold text-textPrimary mb-1">QR Locked</Text>
+          <Text className="text-xl font-bold text-textPrimary mb-1">
+            QR Locked
+          </Text>
           <Text className="text-sm text-textSecondary text-center leading-5">
             Upgrade to Backtrack Pro to create your personalized QR code
           </Text>
@@ -110,24 +113,19 @@ export const UserQRCodePressableCard = ({
   return (
     <Pressable
       onPress={handlePreviewProfile}
-      className="bg-surface rounded-xl items-center justify-center border border-divider p-8 w-full"
+      className="bg-surface rounded-xl items-center justify-center border border-divider p-md w-full"
       style={CARD_SHADOW}
     >
-      <View className="items-center">
-        <QRCode
-          value={qrValue}
-          size={240}
-          logo={logoSource}
-          logoSize={60}
-          logoBorderRadius={30}
-          logoBackgroundColor="white"
-          logoMargin={4}
-          quietZone={10}
-        />
-        <Text className="mt-6 text-xs font-medium tracking-widest text-primary uppercase">
-          Tap to preview your public profile
-        </Text>
-      </View>
+      <QRCode
+        value={qrValue}
+        size={width * 0.8}
+        logo={logoSource}
+        logoSize={60}
+        logoBorderRadius={30}
+        logoBackgroundColor="white"
+        logoMargin={4}
+        quietZone={10}
+      />
     </Pressable>
   );
 };

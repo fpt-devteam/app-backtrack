@@ -7,6 +7,7 @@ import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus, UserSubscription } from "@/src/features/qr/types";
 import { colors } from "@/src/shared/theme/colors";
 import { formatDate } from "@/src/shared/utils";
+import * as Haptics from "expo-haptics";
 import {
   ArrowSquareOutIcon,
   CalendarBlankIcon,
@@ -15,6 +16,7 @@ import {
   WarningIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
+import type { ViewStyle } from "react-native";
 import {
   ActivityIndicator,
   Linking,
@@ -22,8 +24,6 @@ import {
   Text,
   View,
 } from "react-native";
-import * as Haptics from "expo-haptics";
-import type { ViewStyle } from "react-native";
 
 const CARD_SHADOW: ViewStyle = {
   shadowColor: colors.black,
@@ -60,53 +60,72 @@ function CardBody({
   if (isActive && subscription) {
     return (
       <View
-        className="rounded-xl border border-divider bg-surface px-6 py-6"
+        className="rounded-xl border border-divider bg-surface p-md gap-md"
         style={CARD_SHADOW}
       >
-        <View className="flex-row items-start justify-between mb-3">
-          <View className="flex-1 pr-4">
-            <Text className="text-xs font-semibold text-textSecondary uppercase tracking-widest">
-              Current Plan
-            </Text>
-            <View className="mt-2 flex-row items-center gap-2">
-              <Text className="text-lg font-extrabold text-textPrimary leading-tight">
-                {subscription.planType}
+        <View className="gap-xs">
+          {/* Title */}
+          <View className="flex-row items-start justify-between">
+            <View className="flex-row items-center gap-xs">
+              <Text className="text-lg font-normal text-textPrimary">
+                Current Plan
               </Text>
-              <View className="rounded-full bg-[#E6F4EA] px-3 py-1">
-                <Text className="text-[#008A05] text-xs font-semibold">
-                  Active
-                </Text>
+
+              {/* Badges */}
+              <View className="flex-row items-center gap-xs">
+                <View className="rounded-full bg-[#E6F4EA] px-sm py-xs">
+                  <Text className="text-[#008A05] text-xs font-semibold">
+                    {subscription.planType}
+                  </Text>
+                </View>
+
+                <View className="rounded-full bg-[#E6F4EA] px-sm py-xs">
+                  <Text className="text-[#008A05] text-xs font-semibold">
+                    Active
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          {/* Star in accent circle — thin, primary color */}
-          <View className="h-12 w-12 rounded-full bg-accent items-center justify-center">
             <StarIcon size={24} color={colors.primary} weight="thin" />
           </View>
+
+          {/* Renewal Date */}
+          <View className="flex-row items-center gap-xs">
+            <CalendarBlankIcon
+              size={18}
+              color={colors.hof[500]}
+              weight="thin"
+            />
+            <Text className="text-sm text-textSecondary font-thin">
+              Renews on {formatDate(subscription.currentPeriodEnd)}
+            </Text>
+          </View>
         </View>
 
-        <View className="flex-row items-center gap-3 mb-4">
-          <CalendarBlankIcon size={18} color={colors.hof[500]} weight="thin" />
-          <Text className="text-sm text-textSecondary font-medium">
-            Renews on {formatDate(subscription.currentPeriodEnd)}
-          </Text>
-        </View>
-
+        {/* Manage Subscription */}
         <Pressable
           onPress={onManageSubscription}
-          className="h-11 rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-2 active:opacity-80"
+          className="py-sm rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-xs active:opacity-80"
         >
-          <Text className="text-textPrimary font-semibold text-sm">
+          <Text className="text-textPrimary font-normal text-sm">
             Manage Subscription
           </Text>
-          <ArrowSquareOutIcon size={16} color={colors.hof[900]} weight="thin" />
+          <ArrowSquareOutIcon size={16} color={colors.hof[900]} />
         </Pressable>
 
+        {/* Cancellation Notice */}
         {subscription.cancelAtPeriodEnd && (
           <View className="mt-3 flex-row items-center gap-1">
-            <WarningIcon size={14} color={colors.status.warning} weight="thin" />
-            <Text className="text-xs font-medium" style={{ color: colors.status.warning }}>
+            <WarningIcon
+              size={14}
+              color={colors.status.warning}
+              weight="thin"
+            />
+            <Text
+              className="text-xs font-medium"
+              style={{ color: colors.status.warning }}
+            >
               Subscription will cancel at the end of this billing period
             </Text>
           </View>
@@ -116,7 +135,10 @@ function CardBody({
   }
 
   return (
-    <View className="rounded-xl border border-divider bg-surface px-5 py-5" style={CARD_SHADOW}>
+    <View
+      className="rounded-xl border border-divider bg-surface px-5 py-5"
+      style={CARD_SHADOW}
+    >
       <View className="flex-row items-center gap-3">
         <View className="w-10 h-10 rounded-full bg-canvas items-center justify-center">
           <LockKeyIcon size={18} color={colors.hof[500]} weight="thin" />
@@ -133,7 +155,7 @@ function CardBody({
 
       <Pressable
         onPress={onManageSubscription}
-        className="mt-4 h-11 rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-2 active:opacity-80"
+        className="mt-4 py-sm rounded-full border border-divider bg-canvas flex-row items-center justify-center gap-xs active:opacity-80"
       >
         <Text className="text-textPrimary font-medium text-sm">View Plans</Text>
         <ArrowSquareOutIcon size={16} color={colors.hof[900]} weight="thin" />

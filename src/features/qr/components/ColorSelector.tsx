@@ -1,3 +1,4 @@
+import { colors } from "@/src/shared/theme";
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
@@ -21,21 +22,15 @@ type ColorSwatchesProps = {
   onSelectColor: (color: string) => void;
   selectedColor?: string;
   title?: string;
-  colors?: string[];
 };
 
 const ColorSwatches = ({
   onSelectColor,
   selectedColor,
-  colors = DEFAULT_COLOR_SWATCHES,
 }: ColorSwatchesProps) => {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ gap: 10, paddingRight: 6 }}
-    >
-      {colors.map((color) => {
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {DEFAULT_COLOR_SWATCHES.map((color) => {
         const isSelected = selectedColor?.toLowerCase() === color.toLowerCase();
 
         return (
@@ -44,20 +39,18 @@ const ColorSwatches = ({
             onPress={() => onSelectColor(color)}
             className="items-center justify-center rounded-full"
             style={{
-              width: 34,
-              height: 34,
-              borderWidth: 2,
-              borderColor: isSelected ? "#84CC16" : "transparent",
+              width: 36,
+              height: 36,
+              borderWidth: 1,
+              borderColor: isSelected ? colors.status.success : "transparent",
             }}
           >
             <View
               className="rounded-full"
               style={{
-                width: 26,
-                height: 26,
+                width: 24,
+                height: 24,
                 backgroundColor: color,
-                borderWidth: color.toLowerCase() === "#f5f5f5" ? 1 : 0,
-                borderColor: "#D1D5DB",
               }}
             />
           </Pressable>

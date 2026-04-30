@@ -127,6 +127,8 @@ const palette = {
    * Source: Airbnb DLS — Arches scale
    */
   arches: {
+    50: "#FFF8E1",
+    300: "#FFD54F",
     500: "#FFB400",
     600: "#F59F00",
   },

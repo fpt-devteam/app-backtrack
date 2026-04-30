@@ -12,14 +12,19 @@ import {
   UpdateMyQrDesignRequest,
   UserQrDesign,
 } from "@/src/features/qr/types";
-import { AppInlineError } from "@/src/shared/components";
+import {
+  AppBackButton,
+  AppInlineError,
+  TouchableIconButton,
+} from "@/src/shared/components";
+import { metrics } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
-import { router } from "expo-router";
-import { CaretLeftIcon, FloppyDiskIcon } from "phosphor-react-native";
+import { typography } from "@/src/shared/theme/typography";
+import { Stack } from "expo-router";
+import { FloppyDiskIcon } from "phosphor-react-native";
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, TextStyle, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const DEFAULT_DESIGN: UpdateMyQrDesignRequest = {
   color: "#000000",
@@ -68,21 +73,16 @@ const toForm = (design?: UserQrDesign | null): UpdateMyQrDesignRequest => {
   };
 };
 
-const SectionCard = ({
+const SectionTitle = ({
   title,
   subtitle,
-  children,
 }: {
   title: string;
-  subtitle?: string;
-  children: React.ReactNode;
+  subtitle: string;
 }) => (
-  <View className="bg-surface rounded-2xl border border-divider px-4 py-4">
-    <Text className="text-sm font-bold text-textPrimary">{title}</Text>
-    {!!subtitle && (
-      <Text className="text-xs text-slate-400 mt-1 mb-3">{subtitle}</Text>
-    )}
-    {children}
+  <View className="">
+    <Text className="text-sm font-normal text-textPrimary">{title}</Text>
+    <Text className="text-xs font-thin text-textSecondary">{subtitle}</Text>
   </View>
 );
 
@@ -152,74 +152,61 @@ const QRCustomizeScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas">
-      <View className="flex-row items-center px-4 py-3 bg-canvas">
-        <Pressable onPress={() => router.back()} hitSlop={10}>
-          <CaretLeftIcon size={22} color={colors.black} weight="bold" />
-        </Pressable>
-        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
-          Customize QR
-        </Text>
+    <View className="flex-1 bg-surface">
+      <Stack.Screen
+        options={{
+          headerTitle: "QR Customize",
+          headerLeft: () => <AppBackButton />,
+          headerRight: () => (
+            <TouchableIconButton
+              icon={<FloppyDiskIcon size={24} color={colors.black} />}
+              onPress={handleSave}
+              disabled={isUpdatingDesign || isDesignLoading}
+            />
+          ),
 
-        {/* Save Button */}
-        <Pressable
-          onPress={handleSave}
-          disabled={isUpdatingDesign || isDesignLoading}
-          hitSlop={10}
-          className="flex-row items-center gap-1"
-        >
-          <FloppyDiskIcon size={16} color={colors.primary} weight="fill" />
-          <Text
-            className="text-base font-semibold"
-            style={{ color: colors.primary }}
-          >
-            {isUpdatingDesign ? "Saving..." : "Save"}
-          </Text>
-        </Pressable>
-      </View>
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
 
       <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: metrics.spacing.md,
+          paddingVertical: metrics.spacing.lg,
+          gap: metrics.spacing.md,
+        }}
       >
         {!!designError && <AppInlineError message={designError.message} />}
+
         {!!updateError && <AppInlineError message={updateError.message} />}
 
         <View className="rounded-3xl overflow-hidden border border-divider">
-          <View className="items-center py-8">
-            <View
-              style={{
-                borderRadius: clamp(preview.logoBorderRadius, 0, 24),
-                overflow: "hidden",
-                backgroundColor: colors.white,
-                padding: 12,
-                shadowColor: "#000",
-                shadowOpacity: 0.08,
-                shadowRadius: 12,
-                elevation: 4,
-              }}
-            >
-              <QRCode
-                value={publicCode || "BTK-PREVIEW"}
-                size={180}
-                color={preview.color}
-                backgroundColor={preview.backgroundColor}
-                quietZone={8}
-                ecl={preview.ecl}
-                logo={form.logo?.url ?? ""}
-                logoBorderRadius={99999}
-                logoSize={60}
-              />
-            </View>
+          <View className="items-center py-md">
+            <QRCode
+              value={publicCode || "BTK-PREVIEW"}
+              size={180}
+              color={preview.color}
+              backgroundColor={preview.backgroundColor}
+              quietZone={8}
+              ecl={preview.ecl}
+              logo={form.logo?.url ?? ""}
+              logoBorderRadius={99999}
+              logoSize={60}
+            />
           </View>
         </View>
 
-        <SectionCard
-          title="QR Colors"
-          subtitle="Choose module and background colors"
-        >
-          <Text className="text-sm font-bold text-textPrimary">QR Color</Text>
+        {/* QR Colors */}
+        <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
+          <SectionTitle
+            title="QR Colors"
+            subtitle="Choose module and background colors"
+          />
+
           <ColorSwatches
             selectedColor={form.color ?? ""}
             onSelectColor={(color) =>
@@ -229,10 +216,15 @@ const QRCustomizeScreen = () => {
               }))
             }
           />
+        </View>
 
-          <Text className="text-sm font-bold text-textPrimary">
-            Background Color
-          </Text>
+        {/* Background Color */}
+        <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
+          <SectionTitle
+            title="Background Color"
+            subtitle="Choose the background color for the QR code"
+          />
+
           <ColorSwatches
             selectedColor={form.backgroundColor ?? ""}
             onSelectColor={(color) =>
@@ -242,22 +234,26 @@ const QRCustomizeScreen = () => {
               }))
             }
           />
-        </SectionCard>
+        </View>
 
-        <SectionCard
-          title="Error Correction"
-          subtitle="Higher level improves readability when QR is damaged"
-        >
-          <View className="flex-row gap-2">
+        {/* Error Correction */}
+        <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
+          <SectionTitle
+            title="Error Correction"
+            subtitle="Higher level improves readability when QR is damaged"
+          />
+          <View className="flex-row gap-sm">
             {ECL_OPTIONS.map((ecl) => {
               const selected = (form.ecl ?? "H") === ecl;
               return (
                 <Pressable
                   key={ecl}
                   onPress={() => setForm((prev) => ({ ...prev, ecl }))}
-                  className="px-3 py-2 rounded-xl border"
+                  className="p-sm rounded-xl border"
                   style={{
-                    borderColor: selected ? colors.primary : colors.slate[200],
+                    borderColor: selected
+                      ? colors.primary
+                      : colors.border.DEFAULT,
                     backgroundColor: selected ? colors.sky[100] : colors.white,
                   }}
                 >
@@ -273,12 +269,14 @@ const QRCustomizeScreen = () => {
               );
             })}
           </View>
-        </SectionCard>
+        </View>
 
-        <SectionCard
-          title="Logo"
-          subtitle="Adjust logo appearance sent in update request"
-        >
+        {/* Logo */}
+        <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
+          <SectionTitle
+            title="Logo"
+            subtitle="Adjust logo appearance sent in update request"
+          />
           <LogoSelector
             value={form.logo?.url ?? ""}
             onChange={(url: string) =>
@@ -292,9 +290,9 @@ const QRCustomizeScreen = () => {
             }
             disabled={isUpdatingDesign}
           />
-        </SectionCard>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

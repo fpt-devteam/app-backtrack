@@ -1,24 +1,87 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { usePatchProfile } from "@/src/features/profile/hooks";
-import {
-  UserSettingSectionCard,
-  UserSettingToggleRow,
-} from "@/src/features/qr/components";
 import { useGetMyQR, useUpdateQRNote } from "@/src/features/qr/hooks";
-import { AppLoader } from "@/src/shared/components";
-import { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
+import { AppBackButton, AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme/colors";
+import { typography } from "@/src/shared/theme/typography";
 import { getErrorMessage } from "@/src/shared/utils";
-import { router } from "expo-router";
+import { Stack } from "expo-router";
+import { ChatTeardropTextIcon, EyeIcon } from "phosphor-react-native";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import {
-  CaretLeftIcon,
-  ChatTeardropTextIcon,
-  EyeIcon,
-} from "phosphor-react-native";
-import React, { useCallback, useEffect, useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+  Keyboard,
+  Switch,
+  Text,
+  TextStyle,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+
+import * as Haptics from "expo-haptics";
+import { PostFormTextArea } from "../../post/components";
+
+type UserSettingSectionCardProps = {
+  icon: ReactNode;
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+};
+
+const UserSettingSectionCard = ({
+  icon,
+  title,
+  subtitle,
+  children,
+}: UserSettingSectionCardProps) => (
+  <View className="bg-surfaces p-sm gap-md">
+    <View className="flex-col gap-xs">
+      <View className="flex-row items-center gap-xs">
+        {icon}
+        <Text className="text-base font-normal text-textPrimary">{title}</Text>
+      </View>
+
+      <Text className="text-xs font-thin text-textMuted">{subtitle}</Text>
+    </View>
+
+    {children}
+  </View>
+);
+
+type UserSettingToggleRowProps = {
+  label: string;
+  subtitle: string;
+  value: boolean;
+  onValueChange: (v: boolean) => void;
+};
+
+export const UserSettingToggleRow = ({
+  label,
+  subtitle,
+  value,
+  onValueChange,
+}: UserSettingToggleRowProps) => {
+  const handleOnSwitch = (value: boolean) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onValueChange(value);
+  };
+
+  return (
+    <View className="flex-row items-center justify-between">
+      <View className="flex-1 gap-xs">
+        <Text className="text-sm font-normal text-textPrimary">{label}</Text>
+        <Text className="text-xs font-thin text-textMuted">{subtitle}</Text>
+      </View>
+
+      <Switch
+        value={value}
+        onValueChange={handleOnSwitch}
+        trackColor={{ false: colors.slate[200], true: colors.primary }}
+        thumbColor={colors.white}
+      />
+    </View>
+  );
+};
 
 const QRProfileSettingScreen = () => {
   const { patchProfile } = usePatchProfile();
@@ -92,10 +155,6 @@ const QRProfileSettingScreen = () => {
     [patchProfile],
   );
 
-  const handleBack = () => {
-    router.back();
-  };
-
   const renderContent = () => {
     if (showLoading) {
       return (
@@ -108,49 +167,43 @@ const QRProfileSettingScreen = () => {
     return (
       <>
         <UserSettingSectionCard
-          icon={<EyeIcon size={18} color={colors.primary} weight="fill" />}
+          icon={<EyeIcon size={24} color={colors.primary} weight="fill" />}
           title="Contact Visibility"
+          subtitle="Control what information finders can see when they scan your QR code."
         >
-          <View className="h-px bg-slate-100" />
+          <View className="w-full gap-md">
+            <UserSettingToggleRow
+              label="Show Phone Number"
+              subtitle="Allow direct calls"
+              value={showPhoneNumber}
+              onValueChange={handleTogglePhone}
+            />
 
-          <UserSettingToggleRow
-            label="Show Phone Number"
-            subtitle="Allow direct calls"
-            value={showPhoneNumber}
-            onValueChange={handleTogglePhone}
-          />
-
-          <View className="h-px bg-slate-100" />
-
-          <UserSettingToggleRow
-            label="Show Email Address"
-            value={showEmailAddress}
-            onValueChange={handleToggleEmail}
-          />
+            <UserSettingToggleRow
+              label="Show Email Address"
+              subtitle="Allow email contact"
+              value={showEmailAddress}
+              onValueChange={handleToggleEmail}
+            />
+          </View>
         </UserSettingSectionCard>
 
         {/* Custom Message to Finders */}
         <UserSettingSectionCard
           icon={
             <ChatTeardropTextIcon
-              size={18}
+              size={24}
               color={colors.primary}
               weight="fill"
             />
           }
           title="Custom Message to Finders"
+          subtitle="Let finders know what to do when they scan your QR code."
         >
-          <Text className="text-xs text-slate-400 leading-4 mb-2">
-            Display a note when your code is scanned (e.g. reward info).
-          </Text>
-          <TextInput
+          <PostFormTextArea
             value={customMessage}
-            onChangeText={setCustomMessage}
+            onChange={setCustomMessage}
             placeholder="Write a message for finders..."
-            placeholderTextColor={colors.slate[400]}
-            multiline
-            textAlignVertical="top"
-            className="bg-canvas border border-divider rounded-xl p-3 text-sm text-slate-700"
           />
         </UserSettingSectionCard>
       </>
@@ -158,29 +211,22 @@ const QRProfileSettingScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas">
-      {/* Header */}
-      <View className="flex-row items-center px-4 py-3 bg-canvas">
-        <TouchableIconButton
-          onPress={handleBack}
-          icon={<CaretLeftIcon size={22} color={colors.black} weight="bold" />}
-        />
+    <View className="flex-1 bg-surface">
+      <Stack.Screen
+        options={{
+          headerTitle: "QR Profile Settings",
+          headerLeft: () => <AppBackButton />,
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
 
-        <Text className="flex-1 text-center text-base font-bold text-textPrimary">
-          Public Profile Settings
-        </Text>
-        <View style={{ width: 22 }} />
-      </View>
-
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 16, gap: 16 }}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        {renderContent()}
-      </ScrollView>
-    </SafeAreaView>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View className="flex-1 p-md gap-md">{renderContent()}</View>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 
