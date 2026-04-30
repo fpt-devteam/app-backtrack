@@ -24,6 +24,7 @@ export const ChatScreen = () => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    isRefetching,
   } = useConversations({ enabled: isAuthReady });
 
   const endReachedLockRef = useRef(false);
@@ -44,9 +45,6 @@ export const ChatScreen = () => {
       });
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const refreshing = useMemo(() => {
-    return isFetching && !isFetchingNextPage;
-  }, [isFetching, isFetchingNextPage]);
 
   const handleNavigateToOnboarding = useCallback(() => {
     router.push(AUTH_ROUTE.onboarding);
@@ -149,7 +147,7 @@ export const ChatScreen = () => {
           data={data}
           keyExtractor={(item) => item.conversationId}
           renderItem={({ item }) => <ConversationCard conversation={item} />}
-          contentContainerClassName="px-md"
+          contentContainerClassName="px-md pt-md"
           contentContainerStyle={{
             paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
           }}
@@ -157,7 +155,7 @@ export const ChatScreen = () => {
           onEndReached={onLoadMore}
           onEndReachedThreshold={0.35}
           className="flex-1"
-          ItemSeparatorComponent={() => <View className="h-md" />}
+          ItemSeparatorComponent={() => <View className="h-lg" />}
           ListEmptyComponent={
             <View
               className="flex-1"
@@ -187,7 +185,7 @@ export const ChatScreen = () => {
           }
           refreshControl={
             <RefreshControl
-              refreshing={refreshing}
+              refreshing={isRefetching}
               onRefresh={handleRefetch}
               tintColor={colors.primary}
             />

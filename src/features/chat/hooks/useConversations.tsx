@@ -36,5 +36,6 @@ export const useConversations = ({ enabled = true }: UseConversationsProps) => {
     fetchNextPage: query.fetchNextPage,
     hasNextPage: query.hasNextPage,
     isFetchingNextPage: query.isFetchingNextPage,
+    isRefetching: query.isRefetching,
   };
 };

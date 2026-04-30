@@ -9,7 +9,7 @@ import { privateClient } from "@/src/shared/api";
 
 const NOTIFICATION_API = {
   FILTER: "/api/core/notifications",
-  UPDATE_STATUS: "/api/core/notifications",
+  UPDATE_STATUS: "/api/core/notifications/status",
   SEND: "/api/core/notifications",
   UNREAD_COUNT: "/api/core/notifications/unread-count",
 } as const;

@@ -98,7 +98,7 @@ export const ConversationCard = ({ conversation }: Props) => {
           />
 
           {/* Main */}
-          <View className="flex-1 ml-3 gap-xs">
+          <View className="flex-1 ml-sm gap-xs">
             {/* Row 1: Name + unread dot */}
             <View className="flex-row items-center">
               <Text className={`flex-1 ${nameTextClass}`} numberOfLines={1}>

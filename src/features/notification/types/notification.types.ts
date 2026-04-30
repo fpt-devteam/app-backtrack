@@ -54,6 +54,7 @@ export type NotificationsFilterRequest = {
 } & CursorPaginationParams;
 
 export type NotificationStatusUpdateRequest = {
+  userId: string;
   notificationIds: string[];
   status: NotificationStatus;
 };

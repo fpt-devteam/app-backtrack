@@ -14,9 +14,9 @@ import {
 } from "@/src/features/notification/types";
 import { AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
-import { AUTH_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { RelativePathString, router } from "expo-router";
+import { router } from "expo-router";
 import { BellRingingIcon, BellSimpleSlashIcon } from "phosphor-react-native";
 import React from "react";
 import {
@@ -84,18 +84,19 @@ const NotificationScreen = () => {
       await updateStatus({
         notificationIds: [notification.id],
         status: NOTIFICATION_STATUS.Read,
+        userId: notification.userId,
       });
 
-      const screenPath = notification.data?.screenPath as RelativePathString;
+      // const screenPath = notification.data?.screenPath as RelativePathString;
 
-      if (screenPath) {
-        router.push(screenPath);
-      } else {
-        router.push(SHARED_ROUTE.notAvailable);
-      }
+      // if (screenPath) {
+      //   router.push(screenPath);
+      // } else {
+      //   router.push(SHARED_ROUTE.notAvailable);
+      // }
     } catch (error) {
       console.log("Error when update notification status: ", error);
-      router.push(SHARED_ROUTE.notAvailable);
+      // router.push(SHARED_ROUTE.notAvailable);
       return;
     }
   };
