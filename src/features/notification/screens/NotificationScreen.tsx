@@ -124,7 +124,6 @@ const NotificationScreen = () => {
         }
         title="You don't have any notifications."
         subtitle="When you receive a new notification, it will appear here."
-        backButton={null}
       />
     );
   };

@@ -9,7 +9,7 @@ import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
-import { ArrowRightIcon } from "phosphor-react-native";
+import { ArrowRightIcon, PackageIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
@@ -166,16 +166,23 @@ const HandoverScreen = () => {
               subtitle="Completed or closed handovers you may want to reference later."
             />
 
-            <View className="px-lg">
+            <View className="flex-1 px-lg">
               {pastHandovers.length === 0 ? (
-                <View className="pb-md">
+                <View className="flex-1 items-center justify-center">
                   <EmptyList
+                    icon={
+                      <PackageIcon
+                        size={96}
+                        color={colors.secondary}
+                        weight="thin"
+                      />
+                    }
                     title="No completed handovers yet"
                     subtitle="Closed handovers will appear here once a return is completed or resolved."
                   />
                 </View>
               ) : (
-                <View style={{ paddingBottom: metrics.spacing.md }}>
+                <View className="gap-md2">
                   {pastHandovers.slice(0, 2).map((handover) => (
                     <HandoverRequestCard
                       key={handover.id}

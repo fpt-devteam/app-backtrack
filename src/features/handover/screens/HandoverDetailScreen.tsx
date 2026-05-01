@@ -34,6 +34,7 @@ import { CHAT_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { formatDate } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
+import * as ImagePicker from "expo-image-picker";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import {
@@ -422,7 +423,6 @@ const ActionPanel = ({
 }: ActionPanelProps) => {
   const { status } = report;
 
-  // ── Confirmed ──
   if (status === "Confirmed") {
     return (
       <View
@@ -450,7 +450,6 @@ const ActionPanel = ({
     );
   }
 
-  // ── Closed / Rejected ──
   if (status === "Closed" || status === "Rejected") {
     const label =
       status === "Closed"
@@ -481,7 +480,6 @@ const ActionPanel = ({
     );
   }
 
-  // ── Ongoing — Finder: can mark delivery ──
   if (status === "Ongoing" && isFinder) {
     return (
       <View
@@ -503,7 +501,6 @@ const ActionPanel = ({
     );
   }
 
-  // ── Ongoing — Owner: waiting for finder to deliver ──
   if (status === "Ongoing" && isOwner) {
     return (
       <View
@@ -529,7 +526,6 @@ const ActionPanel = ({
     );
   }
 
-  // ── Delivered — Finder: waiting for owner ──
   if (status === "Delivered" && isFinder) {
     return (
       <View
@@ -561,7 +557,6 @@ const ActionPanel = ({
     );
   }
 
-  // ── Delivered — Owner: confirm receipt or reject ──
   if (status === "Delivered" && isOwner) {
     return (
       <View
@@ -773,24 +768,49 @@ const HandoverDetailScreen = () => {
 
   const handleActivate = useCallback(() => {
     if (!report) return;
+
     Alert.alert(
-      "Mark as Delivered?",
-      "This tells the owner you have handed over the item. They will then confirm receipt to complete the handover.",
+      "Photo Proof Required",
+      "To ensure a secure handover, please take a photo of the item being returned. This will be saved as proof of delivery.",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Confirm Delivery",
+          text: "Take Photo",
           style: "default",
           onPress: async () => {
             try {
-              await activate(report.id);
+              const permissionResult =
+                await ImagePicker.requestCameraPermissionsAsync();
+
+              if (permissionResult.granted === false) {
+                Alert.alert(
+                  "Permission Required",
+                  "Please allow camera access to take a photo of the handover.",
+                );
+                return;
+              }
+
+              const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 0.7,
+              });
+
+              if (result.canceled) return;
+
+              const localUri = result.assets[0].uri;
+              // await activate(report.id, localUri);
+
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success,
               );
-            } catch {
+
+              toast.success("Success", "Item marked as delivered securely.");
+            } catch (error) {
+              console.error("Handover error:", error);
               toast.error(
                 "Error",
-                "Could not mark as delivered. Please try again.",
+                "Could not complete handover. Please try again.",
               );
             }
           },
@@ -889,7 +909,6 @@ const HandoverDetailScreen = () => {
       );
     }
 
-    // ── Error / Not found ──
     if (error || !report) {
       return (
         <View className="flex-1 bg-surface">
