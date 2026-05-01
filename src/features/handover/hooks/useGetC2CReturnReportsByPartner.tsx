@@ -22,7 +22,6 @@ export const useGetC2CReturnReportsByPartner = (
       const response = await getC2CReturnReportsByPartnerApi(partnerId!);
       if (!response.success || !response.data)
         throw new Error("Failed to fetch return reports by partner");
-      console.log("[THIS IS RESPONSE]", response.data.items);
       return response.data.items;
     },
     enabled: !!partnerId,
