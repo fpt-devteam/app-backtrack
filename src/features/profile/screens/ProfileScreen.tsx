@@ -9,8 +9,8 @@ import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import {
   CaretRightIcon,
-  GearIcon,
   HandIcon,
+  LockIcon,
   PackageIcon,
   QrCodeIcon,
   QuestionIcon,
@@ -148,8 +148,8 @@ export function ProfileScreen() {
     // TODO: Navigate to privacy screen
   }, []);
 
-  const handleSettings = useCallback(() => {
-    router.push(PROFILE_ROUTE.setting);
+  const handleUpdatePassword = useCallback(() => {
+    router.push(PROFILE_ROUTE.password);
   }, []);
 
   const handleLogout = useCallback(() => {
@@ -221,9 +221,9 @@ export function ProfileScreen() {
         {/* Menu Actions */}
         <View className="mt-xl">
           <MenuRow
-            icon={GearIcon}
-            label="Account Settings"
-            onPress={handleSettings}
+            icon={LockIcon}
+            label="Change Password"
+            onPress={handleUpdatePassword}
           />
 
           <MenuRow icon={HandIcon} label="Privacy" onPress={handlePrivacy} />

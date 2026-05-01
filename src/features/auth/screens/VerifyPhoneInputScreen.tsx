@@ -59,7 +59,7 @@ const VerifyPhoneInputScreen = () => {
                   label="Phone number"
                   value={phone}
                   onChange={setPhone}
-                  type="phone"
+                  type="phone-pad"
                 />
               </View>
 

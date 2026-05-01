@@ -170,7 +170,7 @@ const ProfileEditScreen = () => {
                   label="Phone number"
                   value={value}
                   onChange={onChange}
-                  type="phone"
+                  type="phone-pad"
                 />
               )}
             />

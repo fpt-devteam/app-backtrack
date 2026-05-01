@@ -44,13 +44,18 @@ const ProfileLayout = () => {
       />
 
       <Stack.Screen
-        name="setting"
+        name="password"
         options={{
-          headerShown: false,
-          title: "Settings",
-          animation: "slide_from_right",
-          presentation: "card",
-          gestureDirection: "horizontal",
+          headerShown: true,
+          title: "Change Password",
+          headerRight: () => (
+            <AppBackButton type={"xIcon"} showBackground={true} />
+          ),
+          presentation: "modal",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.base,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
         }}
       />
 

@@ -1,7 +1,14 @@
 import { colors, metrics, typography } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
+import { EyeClosedIcon, EyeIcon } from "phosphor-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, TextInput, TextStyle, View } from "react-native";
+import {
+  Animated,
+  TextInput,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type PostFormFieldProps = {
   label: string;
@@ -9,7 +16,7 @@ type PostFormFieldProps = {
   onChange: (value: string) => void;
   onBlur?: () => void;
   onFocus?: () => void;
-  type?: "default" | "email" | "phone";
+  type?: "default" | "email-address" | "phone-pad" | "password"; // Added password type
 };
 
 export const PostFormField = ({
@@ -21,6 +28,7 @@ export const PostFormField = ({
   type = "default",
 }: PostFormFieldProps) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false); // Added state for password visibility
   const isActive = isFocused || value.length > 0;
 
   const labelAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
@@ -44,6 +52,11 @@ export const PostFormField = ({
     onBlur?.();
   };
 
+  const togglePasswordVisibility = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   const labelColor = colors.text.muted;
 
   const labelTop = labelAnim.interpolate({
@@ -61,45 +74,61 @@ export const PostFormField = ({
     outputRange: [0, 22],
   });
 
+  const isSecure = type === "password" && !isPasswordVisible;
+
   return (
     <View>
-      <View className="relative h-control-xl bg-surface pb-sm">
-        <Animated.Text
-          style={{
-            position: "absolute",
-            left: metrics.spacing.md2,
-            top: labelTop,
-            fontSize: labelFontSize,
-            fontWeight: typography.fontWeight.thin as TextStyle["fontWeight"],
-            color: labelColor,
-          }}
-        >
-          {label}
-        </Animated.Text>
-
-        <Animated.View style={{ flex: 1, paddingTop: inputPaddingTop }}>
-          <TextInput
-            className="flex-1 px-md2"
+      <View className="relative h-control-xl bg-surface pb-sm flex-row items-center">
+        <View className="flex-1">
+          <Animated.Text
             style={{
-              color: colors.text.primary,
-              fontSize: typography.fontSize.base,
+              position: "absolute",
+              left: metrics.spacing.md2,
+              top: labelTop,
+              fontSize: labelFontSize,
               fontWeight: typography.fontWeight.thin as TextStyle["fontWeight"],
+              color: labelColor,
             }}
-            value={value}
-            onChangeText={onChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            cursorColor={colors.black}
-            selectionColor={colors.black}
-            keyboardType={
-              type === "email"
-                ? "email-address"
-                : type === "phone"
-                  ? "phone-pad"
-                  : "default"
-            }
-          />
-        </Animated.View>
+          >
+            {label}
+          </Animated.Text>
+
+          <Animated.View style={{ flex: 1, paddingTop: inputPaddingTop }}>
+            <TextInput
+              className="flex-1 px-md2"
+              style={{
+                color: colors.text.primary,
+                fontSize: typography.fontSize.base,
+                fontWeight: typography.fontWeight
+                  .thin as TextStyle["fontWeight"],
+              }}
+              value={value}
+              onChangeText={onChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              cursorColor={colors.black}
+              selectionColor={colors.black}
+              keyboardType={type === "password" ? "default" : type}
+              secureTextEntry={isSecure}
+              autoCapitalize={type === "password" ? "none" : undefined}
+              autoCorrect={type === "password" ? false : undefined}
+            />
+          </Animated.View>
+        </View>
+
+        {type === "password" && (
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            className="px-md2 justify-center items-center h-full pt-2"
+            activeOpacity={0.7}
+          >
+            {isPasswordVisible ? (
+              <EyeClosedIcon size={20} color={colors.text.muted} />
+            ) : (
+              <EyeIcon size={20} color={colors.text.muted} />
+            )}
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
