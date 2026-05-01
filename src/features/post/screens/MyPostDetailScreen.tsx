@@ -372,6 +372,7 @@ export const MyPostDetailScreen = () => {
             imageUrls={displayImageUrls}
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
+            isBlurred={post.category === "Cards"}
           />
         </Animated.View>
 

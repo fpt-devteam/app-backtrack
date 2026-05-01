@@ -3,8 +3,13 @@ import {
   PostCategoryBadge,
   PostTypeIconBadge,
 } from "@/src/features/post/components";
-import { useMatchedPostIds } from "@/src/features/post/hooks";
-import { AppUserAvatar, ImageCarousel } from "@/src/shared/components";
+import { useGetPostById, useMatchedPostIds } from "@/src/features/post/hooks";
+import { POST_CATEGORIES } from "@/src/features/post/types";
+import {
+  AppLoader,
+  AppUserAvatar,
+  ImageCarousel,
+} from "@/src/shared/components";
 import { colors, metrics } from "@/src/shared/theme";
 import { toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -35,7 +40,6 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { POST_CATEGORIES, UserPost } from "../types";
 
 const HeaderIcon = ({
   icon: Icon,
@@ -55,18 +59,27 @@ const HeaderIcon = ({
 };
 
 type PostDetailScreenProps = {
-  post: UserPost;
+  postId: string;
 };
 
-export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
+export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
   const insets = useSafeAreaInsets();
+
   const headerHeight = useHeaderHeight();
+
   const { height, width } = useWindowDimensions();
+
+  const { isLoading, data: post } = useGetPostById({ postId });
+
+  const { user } = useAppUser();
+
+  const { matchedPostIds } = useMatchedPostIds();
 
   const CAROUSEL_HEIGHT = height * 0.5;
   const CAROUSEL_WIDTH = width;
 
   const scrollOffset = useSharedValue(0);
+
   const scrollHandler = useAnimatedScrollHandler((event) => {
     scrollOffset.value = event.contentOffset.y;
   });
@@ -106,11 +119,6 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
     );
     return { opacity };
   });
-
-  const { user } = useAppUser();
-  const { matchedPostIds } = useMatchedPostIds();
-  const isBlurred =
-    !matchedPostIds.has(post.id) || post.category === POST_CATEGORIES.CARD;
 
   const { postImageUrls, displayAddress, displayName } = useMemo(() => {
     if (!post) {
@@ -167,9 +175,14 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
     return { formattedDate, formattedTime };
   };
 
-  const { formattedDate, formattedTime } = formatEventDate(post.eventTime);
-
   const renderBody = () => {
+    if (isLoading || !post) return <AppLoader />;
+
+    const { formattedDate, formattedTime } = formatEventDate(post.eventTime);
+
+    const isBlurred =
+      !matchedPostIds.has(post.id) || post.category === POST_CATEGORIES.CARD;
+
     return (
       <>
         {/* Carousel */}
@@ -180,7 +193,7 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
             imageUrls={postImageUrls}
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
-            isBlurred={isBlurred}
+            isBlurred={isBlurred || post.category === "Cards"}
           />
         </Animated.View>
 

@@ -40,8 +40,6 @@ export const ItemPlaceMarker = ({
             width: 42,
             height: 42,
             borderRadius: 21,
-            backgroundColor: "white",
-            padding: 3,
 
             borderWidth: 1,
             borderColor: "rgba(0,0,0,0.10)",
@@ -60,6 +58,7 @@ export const ItemPlaceMarker = ({
               borderRadius: "50%",
             }}
             resizeMode="cover"
+            // isBlurred={disabled}
           />
         </View>
       </TouchableOpacity>

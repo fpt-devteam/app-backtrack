@@ -81,7 +81,7 @@ export const PostCard = ({
           <AppImage
             style={{ width: "100%", height: "100%" }}
             source={{ uri: imageUrl }}
-            isBlurred={isBlurred}
+            isBlurred={isBlurred || item.category === "Cards"}
             contentFit="cover"
           />
         </View>
