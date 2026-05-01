@@ -1,9 +1,10 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { AvatarFormField, FormField } from "@/src/features/profile/components";
+import { AvatarFormField } from "@/src/features/profile/components";
 import { usePatchProfile } from "@/src/features/profile/hooks";
 import type { UpdateProfileRequest } from "@/src/features/profile/types";
 import { AppBackButton, AppButton, AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
+import { metrics } from "@/src/shared/theme";
 import { getErrorMessage } from "@/src/shared/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, Stack } from "expo-router";
@@ -17,8 +18,9 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context"; // 🚀 Import thêm cái này
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
+import { PostFormField } from "../../post/components";
 
 type ProfileEditSchema = {
   displayName: string;
@@ -122,10 +124,11 @@ const ProfileEditScreen = () => {
       <KeyboardAvoidingView
         className="flex-1 bg-surface"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={metrics.tabBar.height}
       >
         <ScrollView
           className="flex-1"
-          contentContainerClassName="px-md pb-32"
+          contentContainerClassName="px-md"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -133,56 +136,51 @@ const ProfileEditScreen = () => {
           <AvatarFormField />
 
           <View className="px-sm mb-lg gap-xs mt-md">
-            <Text className="text-xl font-bold text-textPrimary">
+            <Text className="text-xl font-normal text-textPrimary">
               Personal Information
             </Text>
-            <Text className="text-sm font-normal text-textSecondary leading-5">
+            <Text className="text-sm font-thin text-textSecondary leading-5">
               These details will be shared with others when you connect over a
               lost or found item. Make sure they are accurate.
             </Text>
           </View>
 
-          <View className="bg-surface rounded-2xl border border-divider overflow-hidden">
+          <View className="border rounded-md overflow-hidden">
             {/* Display Name Field */}
-            <View className="px-md py-sm">
-              <Controller
-                control={control}
-                name="displayName"
-                render={({ field: { onChange, value } }) => (
-                  <FormField
-                    label="Display name"
-                    value={value}
-                    onChange={onChange}
-                    placeholder="Your display name"
-                    error={errors.displayName?.message}
-                  />
-                )}
-              />
-            </View>
+            <Controller
+              control={control}
+              name="displayName"
+              render={({ field: { onChange, value } }) => (
+                <PostFormField
+                  label="Display name"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
+
+            <View className="border-t" />
 
             {/* Phone Field */}
-            <View className="px-md py-sm">
-              <Controller
-                control={control}
-                name="phone"
-                render={({ field: { onChange, value } }) => (
-                  <FormField
-                    label="Phone number"
-                    value={value}
-                    onChange={onChange}
-                    placeholder="Your phone number"
-                    error={errors.phone?.message}
-                  />
-                )}
-              />
-            </View>
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field: { onChange, value } }) => (
+                <PostFormField
+                  label="Phone number"
+                  value={value}
+                  onChange={onChange}
+                  type="phone"
+                />
+              )}
+            />
           </View>
         </ScrollView>
 
-        {/* 🚀 Sticky Bottom Action Bar */}
+        {/* Bottom Action Bar */}
         <View
-          className="absolute bottom-0 left-0 right-0 border-t border-divider bg-surface px-md pt-md"
-          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+          className="border-t border-divider bg-surface px-md pt-md"
+          style={{ paddingBottom: insets.bottom }}
         >
           <AppButton
             title="Save Changes"
