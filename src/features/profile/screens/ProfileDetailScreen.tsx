@@ -2,10 +2,11 @@ import { useAppUser } from "@/src/features/auth/providers";
 import { AppBackButton, AppUserAvatar } from "@/src/shared/components";
 import { PROFILE_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
+import { typography } from "@/src/shared/theme/typography";
 import { router, Stack } from "expo-router";
 import { EnvelopeIcon, IconProps, PhoneIcon } from "phosphor-react-native";
 import React, { ComponentType, useCallback } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, TextStyle, View } from "react-native";
 
 type Props = {
   icon: ComponentType<IconProps>;
@@ -35,7 +36,7 @@ const ProfileDetailScreen = () => {
           headerShown: true,
           headerTitle: "Profile Details",
           headerLeft: () => (
-            <AppBackButton type={"arrowLeftIcon"} showBackground />
+            <AppBackButton type={"arrowLeftIcon"} showBackground={false} />
           ),
           headerShadowVisible: false,
           headerRight: () => (
@@ -46,6 +47,10 @@ const ProfileDetailScreen = () => {
               <Text className="text-sm font-normal py-xs">Edit</Text>
             </Pressable>
           ),
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
         }}
       />
       <ScrollView
