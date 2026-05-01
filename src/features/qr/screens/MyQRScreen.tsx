@@ -9,6 +9,7 @@ import {
 } from "@/src/features/qr/constants";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
+import { AppLoader } from "@/src/shared/components/AppLoader";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
@@ -53,7 +54,7 @@ const TipCard = () => (
 );
 
 const MyQRScreen = () => {
-  const { data: subscription } = useGetMySubscription();
+  const { data: subscription, isLoading } = useGetMySubscription();
   const { height } = useWindowDimensions();
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
@@ -101,7 +102,11 @@ const MyQRScreen = () => {
     <View className="flex-1 bg-surface px-lg pt-md pb-xl gap-md">
       {/* QR Card */}
       <View className="w-full items-center gap-md ">
-        <UserQRCodePressableCard isSubscripted={isSubscripted} />
+        {isLoading ? (
+          <AppLoader />
+        ) : (
+          <UserQRCodePressableCard isSubscripted={isSubscripted} />
+        )}
         <View className="w-full">
           <TipCard />
         </View>
