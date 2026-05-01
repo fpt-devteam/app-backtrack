@@ -95,9 +95,7 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
           title: "Message from " + (user.displayName || "Unknown User"),
           body: messageText,
           type: "ChatEvent",
-          data: {
-            screenPath: CHAT_ROUTE.information(conversationId),
-          },
+          data: { screenPath: CHAT_ROUTE.message(conversationId) },
         };
 
         await sendNotification(req);

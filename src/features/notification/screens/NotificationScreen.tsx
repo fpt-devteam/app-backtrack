@@ -14,9 +14,9 @@ import {
 } from "@/src/features/notification/types";
 import { AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
-import { AUTH_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
-import { router } from "expo-router";
+import { RelativePathString, router } from "expo-router";
 import { BellRingingIcon, BellSimpleSlashIcon } from "phosphor-react-native";
 import React from "react";
 import {
@@ -80,6 +80,8 @@ const NotificationScreen = () => {
   }
 
   const handlePress = async (notification: UserNotification) => {
+    const screenPath = notification.data?.screenPath as RelativePathString;
+
     try {
       await updateStatus({
         notificationIds: [notification.id],
@@ -87,17 +89,17 @@ const NotificationScreen = () => {
         userId: notification.userId,
       });
 
-      // const screenPath = notification.data?.screenPath as RelativePathString;
+      console.log("ScreenPath:", screenPath);
 
-      // if (screenPath) {
-      //   router.push(screenPath);
-      // } else {
-      //   router.push(SHARED_ROUTE.notAvailable);
-      // }
+      if (screenPath) {
+        router.push(screenPath);
+      } else {
+        console.warn(`Invalid notification screen path: ${screenPath}`);
+        router.push(SHARED_ROUTE.notAvailable);
+      }
     } catch (error) {
-      console.log("Error when update notification status: ", error);
-      // router.push(SHARED_ROUTE.notAvailable);
-      return;
+      console.error("Error when handling notification press: ", error);
+      router.push(SHARED_ROUTE.notAvailable);
     }
   };
 

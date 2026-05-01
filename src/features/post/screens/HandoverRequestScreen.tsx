@@ -39,7 +39,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSendNotification } from "../../notification/hooks";
 
 const MAX_MESSAGE_LENGTH = 300;
 
@@ -67,7 +66,6 @@ export default function HandoverRequestScreen() {
   const [message, setMessage] = useState("");
   const isSubmitting = isCreating || isCreatingConversation || isSendingMessage;
   const isSubmitDisabled = isSubmitting || !message.trim();
-  const { sendNotification } = useSendNotification();
 
   const handleCreateReturnReport = async () => {
     if (!otherPost || !user) return;
