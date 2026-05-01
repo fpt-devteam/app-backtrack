@@ -48,7 +48,10 @@ export const SimilarPostCard = ({
           }}
         >
           <View className="w-full" style={{ aspectRatio: 1 }}>
-            <AppImage className="w-full h-full" source={{ uri: imgUrl }} />
+            <AppImage
+              style={{ width: "100%", height: "100%" }}
+              source={{ uri: imgUrl }}
+            />
 
             <View style={{ position: "absolute", top: 6, right: 6 }}>
               <ScoreBadge value={safeScore} />

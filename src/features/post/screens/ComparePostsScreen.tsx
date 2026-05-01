@@ -184,7 +184,7 @@ const ComparePostCard = ({ post }: CompareCardProps) => {
       >
         <AppImage
           source={post.imageUrls?.[0] ? { uri: post.imageUrls[0] } : undefined}
-          className="w-full h-full"
+          style={{ width: "100%", height: "100%" }}
           resizeMode="cover"
         />
         <View className="absolute top-2 left-2">

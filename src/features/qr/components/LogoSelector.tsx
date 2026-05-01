@@ -1,3 +1,4 @@
+import { AppImage } from "@/src/shared/components";
 import { ensureMediaPermission } from "@/src/shared/services";
 import { colors } from "@/src/shared/theme/colors";
 import {
@@ -54,7 +55,7 @@ function PresetLogoItem({
         opacity: disabled ? 0.6 : 1,
       }}
     >
-      <Image
+      <AppImage
         source={{ uri: imageUri }}
         style={{ width: 66, height: 66 }}
         resizeMode="cover"

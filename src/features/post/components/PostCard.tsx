@@ -19,7 +19,11 @@ type PostCardProps = {
   isBlurred?: boolean;
 };
 
-export const PostCard = ({ item, size = "sm", isBlurred = true }: PostCardProps) => {
+export const PostCard = ({
+  item,
+  size = "sm",
+  isBlurred = true,
+}: PostCardProps) => {
   const { width } = useWindowDimensions();
 
   const cardWidth = width * (size === "sm" ? 0.43 : 0.9);
@@ -75,10 +79,11 @@ export const PostCard = ({ item, size = "sm", isBlurred = true }: PostCardProps)
       <View className="w-full overflow-hidden" style={{ aspectRatio: 1.18 }}>
         <View className="">
           <AppImage
-              className="w-full h-full"
-              source={{ uri: imageUrl }}
-              blurRadius={isBlurred ? 20 : 0}
-            />
+            style={{ width: "100%", height: "100%" }}
+            source={{ uri: imageUrl }}
+            isBlurred={isBlurred}
+            contentFit="cover"
+          />
         </View>
 
         {/* Status badge */}

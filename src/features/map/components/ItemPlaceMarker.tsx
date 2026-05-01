@@ -1,7 +1,8 @@
 import type { Post } from "@/src/features/post/types";
+import { AppImage } from "@/src/shared/components";
 import * as Haptics from "expo-haptics";
 import React, { useMemo } from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Marker, type LatLng } from "react-native-maps";
 
 type ItemPlaceMarkerProps = {
@@ -51,7 +52,7 @@ export const ItemPlaceMarker = ({
             shadowOffset: { width: 0, height: 5 },
           }}
         >
-          <Image
+          <AppImage
             source={{ uri: imgUrl }}
             style={{
               width: "100%",

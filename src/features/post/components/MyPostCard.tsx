@@ -74,9 +74,10 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
           className="w-28 overflow-hidden rounded-sm"
           style={{ aspectRatio: 1.18 }}
         >
-          <View className="">
-            <AppImage className="w-full h-full" source={{ uri: imageUrl }} />
-          </View>
+          <AppImage
+            style={{ width: "100%", height: "100%" }}
+            source={{ uri: imageUrl }}
+          />
         </View>
 
         {/* INFO STRIP */}

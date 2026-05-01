@@ -1,11 +1,11 @@
 import { usePostCreationStore } from "@/src/features/post/hooks";
+import { AppImage } from "@/src/shared/components";
 import { colors } from "@/src/shared/theme/colors";
 import { Nullable } from "@/src/shared/types";
 import { type ImagePickerAsset } from "expo-image-picker";
 import { ImageIcon, XIcon } from "phosphor-react-native";
 import React from "react";
 import {
-  Image,
   Pressable,
   Text,
   TouchableOpacity,
@@ -21,7 +21,9 @@ const ItemIdentityStepScreen = () => {
   const images = usePostCreationStore((state) => state.draftImages);
   const removeImage = usePostCreationStore((state) => state.removeImage);
   const maxImages = usePostCreationStore((state) => state.maxImages);
-  const openPickerSheet = usePostCreationStore((state) => state.openPickerSheet);
+  const openPickerSheet = usePostCreationStore(
+    (state) => state.openPickerSheet,
+  );
 
   const emptySlots = Math.min(maxImages - images.length, 4);
 
@@ -105,9 +107,9 @@ const HeroSlot = ({ image, onPress, onRemove }: HeroSlotProps) => {
 
   return (
     <View className="w-full aspect-[4/3] overflow-hidden">
-      <Image
+      <AppImage
         source={{ uri: image.uri }}
-        className="w-full h-full"
+        style={{ width: "100%", height: "100%" }}
         resizeMode="cover"
       />
 
@@ -153,9 +155,9 @@ const SecondarySlot = ({
 
   return (
     <View className="overflow-hidden aspect-[4/3]" style={{ width: size }}>
-      <Image
+      <AppImage
         source={{ uri: image.uri }}
-        className="w-full h-full"
+        style={{ width: "100%", height: "100%" }}
         resizeMode="cover"
       />
 

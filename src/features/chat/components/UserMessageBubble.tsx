@@ -1,8 +1,9 @@
 import type { UserMessage } from "@/src/features/chat/types";
+import { AppImage } from "@/src/shared/components";
 import { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 import { formatTime } from "@/src/shared/utils";
 import React, { useMemo } from "react";
-import { Image, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 type MessageBubbleProps = {
   message: UserMessage;
@@ -71,7 +72,7 @@ export const UserMessageBubble = ({
               className={`overflow-hidden ${bubbleRounding}`}
               style={{ width: 200, height: 200 }}
             >
-              <Image
+              <AppImage
                 source={{ uri: message.content }}
                 style={{ width: "100%", height: "100%" }}
                 resizeMode="cover"

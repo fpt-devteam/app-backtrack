@@ -84,11 +84,12 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
           <AppImage
             source={{ uri: imageUrl }}
             style={{
-              width: 72,
-              height: 72,
+              width: 64,
+              height: 64,
               borderRadius: metrics.borderRadius.md,
             }}
             resizeMode="cover"
+            isBlurred={false}
           />
         </View>
 

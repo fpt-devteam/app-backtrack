@@ -23,7 +23,6 @@ export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 export { BaseInputField } from "@/src/shared/components/fields/BaseInputField";
 export { DatePickerField } from "@/src/shared/components/fields/DatePickerField";
 export { EmailField } from "@/src/shared/components/fields/EmailField";
-export { ImageField } from "@/src/shared/components/fields/ImageField";
 export { PasswordField } from "@/src/shared/components/fields/PasswordField";
 export { AppButton } from '@/src/shared/components/ui/AppButton';
 export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';

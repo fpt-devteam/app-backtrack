@@ -1,10 +1,10 @@
 import { useAppUser } from "@/src/features/auth/providers";
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import React, { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { PROFILE_ROUTE } from "../constants";
 import { FALLBACK_AVATAR_SOURCE } from "../data";
+import { AppImage } from "./AppImage";
 
 export const AppUserAvatarIcon = () => {
   const { user } = useAppUser();
@@ -21,7 +21,7 @@ export const AppUserAvatarIcon = () => {
   return (
     <Pressable onPress={handlePress}>
       <View className="relative">
-        <Image
+        <AppImage
           source={source}
           contentFit="cover"
           style={{
@@ -29,7 +29,6 @@ export const AppUserAvatarIcon = () => {
             aspectRatio: 1,
             borderRadius: 999,
           }}
-          transition={1000}
         />
       </View>
     </Pressable>

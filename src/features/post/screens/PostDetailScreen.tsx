@@ -180,7 +180,7 @@ export const PostDetailScreen = ({ post }: PostDetailScreenProps) => {
             imageUrls={postImageUrls}
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
-            blurRadius={isBlurred ? 20 : 0}
+            isBlurred={isBlurred}
           />
         </Animated.View>
 

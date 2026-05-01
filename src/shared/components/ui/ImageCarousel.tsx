@@ -1,21 +1,21 @@
 import { View } from "moti";
 import { PackageIcon } from "phosphor-react-native";
-import { Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { colors } from "../../theme";
+import { AppImage } from "../AppImage";
 
 type ImageCarouselProps = {
   imageUrls: string[];
   height: number;
   width: number;
-  blurRadius?: number;
+  isBlurred?: boolean;
 };
 
 export const ImageCarousel = ({
   imageUrls,
   height,
   width,
-  blurRadius = 0,
+  isBlurred = false,
 }: ImageCarouselProps) => {
   if (imageUrls.length === 0) {
     return (
@@ -37,11 +37,11 @@ export const ImageCarousel = ({
         showsHorizontalScrollIndicator={false}
         keyExtractor={(_, i) => String(i)}
         renderItem={({ item }) => (
-          <Image
+          <AppImage
             source={{ uri: item }}
             style={{ width, height }}
             resizeMode="cover"
-            blurRadius={blurRadius}
+            isBlurred={isBlurred}
           />
         )}
       />
