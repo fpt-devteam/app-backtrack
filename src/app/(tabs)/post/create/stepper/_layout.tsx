@@ -42,13 +42,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const PICKER_OPTIONS: ImagePickerOptions = {
   mediaTypes: ["images"],
-  quality: 1,
+  quality: 0.7,
   allowsMultipleSelection: true,
 };
 
 const CAMERA_OPTIONS: ImagePickerOptions = {
   mediaTypes: ["images"],
-  quality: 1,
+  quality: 0.7,
 };
 
 const STEP_KEY = {
@@ -217,8 +217,6 @@ const PostCreationStepperLayout = () => {
           : {}),
         ...(category === POST_CATEGORIES.OTHERS ? { otherDetail } : {}),
       };
-
-      console.log("req:", req);
 
       const postDetails = await createPost(req);
       const postId = postDetails?.id;

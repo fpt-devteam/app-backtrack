@@ -56,3 +56,11 @@ export type GetC2CHandoverPostRequest = {
 }
 
 export type GetC2CHandoverPostResponse = ApiResponse<Handover>
+
+/**
+ * Deliver Return Report - moves report to Delivered status
+ */
+export type DeliverC2CReturnReportRequest = {
+  reportId: string
+  evidenceImageUrls: string[]
+}

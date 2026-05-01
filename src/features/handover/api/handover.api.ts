@@ -4,6 +4,7 @@ import type {
   C2CHandoversResponse,
   C2CReturnReportResponse,
   CreateC2CReturnReportRequest,
+  DeliverC2CReturnReportRequest,
   GetC2CHandoverPostRequest,
   GetC2CHandoverPostResponse,
   GetC2CHandoverRequest,
@@ -61,9 +62,10 @@ export async function createC2CReturnReportApi(
  * Moves a report to Delivered status.
  * Backend endpoint: PATCH /api/core/return-reports/c2c/{id}/deliver
  */
-export async function activateC2CReturnReportApi(id: string) {
+export async function activateC2CReturnReportApi(req: DeliverC2CReturnReportRequest) {
   const response = await privateClient.patch<C2CReturnReportResponse>(
-    RETURN_REPORT_API.c2cActivate(id),
+    RETURN_REPORT_API.c2cActivate(req.reportId),
+    { evidenceImageUrls: req.evidenceImageUrls }
   );
   return response.data;
 }

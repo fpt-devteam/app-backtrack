@@ -15,7 +15,6 @@ export const useGetC2CReturnReports = (params?: GetC2CHandoverRequest) => {
   const query = useQuery({
     queryKey: [
       ...C2C_RETURN_REPORTS_QUERY_KEY,
-      params,
       currentUser?.id ?? null,
     ],
     queryFn: async () => {

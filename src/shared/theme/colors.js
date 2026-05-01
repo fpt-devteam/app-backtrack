@@ -43,6 +43,7 @@ const palette = {
    *   700: destructive emphasis or dark-mode primary
    */
   rausch: {
+    50: "#FFF0F3",
     100: "#FFEEF1",
     500: "#FF385C",
     600: "#E31C5F",

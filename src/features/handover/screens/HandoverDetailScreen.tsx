@@ -18,6 +18,7 @@ import {
   useOwnerRejectC2CReturnReport,
 } from "@/src/features/handover/hooks";
 import type {
+  DeliverC2CReturnReportRequest,
   Handover,
   ReturnReportStatus,
 } from "@/src/features/handover/types";
@@ -31,6 +32,7 @@ import {
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE } from "@/src/shared/constants";
+import { uploadImageAssets } from "@/src/shared/services";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { formatDate } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
@@ -49,7 +51,6 @@ import {
   PackageIcon,
   PhoneIcon,
   WarningCircleIcon,
-  XCircleIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -64,6 +65,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type StatusTheme = { color: string; bgColor: string };
 
@@ -410,6 +412,37 @@ type ActionPanelProps = {
 
 const ACTION_PANEL_MIN_HEIGHT = 120;
 
+const ActionPanelNotice = ({
+  icon,
+  title,
+  description,
+  borderColor,
+  backgroundColor,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  borderColor: string;
+  backgroundColor: string;
+}) => {
+  return (
+    <View
+      className="flex-row items-start rounded-md border p-md2"
+      style={{
+        borderColor,
+        backgroundColor,
+      }}
+    >
+      {icon}
+
+      <View className="flex-1">
+        <Text className="text-sm font-normal text-textPrimary">{title}</Text>
+        <Text className="text-xs font-thin text-textMuted">{description}</Text>
+      </View>
+    </View>
+  );
+};
+
 const ActionPanel = ({
   report,
   isFinder,
@@ -423,29 +456,24 @@ const ActionPanel = ({
 }: ActionPanelProps) => {
   const { status } = report;
 
+  // Template
   if (status === "Confirmed") {
     return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <View
-          className="flex-1 flex-row items-center justify-center gap-sm rounded-2xl"
-          style={{ backgroundColor: colors.babu[100] }}
-        >
-          <CheckCircleIcon size={22} color={colors.babu[500]} weight="fill" />
-          <View>
-            <Text
-              className="text-sm font-bold"
-              style={{ color: colors.babu[500] }}
-            >
-              Handover Complete
-            </Text>
-            <Text className="text-xs" style={{ color: colors.babu[400] }}>
-              The item has been successfully returned.
-            </Text>
-          </View>
-        </View>
+      <View className="px-lg pt-md border-t border-divider bg-surface">
+        <ActionPanelNotice
+          icon={
+            <CheckCircleIcon
+              size={16}
+              color={colors.babu[600]}
+              style={{ marginTop: 1, marginRight: 8 }}
+              weight="fill"
+            />
+          }
+          title="Handover Complete"
+          description="The item has been successfully returned."
+          borderColor={colors.babu[500]}
+          backgroundColor={colors.babu[100]}
+        />
       </View>
     );
   }
@@ -456,40 +484,42 @@ const ActionPanel = ({
         ? "This handover was closed due to a mismatch."
         : "This handover was rejected.";
     return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <View
-          className="flex-1 flex-row items-center justify-center gap-sm rounded-2xl"
-          style={{ backgroundColor: colors.error[100] }}
-        >
-          <WarningCircleIcon
-            size={22}
-            color={colors.error[500]}
-            weight="fill"
-          />
-          <Text
-            className="text-sm font-medium"
-            style={{ color: colors.error[500] }}
-          >
-            {label}
-          </Text>
-        </View>
+      <View className="px-lg pt-md border-t border-divider bg-surface">
+        <ActionPanelNotice
+          icon={
+            <WarningCircleIcon
+              size={16}
+              color={colors.error[600]}
+              style={{ marginTop: 1, marginRight: 8 }}
+              weight="fill"
+            />
+          }
+          title={`Handover ${status === "Closed" ? "Closed" : "Rejected"}`}
+          description={label}
+          borderColor={colors.error[500]}
+          backgroundColor={colors.error[100]}
+        />
       </View>
     );
   }
 
   if (status === "Ongoing" && isFinder) {
     return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <Text className="text-xs text-textMuted mb-2">
-          Once you hand the item back, mark it here so the owner can confirm
-          receipt.
-        </Text>
+      <View className="px-lg pt-md pb-md2 border-t border-divider bg-surface gap-md2">
+        <ActionPanelNotice
+          icon={
+            <PackageIcon
+              size={16}
+              color={colors.primary}
+              style={{ marginTop: 1, marginRight: 8 }}
+              weight="fill"
+            />
+          }
+          title="Mark delivery when done"
+          description="Once you hand the item back, mark it here so the owner can confirm receipt."
+          borderColor={colors.primary}
+          backgroundColor={colors.rausch[50]}
+        />
 
         <AppButton
           title="I've Delivered the Item"
@@ -503,91 +533,87 @@ const ActionPanel = ({
 
   if (status === "Ongoing" && isOwner) {
     return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <View
-          className="flex-1 flex-row items-center gap-sm px-md rounded-2xl"
-          style={{ backgroundColor: colors.hof[50] }}
-        >
-          <HourglassIcon size={22} color={colors.hof[400]} weight="fill" />
-          <View className="flex-1">
-            <Text className="text-sm font-semibold text-textPrimary">
-              Waiting for delivery
-            </Text>
-            <Text className="text-xs text-textMuted mt-0.5">
-              The finder will mark this handover as delivered after the item is
-              handed back.
-            </Text>
-          </View>
-        </View>
+      <View className="px-lg pt-md border-t border-divider bg-surface">
+        <ActionPanelNotice
+          icon={
+            <HourglassIcon
+              size={16}
+              color={colors.hof[500]}
+              style={{ marginTop: 1, marginRight: 8 }}
+              weight="fill"
+            />
+          }
+          title="Waiting for delivery"
+          description="The finder will mark this handover as delivered after the item is handed back."
+          borderColor={colors.hof[300]}
+          backgroundColor={colors.hof[50]}
+        />
       </View>
     );
   }
 
   if (status === "Delivered" && isFinder) {
     return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <View
-          className="flex-1 flex-row items-center gap-sm px-md rounded-2xl"
-          style={{ backgroundColor: colors.kazan[100] }}
-        >
-          <HourglassIcon size={22} color={colors.kazan[500]} weight="fill" />
-          <View className="flex-1">
-            <Text
-              className="text-sm font-semibold"
-              style={{ color: colors.kazan[600] }}
-            >
-              Waiting for confirmation
-            </Text>
-            <Text
-              className="text-xs mt-0.5"
-              style={{ color: colors.kazan[600] }}
-            >
-              You marked the item as delivered. The owner can confirm receipt to
-              complete the handover.
-            </Text>
-          </View>
-        </View>
+      <View className="px-lg pt-md border-t border-divider bg-surface">
+        <ActionPanelNotice
+          icon={
+            <HourglassIcon
+              size={16}
+              weight="fill"
+              color={colors.kazan[600]}
+              style={{ marginTop: 1, marginRight: 8 }}
+            />
+          }
+          title="Waiting for confirmation"
+          description="You marked the item as delivered. The owner can confirm receipt to complete the handover."
+          borderColor={colors.kazan[500]}
+          backgroundColor={colors.kazan[100]}
+        />
       </View>
     );
   }
 
   if (status === "Delivered" && isOwner) {
     return (
-      <View
-        className="px-lg py-md2 border-t border-divider bg-surface"
-        style={{ minHeight: ACTION_PANEL_MIN_HEIGHT }}
-      >
-        <Text className="text-xs text-textMuted mb-2">
-          The finder marked this handover as delivered. Confirm once you have
-          the item in hand.
-        </Text>
-
-        {/* Confirm Receipt Button */}
-        <AppButton
-          title="I've Received the Item"
-          onPress={onConfirm}
-          disabled={isConfirming || isRejecting}
-          loading={isConfirming}
-          variant="primary"
-        />
-
-        {/* Reject Handover Button */}
-        <AppButton
-          title="Reject Handover"
-          onPress={onReject}
-          disabled={isConfirming || isRejecting}
-          loading={isRejecting}
-          variant="secondary"
+      <View className="px-lg pt-md pb-md2 border-t border-divider bg-surface gap-md2">
+        <ActionPanelNotice
           icon={
-            <XCircleIcon size={18} color={colors.error[500]} weight="bold" />
+            <PackageIcon
+              size={16}
+              color={colors.info[600]}
+              style={{ marginTop: 1, marginRight: 8 }}
+              weight="fill"
+            />
           }
+          title="Confirm the handover"
+          description="The finder marked this handover as delivered. Confirm once you have the item in hand."
+          borderColor={colors.info[500]}
+          backgroundColor={colors.info[100]}
         />
+
+        <View className="flex-row gap-md">
+          {/* Reject Handover Button */}
+          <View className="flex-1">
+            <AppButton
+              title="Reject"
+              onPress={onReject}
+              disabled={isConfirming || isRejecting}
+              loading={isRejecting}
+              variant="outline"
+            />
+          </View>
+
+          {/* Confirm Receipt Button */}
+          <View className="flex-1">
+            <AppButton
+              title="I've Received"
+              onPress={onConfirm}
+              disabled={isConfirming || isRejecting}
+              loading={isConfirming}
+              variant="secondary"
+            />
+          </View>
+        </View>
       </View>
     );
   }
@@ -596,6 +622,7 @@ const ActionPanel = ({
 };
 
 const HandoverDetailScreen = () => {
+  const insets = useSafeAreaInsets();
   const { handoverId } = useLocalSearchParams<{ handoverId: string }>();
   const { user: currentUser } = useAppUser();
 
@@ -610,6 +637,7 @@ const HandoverDetailScreen = () => {
   const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
 
   const [isOpeningChat, setIsOpeningChat] = useState(false);
+
   const [actionPanelHeight, setActionPanelHeight] = useState(
     ACTION_PANEL_MIN_HEIGHT,
   );
@@ -791,21 +819,29 @@ const HandoverDetailScreen = () => {
               }
 
               const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: ["images"],
                 allowsEditing: true,
                 quality: 0.7,
               });
 
               if (result.canceled) return;
 
-              const localUri = result.assets[0].uri;
-              // await activate(report.id, localUri);
+              const localUri = result.assets[0];
+              const imageUrls = await uploadImageAssets([localUri]);
+
+              const req: DeliverC2CReturnReportRequest = {
+                reportId: report.id,
+                evidenceImageUrls: imageUrls,
+              };
+
+              await activate(req);
 
               Haptics.notificationAsync(
                 Haptics.NotificationFeedbackType.Success,
               );
 
               toast.success("Success", "Item marked as delivered securely.");
+              router.back();
             } catch (error) {
               console.error("Handover error:", error);
               toast.error(
@@ -822,12 +858,12 @@ const HandoverDetailScreen = () => {
   const handleConfirm = useCallback(() => {
     if (!report) return;
     Alert.alert(
-      "Confirm Receipt?",
-      "Confirm that you have received the item. This will complete the handover and award the finder their points.",
+      "Item Received?",
+      "By confirming, you agree that the item has been safely returned to you. This action will finalize the process and reward the finder.",
       [
-        { text: "Cancel", style: "cancel" },
+        { text: "Not Yet", style: "cancel" },
         {
-          text: "Confirm",
+          text: "I Got It",
           style: "default",
           onPress: async () => {
             try {
@@ -837,8 +873,8 @@ const HandoverDetailScreen = () => {
               );
             } catch {
               toast.error(
-                "Error",
-                "Could not confirm receipt. Please try again.",
+                "Confirmation Failed",
+                "We couldn't finalize the handover. Please check your connection and try again.",
               );
             }
           },
@@ -1110,11 +1146,10 @@ const HandoverDetailScreen = () => {
         <View
           className="absolute left-0 right-0 bottom-0 bg-surface"
           onLayout={handleActionPanelLayout}
-          style={
-            Platform.OS === "ios"
-              ? metrics.shadows.level2.ios
-              : metrics.shadows.level2.android
-          }
+          style={{
+            ...metrics.shadows.level2.ios,
+            paddingBottom: insets.bottom,
+          }}
         >
           <ActionPanel
             report={report}

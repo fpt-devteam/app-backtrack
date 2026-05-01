@@ -144,6 +144,13 @@ const HandoverScreen = () => {
             <View className="px-lg">
               {inProgressHandovers.length === 0 ? (
                 <EmptyList
+                  icon={
+                    <PackageIcon
+                      size={96}
+                      color={colors.secondary}
+                      weight="thin"
+                    />
+                  }
                   title="No handovers need attention"
                   subtitle="When a chat turns into a return, the active handover will appear here."
                 />
