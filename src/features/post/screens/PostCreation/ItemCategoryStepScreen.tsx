@@ -1,5 +1,6 @@
 import { usePostCreationStore } from "@/src/features/post/hooks";
-import { AppImage, AppLoader } from "@/src/shared/components";
+import { POST_CATEGORIES } from "@/src/features/post/types";
+import { AppLoader } from "@/src/shared/components";
 import {
   CARD_ICON,
   ELECTRONICS_ICON,
@@ -10,8 +11,7 @@ import { colors } from "@/src/shared/theme";
 import { Asset } from "expo-asset";
 import { MotiView } from "moti";
 import React, { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
-import { POST_CATEGORIES } from "../../types";
+import { Image, Pressable, Text, View } from "react-native";
 
 const CATEGORIES = [
   {
@@ -105,7 +105,7 @@ const ItemCategoryStepScreen = () => {
                   >
                     {/* Icon */}
                     <View className="w-20 h-20 items-center justify-center bg-surface/50 rounded-2xl mr-4">
-                      <AppImage
+                      <Image
                         source={item.icon}
                         style={{ width: 90, height: 90 }}
                         resizeMode="contain"
