@@ -1,8 +1,6 @@
 import { useAuth } from "@/src/features/auth/providers";
-import {
-  UserQRCodePressableCard,
-  UserSubscriptionPlanPressableCard,
-} from "@/src/features/qr/components";
+import { UserQRCodePressableCard } from "@/src/features/qr/components";
+import type { QRSvgRef } from "@/src/features/qr/components";
 import {
   IS_QR_FEATURE_MOCK,
   MOCK_QR_PLAN_DATA,
@@ -12,11 +10,15 @@ import { SubscriptionStatus } from "@/src/features/qr/types";
 import { AppTipCard } from "@/src/shared/components";
 import { AppLoader } from "@/src/shared/components/AppLoader";
 import { AUTH_ROUTE } from "@/src/shared/constants";
+import { toast } from "@/src/shared/components/ui/toast";
 import { colors } from "@/src/shared/theme/colors";
+import * as FileSystem from "expo-file-system/legacy";
+import * as Sharing from "expo-sharing";
 import { router } from "expo-router";
-import { QrCodeIcon } from "phosphor-react-native";
-import React, { useMemo } from "react";
+import { DownloadSimpleIcon, QrCodeIcon } from "phosphor-react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Text,
   TouchableOpacity,
   useWindowDimensions,
@@ -29,11 +31,45 @@ const MyQRScreen = () => {
   const { height } = useWindowDimensions();
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
+  const qrRef = useRef<QRSvgRef | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const isSubscripted = useMemo(() => {
     if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.isActive;
     return !!subscription && subscription.status === SubscriptionStatus.Active;
   }, [subscription]);
+
+  const handleDownload = useCallback(async () => {
+    if (!qrRef.current || isDownloading) return;
+    setIsDownloading(true);
+    try {
+      qrRef.current.toDataURL(async (base64: string) => {
+        try {
+          const fileUri = `${FileSystem.cacheDirectory}qr-code.png`;
+          await FileSystem.writeAsStringAsync(fileUri, base64, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          const canShare = await Sharing.isAvailableAsync();
+          if (!canShare) {
+            toast.error("Sharing not available on this device");
+            return;
+          }
+          await Sharing.shareAsync(fileUri, {
+            mimeType: "image/png",
+            dialogTitle: "Save QR Code",
+            UTI: "public.png",
+          });
+        } catch {
+          toast.error("Save failed", "Could not save QR code");
+        } finally {
+          setIsDownloading(false);
+        }
+      });
+    } catch {
+      toast.error("Save failed", "Could not save QR code");
+      setIsDownloading(false);
+    }
+  }, [isDownloading]);
 
   if (!isAuthReady) {
     return (
@@ -76,8 +112,32 @@ const MyQRScreen = () => {
         {isLoading ? (
           <AppLoader />
         ) : (
-          <UserQRCodePressableCard isSubscripted={isSubscripted} />
+          <UserQRCodePressableCard
+            isSubscripted={isSubscripted}
+            qrRef={qrRef}
+          />
         )}
+
+        {/* Download Button — only when subscripted and QR is loaded */}
+        {!isLoading && isSubscripted && (
+          <TouchableOpacity
+            onPress={handleDownload}
+            disabled={isDownloading}
+            activeOpacity={0.75}
+            className="flex-row items-center justify-center gap-xs rounded-primary py-sm px-lg border border-divider bg-surface"
+            style={{ opacity: isDownloading ? 0.6 : 1 }}
+          >
+            {isDownloading ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <DownloadSimpleIcon size={18} color={colors.primary} weight="bold" />
+            )}
+            <Text className="text-sm font-normal text-primary">
+              {isDownloading ? "Preparing..." : "Download QR"}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <View className="w-full">
           <AppTipCard
             title="Pro Tip"
@@ -86,9 +146,6 @@ const MyQRScreen = () => {
           />
         </View>
       </View>
-
-      {/* Subscription Plan Card */}
-      {isSubscripted && <UserSubscriptionPlanPressableCard />}
     </View>
   );
 };

@@ -60,7 +60,6 @@ export const QR_ROUTE = {
   index: createPath(QR_BASE),
   purchase: createPath(`${QR_BASE}/purchase`),
   profile: createPath(`${QR_BASE}/qr-profile`),
-  customize: createPath(`${QR_BASE}/qr-customize`),
   profileSetting: createPath(`${QR_BASE}/qr-profile-setting`),
 } as const;
 

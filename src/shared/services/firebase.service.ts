@@ -1,6 +1,14 @@
 import { auth, firebaseStorage } from "@/src/shared/lib";
-import type { ImageUploadRequest, ImageUploadResponse } from "@/src/shared/types";
-import { getMediaLibraryPermissionsAsync, ImagePickerAsset, PermissionStatus, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import type {
+  ImageUploadRequest,
+  ImageUploadResponse,
+} from "@/src/shared/types";
+import {
+  getMediaLibraryPermissionsAsync,
+  ImagePickerAsset,
+  PermissionStatus,
+  requestMediaLibraryPermissionsAsync,
+} from "expo-image-picker";
 import { getAuth, sendEmailVerification } from "firebase/auth";
 import type { StorageReference } from "firebase/storage";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -8,12 +16,16 @@ import { Alert, Linking, Platform } from "react-native";
 
 const UPLOAD_IMAGE_API = "posts/images";
 
-export async function uploadImageToStorage(req: ImageUploadRequest): Promise<ImageUploadResponse> {
+export async function uploadImageToStorage(
+  req: ImageUploadRequest,
+): Promise<ImageUploadResponse> {
   const { path, blob } = req;
   const storageRef: StorageReference = ref(firebaseStorage, path);
   await uploadBytes(storageRef, blob);
 
-  const res = { downloadURL: await getDownloadURL(storageRef) } as ImageUploadResponse;
+  const res = {
+    downloadURL: await getDownloadURL(storageRef),
+  } as ImageUploadResponse;
   return res;
 }
 
@@ -29,20 +41,22 @@ export const ensureMediaPermission = async () => {
     return isGranted;
   }
 
-  Alert.alert('Permission required', 'Please enable photo access in Settings to upload images.',
+  Alert.alert(
+    "Permission required",
+    "Please enable photo access in Settings to upload images.",
     [
-      { text: 'Cancel', style: 'cancel' },
+      { text: "Cancel", style: "cancel" },
       {
-        text: 'Open Settings',
+        text: "Open Settings",
         onPress: () => {
-          if (Platform.OS === 'ios') {
-            Linking.openURL('app-settings:');
+          if (Platform.OS === "ios") {
+            Linking.openURL("app-settings:");
           } else {
             Linking.openSettings();
           }
         },
       },
-    ]
+    ],
   );
 
   return false;
@@ -59,7 +73,6 @@ export const resendVerificationEmail = async () => {
     throw new Error("No user is currently signed in.");
   }
 };
-
 
 /**
  * @param imageAssets An array of ImagePickerAsset objects representing the images to be uploaded.
@@ -93,4 +106,26 @@ export async function uploadImageAssets(imageAssets: ImagePickerAsset[]) {
   }
 
   return results;
+}
+
+/**
+ * Uploads a QR logo image from a local device URI to Firebase Storage.
+ * @param imageUri - Local file URI from expo-image-picker (e.g. file:///...)
+ * @returns Remote download URL suitable for storing in qrData.logoUrl
+ */
+export async function uploadQRLogo(imageUri: string): Promise<string> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Not authenticated");
+  const fileName = `qr_logo_${Date.now()}`;
+  const response = await fetch(imageUri);
+  const blob = await response.blob();
+  const req: ImageUploadRequest = {
+    filename: fileName,
+    firebaseUid: user.uid,
+    uri: imageUri,
+    blob,
+    path: `qr/${user.uid}/${fileName}`,
+  };
+  const res = await uploadImageToStorage(req);
+  return res.downloadURL;
 }

@@ -7,8 +7,12 @@ export const MOCK_QR_CODE = {
   id: "69991b6e192ff90b71f5fc07",
   userId: "5UOM7YtiyVh5lRGVmPttmrKxTCR2",
   publicCode: "BTK-IXL0B840",
+  note: "Hi! If you found this item, please reach out.",
+  logoUrl: null,
+  showEmail: false,
+  showPhone: false,
   createdAt: "2026-02-21T02:41:50.732Z",
-  updatedAt: "2026-02-21T02:41:50.732Z"
+  updatedAt: "2026-02-21T02:41:50.732Z",
 }
 
 export const MOCK_SUBSCRIPTION: UserSubscription = {

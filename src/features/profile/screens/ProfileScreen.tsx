@@ -27,6 +27,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 
+import { UserSubscriptionPlanPressableCard } from "@/src/features/qr/components";
 import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
 import type { ViewStyle } from "react-native";
@@ -215,6 +216,11 @@ export function ProfileScreen() {
             label="Your QR"
             onPress={handleUserQR}
           />
+        </View>
+
+        {/* Subscription Card */}
+        <View className="mt-xl">
+          <UserSubscriptionPlanPressableCard />
         </View>
 
         {/* Menu Actions */}

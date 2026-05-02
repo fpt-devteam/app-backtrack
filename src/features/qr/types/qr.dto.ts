@@ -1,23 +1,20 @@
 import { ApiResponse } from "@/src/shared/api";
 import {
-  UpdateMyQrDesignRequest,
   UserQrCode,
-  UserQrDesign,
   UserSubscription,
   UserSubscriptionPlan,
 } from "./qr.type";
 
 export type GetMyQrCodeResponse = ApiResponse<UserQrCode>;
 
-export type GetMyQrDesignResponse = ApiResponse<UserQrDesign>;
-
-export type UpdateMyQrDesignPayload = UpdateMyQrDesignRequest;
-
-export type UpdateMyQrNotePayload = {
-  note: string;
+export type PatchMyQrPayload = {
+  note?: string;
+  logoUrl?: string;
+  showEmail?: boolean;
+  showPhone?: boolean;
 };
 
-export type UpdateMyQrDesignResponse = ApiResponse<UserQrDesign>;
+export type PatchMyQrResponse = ApiResponse<UserQrCode>;
 
 export type GetMySubscriptionResponse = ApiResponse<UserSubscription>;
 

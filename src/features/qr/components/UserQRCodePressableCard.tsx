@@ -21,21 +21,25 @@ const CARD_SHADOW: ViewStyle = {
   elevation: 4,
 };
 
+export type QRSvgRef = { toDataURL: (cb: (data: string) => void) => void };
+
 type UserQRCodePressableCardProps = {
   isSubscripted: boolean;
+  qrRef?: React.MutableRefObject<QRSvgRef | null>;
 };
 
 export const UserQRCodePressableCard = ({
   isSubscripted,
+  qrRef,
 }: UserQRCodePressableCardProps) => {
   const { width } = useWindowDimensions();
   const { data: qrCode, isLoading: isQRLoading } = useGetMyQR();
   const { user } = useAppUser();
 
-  const logoSource = useMemo(
-    () => (user?.avatarUrl ? { uri: user.avatarUrl } : undefined),
-    [user?.avatarUrl],
-  );
+  const logoSource = useMemo(() => {
+    const url = qrCode?.logoUrl || user?.avatarUrl;
+    return url ? { uri: url } : undefined;
+  }, [qrCode?.logoUrl, user?.avatarUrl]);
 
   const qrValue = useMemo(() => {
     const code = IS_QR_FEATURE_MOCK
@@ -125,6 +129,9 @@ export const UserQRCodePressableCard = ({
         logoBackgroundColor="white"
         logoMargin={4}
         quietZone={10}
+        getRef={(ref) => {
+          if (qrRef) qrRef.current = ref as QRSvgRef | null;
+        }}
       />
     </Pressable>
   );

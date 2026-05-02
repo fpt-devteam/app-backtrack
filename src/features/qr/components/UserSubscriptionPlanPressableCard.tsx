@@ -11,84 +11,108 @@ import { router } from "expo-router";
 import {
   ArrowRightIcon,
   CalendarBlankIcon,
-  LockKeyIcon,
+  SparkleIcon,
   StarIcon,
   WarningIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
+import type { ViewStyle } from "react-native";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-type CardBodyProps = {
-  readonly isLoading: boolean;
-  readonly isActive: boolean;
-  readonly subscription: UserSubscription | null | undefined;
+// Mirrors CARD_SHADOW from ProfileScreen so the active card
+// matches the visual elevation of the profile feature cards.
+const CARD_SHADOW: ViewStyle = {
+  shadowColor: colors.black,
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
 };
 
-function CardBody({ isLoading, isActive, subscription }: CardBodyProps) {
-  if (isLoading) {
-    return <ActivityIndicator size="small" color={colors.primary} />;
-  }
+// ─── Active state ────────────────────────────────────────────────
 
-  if (isActive && subscription) {
-    return (
-      <View className="gap-xs">
-        <View className="flex-row items-center gap-xs justify-between">
-          <View className="flex-row items-center gap-xs">
-            <StarIcon size={16} color={colors.primary} weight="thin" />
-            <Text className="text-base font-semibold text-primary">
-              {subscription.planType} Subscription
-            </Text>
-          </View>
+type ActiveBodyProps = {
+  readonly subscription: UserSubscription;
+};
 
-          <View className="rounded-full bg-[#E6F4EA] px-2 py-0.5">
-            <Text className="text-xs font-normal text-[#008A05]">Active</Text>
-          </View>
-
-          {subscription.cancelAtPeriodEnd && (
-            <View className="flex-row items-center gap-1 ml-1">
-              <WarningIcon
-                size={14}
-                color={colors.status.warning}
-                weight="thin"
-              />
-              <Text
-                className="text-xs font-normal"
-                style={{ color: colors.status.warning }}
-              >
-                Cancels soon
-              </Text>
-            </View>
-          )}
+function ActiveBody({ subscription }: ActiveBodyProps) {
+  return (
+    <View className="gap-xs">
+      {/* Plan heading row */}
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center gap-xs">
+          <StarIcon size={16} color={colors.primary} weight="fill" />
+          <Text className="text-base font-semibold text-primary">
+            {subscription.planType} Plan
+          </Text>
         </View>
 
-        {/* Renewal Date */}
-        <View className="flex-row items-center gap-xs">
-          <CalendarBlankIcon size={18} color={colors.hof[500]} weight="thin" />
-          <Text className="text-sm text-textSecondary font-thin">
-            Renews on {formatDate(subscription.currentPeriodEnd)}
+        <View
+          className="rounded-full px-2 py-0.5"
+          style={{ backgroundColor: colors.babu[100] }}
+        >
+          <Text
+            className="text-xs font-normal"
+            style={{ color: colors.status.success }}
+          >
+            Active
           </Text>
         </View>
       </View>
-    );
-  }
 
-  return (
-    <View className="flex-row items-center gap-3">
-      <View className="w-9 h-9 rounded-full bg-canvas items-center justify-center">
-        <LockKeyIcon size={16} color={colors.hof[500]} weight="thin" />
-      </View>
-      <View className="flex-1">
-        <Text className="text-sm font-semibold text-textPrimary">
-          No active subscription
+      {/* Renewal row */}
+      <View className="flex-row items-center gap-xs flex-wrap">
+        <CalendarBlankIcon size={13} color={colors.hof[400]} weight="thin" />
+        <Text className="text-sm text-textSecondary font-thin">
+          Renews {formatDate(subscription.currentPeriodEnd)}
         </Text>
-        <Text className="text-xs text-textSecondary mt-0.5">
-          Subscribe to unlock your QR
-        </Text>
+
+        {subscription.cancelAtPeriodEnd && (
+          <View className="flex-row items-center gap-1 ml-auto">
+            <WarningIcon
+              size={13}
+              color={colors.status.warning}
+              weight="fill"
+            />
+            <Text className="text-xs" style={{ color: colors.status.warning }}>
+              Cancels soon
+            </Text>
+          </View>
+        )}
       </View>
-      <ArrowRightIcon size={16} color={colors.hof[400]} weight="bold" />
     </View>
   );
 }
+
+// ─── Upsell (no active subscription) ────────────────────────────
+
+function UpsellBody() {
+  return (
+    <View className="flex-row items-center justify-between">
+      <View className="flex-1 gap-0.5">
+        <View className="flex-row items-center gap-xs">
+          <SparkleIcon size={15} color={colors.primary} weight="fill" />
+          <Text className="text-sm font-semibold text-primary">
+            Unlock Premium QR
+          </Text>
+        </View>
+        <Text className="text-xs font-thin text-textSecondary">
+          Custom logo · Full contact visibility
+        </Text>
+      </View>
+
+      <View
+        className="flex-row items-center gap-1 rounded-full px-3 py-1.5"
+        style={{ backgroundColor: colors.primary }}
+      >
+        <Text className="text-xs font-semibold text-white">Upgrade</Text>
+        <ArrowRightIcon size={11} color={colors.white} weight="bold" />
+      </View>
+    </View>
+  );
+}
+
+// ─── Main component ──────────────────────────────────────────────
 
 export const UserSubscriptionPlanPressableCard = () => {
   const { data: subscription, isLoading } = useGetMySubscription();
@@ -108,21 +132,33 @@ export const UserSubscriptionPlanPressableCard = () => {
   }, [subscription]);
 
   return (
-    <View>
-      <Pressable onPress={handleNavigatePlanScreen} className="gap-2">
-        <View className="flex-row items-center justify-between px-1">
-          <Text className="text-base font-normal text-textPrimary">
-            Current Plan
-          </Text>
-        </View>
-
-        <View className="bg-surface rounded-2xl border border-divider px-5 py-4">
-          <CardBody
-            isLoading={isLoading}
-            isActive={isActiveDisplay}
-            subscription={subscriptionData}
-          />
-        </View>
+    <View className="gap-2">
+      <Pressable onPress={handleNavigatePlanScreen}>
+        {isLoading ? (
+          // Loading skeleton — matches active card proportions
+          <View
+            className="bg-surface rounded-xl border border-divider px-5 py-5 items-center"
+            style={CARD_SHADOW}
+          >
+            <ActivityIndicator size="small" color={colors.primary} />
+          </View>
+        ) : isActiveDisplay && subscriptionData ? (
+          // Active subscription — elevated white card matching FeatureCard
+          <View
+            className="bg-surface rounded-xl border border-divider px-5 py-4"
+            style={CARD_SHADOW}
+          >
+            <ActiveBody subscription={subscriptionData} />
+          </View>
+        ) : (
+          // Upsell banner — primary-tinted background, upgrade CTA
+          <View
+            className="rounded-xl px-5 py-4"
+            style={{ backgroundColor: colors.rausch[50] }}
+          >
+            <UpsellBody />
+          </View>
+        )}
       </Pressable>
     </View>
   );

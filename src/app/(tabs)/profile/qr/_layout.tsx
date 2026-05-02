@@ -4,16 +4,12 @@ import { colors } from "@/src/shared/theme/colors";
 import { typography } from "@/src/shared/theme/typography";
 import { router, Stack } from "expo-router";
 import { View } from "moti";
-import { GearSixIcon, MagicWandIcon } from "phosphor-react-native";
+import { GearSixIcon } from "phosphor-react-native";
 import React, { useCallback } from "react";
 import { TextStyle } from "react-native";
 import { Pressable } from "react-native-gesture-handler";
 
 const QrLayout = () => {
-  const handleEditQRProfile = useCallback(() => {
-    router.push(QR_ROUTE.customize);
-  }, []);
-
   const handleNavigateSettingScreen = useCallback(() => {
     router.push(QR_ROUTE.profileSetting);
   }, []);
@@ -27,11 +23,6 @@ const QrLayout = () => {
           headerLeft: () => <AppBackButton />,
           headerRight: () => (
             <View className="flex-row gap-md2 px-2 items-center">
-              {/* Edit QR Profile */}
-              <Pressable onPress={handleEditQRProfile} hitSlop={10}>
-                <MagicWandIcon size={24} color={colors.black} />
-              </Pressable>
-
               {/* Edit Profile Setting */}
               <Pressable onPress={handleNavigateSettingScreen} hitSlop={10}>
                 <GearSixIcon size={24} color={colors.black} />
@@ -81,8 +72,6 @@ const QrLayout = () => {
           animation: "slide_from_right",
         }}
       />
-
-      <Stack.Screen name="qr-customize" />
     </Stack>
   );
 };
