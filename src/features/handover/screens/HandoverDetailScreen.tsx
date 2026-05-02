@@ -446,6 +446,7 @@ const ActionPanel = ({
           onPress={onActivate}
           loading={isActivating}
           variant="secondary"
+          disabled={isActivating}
         />
       </View>
     );
@@ -522,6 +523,8 @@ const HandoverDetailScreen = () => {
   const { activate, isActivating } = useActivateC2CReturnReport();
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
   const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
+
+  const [isActivatingHandover, setIsActivatingHandover] = useState(false);
 
   const [isOpeningChat, setIsOpeningChat] = useState(false);
 
@@ -697,6 +700,8 @@ const HandoverDetailScreen = () => {
           style: "default",
           onPress: async () => {
             try {
+              setIsActivatingHandover(true);
+
               const permissionResult =
                 await ImagePicker.requestCameraPermissionsAsync();
 
@@ -738,6 +743,8 @@ const HandoverDetailScreen = () => {
                 "Error",
                 "Could not complete handover. Please try again.",
               );
+            } finally {
+              setIsActivatingHandover(false);
             }
           },
         },
@@ -1048,7 +1055,7 @@ const HandoverDetailScreen = () => {
             onActivate={handleActivate}
             onConfirm={handleConfirm}
             onReject={handleReject}
-            isActivating={isActivating}
+            isActivating={isActivating || isActivatingHandover}
             isConfirming={isConfirming}
             isRejecting={isRejecting}
           />
