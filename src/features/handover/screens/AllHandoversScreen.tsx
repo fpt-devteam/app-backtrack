@@ -1,22 +1,17 @@
-// src/features/handover/screens/AllHandoversScreen.tsx
-
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
-import { HandoverRequestCard } from "@/src/features/handover/components";
+import { HandoverCard } from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
-import { AppInlineError } from "@/src/shared/components";
-import { colors, metrics } from "@/src/shared/theme";
-import { router, Stack, useLocalSearchParams } from "expo-router";
-import { ArrowLeftIcon } from "phosphor-react-native";
+import { AppBackButton, AppInlineError } from "@/src/shared/components";
+import { colors, metrics, typography } from "@/src/shared/theme";
+import { Stack, useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Platform,
   Text,
-  TouchableOpacity,
+  TextStyle,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 type FilterParam = "ongoing" | "past";
 
@@ -44,30 +39,19 @@ const AllHandoversScreen = () => {
   const title = filter === "ongoing" ? "Ongoing" : "Past Handovers";
 
   return (
-    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      <View
-        className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
-        style={
-          Platform.OS === "ios"
-            ? { ...metrics.shadows.tabBar.ios }
-            : metrics.shadows.tabBar.android
-        }
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          className="items-center justify-center rounded-full"
-          style={{ width: 44, height: 44, backgroundColor: colors.hof[100] }}
-        >
-          <ArrowLeftIcon size={20} color={colors.text.primary} />
-        </TouchableOpacity>
-        <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
-          {title}
-        </Text>
-        <View style={{ width: 44, height: 44 }} />
-      </View>
+    <View className="flex-1 bg-surface">
+      <Stack.Screen
+        options={{
+          headerTitle: title,
+          headerLeft: () => (
+            <AppBackButton type="arrowLeftIcon" showBackground={false} />
+          ),
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
 
       {isLoading && (
         <View className="flex-1 items-center justify-center">
@@ -91,12 +75,8 @@ const AllHandoversScreen = () => {
             paddingTop: metrics.spacing.md,
             paddingBottom: metrics.spacing.xl,
           }}
-          renderItem={({ item }) => (
-            <HandoverRequestCard
-              handover={item}
-              currentUserId={currentUserId}
-            />
-          )}
+          ItemSeparatorComponent={() => <View className="m-xs" />}
+          renderItem={({ item }) => <HandoverCard handover={item} />}
           ListEmptyComponent={
             <Text className="text-sm text-textMuted text-center mt-lg">
               No handovers to show.
@@ -104,7 +84,7 @@ const AllHandoversScreen = () => {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

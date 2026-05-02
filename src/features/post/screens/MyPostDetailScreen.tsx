@@ -10,7 +10,10 @@ import {
   useMatchingPost,
 } from "@/src/features/post/hooks";
 import { usePostSubcategoryStore } from "@/src/features/post/store";
-import { ELECTRONICS_SUBCATEGORY } from "@/src/features/post/types";
+import {
+  ELECTRONICS_SUBCATEGORY,
+  POST_CATEGORIES,
+} from "@/src/features/post/types";
 import {
   AppLoader,
   ImageCarousel,
@@ -372,7 +375,6 @@ export const MyPostDetailScreen = () => {
             imageUrls={displayImageUrls}
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
-            isBlurred={post.category === "Cards"}
           />
         </Animated.View>
 
@@ -401,7 +403,7 @@ export const MyPostDetailScreen = () => {
                 <PostCategoryBadge category={post.category} />
 
                 {/* Subcategory Badge */}
-                {subcategoryCode && (
+                {subcategoryCode && post.category != POST_CATEGORIES.OTHERS && (
                   <PostSubcategoryBadge subcategory={subcategoryCode} />
                 )}
               </View>
@@ -546,24 +548,18 @@ export const MyPostDetailScreen = () => {
                 </View>
 
                 <ScrollView
-                  horizontal
+                  horizontal={false}
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{
                     gap: metrics.spacing.md,
                     paddingHorizontal: metrics.spacing.lg,
+                    paddingBottom: metrics.spacing.lg,
                   }}
                 >
                   {similarPosts.map((p) => (
-                    <View
-                      key={p.id}
-                      style={{
-                        width: Math.round(
-                          (width - metrics.spacing.lg - 12) / 1.5,
-                        ),
-                      }}
-                    >
+                    <View key={p.id}>
                       <SimilarPostCard
-                        matchPost={p}
+                        item={p}
                         onPress={() => {
                           router.push(PROFILE_ROUTE.detailMatch(post.id, p.id));
                         }}
@@ -616,7 +612,9 @@ export const MyPostDetailScreen = () => {
           ),
         }}
       />
+
       {renderContent()}
+
       <MenuBottomSheet
         isVisible={isActionSheetVisible}
         onClose={handleCloseActionSheet}

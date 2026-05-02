@@ -1,106 +1,138 @@
-import { SimilarPost } from "@/src/features/post/types";
+import { PostCategoryBadge } from "@/src/features/post/components/PostCategoryBadge";
+import { PostTypeIconBadge } from "@/src/features/post/components/PostTypeIconBadge";
+import { SimilarPost } from "@/src/features/post/types/post.type";
 import { AppImage } from "@/src/shared/components";
-import { colors } from "@/src/shared/theme";
-import { LinearGradient } from "expo-linear-gradient";
-import { MotiView } from "moti";
-import { MapPinIcon } from "phosphor-react-native";
+import { colors, metrics } from "@/src/shared/theme";
+import {
+  formatIsoDate,
+  parseStringToDate,
+} from "@/src/shared/utils/datetime.utils";
+import { MotiPressable } from "moti/interactions";
+import { ClockIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import ScoreBadge from "./ScoreBadge";
 
 type SimilarPostCardProps = {
-  matchPost: SimilarPost;
+  item: SimilarPost;
   onPress: () => void;
 };
 
-export const SimilarPostCard = ({
-  matchPost,
-  onPress,
-}: SimilarPostCardProps) => {
-  const imgUrl = matchPost.imageUrls?.[0];
+export const SimilarPostCard = ({ item, onPress }: SimilarPostCardProps) => {
+  const imageUrl = item.imageUrls[0];
 
-  const safeTitle = useMemo(
-    () => matchPost.postTitle || "Untitled item",
-    [matchPost],
+  const categoryLabel = useMemo(() => {
+    return item.category;
+  }, [item.category]);
+
+  const itemNameLabel = useMemo(
+    () => item.postTitle || "Untitled item",
+    [item],
   );
 
-  const safeAddress = useMemo(() => {
-    if (matchPost.displayAddress?.trim()) return matchPost.displayAddress;
+  const locationLabel = useMemo(() => {
+    if (item.displayAddress?.trim()) return item.displayAddress;
+    if (item.location?.latitude != null && item.location?.longitude != null) {
+      return `${item.location.latitude.toFixed(4)}, ${item.location.longitude.toFixed(4)}`;
+    }
     return "Unknown location";
-  }, [matchPost]);
+  }, [item.displayAddress, item.location]);
+
+  const eventTimeLabel = useMemo(() => {
+    if (!item.eventTime) return "Unknown time";
+    const date = parseStringToDate(item.eventTime);
+    if (!date) return "Unknown time";
+    return formatIsoDate(date);
+  }, [item.eventTime]);
 
   const safeScore = useMemo(() => {
-    if (matchPost.score == null) return 0;
-    return Math.round(matchPost.score * 100);
-  }, [matchPost]);
+    if (item.score == null) return 0;
+    return Math.round(item.score * 100);
+  }, [item]);
 
   return (
-    <Pressable onPress={onPress}>
-      {({ pressed }) => (
-        <MotiView
-          animate={{ scale: pressed ? 0.97 : 1 }}
-          transition={{ type: "timing", duration: 150 }}
-          className="bg-surface rounded-xl overflow-hidden"
-          style={{
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-          }}
-        >
-          <View className="w-full" style={{ aspectRatio: 1 }}>
-            <AppImage
-              style={{ width: "100%", height: "100%" }}
-              source={{ uri: imgUrl }}
-            />
+    <MotiPressable
+      onPress={onPress}
+      animate={({ pressed }) => {
+        "worklet";
+        return {
+          scale: pressed ? 0.96 : 1,
+          opacity: pressed ? 0.92 : 1,
+        };
+      }}
+      transition={{ type: "spring", damping: 18, stiffness: 250 }}
+      style={{
+        width: "100%",
+        backgroundColor: colors.surface,
+        borderRadius: metrics.borderRadius.lg,
+        padding: metrics.spacing.md2,
 
-            <View style={{ position: "absolute", top: 6, right: 6 }}>
-              <ScoreBadge value={safeScore} />
-            </View>
+        shadowColor: colors.black,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      }}
+    >
+      <View className="flex-row gap-sm">
+        {/* IMAGE */}
+        <View
+          className="relative w-28 overflow-hidden rounded-sm"
+          style={{ aspectRatio: 1.18 }}
+        >
+          <AppImage
+            style={{ width: "100%", height: "100%" }}
+            source={{ uri: imageUrl }}
+          />
+
+          <View className="absolute top-1 right-1">
+            <ScoreBadge value={safeScore} />
+          </View>
+        </View>
+
+        {/* INFO STRIP */}
+        <View className="flex-1 gap-xs">
+          {/* Post Title */}
+          <Text
+            numberOfLines={1}
+            className="text-lg font-normal text-textPrimary"
+          >
+            {itemNameLabel}
+          </Text>
+
+          {/* Badges row */}
+          <View className="flex-row gap-xs items-center justify-start">
+            {/* Post Type  */}
+            <PostTypeIconBadge status={item.postType} size="xs" />
+
+            {/* Post Category */}
+            <PostCategoryBadge category={categoryLabel} />
           </View>
 
-          <View
-            className="absolute bottom-0 left-0 right-0 px-md pb-md2 gap-xs"
-            style={{ paddingTop: 72 }}
-          >
-            <LinearGradient
-              colors={[
-                "rgba(0, 0, 0, 0.92)",
-                "rgba(0, 0, 0, 0.68)",
-                "rgba(0, 0, 0, 0.32)",
-                "rgba(0, 0, 0, 0.12)",
-                "transparent",
-              ]}
-              locations={[0, 0.3, 0.58, 0.8, 1]}
-              pointerEvents="none"
-              start={{ x: 0.5, y: 1 }}
-              end={{ x: 0.5, y: 0 }}
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0,
-              }}
-            />
-            <Text
-              className="text-base font-normal text-white"
-              numberOfLines={1}
-            >
-              {safeTitle}
-            </Text>
-
+          <View>
+            {/* Location */}
             <View className="flex-row items-center gap-xs">
-              <MapPinIcon size={16} color={colors.primary} weight="fill" />
+              <MapPinIcon size={12} color={colors.secondary} weight="thin" />
               <Text
-                className="flex-1 text-sm text-white font-thin"
                 numberOfLines={1}
+                className="flex-1 text-xs leading-5 font-thin text-textMuted"
               >
-                {safeAddress}
+                {locationLabel}
+              </Text>
+            </View>
+
+            {/* Event Time */}
+            <View className="flex-row items-center gap-xs">
+              <ClockIcon size={12} color={colors.secondary} weight="thin" />
+              <Text
+                numberOfLines={1}
+                className="flex-1 text-xs leading-5 font-thin text-textMuted"
+              >
+                {eventTimeLabel}
               </Text>
             </View>
           </View>
-        </MotiView>
-      )}
-    </Pressable>
+        </View>
+      </View>
+    </MotiPressable>
   );
 };

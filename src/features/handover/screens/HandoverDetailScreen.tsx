@@ -27,6 +27,7 @@ import {
   AppBackButton,
   AppButton,
   AppInlineError,
+  AppTipCard,
   AppUserAvatar,
   TouchableIconButton,
 } from "@/src/shared/components";
@@ -46,7 +47,6 @@ import {
   CheckCircleIcon,
   ClockCountdownIcon,
   HandshakeIcon,
-  HourglassIcon,
   InfoIcon,
   PackageIcon,
   PhoneIcon,
@@ -412,37 +412,6 @@ type ActionPanelProps = {
 
 const ACTION_PANEL_MIN_HEIGHT = 120;
 
-const ActionPanelNotice = ({
-  icon,
-  title,
-  description,
-  borderColor,
-  backgroundColor,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  borderColor: string;
-  backgroundColor: string;
-}) => {
-  return (
-    <View
-      className="flex-row items-start rounded-md border p-md2"
-      style={{
-        borderColor,
-        backgroundColor,
-      }}
-    >
-      {icon}
-
-      <View className="flex-1">
-        <Text className="text-sm font-normal text-textPrimary">{title}</Text>
-        <Text className="text-xs font-thin text-textMuted">{description}</Text>
-      </View>
-    </View>
-  );
-};
-
 const ActionPanel = ({
   report,
   isFinder,
@@ -456,23 +425,13 @@ const ActionPanel = ({
 }: ActionPanelProps) => {
   const { status } = report;
 
-  // Template
   if (status === "Confirmed") {
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
-        <ActionPanelNotice
-          icon={
-            <CheckCircleIcon
-              size={16}
-              color={colors.babu[600]}
-              style={{ marginTop: 1, marginRight: 8 }}
-              weight="fill"
-            />
-          }
+        <AppTipCard
           title="Handover Complete"
           description="The item has been successfully returned."
-          borderColor={colors.babu[500]}
-          backgroundColor={colors.babu[100]}
+          type="success"
         />
       </View>
     );
@@ -485,19 +444,10 @@ const ActionPanel = ({
         : "This handover was rejected.";
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
-        <ActionPanelNotice
-          icon={
-            <WarningCircleIcon
-              size={16}
-              color={colors.error[600]}
-              style={{ marginTop: 1, marginRight: 8 }}
-              weight="fill"
-            />
-          }
+        <AppTipCard
           title={`Handover ${status === "Closed" ? "Closed" : "Rejected"}`}
           description={label}
-          borderColor={colors.error[500]}
-          backgroundColor={colors.error[100]}
+          type="warning"
         />
       </View>
     );
@@ -505,22 +455,7 @@ const ActionPanel = ({
 
   if (status === "Ongoing" && isFinder) {
     return (
-      <View className="px-lg pt-md pb-md2 border-t border-divider bg-surface gap-md2">
-        <ActionPanelNotice
-          icon={
-            <PackageIcon
-              size={16}
-              color={colors.primary}
-              style={{ marginTop: 1, marginRight: 8 }}
-              weight="fill"
-            />
-          }
-          title="Mark delivery when done"
-          description="Once you hand the item back, mark it here so the owner can confirm receipt."
-          borderColor={colors.primary}
-          backgroundColor={colors.rausch[50]}
-        />
-
+      <View className="px-lg pt-md border-t border-divider bg-surface">
         <AppButton
           title="I've Delivered the Item"
           onPress={onActivate}
@@ -534,19 +469,10 @@ const ActionPanel = ({
   if (status === "Ongoing" && isOwner) {
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
-        <ActionPanelNotice
-          icon={
-            <HourglassIcon
-              size={16}
-              color={colors.hof[500]}
-              style={{ marginTop: 1, marginRight: 8 }}
-              weight="fill"
-            />
-          }
+        <AppTipCard
           title="Waiting for delivery"
           description="The finder will mark this handover as delivered after the item is handed back."
-          borderColor={colors.hof[300]}
-          backgroundColor={colors.hof[50]}
+          type="waiting"
         />
       </View>
     );
@@ -555,19 +481,10 @@ const ActionPanel = ({
   if (status === "Delivered" && isFinder) {
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
-        <ActionPanelNotice
-          icon={
-            <HourglassIcon
-              size={16}
-              weight="fill"
-              color={colors.kazan[600]}
-              style={{ marginTop: 1, marginRight: 8 }}
-            />
-          }
+        <AppTipCard
           title="Waiting for confirmation"
           description="You marked the item as delivered. The owner can confirm receipt to complete the handover."
-          borderColor={colors.kazan[500]}
-          backgroundColor={colors.kazan[100]}
+          type="waiting"
         />
       </View>
     );
@@ -575,22 +492,7 @@ const ActionPanel = ({
 
   if (status === "Delivered" && isOwner) {
     return (
-      <View className="px-lg pt-md pb-md2 border-t border-divider bg-surface gap-md2">
-        <ActionPanelNotice
-          icon={
-            <PackageIcon
-              size={16}
-              color={colors.info[600]}
-              style={{ marginTop: 1, marginRight: 8 }}
-              weight="fill"
-            />
-          }
-          title="Confirm the handover"
-          description="The finder marked this handover as delivered. Confirm once you have the item in hand."
-          borderColor={colors.info[500]}
-          backgroundColor={colors.info[100]}
-        />
-
+      <View className="px-lg pt-md border-t border-divider bg-surface gap-md2">
         <View className="flex-row gap-md">
           {/* Reject Handover Button */}
           <View className="flex-1">
@@ -646,6 +548,7 @@ const HandoverDetailScreen = () => {
     () => !!currentUser && report?.finder?.id === currentUser.id,
     [currentUser, report],
   );
+
   const isOwner = useMemo(
     () => !!currentUser && report?.owner?.id === currentUser.id,
     [currentUser, report],
@@ -661,10 +564,12 @@ const HandoverDetailScreen = () => {
     () => (report ? getHandoverCounterpart(report, currentUser?.id) : null),
     [report, currentUser?.id],
   );
+
   const viewerRole = useMemo(
     () => (report ? getHandoverViewerRole(report, currentUser?.id) : "Unknown"),
     [report, currentUser?.id],
   );
+
   const title = useMemo(
     () => (report ? getHandoverTitle(report) : "Handover"),
     [report],

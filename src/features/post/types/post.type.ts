@@ -80,15 +80,8 @@ export type UserPost = {
 /**
  * Post - This type defines the structure of a post. 
  */
-export type Post = {
-  id: string
-  postType: PostType
-  postTitle: Nullable<string>
+export type Post = BasePost & {
   status: PostStatus
-  category: PostCategory
-  subcategoryId: string
-  imageUrls: string[]
-  description: string | null
   organization: Nullable<string>
   eventTime: Date
   createdAt: Date
@@ -318,32 +311,35 @@ export type SimilarPostOtherDetail = {
 /**
  * 
  */
-export type SimilarPost = {
-  id: string
-  postType: PostType
-  postTitle: Nullable<string>
-  category: PostCategory
-  subcategoryId: string
+export type SimilarPost = BasePost & {
   personalBelongingDetail?: Nullable<SimilarPostPersonalBelongingDetail>
   cardDetail?: Nullable<SimilarPostCardDetail>
   electronicDetail?: Nullable<SimilarPostElectronicDetail>
   otherDetail?: Nullable<SimilarPostOtherDetail>
-  imageUrls: string[]
-  eventTime: string
   score: number;
   evidence: MatchEvidence[];
   status: MatchStatus;
   timeGap: string;
   locationDistance: number;
-} & Omit<UserLocation, "radiusInKm">
+}
 
-
+/**
+ * BasePost
+ * This type defines the common properties for all post types.
+ */
 export type BasePost = {
+  id: string,
   postType: PostType
   postTitle: Nullable<string>
+
+  category: PostCategory
+  subcategoryId: string
+
+  imageUrls: string[]
+
   location: LatLng
   externalPlaceId: string
   displayAddress: string
-  category: PostCategory
-  imageUrls: string[]
+
+  eventTime: string
 }

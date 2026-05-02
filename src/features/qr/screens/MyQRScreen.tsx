@@ -9,12 +9,12 @@ import {
 } from "@/src/features/qr/constants";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
+import { AppTipCard } from "@/src/shared/components";
 import { AppLoader } from "@/src/shared/components/AppLoader";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import { router } from "expo-router";
-import { MotiView } from "moti";
-import { LightbulbIcon, QrCodeIcon } from "phosphor-react-native";
+import { QrCodeIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
   Text,
@@ -23,35 +23,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const TipCard = () => (
-  <MotiView
-    from={{ opacity: 0, translateY: 16 }}
-    animate={{ opacity: 1, translateY: 0 }}
-    transition={{ type: "timing", duration: 260, delay: 180 }}
-  >
-    <View
-      className="flex-row items-start rounded-md border p-md2"
-      style={{
-        borderColor: colors.arches[300],
-        backgroundColor: colors.arches[50],
-      }}
-    >
-      <LightbulbIcon
-        size={16}
-        weight="fill"
-        color={colors.arches[600]}
-        style={{ marginTop: 1, marginRight: 8 }}
-      />
-      <Text
-        className="flex-1 text-xs leading-relaxed"
-        style={{ color: colors.arches[600] }}
-      >
-        Stick your QR on items for a higher chance of recovery.
-      </Text>
-    </View>
-  </MotiView>
-);
 
 const MyQRScreen = () => {
   const { data: subscription, isLoading } = useGetMySubscription();
@@ -108,7 +79,11 @@ const MyQRScreen = () => {
           <UserQRCodePressableCard isSubscripted={isSubscripted} />
         )}
         <View className="w-full">
-          <TipCard />
+          <AppTipCard
+            title="Pro Tip"
+            description="Stick your QR on items for a higher chance of recovery."
+            type="tip"
+          />
         </View>
       </View>
 

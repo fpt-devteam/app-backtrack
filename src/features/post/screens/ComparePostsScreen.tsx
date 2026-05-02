@@ -244,8 +244,6 @@ export const ComparePostsScreen = ({
     [similarPosts, otherPostId],
   );
 
-  console.log("matchedPost", matchedPost);
-
   const evidenceRows = useMemo(
     () => (matchedPost ? mapEvidenceRows(matchedPost.evidence ?? []) : []),
     [matchedPost],

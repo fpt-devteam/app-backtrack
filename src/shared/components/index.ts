@@ -18,6 +18,7 @@ export { AppLogo } from "@/src/shared/components/AppLogo";
 export { AppSearchRow } from '@/src/shared/components/AppSearchRow';
 export { AppSegmentedControl } from "@/src/shared/components/AppSegmentedControl";
 export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
+export { AppTipCard } from "@/src/shared/components/AppTipCard";
 export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 export { BaseInputField } from "@/src/shared/components/fields/BaseInputField";

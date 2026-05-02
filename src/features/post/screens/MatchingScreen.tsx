@@ -86,7 +86,7 @@ export const MatchingScreen = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <SimilarPostCard
-              matchPost={item}
+              item={item}
               onPress={() => {
                 router.push(POST_ROUTE.detailMatching(postId, item.id));
               }}

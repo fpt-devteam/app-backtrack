@@ -1,13 +1,10 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
-import {
-  HandoverCard,
-  HandoverRequestCard,
-} from "@/src/features/handover/components";
+import { HandoverCard } from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
 import { AppInlineError } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
-import { colors, metrics } from "@/src/shared/theme";
+import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
 import { ArrowRightIcon, PackageIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
@@ -16,10 +13,10 @@ import {
   RefreshControl,
   ScrollView,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 // ─── Section header ────────────────────────────────────────────────────────────
 
@@ -88,17 +85,16 @@ const HandoverScreen = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-surface" edges={["top"]}>
-      <Stack.Screen options={{ headerShown: false }} />
-
-      {/* ── Page header ──────────────────────────────────────────────── */}
-      <View className="px-lg pt-lg pb-md gap-xs bg-surface">
-        <View className="flex-row items-center gap-sm">
-          <Text className="text-3xl font-normal text-textPrimary">
-            Handover
-          </Text>
-        </View>
-      </View>
+    <View className="flex-1 bg-surface">
+      <Stack.Screen
+        options={{
+          headerTitle: "Handovers",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
 
       {/* ── Loading ──────────────────────────────────────────────────── */}
       {isLoading && (
@@ -134,7 +130,7 @@ const HandoverScreen = () => {
           }
         >
           {/* In Progress section */}
-          <View className="border-b-4 pb-sm border-divider">
+          <View className="border-b-8 pb-sm border-divider">
             <SectionHeader
               title="In Progress"
               subtitle="These handovers still need delivery, confirmation, or review."
@@ -160,7 +156,9 @@ const HandoverScreen = () => {
                     <HandoverCard key={handover.id} handover={handover} />
                   ))}
 
-                  <SeeAllRow filter="ongoing" />
+                  {inProgressHandovers.length > 2 && (
+                    <SeeAllRow filter="ongoing" />
+                  )}
                 </View>
               )}
             </View>
@@ -191,21 +189,17 @@ const HandoverScreen = () => {
               ) : (
                 <View className="gap-md2">
                   {pastHandovers.slice(0, 2).map((handover) => (
-                    <HandoverRequestCard
-                      key={handover.id}
-                      handover={handover}
-                      currentUserId={currentUserId}
-                    />
+                    <HandoverCard key={handover.id} handover={handover} />
                   ))}
 
-                  <SeeAllRow filter="past" />
+                  {pastHandovers.length > 2 && <SeeAllRow filter="past" />}
                 </View>
               )}
             </View>
           </View>
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

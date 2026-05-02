@@ -77,7 +77,6 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
           <AppImage
             style={{ width: "100%", height: "100%" }}
             source={{ uri: imageUrl }}
-            isBlurred={item.category === "Cards"}
           />
         </View>
 
