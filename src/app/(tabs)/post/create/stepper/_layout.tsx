@@ -9,6 +9,7 @@ import {
   CardDetail,
   POST_CATEGORIES,
   PostCreateRequest,
+  PostType,
 } from "@/src/features/post/types";
 import {
   AppBackButton,
@@ -146,6 +147,7 @@ const PostCreationStepperLayout = () => {
 
   const isNextDisabled = useMemo(() => {
     if (STEPS[currentStep].key === STEP_KEY.IDENTITY) {
+      if (postType === PostType.Lost) return false;
       return draftImages.length === 0;
     }
 
@@ -418,7 +420,7 @@ const PostCreationStepperLayout = () => {
                   <TouchableIconButton
                     icon={<HeadCircuitIcon size={32} />}
                     onPress={handleAIAnalyze}
-                    disabled={isAnalyzing}
+                    disabled={isAnalyzing || draftImages.length === 0}
                   />
                 ),
               }}

@@ -5,14 +5,6 @@ const SharedScreensLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
-        name="not-available"
-        options={{
-          presentation: "transparentModal",
-          animation: "fade",
-        }}
-      />
-
-      <Stack.Screen
         name="[userId]"
         options={{
           headerShown: true,

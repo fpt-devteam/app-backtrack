@@ -5,16 +5,12 @@ import {
   useUpdateNotificationStatus,
 } from "@/src/features/notification/hooks";
 import {
-  IS_NOTIFICATIONS_MOCK,
-  MOCK_NOTIFICATIONS,
-} from "@/src/features/notification/screens/mock";
-import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
 import { AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
-import { AUTH_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { RelativePathString, router } from "expo-router";
 import { BellRingingIcon, BellSimpleSlashIcon } from "phosphor-react-native";
@@ -43,9 +39,7 @@ const NotificationScreen = () => {
     refetch,
   } = useNotifications({ enabled: isAuthReady });
 
-  const items: UserNotification[] = IS_NOTIFICATIONS_MOCK
-    ? MOCK_NOTIFICATIONS
-    : fetchedItems;
+  const items: UserNotification[] = fetchedItems;
 
   const { updateStatus } = useUpdateNotificationStatus();
 
@@ -96,11 +90,9 @@ const NotificationScreen = () => {
         router.push(screenPath);
       } else {
         console.warn(`Invalid notification screen path: ${screenPath}`);
-        router.push(SHARED_ROUTE.notAvailable);
       }
     } catch (error) {
       console.error("Error when handling notification press: ", error);
-      router.push(SHARED_ROUTE.notAvailable);
     }
   };
 

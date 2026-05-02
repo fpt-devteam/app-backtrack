@@ -31,10 +31,9 @@ export const TouchableIconButton = ({
       disabled={isDisabled}
       hitSlop={8}
       className="items-center justify-center"
-      style={({ pressed }) => ({
-        transform: [{ scale: pressed ? 0.97 : 1 }],
-        opacity: pressed ? 0.9 : 1,
-      })}
+      style={{
+        opacity: isDisabled ? 0.2 : 1,
+      }}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
