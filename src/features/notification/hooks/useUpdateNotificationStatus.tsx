@@ -2,6 +2,7 @@ import { updateStatusNotifications } from "@/src/features/notification/api/notif
 import {
   NOTIFICATION_UPDATE_STATUS_KEY,
   NOTIFICATIONS_QUERY_KEY,
+  NOTIFICATIONS_UNREAD_COUNT_KEY,
 } from "@/src/features/notification/constants";
 import type { NotificationStatusUpdateRequest } from "@/src/features/notification/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +19,9 @@ export const useUpdateNotificationStatus = () => {
 
     onSuccess: async () => {
       qc.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
+      qc.invalidateQueries({
+        queryKey: NOTIFICATIONS_UNREAD_COUNT_KEY,
+      });
     },
   });
 

@@ -1,5 +1,5 @@
 import { getUnreadCountApi } from "@/src/features/notification/api/notification.api";
-import { NOTIFICATIONS_QUERY_KEY } from "@/src/features/notification/constants";
+import { NOTIFICATIONS_UNREAD_COUNT_KEY } from "@/src/features/notification/constants";
 import type { UnreadCountResponse } from "@/src/features/notification/types";
 
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ export const useUnreadNotificationCount = ({
   enabled = true,
 }: useUnreadNotificationCountOptions = {}) => {
   const query = useQuery<UnreadCountResponse>({
-    queryKey: [...NOTIFICATIONS_QUERY_KEY, "unread-count"],
+    queryKey: [...NOTIFICATIONS_UNREAD_COUNT_KEY],
     enabled,
     queryFn: async () => {
       const res = await getUnreadCountApi();

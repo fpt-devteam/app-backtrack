@@ -21,6 +21,7 @@ import { BellRingingIcon, BellSimpleSlashIcon } from "phosphor-react-native";
 import React from "react";
 import {
   FlatList,
+  RefreshControl,
   Text,
   TouchableOpacity,
   useWindowDimensions,
@@ -38,6 +39,8 @@ const NotificationScreen = () => {
     hasMore,
     loadMore,
     isLoadingNextPage,
+    isRefetching,
+    refetch,
   } = useNotifications({ enabled: isAuthReady });
 
   const items: UserNotification[] = IS_NOTIFICATIONS_MOCK
@@ -144,6 +147,15 @@ const NotificationScreen = () => {
         contentContainerStyle={{
           paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
         }}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.primary}
+          />
+        }
       />
     </View>
   );
