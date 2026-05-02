@@ -60,5 +60,6 @@ export async function getPostSubcategoriesApi() {
 
 export async function deletePostApi(req: PostDeleteByIdRequest) {
   const response = await privateClient.delete(POST_API.detail(req.postId));
+  if (response.status === 204) return { success: true };
   return response.data;
 } 

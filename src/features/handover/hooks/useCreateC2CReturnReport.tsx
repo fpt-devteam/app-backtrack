@@ -4,6 +4,10 @@ import {
   CREATE_C2C_RETURN_REPORT_KEY,
 } from "@/src/features/handover/constants";
 import type { CreateC2CReturnReportRequest } from "@/src/features/handover/types";
+import {
+  MY_POSTS_QUERY_KEY,
+  POSTS_QUERY_KEY,
+} from "@/src/features/post/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -19,6 +23,9 @@ export const useCreateC2CReturnReport = () => {
     },
     onSuccess: async () => {
       qc.invalidateQueries({ queryKey: C2C_RETURN_REPORTS_QUERY_KEY });
+      
+      qc.invalidateQueries({ queryKey: POSTS_QUERY_KEY });
+      qc.invalidateQueries({ queryKey: MY_POSTS_QUERY_KEY });
     },
   });
 

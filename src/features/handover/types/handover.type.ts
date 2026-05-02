@@ -1,5 +1,5 @@
 import { AppUser } from "@/src/features/auth/types"
-import type { BasePost, Post, PostType } from "@/src/features/post/types"
+import type { Post, PostType } from "@/src/features/post/types"
 import { Nullable } from "@/src/shared/types"
 
 /**
@@ -32,7 +32,7 @@ export type Handover = {
   owner: Nullable<AppUser>
   finderPost: Nullable<Post>
   ownerPost: Nullable<Post>
-  status: ReturnReportStatus
+  status: HandoverStatus
   activatedByRole: Nullable<ReturnReportRole>
   confirmedAt: Nullable<string>
   expiresAt: string
@@ -42,7 +42,7 @@ export type Handover = {
 /**
  * 
  */
-const RETURN_REPORT_STATUS = {
+export const HANDOVER_STATUS = {
   Ongoing: "Ongoing",
   Delivered: "Delivered",
   Confirmed: "Confirmed",
@@ -50,4 +50,4 @@ const RETURN_REPORT_STATUS = {
   Closed: "Closed",
 }
 
-export type ReturnReportStatus = keyof typeof RETURN_REPORT_STATUS
+export type HandoverStatus = typeof HANDOVER_STATUS[keyof typeof HANDOVER_STATUS];

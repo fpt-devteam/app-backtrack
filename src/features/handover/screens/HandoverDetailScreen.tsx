@@ -7,9 +7,9 @@ import {
 import {
   getHandoverCounterpart,
   getHandoverDetailGuidance,
-  getHandoverStatusLabel,
   getHandoverTitle,
   getHandoverViewerRole,
+  HandoverStatusBadge,
 } from "@/src/features/handover/components";
 import {
   useActivateC2CReturnReport,
@@ -20,7 +20,7 @@ import {
 import type {
   DeliverC2CReturnReportRequest,
   Handover,
-  ReturnReportStatus,
+  HandoverStatus,
 } from "@/src/features/handover/types";
 import { PostCard } from "@/src/features/post/components";
 import {
@@ -69,27 +69,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type StatusTheme = { color: string; bgColor: string };
 
-const STATUS_THEME: Record<ReturnReportStatus, StatusTheme> = {
+const STATUS_THEME: Record<HandoverStatus, StatusTheme> = {
   Ongoing: { color: colors.kazan[500], bgColor: colors.kazan[100] },
   Delivered: { color: colors.info[500], bgColor: colors.info[50] },
   Confirmed: { color: colors.babu[500], bgColor: colors.babu[100] },
   Rejected: { color: colors.error[500], bgColor: colors.error[100] },
   Closed: { color: colors.hof[400], bgColor: colors.hof[100] },
-};
-
-const HandoverStatusBadge = ({ status }: { status: ReturnReportStatus }) => {
-  const { color, bgColor } = STATUS_THEME[status];
-  const label = getHandoverStatusLabel(status);
-  return (
-    <View
-      className="self-start px-3 py-1 rounded-full"
-      style={{ backgroundColor: bgColor, borderWidth: 1, borderColor: color }}
-    >
-      <Text className="text-xs font-semibold" style={{ color }}>
-        {label}
-      </Text>
-    </View>
-  );
 };
 
 type StepState = "done" | "active" | "pending";
@@ -101,7 +86,7 @@ type StepDef = {
 };
 
 function deriveSteps(
-  status: ReturnReportStatus,
+  status: HandoverStatus,
   isFinder: boolean,
   hasMarkedDelivery: boolean,
 ): StepDef[] {
@@ -189,7 +174,7 @@ const ProgressStepper = ({
   hasMarkedDelivery,
   viewerRole,
 }: {
-  status: ReturnReportStatus;
+  status: HandoverStatus;
   isFinder: boolean;
   hasMarkedDelivery: boolean;
   viewerRole: "Finder" | "Owner" | "Unknown";

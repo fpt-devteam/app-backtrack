@@ -108,6 +108,7 @@ const palette = {
    */
   error: {
     100: "#FDECEA",
+    200: "#F9BDB6",
     500: "#C62828",
     600: "#B71C1C",
   },

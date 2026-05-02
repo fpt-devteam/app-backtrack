@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 export const useGetAllMyPost = () => {
   const query = useQuery({
-    queryKey: [MY_POSTS_QUERY_KEY],
+    queryKey: [...MY_POSTS_QUERY_KEY],
     queryFn: async () => {
       const response = await getAllMyPost();
       if (!response.success) throw new Error("Failed to fetch your posts");

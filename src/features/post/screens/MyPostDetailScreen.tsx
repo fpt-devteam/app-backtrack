@@ -20,6 +20,7 @@ import {
   MenuBottomSheet,
   type MenuOption,
 } from "@/src/shared/components";
+import { toast } from "@/src/shared/components/ui/toast";
 import { PROFILE_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { formatIsoDate, toTitleCase } from "@/src/shared/utils";
@@ -159,13 +160,16 @@ export const MyPostDetailScreen = () => {
       try {
         await deletePost({ postId });
         router.back();
+
+        toast.success("Delete Successful", "Post deleted successfully.");
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
             : deletePostError?.message || "Delete post failed";
 
-        Alert.alert("Delete Failed", message);
+        console.log("Error: ", error);
+        toast.error("Delete Failed", message);
       }
     })();
   }, [deletePost, deletePostError?.message, isDeletingPost, postId]);
@@ -174,14 +178,18 @@ export const MyPostDetailScreen = () => {
     if (isDeletingPost) return;
 
     handleCloseActionSheet();
-    Alert.alert("Delete Post", "Are you sure you want to delete this post?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: handleDeleteConfirm,
-      },
-    ]);
+    Alert.alert(
+      "Delete Post",
+      "Are you sure you want to delete this post? All handover requests will be cancelled.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: handleDeleteConfirm,
+        },
+      ],
+    );
   }, [handleCloseActionSheet, handleDeleteConfirm, isDeletingPost]);
 
   const actionMenuOptions = useMemo<MenuOption[]>(

@@ -4,6 +4,10 @@ import {
   C2C_RETURN_REPORTS_QUERY_KEY,
   OWNER_CONFIRM_C2C_RETURN_REPORT_KEY,
 } from "@/src/features/handover/constants";
+import {
+  MY_POSTS_QUERY_KEY,
+  POSTS_QUERY_KEY,
+} from "@/src/features/post/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -22,6 +26,9 @@ export const useOwnerConfirmC2CReturnReport = () => {
       qc.invalidateQueries({
         queryKey: [...C2C_RETURN_REPORT_DETAIL_QUERY_KEY, id],
       });
+
+      qc.invalidateQueries({ queryKey: POSTS_QUERY_KEY });
+      qc.invalidateQueries({ queryKey: MY_POSTS_QUERY_KEY });
     },
   });
 

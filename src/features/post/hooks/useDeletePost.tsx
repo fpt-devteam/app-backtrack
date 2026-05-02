@@ -14,7 +14,6 @@ export const useDeletePost = () => {
     mutationFn: async (request: PostDeleteByIdRequest) => {
       const response = await deletePostApi(request);
       if (!response.success) throw new Error("Delete post failed");
-      return response.data;
     },
 
     onSuccess: async () => {

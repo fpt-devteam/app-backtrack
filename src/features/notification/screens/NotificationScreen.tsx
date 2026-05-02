@@ -89,8 +89,6 @@ const NotificationScreen = () => {
         userId: notification.userId,
       });
 
-      console.log("ScreenPath:", screenPath);
-
       if (screenPath) {
         router.push(screenPath);
       } else {

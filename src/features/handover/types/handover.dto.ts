@@ -1,5 +1,5 @@
 import type { ApiResponse, PagedRequest, PagedResponse } from "@/src/shared/api"
-import type { Handover, ReturnReportStatus } from "./handover.type"
+import type { Handover, HandoverStatus } from "./handover.type"
 
 // ─── C2C Return Report ────────────────────────────────────────────────────────
 
@@ -15,7 +15,7 @@ export type CreateC2CReturnReportResponse = {
 
 // GET /return-reports/c2c  (query params)
 export type GetC2CHandoverRequest = {
-  status?: ReturnReportStatus
+  status?: HandoverStatus
 } & PagedRequest
 
 
@@ -35,7 +35,7 @@ export type CreateOrgReturnReportRequest = {
   ownerPostId?: string
   finderId?: string
   ownerId?: string
-  status: ReturnReportStatus
+  status: HandoverStatus
 }
 
 // GET /return-reports/org/{orgId}  (query params)

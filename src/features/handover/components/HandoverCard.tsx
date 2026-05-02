@@ -6,10 +6,7 @@ import {
   getHandoverTitle,
   getViewerRoleContext,
 } from "@/src/features/handover/components/handover.presentation";
-import type {
-  Handover,
-  ReturnReportStatus,
-} from "@/src/features/handover/types";
+import type { Handover, HandoverStatus } from "@/src/features/handover/types";
 import { AppImage, AppUserAvatar } from "@/src/shared/components";
 import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import React, { useCallback } from "react";
@@ -18,8 +15,9 @@ import { InteractionManager, Text, View } from "react-native";
 import { colors, metrics } from "@/src/shared/theme";
 import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
+import { HandoverStatusBadge } from "./HandoverStatusBadge";
 
-const STATUS_THEME: Record<ReturnReportStatus, { bg: string; text: string }> = {
+const STATUS_THEME: Record<HandoverStatus, { bg: string; text: string }> = {
   Ongoing: { bg: colors.kazan[100], text: colors.kazan[600] },
   Delivered: { bg: colors.info[100], text: colors.info[500] },
   Confirmed: { bg: colors.babu[100], text: colors.babu[500] },
@@ -113,17 +111,7 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
 
         {/* Status Badge */}
         <View className="flex-row items-center gap-xs">
-          <View
-            className="p-xs rounded-full"
-            style={{ backgroundColor: STATUS_THEME[handover.status].bg }}
-          >
-            <Text
-              className="text-xs font-semibold"
-              style={{ color: STATUS_THEME[handover.status].text }}
-            >
-              {statusLabel}
-            </Text>
-          </View>
+          <HandoverStatusBadge status={handover.status} />
 
           {counterpart?.displayName ? (
             <Text
