@@ -6,24 +6,14 @@ import { TextStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 
 const ChatLayout = () => {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="index" options={{ headerShown: true }} />
+    <Stack>
+      <Stack.Screen name="index" />
+
+      <Stack.Screen name="[conversationId]/index" />
 
       <Stack.Screen
-        name="conversations/[conversationId]/index"
+        name="[conversationId]/information"
         options={{
-          headerShown: true,
-        }}
-      />
-
-      <Stack.Screen
-        name="conversations/[conversationId]/information"
-        options={{
-          headerShown: true,
           headerTitle: "Details",
           headerTitleStyle: {
             fontSize: typography.fontSize.base,

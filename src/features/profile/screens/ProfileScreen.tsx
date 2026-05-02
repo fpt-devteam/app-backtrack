@@ -137,7 +137,6 @@ export function ProfileScreen() {
 
   const handleUserQR = useCallback(() => {
     router.push(QR_ROUTE.index);
-    // TODO: Navigate to user QR screen
   }, []);
 
   const handleGetHelp = useCallback(() => {

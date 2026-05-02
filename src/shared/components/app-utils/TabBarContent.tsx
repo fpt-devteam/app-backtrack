@@ -2,7 +2,7 @@ import { useAppUser } from "@/src/features/auth/providers";
 import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
 import { BottomSheet } from "@/src/shared/components/ui/BottomSheet";
-import { AUTH_ROUTE, POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
@@ -177,7 +177,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
             <AppButton
               onPress={() => {
                 setIsPhoneSheetVisible(false);
-                router.push(SHARED_ROUTE.verifyPhoneInput);
+                router.push(AUTH_ROUTE.verifyPhoneInput);
               }}
               title="Verify phone number"
               variant="secondary"

@@ -1,7 +1,7 @@
 import { PostFormField } from "@/src/features/post/components";
 import { AppBackButton } from "@/src/shared/components";
 import { AppButton } from "@/src/shared/components/ui/AppButton";
-import { SHARED_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors, typography } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
 import React, { useState } from "react";
@@ -23,7 +23,7 @@ const VerifyPhoneInputScreen = () => {
     Keyboard.dismiss();
 
     router.push({
-      pathname: SHARED_ROUTE.verifyPhone,
+      pathname: AUTH_ROUTE.verifyPhone,
       params: { phone },
     });
   };

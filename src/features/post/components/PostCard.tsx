@@ -49,7 +49,7 @@ export const PostCard = ({
   }, [item.displayAddress, item.location?.latitude, item.location?.longitude]);
 
   const handleOpenDetail = useCallback(() => {
-    router.push(POST_ROUTE.details(item.id));
+    router.push(POST_ROUTE.detail(item.id));
   }, [item.id]);
 
   return (

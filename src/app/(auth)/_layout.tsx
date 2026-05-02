@@ -15,7 +15,13 @@ function PublicLayout() {
     return <Redirect href={POST_ROUTE.index as RelativePathString} />;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        presentation: "modal",
+        animation: "slide_from_bottom",
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
@@ -69,6 +75,8 @@ function PublicLayout() {
       />
 
       <Stack.Screen name="verify-email" options={{ headerShown: true }} />
+      <Stack.Screen name="verify-phone-input" options={{ headerShown: true }} />
+      <Stack.Screen name="verify-phone" options={{ headerShown: true }} />
     </Stack>
   );
 }
