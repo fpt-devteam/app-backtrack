@@ -1,4 +1,3 @@
-import { useAppUser } from "@/src/features/auth/providers";
 import { IS_QR_FEATURE_MOCK, MOCK_QR_CODE } from "@/src/features/qr/constants";
 import { useGetMyQR } from "@/src/features/qr/hooks";
 import { AppLoader } from "@/src/shared/components/AppLoader";
@@ -34,12 +33,11 @@ export const UserQRCodePressableCard = ({
 }: UserQRCodePressableCardProps) => {
   const { width } = useWindowDimensions();
   const { data: qrCode, isLoading: isQRLoading } = useGetMyQR();
-  const { user } = useAppUser();
 
   const logoSource = useMemo(() => {
-    const url = qrCode?.logoUrl || user?.avatarUrl;
+    const url = qrCode?.logoUrl;
     return url ? { uri: url } : undefined;
-  }, [qrCode?.logoUrl, user?.avatarUrl]);
+  }, [qrCode?.logoUrl]);
 
   const qrValue = useMemo(() => {
     const code = IS_QR_FEATURE_MOCK

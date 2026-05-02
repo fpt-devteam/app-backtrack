@@ -1,8 +1,4 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
-import {
-  IS_QR_FEATURE_MOCK,
-  MOCK_QR_PROFILE,
-} from "@/src/features/qr/constants";
 import { useGetMyQR } from "@/src/features/qr/hooks";
 import { AppUserAvatar } from "@/src/shared/components";
 import { colors } from "@/src/shared/theme/colors";
@@ -14,7 +10,7 @@ import {
   SealCheckIcon,
   ShieldCheckIcon,
 } from "phosphor-react-native";
-import React, { useMemo } from "react";
+import React from "react";
 import type { ViewStyle } from "react-native";
 import { Text, View } from "react-native";
 
@@ -59,21 +55,12 @@ const SafetyBanner = () => (
 const QRProfileScreen = () => {
   const { user } = useAppUser();
   const { data: qrData, isLoading } = useGetMyQR();
+  if (!user || isLoading) return null;
 
-  const memberSince = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PROFILE.memberSince;
-    return MOCK_QR_PROFILE.memberSince;
-  }, []);
-
-  const ownerNote = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PROFILE.ownerNote;
-    return qrData?.note;
-  }, []);
-
-  const phone = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PROFILE.phone;
-    return user?.phone;
-  }, []);
+  const ownerNote = qrData?.note;
+  const phone = user?.phone;
+  const showPhone = qrData?.showPhone;
+  const showEmail = qrData?.showEmail;
 
   return (
     <View className="flex-1 bg-surface p-md gap-md">
@@ -96,10 +83,6 @@ const QRProfileScreen = () => {
         <Text className="text-lg font-normal text-textPrimary">
           {user?.displayName ?? "Unknown"}
         </Text>
-
-        <Text className="text-sm font-thin text-textSecondary">
-          Member since {memberSince}
-        </Text>
       </View>
 
       {/* Contact Info */}
@@ -107,23 +90,27 @@ const QRProfileScreen = () => {
         className="bg-surface rounded-xl border border-divider"
         style={CARD_SHADOW}
       >
-        <View className="flex-row items-center gap-md px-lg py-md">
-          <EnvelopeSimpleIcon
-            size={20}
-            color={colors.secondary}
-            weight="thin"
-          />
-          <Text className="flex-1 text-md font-thin text-textPrimary">
-            {user?.email ?? "—"}
-          </Text>
-        </View>
+        {showEmail && (
+          <View className="flex-row items-center gap-md px-lg py-md">
+            <EnvelopeSimpleIcon
+              size={20}
+              color={colors.secondary}
+              weight="thin"
+            />
+            <Text className="flex-1 text-md font-thin text-textPrimary">
+              {user?.email ?? "—"}
+            </Text>
+          </View>
+        )}
         <View className="h-px bg-divider mx-lg" />
-        <View className="flex-row items-center gap-md px-lg py-md">
-          <PhoneIcon size={20} color={colors.secondary} weight="thin" />
-          <Text className="flex-1 text-md font-thin text-textPrimary">
-            {phone}
-          </Text>
-        </View>
+        {showPhone && (
+          <View className="flex-row items-center gap-md px-lg py-md">
+            <PhoneIcon size={20} color={colors.secondary} weight="thin" />
+            <Text className="flex-1 text-md font-thin text-textPrimary">
+              {phone}
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Owner's Note Card */}

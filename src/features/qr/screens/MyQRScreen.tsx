@@ -1,20 +1,16 @@
 import { useAuth } from "@/src/features/auth/providers";
-import { UserQRCodePressableCard } from "@/src/features/qr/components";
 import type { QRSvgRef } from "@/src/features/qr/components";
-import {
-  IS_QR_FEATURE_MOCK,
-  MOCK_QR_PLAN_DATA,
-} from "@/src/features/qr/constants";
+import { UserQRCodePressableCard } from "@/src/features/qr/components";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
 import { AppTipCard } from "@/src/shared/components";
 import { AppLoader } from "@/src/shared/components/AppLoader";
-import { AUTH_ROUTE } from "@/src/shared/constants";
 import { toast } from "@/src/shared/components/ui/toast";
+import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import * as FileSystem from "expo-file-system/legacy";
-import * as Sharing from "expo-sharing";
 import { router } from "expo-router";
+import * as Sharing from "expo-sharing";
 import { DownloadSimpleIcon, QrCodeIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -35,7 +31,6 @@ const MyQRScreen = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const isSubscripted = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.isActive;
     return !!subscription && subscription.status === SubscriptionStatus.Active;
   }, [subscription]);
 
@@ -130,7 +125,11 @@ const MyQRScreen = () => {
             {isDownloading ? (
               <ActivityIndicator size="small" color={colors.primary} />
             ) : (
-              <DownloadSimpleIcon size={18} color={colors.primary} weight="bold" />
+              <DownloadSimpleIcon
+                size={18}
+                color={colors.primary}
+                weight="bold"
+              />
             )}
             <Text className="text-sm font-normal text-primary">
               {isDownloading ? "Preparing..." : "Download QR"}
