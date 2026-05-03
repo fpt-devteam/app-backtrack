@@ -56,7 +56,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  InteractionManager,
   LayoutChangeEvent,
   Platform,
   ScrollView,
@@ -445,7 +444,6 @@ const ActionPanel = ({
           title="I've Delivered the Item"
           onPress={onActivate}
           loading={isActivating}
-          variant="secondary"
           disabled={isActivating}
         />
       </View>
@@ -670,10 +668,7 @@ const HandoverDetailScreen = () => {
       }
 
       if (conversationId) {
-        router.navigate(CHAT_ROUTE.index);
-        InteractionManager.runAfterInteractions(() => {
-          router.navigate(CHAT_ROUTE.message(conversationId));
-        });
+        router.navigate(CHAT_ROUTE.message(conversationId));
       } else {
         toast.error(
           "Chat not found",

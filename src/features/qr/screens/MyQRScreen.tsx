@@ -1,4 +1,3 @@
-import { useAuth } from "@/src/features/auth/providers";
 import type { QRSvgRef } from "@/src/features/qr/components";
 import { UserQRCodePressableCard } from "@/src/features/qr/components";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
@@ -6,27 +5,15 @@ import { SubscriptionStatus } from "@/src/features/qr/types";
 import { AppTipCard } from "@/src/shared/components";
 import { AppLoader } from "@/src/shared/components/AppLoader";
 import { toast } from "@/src/shared/components/ui/toast";
-import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors } from "@/src/shared/theme/colors";
 import * as FileSystem from "expo-file-system/legacy";
-import { router } from "expo-router";
 import * as Sharing from "expo-sharing";
-import { DownloadSimpleIcon, QrCodeIcon } from "phosphor-react-native";
+import { DownloadSimpleIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 const MyQRScreen = () => {
   const { data: subscription, isLoading } = useGetMySubscription();
-  const { height } = useWindowDimensions();
-  const { isAppReady, isLoggedIn } = useAuth();
-  const isAuthReady = isAppReady && isLoggedIn;
   const qrRef = useRef<QRSvgRef | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
@@ -65,40 +52,6 @@ const MyQRScreen = () => {
       setIsDownloading(false);
     }
   }, [isDownloading]);
-
-  if (!isAuthReady) {
-    return (
-      <SafeAreaView className="flex-1 bg-surface">
-        <View
-          className="flex-1 px-10 gap-10"
-          style={{ paddingTop: height * 0.15, paddingBottom: height * 0.1 }}
-        >
-          <View className="flex-row justify-center">
-            <QrCodeIcon size={128} color={colors.primary} weight="thin" />
-          </View>
-
-          <View className="gap-y-2">
-            <Text className="text-xl font-normal text-textPrimary text-center">
-              Log in to see your QR code
-            </Text>
-            <Text className="text-base font-thin text-textSecondary text-center leading-6">
-              Once you log in, you will find your QR code here.
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            className="w-full py-5 rounded-sm bg-primary items-center justify-center"
-            onPress={() => router.push(AUTH_ROUTE.onboarding)}
-            activeOpacity={0.8}
-          >
-            <Text className="text-base font-normal text-white text-center">
-              Log in or Sign up
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <View className="flex-1 bg-surface px-lg pt-md pb-xl gap-md">

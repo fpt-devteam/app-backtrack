@@ -14,7 +14,7 @@ export default function PostsStackLayout() {
       >
         <Stack.Screen key="index" name="index" />
 
-        <Stack.Screen key="[postId]/index" name="[postId]/index" />
+        <Stack.Screen key="[postId]" name="[postId]" />
 
         <Stack.Screen
           key="search/index"

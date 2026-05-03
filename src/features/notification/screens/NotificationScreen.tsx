@@ -8,7 +8,7 @@ import {
   NOTIFICATION_STATUS,
   type UserNotification,
 } from "@/src/features/notification/types";
-import { AppLoader } from "@/src/shared/components";
+import { AppButton, AppLoader } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
@@ -19,15 +19,44 @@ import {
   FlatList,
   RefreshControl,
   Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
 
+const GuestView = () => {
+  const layout = useWindowDimensions();
+
+  return (
+    <View
+      className="flex-1 bg-surface px-lg gap-lg"
+      style={{ paddingTop: layout.height * 0.15 }}
+    >
+      <View className="flex-row justify-center">
+        <BellRingingIcon size={128} color={colors.secondary} weight="thin" />
+      </View>
+
+      <View className="gap-y-2">
+        <Text className="text-xl font-normal text-textPrimary text-center">
+          Log in to view your notifications
+        </Text>
+
+        <Text className="text-base font-thin text-textSecondary text-center leading-6">
+          Once you log in, you will find all your notifications here.
+        </Text>
+      </View>
+
+      <AppButton
+        onPress={() => router.push(AUTH_ROUTE.onboarding)}
+        title="Login or Sign up"
+        variant="secondary"
+      />
+    </View>
+  );
+};
+
 const NotificationScreen = () => {
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
-  const { height } = useWindowDimensions();
 
   const {
     items: fetchedItems,
@@ -43,38 +72,7 @@ const NotificationScreen = () => {
 
   const { updateStatus } = useUpdateNotificationStatus();
 
-  if (!isAuthReady) {
-    return (
-      <View
-        className="flex-1 bg-surface px-10 gap-10 pt-20"
-        style={{ paddingTop: height * 0.15 }}
-      >
-        <View className="flex-row justify-center">
-          <BellRingingIcon size={128} color={colors.primary} />
-        </View>
-
-        <View className="gap-y-2">
-          <Text className="text-xl font-normal text-textPrimary text-center">
-            Log in to see notifications
-          </Text>
-
-          <Text className="text-base font-thin text-textSecondary text-center leading-6">
-            Once you log in, you will find all your notifications here.
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          className="w-full py-5 rounded-sm bg-primary items-center justify-center"
-          onPress={() => router.push(AUTH_ROUTE.onboarding)}
-          activeOpacity={0.8}
-        >
-          <Text className="text-base font-normal text-white text-center">
-            Log in or Sign up
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  if (!isAuthReady) return <GuestView />;
 
   const handlePress = async (notification: UserNotification) => {
     const screenPath = notification.data?.screenPath as RelativePathString;

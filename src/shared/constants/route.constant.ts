@@ -15,14 +15,11 @@ export const PROFILE_ROUTE = {
   detail: `/(tabs)/profile/detail` as ExternalPathString | RelativePathString,
   edit: `/(tabs)/profile/edit` as ExternalPathString | RelativePathString,
   password: `/(tabs)/profile/password` as ExternalPathString | RelativePathString,
-  menuTab: `/(tabs)/profile/menu-tab` as ExternalPathString | RelativePathString,
+
+  // 
   userPosts: `/(tabs)/profile/user-posts` as ExternalPathString | RelativePathString,
   userPostDetail: (postId: string) => `/(tabs)/profile/user-posts/${postId}` as ExternalPathString | RelativePathString,
-  detailMatch: (postId: string, otherPostId: string) =>
-    `/(tabs)/profile/user-posts/${postId}/${otherPostId}` as ExternalPathString | RelativePathString,
-
   userPostDetailEdit: (postId: string) => `/(tabs)/profile/user-posts/${postId}/edit` as ExternalPathString | RelativePathString,
-  handoverRequest: (postId: string, otherPostId: string) => `/(tabs)/profile/user-posts/${postId}/${otherPostId}/handover-request` as ExternalPathString | RelativePathString,
 } as const;
 
 export const POST_ROUTE = {
@@ -38,12 +35,7 @@ export const POST_ROUTE = {
   timeline: createPath(`${POST_BASE}/create/stepper/timeline`),
   itemDetail: createPath(`${POST_BASE}/create/stepper/detail`),
 
-  matching: (p: string) => createPath(`${POST_BASE}/create/${p}`),
-  detailMatching: (p1: string, p2: string) => createPath(`${POST_BASE}/create/${p1}/${p2}`),
-  detailMatch: (p1: string, p2: string) =>
-    createPath(`${POST_BASE}/${p1}/compare/${p2}`),
-
-  // 
+  // Shared routes
   search: createPath(`${POST_BASE}/search`),
   searchFilter: createPath(`${POST_BASE}/search/filter`),
   searchResult: createPath(`${POST_BASE}/search/result`),
@@ -65,10 +57,7 @@ export const QR_ROUTE = {
 
 export const HANDOVER_ROUTE = {
   index: createPath(HANDOVER_BASE),
-  detail: (handoverId: string) =>
-    createPath(`${HANDOVER_BASE}/${handoverId}`),
-  all: (filter: `ongoing` | `past`) =>
-    createPath(`${HANDOVER_BASE}/all?filter=${filter}`),
+  all: (filter: `ongoing` | `past`) => createPath(`${HANDOVER_BASE}/all?filter=${filter}`),
 } as const;
 
 export const AUTH_ROUTE = {
@@ -79,4 +68,12 @@ export const AUTH_ROUTE = {
   passwordReset: createPath(`${AUTH_BASE}/password-reset`),
   verifyPhone: createPath(`${AUTH_BASE}/verify-phone`),
   verifyPhoneInput: createPath(`${AUTH_BASE}/verify-phone-input`),
+} as const;
+
+export const SHARED_ROUTE = {
+  matching: (postId: string) => createPath(`/(shared)/matching/${postId}`),
+  matchingDetail: (postId: string, otherPostId: string) => createPath(`/(shared)/matching/${postId}/${otherPostId}`),
+
+  handoverRequest: (postId: string, otherPostId: string) => createPath(`/(shared)/matching/${postId}/${otherPostId}/handover-request`),
+  handoverDetail: (handoverId: string) => createPath(`/(shared)/handover/${handoverId}`),
 } as const;

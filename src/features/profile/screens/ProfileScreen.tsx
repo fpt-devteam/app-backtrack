@@ -1,7 +1,7 @@
 import { useAppUser, useAuth } from "@/src/features/auth/providers";
 import { socketChatService } from "@/src/features/chat/services";
 import { useUnregisterDeviceMutation } from "@/src/features/notification/hooks";
-import { AppUserAvatar } from "@/src/shared/components";
+import { AppButton, AppUserAvatar } from "@/src/shared/components";
 import { AUTH_ROUTE, PROFILE_ROUTE, QR_ROUTE } from "@/src/shared/constants";
 import { auth } from "@/src/shared/lib/firebase";
 import { colors } from "@/src/shared/theme";
@@ -23,17 +23,14 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
   useWindowDimensions,
+  View,
 } from "react-native";
 
 import { UserSubscriptionPlanPressableCard } from "@/src/features/qr/components";
 import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
 import type { ViewStyle } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-// ─── Shared Styles ───────────────────────────────────────────────
 
 const CARD_SHADOW: ViewStyle = {
   shadowColor: colors.black,
@@ -42,8 +39,6 @@ const CARD_SHADOW: ViewStyle = {
   shadowRadius: 8,
   elevation: 4,
 };
-
-// ─── Sub-components ──────────────────────────────────────────────
 
 type MenuRowProps = {
   icon: ComponentType<IconProps>;
@@ -85,11 +80,11 @@ const GuestView = () => {
 
   return (
     <View
-      className="flex-1 bg-surface px-10 gap-10 pt-20"
+      className="flex-1 bg-surface px-lg gap-lg"
       style={{ paddingTop: layout.height * 0.15 }}
     >
       <View className="flex-row justify-center">
-        <UserCircleIcon size={128} color={colors.primary} />
+        <UserCircleIcon size={128} color={colors.secondary} weight="thin" />
       </View>
 
       <View className="gap-y-2">
@@ -102,20 +97,16 @@ const GuestView = () => {
         </Text>
       </View>
 
-      <TouchableOpacity
-        className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+      <AppButton
         onPress={() => router.push(AUTH_ROUTE.onboarding)}
-        activeOpacity={0.8}
-      >
-        <Text className="text-base font-normal text-white text-center">
-          Log in or Sign up
-        </Text>
-      </TouchableOpacity>
+        title="Login or Sign up"
+        variant="secondary"
+      />
     </View>
   );
 };
 
-export function ProfileScreen() {
+function ProfileScreen() {
   const layout = useWindowDimensions();
   const { user } = useAppUser();
   const { isAppReady, isLoggedIn } = useAuth();
@@ -176,19 +167,16 @@ export function ProfileScreen() {
 
   if (!isAuthReady) return <GuestView />;
 
-  return (
-    <SafeAreaView className="flex-1 bg-surface">
+  const renderContent = () => {
+    if (!isAuthReady) return <GuestView />;
+
+    return (
       <ScrollView
         className="flex-1 bg-surface"
         contentContainerClassName="px-lg pt-md pb-xl"
         contentContainerStyle={{ paddingBottom: layout.height * 0.1 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title */}
-        <View className="pt-lg pb-lg">
-          <Text className="text-3xl font-normal text-textPrimary">Profile</Text>
-        </View>
-
         {/* Profile Card */}
         <TouchableOpacity
           onPress={handleShowProfile}
@@ -255,6 +243,10 @@ export function ProfileScreen() {
           </Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
-  );
+    );
+  };
+
+  return <View className="flex-1 bg-surface">{renderContent()}</View>;
 }
+
+export default ProfileScreen;

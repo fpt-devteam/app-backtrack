@@ -5,7 +5,6 @@ import type {
   BasePost,
   MatchEvidence,
   MatchStrength,
-  SimilarPost,
 } from "@/src/features/post/types";
 import { PostType } from "@/src/features/post/types";
 
@@ -16,7 +15,7 @@ import {
   AppInlineError,
   AppSplashScreen,
 } from "@/src/shared/components";
-import { HANDOVER_ROUTE, PROFILE_ROUTE } from "@/src/shared/constants";
+import { SHARED_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { formatCompareTimeGap } from "@/src/shared/utils/datetime.utils";
 import { formatLocationGap } from "@/src/shared/utils/location.utils";
@@ -39,39 +38,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LatLng } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ComparePostsScreenProps {
   postId: string;
   otherPostId: string;
 }
-
-type CompareIdentityRow = {
-  label: string;
-  leftValue: string;
-  rightValue: string;
-};
-
-type DateInput = Date | string | null | undefined;
-
-type ComparePostLike = {
-  postType: PostType;
-  postTitle?: string | null;
-  category?: string;
-  imageUrls?: string[];
-  displayAddress?: string | null;
-  eventTime?: DateInput;
-  item?: {
-    itemName?: string;
-    category?: string;
-  };
-  location: LatLng;
-  cardDetail?: SimilarPost["cardDetail"];
-  personalBelongingDetail?: SimilarPost["personalBelongingDetail"];
-  electronicDetail?: SimilarPost["electronicDetail"];
-  otherDetail?: SimilarPost["otherDetail"];
-};
 
 type EvidenceRow = {
   key: string;
@@ -303,11 +275,11 @@ export const ComparePostsScreen = ({
     }
 
     if (existingHandoverId) {
-      router.push(HANDOVER_ROUTE.detail(existingHandoverId));
+      router.navigate(SHARED_ROUTE.handoverDetail(existingHandoverId));
       return;
     }
 
-    router.push(PROFILE_ROUTE.handoverRequest(postId, otherPostId));
+    router.push(SHARED_ROUTE.handoverRequest(postId, otherPostId));
   };
 
   if (isLoadingMatch || isLoadingPost1) return <AppSplashScreen />;

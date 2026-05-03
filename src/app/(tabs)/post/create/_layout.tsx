@@ -35,8 +35,6 @@ const PostCreateLayout = () => {
       />
 
       <Stack.Screen name="stepper" />
-
-      <Stack.Screen name="[postId]" />
     </Stack>
   );
 };

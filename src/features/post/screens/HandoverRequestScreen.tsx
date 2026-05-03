@@ -16,7 +16,6 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
@@ -91,14 +90,8 @@ export default function HandoverRequestScreen() {
       });
 
       if (res) {
-        router.dismissAll();
-        router.navigate(HANDOVER_ROUTE.index);
-
-        setTimeout(() => {
-          router.push(HANDOVER_ROUTE.detail(res.id));
-        }, 100);
+        router.back();
         toast.success("Handover request sent successfully!");
-        return;
       } else {
         toast.error("Failed to create handover request.");
       }
