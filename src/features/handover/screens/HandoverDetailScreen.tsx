@@ -445,7 +445,6 @@ const ActionPanel = ({
           title="I've Delivered the Item"
           onPress={onActivate}
           loading={isActivating}
-          variant="secondary"
           disabled={isActivating}
         />
       </View>

@@ -42,11 +42,11 @@ export const MenuBottomSheet = ({
           >
             <View
               className="w-12 h-12 rounded-full items-center justify-center"
-              style={{ backgroundColor: colors.secondary }}
+              style={{ backgroundColor: colors.primary }}
             >
               <option.icon
                 size={20}
-                color={colors.secondaryForeground}
+                color={colors.primaryForeground}
                 weight="thin"
               />
             </View>
