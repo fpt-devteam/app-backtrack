@@ -10,4 +10,5 @@ export { usePostCreationStore } from './usePostCreationStore'
 export { usePosts } from './usePosts'
 export { usePostSearchStore } from './usePostSearchStore'
 export { useSearchPost } from './useSearchPost'
+export { useUpdatePost } from './useUpdatePost'
 
