@@ -60,9 +60,9 @@ export const AppImage = ({
         style,
         width != null || height != null ? { width, height } : undefined,
       ]}
-      blurRadius={isBlurred ? 300 : 0}
+      // blurRadius={isBlurred ? 300 : 0}
       cachePolicy={"memory-disk"}
-      placeholder={{ blurhash }}
+      // placeholder={{ blurhash }}
       transition={1000}
     />
   );
