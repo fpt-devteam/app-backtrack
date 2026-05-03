@@ -4,6 +4,5 @@ export { default as ProfileMenuTabScreen } from "@/src/features/profile/screens/
 export { default as ProfilePublicScreen } from "@/src/features/profile/screens/ProfilePublicScreen";
 export { default as ProfileUpdatePasswordScreen } from "@/src/features/profile/screens/ProfileUpdatePasswordScreen";
 export { default as UserPostScreen } from "@/src/features/profile/screens/UserPostScreen";
-
-export { ProfileScreen } from '@/src/features/profile/screens/ProfileScreen';
+export { default as ProfileScreen } from '@/src/features/profile/screens/ProfileScreen';
 

@@ -6,8 +6,22 @@ import { TextStyle } from "react-native";
 
 const ProfileLayout = () => {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          headerTitle: "Profile",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
 
       <Stack.Screen
         name="edit"
@@ -47,7 +61,6 @@ const ProfileLayout = () => {
       <Stack.Screen
         name="detail"
         options={{
-          headerShown: false,
           title: "Profile",
           animation: "slide_from_right",
           presentation: "card",

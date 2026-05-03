@@ -1,12 +1,16 @@
-import { useAppUser } from "@/src/features/auth/providers/user.provider";
+import { useAuth } from "@/src/features/auth/providers";
 import { HandoverCard } from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
-import { AppInlineError } from "@/src/shared/components";
+import { AppButton, AppInlineError } from "@/src/shared/components";
 import EmptyList from "@/src/shared/components/ui/EmptyList";
-import { HANDOVER_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack } from "expo-router";
-import { ArrowRightIcon, PackageIcon } from "phosphor-react-native";
+import {
+  ArrowRightIcon,
+  HandshakeIcon,
+  PackageIcon,
+} from "phosphor-react-native";
 import React, { useMemo } from "react";
 import {
   ActivityIndicator,
@@ -15,10 +19,9 @@ import {
   Text,
   TextStyle,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
-
-// ─── Section header ────────────────────────────────────────────────────────────
 
 type SectionHeaderProps = {
   title: string;
@@ -50,10 +53,39 @@ const SeeAllRow = ({ filter }: SeeAllRowProps) => (
   </TouchableOpacity>
 );
 
-// ─── Main screen ───────────────────────────────────────────────────────────────
+const GuestView = () => {
+  const layout = useWindowDimensions();
+
+  return (
+    <View
+      className="flex-1 bg-surface px-lg gap-lg"
+      style={{ paddingTop: layout.height * 0.15 }}
+    >
+      <View className="flex-row justify-center">
+        <HandshakeIcon size={128} color={colors.secondary} weight="thin" />
+      </View>
+
+      <View className="gap-y-2">
+        <Text className="text-xl font-normal text-textPrimary text-center">
+          Log in to view your conversations
+        </Text>
+
+        <Text className="text-base font-thin text-textSecondary text-center leading-6">
+          Once you log in, you will find all your conversations here.
+        </Text>
+      </View>
+
+      <AppButton
+        onPress={() => router.push(AUTH_ROUTE.onboarding)}
+        title="Login or Sign up"
+        variant="secondary"
+      />
+    </View>
+  );
+};
+
 const HandoverScreen = () => {
-  const { user } = useAppUser();
-  const currentUserId = user?.id ?? "";
+  const { isAppReady, isLoggedIn } = useAuth();
 
   const {
     data: handovers,
@@ -63,7 +95,6 @@ const HandoverScreen = () => {
     refetch,
   } = useGetC2CReturnReports();
 
-  // In-progress: Ongoing (coordinating) + Delivered (awaiting confirmation)
   const inProgressHandovers = useMemo(
     () =>
       handovers.filter(
@@ -72,7 +103,6 @@ const HandoverScreen = () => {
     [handovers],
   );
 
-  // Past: all completed or closed
   const pastHandovers = useMemo(
     () =>
       handovers.filter(
@@ -83,6 +113,117 @@ const HandoverScreen = () => {
       ),
     [handovers],
   );
+
+  const renderContent = () => {
+    if (!isAppReady || !isLoggedIn) {
+      return <GuestView />;
+    }
+
+    if (isLoading) {
+      return (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View className="px-lg pt-md">
+          <AppInlineError message={error.message} />
+        </View>
+      );
+    }
+
+    return (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={() => {
+              void refetch();
+            }}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
+          />
+        }
+      >
+        {/* In Progress section */}
+        <View className="border-b-8 pb-sm border-divider">
+          <SectionHeader
+            title="In Progress"
+            subtitle="These handovers still need delivery, confirmation, or review."
+            count={inProgressHandovers.length}
+          />
+
+          <View className="px-lg">
+            {inProgressHandovers.length === 0 ? (
+              <EmptyList
+                icon={
+                  <PackageIcon
+                    size={96}
+                    color={colors.secondary}
+                    weight="thin"
+                  />
+                }
+                title="No handovers need attention"
+                subtitle="When a chat turns into a return, the active handover will appear here."
+              />
+            ) : (
+              <View className="gap-md2">
+                {inProgressHandovers.slice(0, 2).map((handover) => (
+                  <HandoverCard key={handover.id} handover={handover} />
+                ))}
+
+                {inProgressHandovers.length > 2 && (
+                  <SeeAllRow filter="ongoing" />
+                )}
+              </View>
+            )}
+          </View>
+        </View>
+
+        {/* ── Past section */}
+        <View className="flex-1">
+          <SectionHeader
+            title="Past"
+            subtitle="Completed or closed handovers you may want to reference later."
+          />
+
+          <View className="flex-1 px-lg">
+            {pastHandovers.length === 0 ? (
+              <View className="flex-1 items-center justify-center">
+                <EmptyList
+                  icon={
+                    <PackageIcon
+                      size={96}
+                      color={colors.secondary}
+                      weight="thin"
+                    />
+                  }
+                  title="No completed handovers yet"
+                  subtitle="Closed handovers will appear here once a return is completed or resolved."
+                />
+              </View>
+            ) : (
+              <View className="gap-md2">
+                {pastHandovers.slice(0, 2).map((handover) => (
+                  <HandoverCard key={handover.id} handover={handover} />
+                ))}
+
+                {pastHandovers.length > 2 && <SeeAllRow filter="past" />}
+              </View>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    );
+  };
 
   return (
     <View className="flex-1 bg-surface">
@@ -95,110 +236,7 @@ const HandoverScreen = () => {
           },
         }}
       />
-
-      {/* ── Loading ──────────────────────────────────────────────────── */}
-      {isLoading && (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      )}
-
-      {/* ── Error ────────────────────────────────────────────────────── */}
-      {!isLoading && error && (
-        <View className="px-lg pt-md">
-          <AppInlineError message={error.message} />
-        </View>
-      )}
-
-      {/* Content */}
-      {!isLoading && (!error || handovers.length > 0) && (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingBottom: metrics.tabBar.height + metrics.spacing.lg,
-          }}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetching}
-              onRefresh={() => {
-                void refetch();
-              }}
-              tintColor={colors.primary}
-              colors={[colors.primary]}
-            />
-          }
-        >
-          {/* In Progress section */}
-          <View className="border-b-8 pb-sm border-divider">
-            <SectionHeader
-              title="In Progress"
-              subtitle="These handovers still need delivery, confirmation, or review."
-              count={inProgressHandovers.length}
-            />
-
-            <View className="px-lg">
-              {inProgressHandovers.length === 0 ? (
-                <EmptyList
-                  icon={
-                    <PackageIcon
-                      size={96}
-                      color={colors.secondary}
-                      weight="thin"
-                    />
-                  }
-                  title="No handovers need attention"
-                  subtitle="When a chat turns into a return, the active handover will appear here."
-                />
-              ) : (
-                <View className="gap-md2">
-                  {inProgressHandovers.slice(0, 2).map((handover) => (
-                    <HandoverCard key={handover.id} handover={handover} />
-                  ))}
-
-                  {inProgressHandovers.length > 2 && (
-                    <SeeAllRow filter="ongoing" />
-                  )}
-                </View>
-              )}
-            </View>
-          </View>
-
-          {/* ── Past section */}
-          <View className="flex-1">
-            <SectionHeader
-              title="Past"
-              subtitle="Completed or closed handovers you may want to reference later."
-            />
-
-            <View className="flex-1 px-lg">
-              {pastHandovers.length === 0 ? (
-                <View className="flex-1 items-center justify-center">
-                  <EmptyList
-                    icon={
-                      <PackageIcon
-                        size={96}
-                        color={colors.secondary}
-                        weight="thin"
-                      />
-                    }
-                    title="No completed handovers yet"
-                    subtitle="Closed handovers will appear here once a return is completed or resolved."
-                  />
-                </View>
-              ) : (
-                <View className="gap-md2">
-                  {pastHandovers.slice(0, 2).map((handover) => (
-                    <HandoverCard key={handover.id} handover={handover} />
-                  ))}
-
-                  {pastHandovers.length > 2 && <SeeAllRow filter="past" />}
-                </View>
-              )}
-            </View>
-          </View>
-        </ScrollView>
-      )}
+      {renderContent()}
     </View>
   );
 };

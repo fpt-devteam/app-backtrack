@@ -2,7 +2,7 @@ import { useAuth } from "@/src/features/auth/providers";
 import { AppBackButton } from "@/src/shared/components";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, typography } from "@/src/shared/theme";
-import { Redirect, RelativePathString, Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import React from "react";
 import { TextStyle } from "react-native";
 
@@ -11,8 +11,7 @@ function PublicLayout() {
 
   if (!isAppReady) return null;
 
-  if (isLoggedIn)
-    return <Redirect href={POST_ROUTE.index as RelativePathString} />;
+  if (isLoggedIn) return <Redirect href={POST_ROUTE.index} />;
 
   return (
     <Stack
@@ -23,7 +22,7 @@ function PublicLayout() {
       }}
     >
       <Stack.Screen
-        name="index"
+        name="onboarding"
         options={{
           headerShown: true,
           headerRight: () => <AppBackButton type="xIcon" />,

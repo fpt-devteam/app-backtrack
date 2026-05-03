@@ -23,17 +23,14 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
   useWindowDimensions,
+  View,
 } from "react-native";
 
 import { UserSubscriptionPlanPressableCard } from "@/src/features/qr/components";
 import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
 import type { ViewStyle } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-// ─── Shared Styles ───────────────────────────────────────────────
 
 const CARD_SHADOW: ViewStyle = {
   shadowColor: colors.black,
@@ -42,8 +39,6 @@ const CARD_SHADOW: ViewStyle = {
   shadowRadius: 8,
   elevation: 4,
 };
-
-// ─── Sub-components ──────────────────────────────────────────────
 
 type MenuRowProps = {
   icon: ComponentType<IconProps>;
@@ -86,7 +81,7 @@ const GuestView = () => {
   return (
     <View
       className="flex-1 bg-surface px-lg gap-lg"
-      style={{ paddingTop: layout.height * 0.27 }}
+      style={{ paddingTop: layout.height * 0.15 }}
     >
       <View className="flex-row justify-center">
         <UserCircleIcon size={128} color={colors.secondary} weight="thin" />
@@ -111,7 +106,7 @@ const GuestView = () => {
   );
 };
 
-export function ProfileScreen() {
+function ProfileScreen() {
   const layout = useWindowDimensions();
   const { user } = useAppUser();
   const { isAppReady, isLoggedIn } = useAuth();
@@ -172,19 +167,16 @@ export function ProfileScreen() {
 
   if (!isAuthReady) return <GuestView />;
 
-  return (
-    <SafeAreaView className="flex-1 bg-surface">
+  const renderContent = () => {
+    if (!isAuthReady) return <GuestView />;
+
+    return (
       <ScrollView
         className="flex-1 bg-surface"
         contentContainerClassName="px-lg pt-md pb-xl"
         contentContainerStyle={{ paddingBottom: layout.height * 0.1 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title */}
-        <View className="pt-lg pb-lg">
-          <Text className="text-3xl font-normal text-textPrimary">Profile</Text>
-        </View>
-
         {/* Profile Card */}
         <TouchableOpacity
           onPress={handleShowProfile}
@@ -251,6 +243,10 @@ export function ProfileScreen() {
           </Text>
         </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
-  );
+    );
+  };
+
+  return <View className="flex-1 bg-surface">{renderContent()}</View>;
 }
+
+export default ProfileScreen;

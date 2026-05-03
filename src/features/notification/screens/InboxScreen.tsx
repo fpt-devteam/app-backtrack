@@ -82,10 +82,9 @@ const InboxScreen = () => {
           headerShown: true,
           headerTitle: "Inbox",
           headerTitleStyle: {
-            fontSize: typography.fontSize["3xl"] as TextStyle["fontSize"],
+            fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
           },
-          headerShadowVisible: false,
         }}
       />
 
