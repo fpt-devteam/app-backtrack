@@ -7,3 +7,4 @@ export const POST_ANALYZE_IMAGE_KEY = ["post-analyze-image"] as const;
 export const POST_SEARCH_QUERY_KEY = ["posts", "search"] as const;
 export const POST_SUGGESTIONS_QUERY_KEY = ["posts", "suggestions"] as const;
 export const MATCHED_POST_IDS_QUERY_KEY = ["matched-post-ids"] as const;
+export const POST_UPDATE_KEY = ["post-update"] as const;

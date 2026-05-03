@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -12,6 +12,7 @@ export const POST_API = {
   analyzeImage: "/api/core/post-image/analyze",
   getAllMyPost: "/api/core/posts/me",
   getSubcategories: "/api/core/subcategories",
+  update: (postId: string) => `/api/core/posts/${postId}`,
 } as const;
 
 export async function getFeedPostsApi(params: PostFeedRequest) {
@@ -62,5 +63,10 @@ export async function getPostSubcategoriesApi() {
 export async function deletePostApi(req: PostDeleteByIdRequest) {
   const response = await privateClient.patch(POST_API.archive(req.postId));
   if (response.status === 204) return { success: true };
+  return response.data;
+}
+
+export async function updatePostApi(postId: string, req: PostUpdateRequest) {
+  const response = await privateClient.put<PostCreateResponse>(POST_API.update(postId), req);
   return response.data;
 } 
