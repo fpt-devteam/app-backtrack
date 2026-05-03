@@ -14,6 +14,7 @@ import {
 import {
   useActivateC2CReturnReport,
   useGetC2CReturnReportById,
+  useOwnerCloseC2CReturnReport,
   useOwnerConfirmC2CReturnReport,
   useOwnerRejectC2CReturnReport,
 } from "@/src/features/handover/hooks";
@@ -65,16 +66,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-type StatusTheme = { color: string; bgColor: string };
-
-const STATUS_THEME: Record<HandoverStatus, StatusTheme> = {
-  Ongoing: { color: colors.kazan[500], bgColor: colors.kazan[100] },
-  Delivered: { color: colors.info[500], bgColor: colors.info[50] },
-  Confirmed: { color: colors.babu[500], bgColor: colors.babu[100] },
-  Rejected: { color: colors.error[500], bgColor: colors.error[100] },
-  Closed: { color: colors.hof[400], bgColor: colors.hof[100] },
-};
 
 type StepState = "done" | "active" | "pending";
 
@@ -389,9 +380,11 @@ type ActionPanelProps = {
   onActivate: () => void;
   onConfirm: () => void;
   onReject: () => void;
+  onClose: () => void;
   isActivating: boolean;
   isConfirming: boolean;
   isRejecting: boolean;
+  isClosing: boolean;
 };
 
 const ACTION_PANEL_MIN_HEIGHT = 120;
@@ -403,9 +396,11 @@ const ActionPanel = ({
   onActivate,
   onConfirm,
   onReject,
+  onClose,
   isActivating,
   isConfirming,
   isRejecting,
+  isClosing,
 }: ActionPanelProps) => {
   const { status } = report;
 
@@ -440,12 +435,29 @@ const ActionPanel = ({
   if (status === "Ongoing" && isFinder) {
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
-        <AppButton
-          title="I've Delivered the Item"
-          onPress={onActivate}
-          loading={isActivating}
-          disabled={isActivating}
-        />
+        <View className="flex-row gap-md">
+          {/* Close Handover Button */}
+          <View className="flex-1">
+            <AppButton
+              title="Close Handover"
+              onPress={onClose}
+              disabled={isConfirming || isRejecting || isClosing}
+              loading={isClosing}
+              variant="outline"
+            />
+          </View>
+
+          {/* Deliver Handover Button */}
+          <View className="flex-1">
+            <AppButton
+              title="Mark Delivered"
+              onPress={onActivate}
+              loading={isActivating}
+              disabled={isActivating}
+              variant="secondary"
+            />
+          </View>
+        </View>
       </View>
     );
   }
@@ -521,9 +533,9 @@ const HandoverDetailScreen = () => {
   const { activate, isActivating } = useActivateC2CReturnReport();
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
   const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
+  const { ownerClose, isClosing } = useOwnerCloseC2CReturnReport();
 
   const [isActivatingHandover, setIsActivatingHandover] = useState(false);
-
   const [isOpeningChat, setIsOpeningChat] = useState(false);
 
   const [actionPanelHeight, setActionPanelHeight] = useState(
@@ -731,7 +743,6 @@ const HandoverDetailScreen = () => {
               );
 
               toast.success("Success", "Item marked as delivered securely.");
-              router.back();
             } catch (error) {
               console.error("Handover error:", error);
               toast.error(
@@ -746,6 +757,38 @@ const HandoverDetailScreen = () => {
       ],
     );
   }, [report, activate]);
+
+  const handleClose = useCallback(() => {
+    if (!report) return;
+
+    Alert.alert(
+      "Confirm Close Handover",
+      " Are you sure you want to close this handover? This action cannot be undone and should only be used if the item exchange cannot be completed.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Close Handover",
+          style: "default",
+          onPress: async () => {
+            try {
+              await ownerClose(report.id);
+
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success,
+              );
+
+              toast.success("Success", "Item closed securely.");
+            } catch (error) {
+              toast.error(
+                "Error",
+                "Could not close handover. Please try again.",
+              );
+            }
+          },
+        },
+      ],
+    );
+  }, [report]);
 
   const handleConfirm = useCallback(() => {
     if (!report) return;
@@ -1050,6 +1093,8 @@ const HandoverDetailScreen = () => {
             onActivate={handleActivate}
             onConfirm={handleConfirm}
             onReject={handleReject}
+            onClose={handleClose}
+            isClosing={isClosing}
             isActivating={isActivating || isActivatingHandover}
             isConfirming={isConfirming}
             isRejecting={isRejecting}

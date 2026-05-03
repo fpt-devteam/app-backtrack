@@ -19,11 +19,10 @@ export const RETURN_REPORT_API = {
   c2cActivate: (id: string) => `/api/core/return-reports/c2c/${id}/deliver`,
   c2cConfirm: (id: string) => `/api/core/return-reports/c2c/${id}/confirm`,
   c2cReject: (id: string) => `/api/core/return-reports/c2c/${id}/reject`,
+  c2cClose: (id: string) => `/api/core/return-reports/c2c/${id}/close`,
   c2cByPartner: (partnerId: string) => `/api/core/return-reports/c2c/partner/${partnerId}`,
   c2cPosts: `/api/core/return-reports/c2c/posts`,
 } as const;
-
-// ─── C2C ─────────────────────────────────────────────────────────────────────
 
 export async function getC2CReturnReportsApi(params?: GetC2CHandoverRequest) {
   const response = await privateClient.get<C2CHandoversResponse>(
@@ -88,6 +87,17 @@ export async function confirmC2CReturnReportApi(id: string) {
 export async function rejectC2CReturnReportApi(id: string) {
   const response = await privateClient.patch<C2CReturnReportResponse>(
     RETURN_REPORT_API.c2cReject(id),
+  );
+  return response.data;
+}
+
+/**
+ * Closes a handover (Delivered → Closed).
+ * Must be called by the Owner when the handover status is Delivered.
+ */
+export async function closeC2CReturnReportApi(id: string) {
+  const response = await privateClient.patch<C2CReturnReportResponse>(
+    RETURN_REPORT_API.c2cClose(id),
   );
   return response.data;
 }
