@@ -3,7 +3,7 @@ import { useMatchingPost } from "@/src/features/post/hooks";
 import { MatchingErrorScreen } from "@/src/features/post/screens/MatchingErrorScreen";
 import { AppBackButton } from "@/src/shared/components";
 import { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
-import { POST_ROUTE } from "@/src/shared/constants/route.constant";
+import { SHARED_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors } from "@/src/shared/theme/colors";
 import { typography } from "@/src/shared/theme/typography";
 import { getErrorMessage } from "@/src/shared/utils";
@@ -49,12 +49,7 @@ export const MatchingScreen = () => {
     );
 
   const handleCancel = () => {
-    const parent = navigation.getParent();
-    if (parent) {
-      parent.getParent()?.goBack();
-    } else {
-      router.back();
-    }
+    router.replace("/");
   };
 
   if (error)
@@ -88,7 +83,7 @@ export const MatchingScreen = () => {
             <SimilarPostCard
               item={item}
               onPress={() => {
-                router.push(POST_ROUTE.detailMatching(postId, item.id));
+                router.push(SHARED_ROUTE.matchingDetail(postId, item.id));
               }}
             />
           )}

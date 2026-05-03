@@ -21,7 +21,7 @@ import {
   type MenuOption,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { PROFILE_ROUTE } from "@/src/shared/constants";
+import { SHARED_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors, metrics } from "@/src/shared/theme";
 import { formatIsoDate, toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -569,7 +569,9 @@ export const MyPostDetailScreen = () => {
                       <SimilarPostCard
                         item={p}
                         onPress={() => {
-                          router.push(PROFILE_ROUTE.detailMatch(post.id, p.id));
+                          router.push(
+                            SHARED_ROUTE.matchingDetail(post.id, p.id),
+                          );
                         }}
                       />
                     </View>

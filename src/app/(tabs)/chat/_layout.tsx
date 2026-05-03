@@ -9,8 +9,6 @@ const ChatLayout = () => {
     <Stack>
       <Stack.Screen name="index" />
 
-      <Stack.Screen name="[conversationId]/index" />
-
       <Stack.Screen
         name="[conversationId]/information"
         options={{

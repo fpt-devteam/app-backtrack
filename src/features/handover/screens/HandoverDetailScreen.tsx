@@ -56,7 +56,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  InteractionManager,
   LayoutChangeEvent,
   Platform,
   ScrollView,
@@ -669,10 +668,7 @@ const HandoverDetailScreen = () => {
       }
 
       if (conversationId) {
-        router.navigate(CHAT_ROUTE.index);
-        InteractionManager.runAfterInteractions(() => {
-          router.navigate(CHAT_ROUTE.message(conversationId));
-        });
+        router.navigate(CHAT_ROUTE.message(conversationId));
       } else {
         toast.error(
           "Chat not found",

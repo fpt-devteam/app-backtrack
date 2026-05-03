@@ -8,9 +8,10 @@ const UserPostLayout = () => {
         name="index"
         options={{ headerShown: true, headerBackVisible: false }}
       />
+
       <Stack.Screen
         name="[postId]"
-        options={{ headerShown: false, headerBackVisible: false }}
+        options={{ headerShown: true, headerBackVisible: false }}
       />
     </Stack>
   );

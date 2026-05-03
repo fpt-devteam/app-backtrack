@@ -19,7 +19,7 @@ import {
 } from "@/src/shared/components";
 import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
 import { toast } from "@/src/shared/components/ui/toast";
-import { POST_ROUTE } from "@/src/shared/constants";
+import { POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { ensureMediaPermission } from "@/src/shared/services";
 import { colors, typography } from "@/src/shared/theme";
 import {
@@ -227,7 +227,8 @@ const PostCreationStepperLayout = () => {
         toast.error("Failed to create post. Please try again.");
         return;
       }
-      router.push(POST_ROUTE.matching(postId));
+      
+      router.push(SHARED_ROUTE.matching(postId));
     } catch (e) {
       console.log("Submit failed", e);
       toast.error("Failed to create post. Please try again.");

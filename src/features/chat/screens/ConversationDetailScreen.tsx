@@ -28,7 +28,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CHAT_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { router, Stack } from "expo-router";
 
 type Props = {
