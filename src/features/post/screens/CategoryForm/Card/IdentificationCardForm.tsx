@@ -7,13 +7,16 @@ import { DatePickerField } from "@/src/shared/components";
 import React from "react";
 import { Text, View } from "react-native";
 
-const CompanyCardForm = () => {
+const IdentificationCardForm = () => {
   const cardDetail = usePostCreationStore((state) => state.cardDetail);
   const setCardNumberMasked = usePostCreationStore(
     (state) => state.setCardNumberMasked,
   );
   const setCardHolderName = usePostCreationStore(
     (state) => state.setCardHolderName,
+  );
+  const setCardDateOfBirth = usePostCreationStore(
+    (state) => state.setCardDateOfBirth,
   );
   const setCardIssueDate = usePostCreationStore(
     (state) => state.setCardIssueDate,
@@ -54,7 +57,7 @@ const CompanyCardForm = () => {
         <View className="border-t" />
 
         <PostFormField
-          label="Employee ID"
+          label="ID Number"
           value={cardDetail.cardNumberMasked ?? ""}
           onChange={setCardNumberMasked}
         />
@@ -70,36 +73,43 @@ const CompanyCardForm = () => {
         <View className="border-t" />
 
         <PostFormField
-          label="Company Name"
+          label="Issuing Authority"
           value={cardDetail.issuingAuthority ?? ""}
           onChange={setCardIssuingAuthority}
         />
       </View>
 
-      <View className="border rounded-md overflow-hidden">
-        <View className="p-md2 gap-sm">
-          <Text className="text-textPrimary font-normal text-lg tracking-tight">
-            Issue Date
-          </Text>
-          <DatePickerField
-            value={cardDetail.issueDate}
-            onChange={setCardIssueDate}
-            placeholder="mm/dd/yyyy"
-          />
-        </View>
+      <View className="gap-sm">
+        <Text className="text-textPrimary font-normal text-lg tracking-tight">
+          Date of Birth
+        </Text>
+        <DatePickerField
+          value={cardDetail.dateOfBirth}
+          onChange={setCardDateOfBirth}
+          placeholder="mm/dd/yyyy"
+        />
+      </View>
 
-        <View className="border-t" />
+      <View className="gap-sm">
+        <Text className="text-textPrimary font-normal text-lg tracking-tight">
+          Issue Date
+        </Text>
+        <DatePickerField
+          value={cardDetail.issueDate}
+          onChange={setCardIssueDate}
+          placeholder="mm/dd/yyyy"
+        />
+      </View>
 
-        <View className="p-md2 gap-sm">
-          <Text className="text-textPrimary font-normal text-lg tracking-tight">
-            Expiry Date
-          </Text>
-          <DatePickerField
-            value={cardDetail.expiryDate}
-            onChange={setCardExpiryDate}
-            placeholder="mm/dd/yyyy"
-          />
-        </View>
+      <View className="gap-sm">
+        <Text className="text-textPrimary font-normal text-lg tracking-tight">
+          Expiry Date
+        </Text>
+        <DatePickerField
+          value={cardDetail.expiryDate}
+          onChange={setCardExpiryDate}
+          placeholder="mm/dd/yyyy"
+        />
       </View>
 
       <View className="gap-sm">
@@ -116,4 +126,4 @@ const CompanyCardForm = () => {
   );
 };
 
-export default CompanyCardForm;
+export default IdentificationCardForm;

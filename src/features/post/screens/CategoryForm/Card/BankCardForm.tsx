@@ -76,30 +76,26 @@ const BankCardForm = () => {
         />
       </View>
 
-      <View className="border rounded-md overflow-hidden">
-        <View className="p-md2 gap-sm">
-          <Text className="text-textPrimary font-normal text-lg tracking-tight">
-            Valid From
-          </Text>
-          <DatePickerField
-            value={cardDetail.issueDate}
-            onChange={setCardIssueDate}
-            placeholder="mm/dd/yyyy"
-          />
-        </View>
+      <View className="gap-sm">
+        <Text className="text-textPrimary font-normal text-lg tracking-tight">
+          Valid From
+        </Text>
+        <DatePickerField
+          value={cardDetail.issueDate}
+          onChange={setCardIssueDate}
+          placeholder="mm/dd/yyyy"
+        />
+      </View>
 
-        <View className="border-t" />
-
-        <View className="p-md2 gap-sm">
-          <Text className="text-textPrimary font-normal text-lg tracking-tight">
-            Expiry Date
-          </Text>
-          <DatePickerField
-            value={cardDetail.expiryDate}
-            onChange={setCardExpiryDate}
-            placeholder="mm/dd/yyyy"
-          />
-        </View>
+      <View className="gap-sm">
+        <Text className="text-textPrimary font-normal text-lg tracking-tight">
+          Expiry Date
+        </Text>
+        <DatePickerField
+          value={cardDetail.expiryDate}
+          onChange={setCardExpiryDate}
+          placeholder="mm/dd/yyyy"
+        />
       </View>
 
       <View className="gap-sm">

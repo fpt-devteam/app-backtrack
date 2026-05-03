@@ -62,15 +62,15 @@ export const DatePickerField = ({
   };
 
   return (
-    <View className="border-primary">
+    <View className="w-full">
       <Pressable
         onPress={openModal}
         disabled={disabled}
-        className="h-[52px] rounded-[14px] border border-[rgba(9,63,189,0.14)] bg-surface px-3.5 flex-row items-center gap-3"
+        className="h-2xl rounded-sm border bg-surface px-sm flex-row items-center gap-sm"
       >
-        <CalendarBlankIcon size={18} color="#94A3B8" />
+        <CalendarBlankIcon size={20} />
         <Text
-          className={`text-[15px] ${value ? "text-textPrimary" : "text-slate-400"}`}
+          className={`text-normal font-thin ${value ? "text-textPrimary" : "text-textSecondary"}`}
           numberOfLines={1}
         >
           {displayText}

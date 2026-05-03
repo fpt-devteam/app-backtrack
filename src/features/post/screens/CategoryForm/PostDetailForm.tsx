@@ -1,30 +1,30 @@
 import React from "react";
 import { Text, View } from "react-native";
 
-import BackpackForm from "@/src/features/post/screens/CategoryForm/BackpackForm";
-import BankCardForm from "@/src/features/post/screens/CategoryForm/BankCardForm";
-import ChargerAdapterForm from "@/src/features/post/screens/CategoryForm/ChargerAdapterForm";
-import ClothingsForm from "@/src/features/post/screens/CategoryForm/ClothingsForm";
-import CompanyCardForm from "@/src/features/post/screens/CategoryForm/CompanyCardForm";
-import DriverLicenseForm from "@/src/features/post/screens/CategoryForm/DriverLicenseForm";
-import EarphoneForm from "@/src/features/post/screens/CategoryForm/EarphoneForm";
-import HeadphoneForm from "@/src/features/post/screens/CategoryForm/HeadphoneForm";
-import IdentificationCardForm from "@/src/features/post/screens/CategoryForm/IdentificationCardForm";
-import JewelryForm from "@/src/features/post/screens/CategoryForm/JewelryForm";
-import KeyboardForm from "@/src/features/post/screens/CategoryForm/KeyboardForm";
-import KeysForm from "@/src/features/post/screens/CategoryForm/KeysForm";
-import LaptopForm from "@/src/features/post/screens/CategoryForm/LaptopForm";
-import MouseForm from "@/src/features/post/screens/CategoryForm/MouseForm";
-import OtherForm from "@/src/features/post/screens/CategoryForm/OtherForm";
-import PassportForm from "@/src/features/post/screens/CategoryForm/PassportForm";
-import PersonalCardForm from "@/src/features/post/screens/CategoryForm/PersonalCardForm";
-import PhoneForm from "@/src/features/post/screens/CategoryForm/PhoneForm";
-import PowerbankForm from "@/src/features/post/screens/CategoryForm/PowerbankForm";
-import PowerOutletForm from "@/src/features/post/screens/CategoryForm/PowerOutletForm";
-import SmartwatchForm from "@/src/features/post/screens/CategoryForm/SmartwatchForm";
-import StudentCardForm from "@/src/features/post/screens/CategoryForm/StudentCardForm";
-import SuitcasesForm from "@/src/features/post/screens/CategoryForm/SuitcasesForm";
-import WalletsForm from "@/src/features/post/screens/CategoryForm/WalletsForm";
+import BackpackForm from "@/src/features/post/screens/CategoryForm/PersonalBelonging/BackpackForm";
+import BankCardForm from "@/src/features/post/screens/CategoryForm/Card/BankCardForm";
+import ChargerAdapterForm from "@/src/features/post/screens/CategoryForm/Electronic/ChargerAdapterForm";
+import ClothingsForm from "@/src/features/post/screens/CategoryForm/PersonalBelonging/ClothingsForm";
+import CompanyCardForm from "@/src/features/post/screens/CategoryForm/Card/CompanyCardForm";
+import DriverLicenseForm from "@/src/features/post/screens/CategoryForm/Card/DriverLicenseForm";
+import EarphoneForm from "@/src/features/post/screens/CategoryForm/Electronic/EarphoneForm";
+import HeadphoneForm from "@/src/features/post/screens/CategoryForm/Electronic/HeadphoneForm";
+import IdentificationCardForm from "@/src/features/post/screens/CategoryForm/Card/IdentificationCardForm";
+import JewelryForm from "@/src/features/post/screens/CategoryForm/PersonalBelonging/JewelryForm";
+import KeyboardForm from "@/src/features/post/screens/CategoryForm/Electronic/KeyboardForm";
+import KeysForm from "@/src/features/post/screens/CategoryForm/PersonalBelonging/KeysForm";
+import LaptopForm from "@/src/features/post/screens/CategoryForm/Electronic/LaptopForm";
+import MouseForm from "@/src/features/post/screens/CategoryForm/Electronic/MouseForm";
+import OtherForm from "@/src/features/post/screens/CategoryForm/Other/OtherForm";
+import PassportForm from "@/src/features/post/screens/CategoryForm/Card/PassportForm";
+import PersonalCardForm from "@/src/features/post/screens/CategoryForm/Card/PersonalCardForm";
+import PhoneForm from "@/src/features/post/screens/CategoryForm/Electronic/PhoneForm";
+import PowerbankForm from "@/src/features/post/screens/CategoryForm/Electronic/PowerbankForm";
+import PowerOutletForm from "@/src/features/post/screens/CategoryForm/Electronic/PowerOutletForm";
+import SmartwatchForm from "@/src/features/post/screens/CategoryForm/Electronic/SmartwatchForm";
+import StudentCardForm from "@/src/features/post/screens/CategoryForm/Card/StudentCardForm";
+import SuitcasesForm from "@/src/features/post/screens/CategoryForm/PersonalBelonging/SuitcasesForm";
+import WalletsForm from "@/src/features/post/screens/CategoryForm/PersonalBelonging/WalletsForm";
 import {
   CARD_SUBCATEGORY,
   ELECTRONICS_SUBCATEGORY,
