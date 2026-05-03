@@ -327,6 +327,10 @@ const MyPostUpdateScreen = () => {
 
   // Save
   const handleSave = async () => {
+    if (!postId) {
+      toast.error("Invalid post. Please go back and try again.");
+      return;
+    }
     if (eventTimeError) {
       toast.error(eventTimeError);
       return;
@@ -359,7 +363,7 @@ const MyPostUpdateScreen = () => {
 
   const isBusy = isUpdatingPost || isAnalyzing;
 
-  if (isLoading) {
+  if (isLoading || !isLoaded) {
     return (
       <SafeAreaView className="flex-1 bg-surface items-center justify-center">
         <AppLoader />
@@ -402,7 +406,7 @@ const MyPostUpdateScreen = () => {
               contentContainerStyle={{ gap: 8 }}
             >
               {draftImages.map((img, idx) => (
-                <View key={`img-${idx}`} className="relative">
+                <View key={img.assetId ?? img.uri} className="relative">
                   <Image
                     source={{ uri: img.uri }}
                     className="w-24 h-24 rounded-md"
