@@ -12,6 +12,7 @@ import {
   useUpdatePost,
 } from "@/src/features/post/hooks";
 import { eventTimeSchema } from "@/src/features/post/schemas";
+import { usePostSubcategoryStore } from "@/src/features/post/store";
 import {
   CardDetail,
   POST_CATEGORIES,
@@ -28,6 +29,7 @@ import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
 import { toast } from "@/src/shared/components/ui/toast";
 import { ensureMediaPermission } from "@/src/shared/services";
 import { AppLocation } from "@/src/shared/store";
+import { metrics, typography } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
 import { Optional } from "@/src/shared/types/global.type";
 import { parseToDate } from "@/src/shared/utils/datetime.utils";
@@ -42,10 +44,11 @@ import {
   launchImageLibraryAsync,
   requestCameraPermissionsAsync,
 } from "expo-image-picker";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import {
   CameraIcon,
+  CheckIcon,
   GpsFixIcon,
   HeadCircuitIcon,
   ImageIcon,
@@ -68,12 +71,11 @@ import {
   ScrollView,
   Text,
   TextInput,
-  TouchableOpacity,
+  TextStyle,
   View,
 } from "react-native";
 import MapView, { Marker, Region } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { usePostSubcategoryStore } from "@/src/features/post/store";
 import PostDetailForm from "./CategoryForm/PostDetailForm";
 
 const PICKER_OPTIONS: ImagePickerOptions = {
@@ -87,25 +89,39 @@ const CAMERA_OPTIONS: ImagePickerOptions = {
   quality: 0.7,
 };
 
-// ---------------------------------------------------------------------------
-// Main screen
-// ---------------------------------------------------------------------------
-
 const MyPostUpdateScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  const { isLoading, data: post, error: fetchError } = useGetPostById({ postId });
+  const {
+    isLoading,
+    data: post,
+    error: fetchError,
+  } = useGetPostById({ postId });
   const { isLoaded, findSubcategoryById } = usePostSubcategoryStore();
 
   const { updatePost, isUpdatingPost } = useUpdatePost();
   const { analyzeImage, isAnalyzing } = useAnalyzeImage();
 
-  // Store selectors
+  const [isAnalysisDone, setIsAnalysisDone] = useState(true);
+
   const draftImages = usePostCreationStore((s) => s.draftImages);
+
+  const isActionDisabled = isUpdatingPost || isAnalyzing || !isAnalysisDone;
+
+  const canAnalyze = useMemo(() => {
+    if (!post) return false;
+    const hasImages = post.imageUrls.length > 0 || draftImages.length > 0;
+    return hasImages;
+  }, [post, draftImages]);
+
   const addImages = usePostCreationStore((s) => s.addImages);
   const removeImage = usePostCreationStore((s) => s.removeImage);
   const uploadImages = usePostCreationStore((s) => s.uploadImages);
-  const getUploadedImageUrls = usePostCreationStore((s) => s.getUploadedImageUrls);
-  const isPickerSheetVisible = usePostCreationStore((s) => s.isPickerSheetVisible);
+  const getUploadedImageUrls = usePostCreationStore(
+    (s) => s.getUploadedImageUrls,
+  );
+  const isPickerSheetVisible = usePostCreationStore(
+    (s) => s.isPickerSheetVisible,
+  );
   const openPickerSheet = usePostCreationStore((s) => s.openPickerSheet);
   const closePickerSheet = usePostCreationStore((s) => s.closePickerSheet);
   const location = usePostCreationStore((s) => s.location);
@@ -113,7 +129,9 @@ const MyPostUpdateScreen = () => {
   const electronicDetail = usePostCreationStore((s) => s.electronicDetail);
   const cardDetail = usePostCreationStore((s) => s.cardDetail);
   const otherDetail = usePostCreationStore((s) => s.otherDetail);
-  const personalBelongingDetail = usePostCreationStore((s) => s.personalBelongingDetail);
+  const personalBelongingDetail = usePostCreationStore(
+    (s) => s.personalBelongingDetail,
+  );
   const category = usePostCreationStore((s) => s.category);
   const patchPostTitle = usePostCreationStore((s) => s.updatePostTitle);
   const subCategoryCode = usePostCreationStore((s) => s.subCategoryCode);
@@ -121,14 +139,18 @@ const MyPostUpdateScreen = () => {
 
   const isPopulated = useRef(false);
 
-  // Pre-populate store once post is fetched
   useEffect(() => {
     if (!post || isPopulated.current) return;
     isPopulated.current = true;
 
     if (post.imageUrls?.length) {
       addImages(
-        post.imageUrls.map((uri) => ({ uri, assetId: uri, width: 0, height: 0 })),
+        post.imageUrls.map((uri) => ({
+          uri,
+          assetId: uri,
+          width: 0,
+          height: 0,
+        })),
       );
     }
 
@@ -154,8 +176,10 @@ const MyPostUpdateScreen = () => {
           hasCase: post.electronicDetail.hasCase ?? null,
           caseDescription: post.electronicDetail.caseDescription ?? null,
           screenCondition: post.electronicDetail.screenCondition ?? null,
-          lockScreenDescription: post.electronicDetail.lockScreenDescription ?? null,
-          distinguishingFeatures: post.electronicDetail.distinguishingFeatures ?? null,
+          lockScreenDescription:
+            post.electronicDetail.lockScreenDescription ?? null,
+          distinguishingFeatures:
+            post.electronicDetail.distinguishingFeatures ?? null,
           aiDescription: post.electronicDetail.aiDescription ?? null,
           additionalDetails: post.electronicDetail.additionalDetails ?? null,
         },
@@ -192,9 +216,11 @@ const MyPostUpdateScreen = () => {
           material: post.personalBelongingDetail.material ?? null,
           size: post.personalBelongingDetail.size ?? null,
           condition: post.personalBelongingDetail.condition ?? null,
-          distinctiveMarks: post.personalBelongingDetail.distinctiveMarks ?? null,
+          distinctiveMarks:
+            post.personalBelongingDetail.distinctiveMarks ?? null,
           aiDescription: post.personalBelongingDetail.aiDescription ?? null,
-          additionalDetails: post.personalBelongingDetail.additionalDetails ?? null,
+          additionalDetails:
+            post.personalBelongingDetail.additionalDetails ?? null,
         },
       });
     }
@@ -210,7 +236,6 @@ const MyPostUpdateScreen = () => {
     }
   }, [post]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       resetForm();
@@ -223,14 +248,12 @@ const MyPostUpdateScreen = () => {
     return findSubcategoryById(post.subcategoryId);
   }, [post, isLoaded]);
 
-  // Sync subcategoryCode when subcategory resolves
   useEffect(() => {
     if (safeSubCategory) {
       usePostCreationStore.setState({ subCategoryCode: safeSubCategory.code });
     }
   }, [safeSubCategory]);
 
-  // Event time
   const safeDate = useMemo(
     () => parseToDate(post?.eventTime) ?? new Date(),
     [post],
@@ -258,7 +281,6 @@ const MyPostUpdateScreen = () => {
     [],
   );
 
-  // Image handlers
   const openGallery = async () => {
     closePickerSheet();
     const granted = await ensureMediaPermission();
@@ -283,17 +305,22 @@ const MyPostUpdateScreen = () => {
     addImages(result.assets);
   };
 
-  // AI analyze
   const handleAIAnalyze = async () => {
     try {
+      setIsAnalysisDone(false);
       uploadImages();
       const imageUrls = await getUploadedImageUrls();
-      const result = await analyzeImage({ imageUrls, subcategoryCode: subCategoryCode });
+      const result = await analyzeImage({
+        imageUrls,
+        subcategoryCode: subCategoryCode,
+      });
 
       if (result?.electronic)
         usePostCreationStore.setState({ electronicDetail: result.electronic });
       if (result?.personalBelonging)
-        usePostCreationStore.setState({ personalBelongingDetail: result.personalBelonging });
+        usePostCreationStore.setState({
+          personalBelongingDetail: result.personalBelonging,
+        });
       if (result?.other)
         usePostCreationStore.setState({ otherDetail: result.other });
       if (result?.card) {
@@ -322,10 +349,11 @@ const MyPostUpdateScreen = () => {
       if (titleData) patchPostTitle(titleData);
     } catch {
       toast.error("AI analysis got an error. Please try again.");
+    } finally {
+      setIsAnalysisDone(true);
     }
   };
 
-  // Save
   const handleSave = async () => {
     if (!postId) {
       toast.error("Invalid post. Please go back and try again.");
@@ -345,7 +373,9 @@ const MyPostUpdateScreen = () => {
         location: location.coords ?? undefined,
         displayAddress: location.address ?? undefined,
         externalPlaceId: location.placeId ?? undefined,
-        ...(category === POST_CATEGORIES.ELECTRONICS ? { electronicDetail } : {}),
+        ...(category === POST_CATEGORIES.ELECTRONICS
+          ? { electronicDetail }
+          : {}),
         ...(category === POST_CATEGORIES.CARD ? { cardDetail } : {}),
         ...(category === POST_CATEGORIES.PERSONAL_BELONGINGS
           ? { personalBelongingDetail }
@@ -361,7 +391,6 @@ const MyPostUpdateScreen = () => {
     }
   };
 
-  const isBusy = isUpdatingPost || isAnalyzing;
 
   if (isLoading || !isLoaded) {
     return (
@@ -381,25 +410,49 @@ const MyPostUpdateScreen = () => {
 
   return (
     <>
-      <SafeAreaView className="flex-1 bg-surface" edges={["bottom"]}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-lg py-sm border-b border-divider">
-          <AppBackButton onPress={() => router.back()} />
-          <Text className="text-base font-normal text-textPrimary">Edit Post</Text>
-          <TouchableIconButton
-            icon={<HeadCircuitIcon size={28} />}
-            onPress={handleAIAnalyze}
-            disabled={isAnalyzing || draftImages.length === 0}
-          />
-        </View>
+      <View className="flex-1 bg-surface">
+        <Stack.Screen
+          options={{
+            headerTitle: "Update Post",
+            headerTitleStyle: {
+              fontSize: typography.fontSize.lg,
+              fontWeight: typography.fontWeight
+                .normal as TextStyle["fontWeight"],
+            },
+            headerLeft: () => (
+              <AppBackButton type="arrowLeftIcon" showBackground={false} disabled={isActionDisabled} />
+            ),
+            headerRight: () => (
+              <View className="flex-row items-center gap-md">
+                <TouchableIconButton
+                  icon={<HeadCircuitIcon size={28} />}
+                  onPress={handleAIAnalyze}
+                  disabled={isActionDisabled || !canAnalyze}
+                  loading={isAnalyzing}
+                />
 
+                <TouchableIconButton
+                  icon={<CheckIcon size={28} />}
+                  onPress={handleSave}
+                  disabled={isActionDisabled}
+                  loading={isUpdatingPost}
+                />
+              </View>
+            ),
+          }}
+        />
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ gap: 16, paddingHorizontal: 16, paddingVertical: 16 }}
+          contentContainerStyle={{
+            gap: metrics.spacing.xl,
+            paddingHorizontal: 16,
+            paddingVertical: 16,
+          }}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Images */}
           <View className="gap-sm">
-            <Text className="text-sm font-normal text-textMuted">Photos</Text>
+            <Text className="text-lg font-normal text-textPrimary">Photos</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -434,9 +487,10 @@ const MyPostUpdateScreen = () => {
 
           {/* Event Time */}
           <View className="gap-sm">
-            <Text className="text-sm font-normal text-textMuted">
+            <Text className="text-lg font-normal text-textPrimary">
               Occurrence Time
             </Text>
+
             <View className="rounded-primary border border-divider bg-surface p-md gap-md">
               <View className="flex-row items-center justify-between">
                 <View className="flex-1 mr-md">
@@ -480,33 +534,15 @@ const MyPostUpdateScreen = () => {
 
           {/* Detail Form */}
           <View className="gap-sm">
-            <Text className="text-sm font-normal text-textMuted">
+            <Text className="text-lg font-normal text-textPrimary">
               Item Details
             </Text>
             <PostDetailForm subcategory={safeSubCategory.code} />
           </View>
         </ScrollView>
+      </View>
 
-        {/* Footer */}
-        <View className="flex-row border-t border-divider justify-end items-center px-lg pt-md pb-sm">
-          <TouchableOpacity
-            className="border bg-secondary rounded-sm px-lg py-md"
-            onPress={handleSave}
-            disabled={isBusy || !!eventTimeError}
-            style={{ opacity: isBusy || !!eventTimeError ? 0.4 : 1 }}
-          >
-            {isBusy ? (
-              <AppLoader colorClass="bg-white" />
-            ) : (
-              <Text className="text-base font-normal text-center text-white tracking-label">
-                Save
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-
-      {isAnalyzing && (
+      {(isAnalyzing || !isAnalysisDone) && (
         <View className="absolute inset-0 z-10 items-center justify-center bg-black/10">
           <AppLoader />
         </View>
@@ -538,16 +574,15 @@ const MyPostUpdateScreen = () => {
 
 export default MyPostUpdateScreen;
 
-// ---------------------------------------------------------------------------
-// LocationSection — compact map + search overlay, inline on the edit form
-// ---------------------------------------------------------------------------
-
 type LocationSectionProps = {
   location: AppLocation;
   onChangeLocation: (loc: AppLocation) => void;
 };
 
-const LocationSection = ({ location, onChangeLocation }: LocationSectionProps) => {
+const LocationSection = ({
+  location,
+  onChangeLocation,
+}: LocationSectionProps) => {
   const inputRef = useRef<TextInput>(null);
   const mapRef = useRef<MapView>(null);
 
@@ -588,8 +623,11 @@ const LocationSection = ({ location, onChangeLocation }: LocationSectionProps) =
   const handleSelectSuggestion = useCallback(
     async (prediction: PlacePrediction) => {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
       try {
-        const placeDetail = await getPlaceDetails({ placeId: prediction.placeId });
+        const placeDetail = await getPlaceDetails({
+          placeId: prediction.placeId,
+        });
         onChangeLocation({
           coords: placeDetail.location,
           address: placeDetail.formattedAddress,
@@ -627,14 +665,11 @@ const LocationSection = ({ location, onChangeLocation }: LocationSectionProps) =
 
   return (
     <View className="gap-sm">
-      <Text className="text-sm font-normal text-textMuted">Location</Text>
-      <View
-        className="rounded-primary overflow-hidden border border-divider"
-        style={{ height: 200 }}
-      >
+      <Text className="text-lg font-normal text-textPrimary">Location</Text>
+      <View className="rounded-md overflow-hidden">
         <MapView
           ref={mapRef}
-          style={{ flex: 1 }}
+          style={{ height: 300 }}
           initialRegion={mapRegion}
           onPress={handleBlur}
         >
@@ -642,7 +677,7 @@ const LocationSection = ({ location, onChangeLocation }: LocationSectionProps) =
         </MapView>
 
         {/* Search overlay */}
-        <View className="absolute left-sm right-sm top-sm">
+        <View className="absolute left-sm right-sm top-md">
           <View
             className="rounded-md bg-surface"
             style={{
@@ -652,71 +687,79 @@ const LocationSection = ({ location, onChangeLocation }: LocationSectionProps) =
               shadowRadius: 8,
             }}
           >
-            <View
-              className="flex-row items-center rounded-md"
-              style={{
-                borderWidth: isFocused ? 1 : 0,
-                borderColor: isFocused ? colors.secondary : colors.muted,
-              }}
-            >
-              <View className="p-sm">
-                <MagnifyingGlassIcon
-                  size={14}
-                  weight="bold"
-                  color={colors.secondary}
-                />
-              </View>
-              <TextInput
-                ref={inputRef}
-                value={query}
-                onChangeText={setQuery}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                placeholder="Search area or landmark"
-                className="flex-1 font-thin text-textPrimary text-sm"
-                returnKeyType="search"
-                placeholderTextColor={colors.text.muted}
-                cursorColor={colors.black}
-                selectionColor={colors.black}
-                numberOfLines={1}
-              />
-              <View className="p-sm">
-                <Pressable
-                  onPress={handleNearby}
-                  disabled={loading}
-                  style={{ opacity: loading ? 0.4 : 1 }}
-                >
-                  <GpsFixIcon size={20} color={colors.primary} weight="duotone" />
-                </Pressable>
-              </View>
-            </View>
-
-            {showSuggestions && (
-              <MotiView
-                from={{ opacity: 0, translateY: 4 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ type: "timing", duration: 300 }}
+            <View className="gap-xs">
+              {/* Search Input */}
+              <View
+                className="flex-row items-center rounded-md p-sm"
+                style={{
+                  borderWidth: isFocused ? 1 : 0,
+                  borderColor: isFocused ? colors.secondary : colors.muted,
+                }}
               >
-                {predictions.length === 0 ? (
-                  <View className="px-md pb-xs">
-                    <Text className="text-sm text-textMuted">
-                      No matches found.
-                    </Text>
-                  </View>
-                ) : (
-                  <View className="flex-col px-sm gap-xs mb-xs">
-                    {predictions.map((item) => (
-                      <AppSearchRow
-                        key={`update-location-${item.placeId}`}
-                        IconComponent={MapPinIcon}
-                        text={item.formattedAddress}
-                        onPress={() => void handleSelectSuggestion(item)}
-                      />
-                    ))}
-                  </View>
-                )}
-              </MotiView>
-            )}
+                <View className="p-sm">
+                  <MagnifyingGlassIcon
+                    size={14}
+                    weight="bold"
+                    color={colors.secondary}
+                  />
+                </View>
+                <TextInput
+                  ref={inputRef}
+                  value={query}
+                  onChangeText={setQuery}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  placeholder="Search area or landmark"
+                  className="flex-1 font-thin text-textPrimary text-sm"
+                  returnKeyType="search"
+                  placeholderTextColor={colors.text.muted}
+                  cursorColor={colors.black}
+                  selectionColor={colors.black}
+                  numberOfLines={1}
+                />
+                <View className="p-sm">
+                  <Pressable
+                    onPress={handleNearby}
+                    disabled={loading}
+                    style={{ opacity: loading ? 0.4 : 1 }}
+                  >
+                    <GpsFixIcon
+                      size={20}
+                      color={colors.primary}
+                      weight="duotone"
+                    />
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Suggestions */}
+              {showSuggestions && (
+                <MotiView
+                  from={{ opacity: 0, translateY: 4 }}
+                  animate={{ opacity: 1, translateY: 0 }}
+                  transition={{ type: "timing", duration: 300 }}
+                >
+                  {predictions.length === 0 ? (
+                    <View className="px-md pb-xs">
+                      <Text className="text-sm text-textMuted">
+                        No matches found.
+                      </Text>
+                    </View>
+                  ) : (
+                    <View className="flex-col px-sm gap-xs mb-xs">
+                      {predictions.map((item) => (
+                        <AppSearchRow
+                          key={`update-location-${item.placeId}`}
+                          IconComponent={MapPinIcon}
+                          text={item.formattedAddress}
+                          onPress={() => void handleSelectSuggestion(item)}
+                        />
+                      ))}
+                    </View>
+                  )}
+                </MotiView>
+              )}
+            </View>
           </View>
         </View>
       </View>

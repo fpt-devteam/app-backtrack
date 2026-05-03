@@ -58,13 +58,15 @@ export type PostCreateRequest = {
  *  This type defines the structure of the request body when updating an existing post.
  */
 export type PostUpdateRequest = {
-  postTitle: string;
-  imageUrls: string[];
-  eventTime: Date;
+  imageUrls?: string[];
+  eventTime?: Date;
+
   electronicDetail?: ElectronicDetail
   cardDetail?: CardDetail
   personalBelongingDetail?: PersonalBelongingDetail
-  location: LatLng;
+  otherDetail?: OtherDetail
+
+  location?: LatLng;
   displayAddress?: string;
   externalPlaceId?: string;
 };

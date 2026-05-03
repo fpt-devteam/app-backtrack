@@ -2,7 +2,7 @@ import { colors } from "@/src/shared/theme";
 import { router } from "expo-router";
 import { ArrowLeftIcon, CaretLeftIcon, XIcon } from "phosphor-react-native";
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { TouchableIconButton } from "./ui/TouchableIconButton";
 
 type Prop = {
@@ -10,6 +10,7 @@ type Prop = {
   size?: number;
   showBackground?: boolean;
   onPress?: () => void;
+  disabled?: boolean;
 };
 
 export const AppBackButton = ({
@@ -17,6 +18,7 @@ export const AppBackButton = ({
   size = 20,
   showBackground = true,
   onPress,
+  disabled = false,
 }: Prop) => {
   const handleBackPress = () => {
     if (onPress) {
@@ -26,15 +28,19 @@ export const AppBackButton = ({
     }
   };
 
+  const disabledStyle = disabled ? "opacity-40" : "opacity-100";
+
   if (type === "arrowLeftIcon") {
     return (
       <TouchableOpacity
-        className={
+        className={`${
           showBackground
             ? "p-sm rounded-full bg-slate-100 bg-opacity-10"
             : "p-sm"
-        }
+        } ${disabledStyle}`}
         onPress={handleBackPress}
+        disabled={disabled}
+        activeOpacity={0.7}
       >
         <ArrowLeftIcon size={size} color={colors.secondary} weight="bold" />
       </TouchableOpacity>
@@ -42,15 +48,18 @@ export const AppBackButton = ({
   }
 
   return (
-    <TouchableIconButton
-      icon={
-        type === "xIcon" ? (
-          <XIcon size={size} color={colors.secondary} weight="bold" />
-        ) : (
-          <CaretLeftIcon size={size} color={colors.secondary} weight="bold" />
-        )
-      }
-      onPress={handleBackPress}
-    />
+    <View className={disabledStyle}>
+      <TouchableIconButton
+        icon={
+          type === "xIcon" ? (
+            <XIcon size={size} color={colors.secondary} weight="bold" />
+          ) : (
+            <CaretLeftIcon size={size} color={colors.secondary} weight="bold" />
+          )
+        }
+        onPress={handleBackPress}
+        disabled={disabled}
+      />
+    </View>
   );
 };

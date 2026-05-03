@@ -45,16 +45,6 @@ const PhoneForm = () => {
 
   return (
     <View className="flex-1 gap-md">
-      <View>
-        <Text className="text-textPrimary font-normal text-2xl pr-lg tracking-tight">
-          What does it look like?
-        </Text>
-        <Text className="text-textSecondary font-thin text-base mt-xs">
-          The more unique traits you provide, the faster our AI can track it
-          down.
-        </Text>
-      </View>
-
       {/* Identification */}
       <View className="border rounded-md overflow-hidden">
         <PostFormField

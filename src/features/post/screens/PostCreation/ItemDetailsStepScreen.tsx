@@ -5,7 +5,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import PostDetailForm from "../CategoryForm/PostDetailForm";
 
@@ -25,6 +27,16 @@ const ItemDetailsStepScreen = () => {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
+          <View>
+            <Text className="text-textPrimary font-normal text-2xl pr-lg tracking-tight">
+              What does it look like?
+            </Text>
+            <Text className="text-textSecondary font-thin text-base mt-xs">
+              The more unique traits you provide, the faster our AI can track it
+              down.
+            </Text>
+          </View>
+          
           <PostDetailForm subcategory={subCategory} />
         </ScrollView>
       </TouchableWithoutFeedback>
