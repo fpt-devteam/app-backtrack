@@ -53,6 +53,22 @@ export type PostCreateRequest = {
   personalBelongingDetail?: PersonalBelongingDetail
 } & Omit<UserLocation, "radiusInKm">;
 
+/**
+ *  PostUpdateRequest
+ *  This type defines the structure of the request body when updating an existing post.
+ */
+export type PostUpdateRequest = {
+  postTitle: string;
+  imageUrls: string[];
+  eventTime: Date;
+  electronicDetail?: ElectronicDetail
+  cardDetail?: CardDetail
+  personalBelongingDetail?: PersonalBelongingDetail
+  location: LatLng;
+  displayAddress?: string;
+  externalPlaceId?: string;
+};
+
 export type PostCreateResponse = ApiResponse<Post>;
 
 export type PostGetByIdRequest = {

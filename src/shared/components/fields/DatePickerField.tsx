@@ -4,7 +4,7 @@ import { CalendarBlankIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
 import { Nullable } from "../../types";
-import { formatDateByPattern, parseStringToDate } from "../../utils";
+import { formatDateByPattern, parseToDate } from "../../utils";
 
 type Props = Readonly<{
   label?: string;
@@ -25,7 +25,7 @@ export const DatePickerField = ({
   const [open, setOpen] = useState(false);
 
   const safeDate = useMemo(() => {
-    const parsed = parseStringToDate(value);
+    const parsed = parseToDate(value);
     if (!parsed) return new Date();
     return parsed;
   }, [value]);

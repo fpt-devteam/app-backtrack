@@ -3,10 +3,7 @@ import { PostTypeIconBadge } from "@/src/features/post/components/PostTypeIconBa
 import { SimilarPost } from "@/src/features/post/types/post.type";
 import { AppImage } from "@/src/shared/components";
 import { colors, metrics } from "@/src/shared/theme";
-import {
-  formatIsoDate,
-  parseStringToDate,
-} from "@/src/shared/utils/datetime.utils";
+import { formatIsoDate, parseToDate } from "@/src/shared/utils/datetime.utils";
 import { MotiPressable } from "moti/interactions";
 import { ClockIcon, MapPinIcon } from "phosphor-react-native";
 import React, { useMemo } from "react";
@@ -40,7 +37,7 @@ export const SimilarPostCard = ({ item, onPress }: SimilarPostCardProps) => {
 
   const eventTimeLabel = useMemo(() => {
     if (!item.eventTime) return "Unknown time";
-    const date = parseStringToDate(item.eventTime);
+    const date = parseToDate(item.eventTime);
     if (!date) return "Unknown time";
     return formatIsoDate(date);
   }, [item.eventTime]);

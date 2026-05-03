@@ -334,7 +334,9 @@ export const formatCompareTimeGap = (input?: string | null): string => {
   return label ? `About ${label} apart` : "Less than a minute apart";
 };
 
-export const parseStringToDate = (dateString?: string | null) => {
+export const parseToDate = (dateString?: string | Date | null) => {
   if (!dateString) return null;
+  if (dateString instanceof Date) return dateString;
+
   return parseISO(dateString);
 };

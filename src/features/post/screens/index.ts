@@ -5,7 +5,6 @@ export { MatchingNoResultScreen } from "@/src/features/post/screens/MatchingNoRe
 export { MatchingScreen } from "@/src/features/post/screens/MatchingScreen";
 export { MatchingWaitingScreen } from "@/src/features/post/screens/MatchingWaitingScreen";
 
-export { MyPostDetailScreen } from "@/src/features/post/screens/MyPostDetailScreen";
 export { PostDetailScreen } from "@/src/features/post/screens/PostDetailScreen";
 export { PostScreen } from "@/src/features/post/screens/PostScreen";
 export { default as PostSearchFilterScreen } from "@/src/features/post/screens/PostSearchFilterScreen";
@@ -20,4 +19,8 @@ export { default as ItemDetailsStepScreen } from "@/src/features/post/screens/Po
 export { default as ItemIdentityStepScreen } from "@/src/features/post/screens/PostCreation/ItemIdentityStepScreen";
 export { default as ItemSubCategoryStepScreen } from "@/src/features/post/screens/PostCreation/ItemSubCategoryStepScreen";
 export { default as ReportIntentStepScreen } from "@/src/features/post/screens/PostCreation/ReportIntentStepScreen";
+
+// 
+export { default as MyPostDetailScreen } from "@/src/features/post/screens/MyPostDetailScreen";
+export { default as MyPostUpdateScreen } from "@/src/features/post/screens/MyPostUpdateScreen";
 

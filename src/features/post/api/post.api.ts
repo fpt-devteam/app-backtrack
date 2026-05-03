@@ -6,6 +6,7 @@ export const POST_API = {
   getFeed: "/api/core/posts/feed",
   search: "/api/core/posts/search",
   detail: (postId: string) => `/api/core/posts/${postId}`,
+  archive: (postId: string) => `/api/core/posts/${postId}/archive`,
   matching: (postId: string) => `/api/core/posts/${postId}/similar`,
   checkPostMatchingStatus: (postId: string) => `/api/core/posts/${postId}/matching-status`,
   analyzeImage: "/api/core/post-image/analyze",
@@ -59,7 +60,7 @@ export async function getPostSubcategoriesApi() {
 }
 
 export async function deletePostApi(req: PostDeleteByIdRequest) {
-  const response = await privateClient.delete(POST_API.detail(req.postId));
+  const response = await privateClient.patch(POST_API.archive(req.postId));
   if (response.status === 204) return { success: true };
   return response.data;
 } 

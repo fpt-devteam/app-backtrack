@@ -21,9 +21,12 @@ import {
   type MenuOption,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { SHARED_ROUTE } from "@/src/shared/constants/route.constant";
+import {
+  PROFILE_ROUTE,
+  SHARED_ROUTE,
+} from "@/src/shared/constants/route.constant";
 import { colors, metrics } from "@/src/shared/theme";
-import { formatIsoDate, toTitleCase } from "@/src/shared/utils";
+import { formatIsoDate, parseToDate, toTitleCase } from "@/src/shared/utils";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { BlurView } from "expo-blur";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -78,7 +81,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export const MyPostDetailScreen = () => {
+const MyPostDetailScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const { isLoading, data: post } = useGetPostById({ postId });
   const {
@@ -149,6 +152,11 @@ export const MyPostDetailScreen = () => {
     setIsActionSheetVisible(true);
   }, []);
 
+  const handleUpdatePress = useCallback(() => {
+    handleCloseActionSheet();
+    router.push(PROFILE_ROUTE.userPostDetailEdit(postId));
+  }, [postId]);
+
   const handleCloseActionSheet = useCallback(() => {
     setIsActionSheetVisible(false);
   }, []);
@@ -199,7 +207,7 @@ export const MyPostDetailScreen = () => {
         label: "Edit",
         description: "Update this post later",
         icon: PencilSimpleIcon,
-        onPress: handleCloseActionSheet,
+        onPress: handleUpdatePress,
       },
       {
         id: "delete-post",
@@ -220,12 +228,13 @@ export const MyPostDetailScreen = () => {
       };
     }
 
+    const date = parseToDate(post.eventTime);
+
     return {
       displayAddress: toTitleCase(
         post.displayAddress || "Location not specified",
       ),
-      displayEventTime:
-        formatIsoDate(post.eventTime) || "Event time not specified",
+      displayEventTime: date ? formatIsoDate(date) : "Event time not specified",
     };
   }, [post]);
 
@@ -697,3 +706,5 @@ const FeatureBulletRow = ({
     <Text className="text-sm text-textSecondary">{value}</Text>
   </View>
 );
+
+export default MyPostDetailScreen;

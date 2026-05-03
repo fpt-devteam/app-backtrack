@@ -73,8 +73,8 @@ export type UserPost = {
   otherDetail?: Nullable<SimilarPostOtherDetail>
 
   // 
-  eventTime: Date
-  createdAt: Date
+  eventTime: Date | string
+  createdAt: Date | string
 }
 
 /**
@@ -83,8 +83,6 @@ export type UserPost = {
 export type Post = BasePost & {
   status: PostStatus
   organization: Nullable<string>
-  eventTime: Date
-  createdAt: Date
   author: AppUser
   distanceInMeters?: number
 } & Pick<UserLocation, "location" | "externalPlaceId" | "displayAddress">
@@ -341,5 +339,7 @@ export type BasePost = {
   externalPlaceId: string
   displayAddress: string
 
-  eventTime: string
+  eventTime: Date | string
+  createdAt: Date | string
 }
+
