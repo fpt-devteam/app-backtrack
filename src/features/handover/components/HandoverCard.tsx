@@ -2,13 +2,12 @@ import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import {
   getHandoverCounterpart,
   getHandoverNextStep,
-  getHandoverStatusLabel,
   getHandoverTitle,
   getViewerRoleContext,
 } from "@/src/features/handover/components/handover.presentation";
-import type { Handover, HandoverStatus } from "@/src/features/handover/types";
+import type { Handover } from "@/src/features/handover/types";
 import { AppImage, AppUserAvatar } from "@/src/shared/components";
-import { HANDOVER_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { SHARED_ROUTE } from "@/src/shared/constants";
 import React, { useCallback } from "react";
 import { InteractionManager, Text, View } from "react-native";
 
@@ -17,21 +16,12 @@ import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
 import { HandoverStatusBadge } from "./HandoverStatusBadge";
 
-const STATUS_THEME: Record<HandoverStatus, { bg: string; text: string }> = {
-  Ongoing: { bg: colors.kazan[100], text: colors.kazan[600] },
-  Delivered: { bg: colors.info[100], text: colors.info[500] },
-  Confirmed: { bg: colors.babu[100], text: colors.babu[500] },
-  Rejected: { bg: colors.error[100], text: colors.error[500] },
-  Closed: { bg: colors.hof[100], text: colors.hof[400] },
-};
-
 export const HandoverCard = ({ handover }: { handover: Handover }) => {
   const { user } = useAppUser();
   const currentUserId = user?.id;
 
   const counterpart = getHandoverCounterpart(handover, currentUserId);
   const title = getHandoverTitle(handover);
-  const statusLabel = getHandoverStatusLabel(handover.status);
   const nextStep = getHandoverNextStep(handover, currentUserId);
   const roleContext = getViewerRoleContext(handover, currentUserId);
 
@@ -43,7 +33,7 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
     InteractionManager.runAfterInteractions(() => {
       router.navigate(SHARED_ROUTE.handoverDetail(handover.id));
     });
-  }, [handover.id]);
+  }, [handover]);
 
   return (
     <MotiPressable
@@ -98,6 +88,7 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
         )}
       </View>
 
+      {/* Details */}
       <View className="flex-1">
         {/* Title */}
         <View>

@@ -1,4 +1,3 @@
-import { useAppUser } from "@/src/features/auth/providers/user.provider";
 import { HandoverCard } from "@/src/features/handover/components";
 import { useGetC2CReturnReports } from "@/src/features/handover/hooks";
 import { AppBackButton, AppInlineError } from "@/src/shared/components";
@@ -17,9 +16,6 @@ type FilterParam = "ongoing" | "past";
 
 const AllHandoversScreen = () => {
   const { filter } = useLocalSearchParams<{ filter: FilterParam }>();
-  const { user } = useAppUser();
-  const currentUserId = user?.id ?? "";
-
   const { data: handovers, isLoading, error } = useGetC2CReturnReports();
 
   const filtered = useMemo(() => {
@@ -36,7 +32,8 @@ const AllHandoversScreen = () => {
     );
   }, [handovers, filter]);
 
-  const title = filter === "ongoing" ? "Ongoing" : "Past Handovers";
+  const title =
+    filter === "ongoing" ? "In Progress Handovers" : "Past Handovers";
 
   return (
     <View className="flex-1 bg-surface">

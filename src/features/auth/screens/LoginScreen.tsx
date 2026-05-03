@@ -84,7 +84,7 @@ const LoginScreen = () => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-1 bg-surface px-lg pt-xl">
-          {/* ── Password field ─────────────────────────────── */}
+          {/*  Password field  */}
           <Controller
             control={formControl}
             name="password"
@@ -103,7 +103,7 @@ const LoginScreen = () => {
             )}
           />
 
-          {/* ── Continue button ─────────────────────────── */}
+          {/* Continue button */}
           <AppButton
             title="Continue"
             onPress={handleSubmit(onSubmit)}

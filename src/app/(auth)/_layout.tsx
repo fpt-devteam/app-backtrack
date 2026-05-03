@@ -14,17 +14,10 @@ function PublicLayout() {
   if (isLoggedIn) return <Redirect href={POST_ROUTE.index} />;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        presentation: "modal",
-        animation: "slide_from_bottom",
-      }}
-    >
+    <Stack>
       <Stack.Screen
         name="onboarding"
         options={{
-          headerShown: true,
           headerRight: () => <AppBackButton type="xIcon" />,
           headerTransparent: true,
           headerTitle: "",
@@ -34,7 +27,6 @@ function PublicLayout() {
       <Stack.Screen
         name="login"
         options={{
-          headerShown: true,
           headerTitle: "Login",
           headerTitleStyle: {
             fontSize: typography.fontSize.base,
@@ -48,7 +40,6 @@ function PublicLayout() {
       <Stack.Screen
         name="register"
         options={{
-          headerShown: true,
           headerTitle: "Register new account",
           headerTitleStyle: {
             fontSize: typography.fontSize.base,
@@ -62,7 +53,6 @@ function PublicLayout() {
       <Stack.Screen
         name="password-reset"
         options={{
-          headerShown: true,
           headerTitle: "Forgot password?",
           headerTitleStyle: {
             fontSize: typography.fontSize.base,
@@ -73,9 +63,11 @@ function PublicLayout() {
         }}
       />
 
-      <Stack.Screen name="verify-email" options={{ headerShown: true }} />
-      <Stack.Screen name="verify-phone-input" options={{ headerShown: true }} />
-      <Stack.Screen name="verify-phone" options={{ headerShown: true }} />
+      <Stack.Screen name="verify-email" />
+
+      <Stack.Screen name="verify-phone-input" />
+
+      <Stack.Screen name="verify-phone" />
     </Stack>
   );
 }
