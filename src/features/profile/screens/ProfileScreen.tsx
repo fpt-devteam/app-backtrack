@@ -1,7 +1,7 @@
 import { useAppUser, useAuth } from "@/src/features/auth/providers";
 import { socketChatService } from "@/src/features/chat/services";
 import { useUnregisterDeviceMutation } from "@/src/features/notification/hooks";
-import { AppUserAvatar } from "@/src/shared/components";
+import { AppButton, AppUserAvatar } from "@/src/shared/components";
 import { AUTH_ROUTE, PROFILE_ROUTE, QR_ROUTE } from "@/src/shared/constants";
 import { auth } from "@/src/shared/lib/firebase";
 import { colors } from "@/src/shared/theme";
@@ -85,11 +85,11 @@ const GuestView = () => {
 
   return (
     <View
-      className="flex-1 bg-surface px-10 gap-10 pt-20"
-      style={{ paddingTop: layout.height * 0.15 }}
+      className="flex-1 bg-surface px-lg gap-lg"
+      style={{ paddingTop: layout.height * 0.27 }}
     >
       <View className="flex-row justify-center">
-        <UserCircleIcon size={128} color={colors.primary} />
+        <UserCircleIcon size={128} color={colors.secondary} weight="thin" />
       </View>
 
       <View className="gap-y-2">
@@ -102,15 +102,11 @@ const GuestView = () => {
         </Text>
       </View>
 
-      <TouchableOpacity
-        className="w-full py-5 rounded-sm bg-primary items-center justify-center"
+      <AppButton
         onPress={() => router.push(AUTH_ROUTE.onboarding)}
-        activeOpacity={0.8}
-      >
-        <Text className="text-base font-normal text-white text-center">
-          Log in or Sign up
-        </Text>
-      </TouchableOpacity>
+        title="Login or Sign up"
+        variant="secondary"
+      />
     </View>
   );
 };
