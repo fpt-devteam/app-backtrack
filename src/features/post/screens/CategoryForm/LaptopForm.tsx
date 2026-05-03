@@ -6,16 +6,7 @@ import { usePostCreationStore } from "@/src/features/post/hooks";
 import { colors } from "@/src/shared/theme";
 import { MotiView } from "moti";
 import React from "react";
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Switch,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { Switch, Text, View } from "react-native";
 
 const LaptopForm = () => {
   const electronicDetail = usePostCreationStore(
@@ -53,120 +44,107 @@ const LaptopForm = () => {
   const hasCase = electronicDetail.hasCase ?? false;
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-surface"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={100}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          className="flex-1 p-lg"
-          contentContainerClassName="gap-lg pb-xl"
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
+    <View className="flex-1 gap-md">
+      <View>
+        <Text className="text-textPrimary font-normal text-2xl pr-lg tracking-tight">
+          What does it look like?
+        </Text>
+        <Text className="text-textSecondary font-thin text-base mt-xs">
+          The more unique traits you provide, the faster our AI can track it
+          down.
+        </Text>
+      </View>
+
+      <View className="border rounded-md overflow-hidden">
+        <PostFormField
+          label="Post Title"
+          value={postTitle}
+          onChange={updatePostTitle}
+        />
+
+        <View className="border-t" />
+
+        <PostFormField
+          label="Device Brand"
+          value={electronicDetail.brand ?? ""}
+          onChange={setElectronicBrand}
+        />
+
+        <View className="border-t" />
+
+        <PostFormField
+          label="Model Name"
+          value={electronicDetail.model ?? ""}
+          onChange={setElectronicModel}
+        />
+
+        <View className="border-t" />
+
+        <PostFormField
+          label="Primary Color"
+          value={electronicDetail.color ?? ""}
+          onChange={setElectronicColor}
+        />
+
+        <View className="border-t" />
+
+        <PostFormField
+          label="Screen & Glass condition"
+          value={electronicDetail.screenCondition ?? ""}
+          onChange={setElectronicScreenCondition}
+        />
+
+        <View className="border-t" />
+
+        <PostFormField
+          label="Wallpaper / Lock screen"
+          value={electronicDetail.lockScreenDescription ?? ""}
+          onChange={setElectronicLockScreenDescription}
+        />
+      </View>
+
+      <View>
+        <View className="flex-row items-center justify-between mb-sm">
+          <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
+            Is it in a case?
+          </Text>
+          <Switch
+            value={hasCase}
+            onValueChange={setElectronicHasCase}
+            trackColor={{ false: colors.white, true: colors.secondary }}
+          />
+        </View>
+
+        <MotiView
+          from={{ opacity: 0, height: 0 }}
+          animate={{
+            height: hasCase ? 50 : 0,
+            opacity: hasCase ? 1 : 0,
+          }}
         >
-          <View>
-            <Text className="text-textPrimary font-normal text-2xl pr-lg tracking-tight">
-              What does it look like?
-            </Text>
-            <Text className="text-textSecondary font-thin text-base mt-xs">
-              The more unique traits you provide, the faster our AI can track it
-              down.
-            </Text>
-          </View>
+          <View className="border-t-[0.5px] border-divider" />
 
-          <View className="border rounded-md overflow-hidden">
+          <View className="border rounded-sm overflow-hidden">
             <PostFormField
-              label="Post Title"
-              value={postTitle}
-              onChange={updatePostTitle}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Device Brand"
-              value={electronicDetail.brand ?? ""}
-              onChange={setElectronicBrand}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Model Name"
-              value={electronicDetail.model ?? ""}
-              onChange={setElectronicModel}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Primary Color"
-              value={electronicDetail.color ?? ""}
-              onChange={setElectronicColor}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Screen & Glass condition"
-              value={electronicDetail.screenCondition ?? ""}
-              onChange={setElectronicScreenCondition}
-            />
-
-            <View className="border-t" />
-
-            <PostFormField
-              label="Wallpaper / Lock screen"
-              value={electronicDetail.lockScreenDescription ?? ""}
-              onChange={setElectronicLockScreenDescription}
+              label="Case colors, materials or stickers"
+              value={electronicDetail.caseDescription ?? ""}
+              onChange={setElectronicCaseDescription}
             />
           </View>
+        </MotiView>
+      </View>
 
-          <View>
-            <View className="flex-row items-center justify-between mb-sm">
-              <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
-                Is it in a case?
-              </Text>
-              <Switch
-                value={hasCase}
-                onValueChange={setElectronicHasCase}
-                trackColor={{ false: colors.white, true: colors.secondary }}
-              />
-            </View>
+      <View className="gap-sm">
+        <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
+          Unique marks & traits
+        </Text>
 
-            <MotiView
-              from={{ opacity: 0, height: 0 }}
-              animate={{
-                height: hasCase ? 50 : 0,
-                opacity: hasCase ? 1 : 0,
-              }}
-            >
-              <View className="border-t-[0.5px] border-divider" />
-
-              <View className="border rounded-sm overflow-hidden">
-                <PostFormField
-                  label="Case colors, materials or stickers"
-                  value={electronicDetail.caseDescription ?? ""}
-                  onChange={setElectronicCaseDescription}
-                />
-              </View>
-            </MotiView>
-          </View>
-
-          <View className="gap-sm">
-            <Text className="text-textPrimary font-normal text-lg pr-lg tracking-tight">
-              Unique marks & traits
-            </Text>
-
-            <PostFormTextArea
-              value={electronicDetail.distinguishingFeatures ?? ""}
-              onChange={setElectronicDistinguishingFeatures}
-            />
-          </View>
-        </ScrollView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+        <PostFormTextArea
+          value={electronicDetail.distinguishingFeatures ?? ""}
+          onChange={setElectronicDistinguishingFeatures}
+        />
+      </View>
+    </View>
   );
 };
 
