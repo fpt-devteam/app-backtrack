@@ -28,6 +28,7 @@ import {
   AppBackButton,
   AppButton,
   AppInlineError,
+  AppLoader,
   AppTipCard,
   AppUserAvatar,
   TouchableIconButton,
@@ -42,7 +43,6 @@ import * as ImagePicker from "expo-image-picker";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import {
-  ArrowLeftIcon,
   CalendarCheckIcon,
   ChatCenteredTextIcon,
   CheckCircleIcon,
@@ -55,14 +55,11 @@ import {
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   LayoutChangeEvent,
-  Platform,
   ScrollView,
   Text,
   TextStyle,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -847,67 +844,15 @@ const HandoverDetailScreen = () => {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <View className="flex-1 bg-surface">
-          <View
-            className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
-            style={
-              Platform.OS === "ios"
-                ? { ...metrics.shadows.tabBar.ios }
-                : metrics.shadows.tabBar.android
-            }
-          >
-            <TouchableOpacity
-              onPress={() => router.back()}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              className="items-center justify-center rounded-full"
-              style={{
-                width: 44,
-                height: 44,
-                backgroundColor: colors.hof[100],
-              }}
-            >
-              <ArrowLeftIcon size={20} color={colors.text.primary} />
-            </TouchableOpacity>
-            <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
-              Handover
-            </Text>
-            <View style={{ width: 44, height: 44 }} />
-          </View>
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color={colors.primary} />
-          </View>
+        <View className="flex-1 bg-surface items-center justify-center">
+          <AppLoader />
         </View>
       );
     }
 
     if (error || !report) {
       return (
-        <View className="flex-1 bg-surface">
-          <View
-            className="flex-row items-center px-lg pt-sm pb-sm bg-surface border-b border-divider"
-            style={
-              Platform.OS === "ios"
-                ? { ...metrics.shadows.tabBar.ios }
-                : metrics.shadows.tabBar.android
-            }
-          >
-            <TouchableOpacity
-              onPress={() => router.back()}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              className="items-center justify-center rounded-full"
-              style={{
-                width: 44,
-                height: 44,
-                backgroundColor: colors.hof[100],
-              }}
-            >
-              <ArrowLeftIcon size={20} color={colors.text.primary} />
-            </TouchableOpacity>
-            <Text className="flex-1 text-base font-semibold text-textPrimary text-center">
-              Handover
-            </Text>
-            <View style={{ width: 44, height: 44 }} />
-          </View>
+        <View className="flex-1 bg-surface items-center justify-center">
           <AppInlineError message={error?.message ?? "Handover not found."} />
         </View>
       );

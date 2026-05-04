@@ -31,6 +31,24 @@ type ActiveBodyProps = {
 function ActiveBody({ subscription }: ActiveBodyProps) {
   const { user, refetch } = useAppUser();
 
+  const actionDisplay = useMemo(() => {
+    if (!user?.postActionLimit) {
+      return (
+        <View className="px-sm py-0.5 rounded-md border bg-primary/10 border-primary/20">
+          <Text className="text-xs font-normal text-primary tracking-tighter">
+            Unlimited
+          </Text>
+        </View>
+      );
+    }
+
+    return (
+      <Text className="text-xs font-medium text-textPrimary">
+        {user.postActionCount}/{user.postActionLimit}
+      </Text>
+    );
+  }, [user]);
+
   useEffect(() => {
     refetch();
   }, []);
@@ -47,12 +65,20 @@ function ActiveBody({ subscription }: ActiveBodyProps) {
         </View>
 
         <View
-          className="rounded-full px-2 py-0.5"
-          style={{ backgroundColor: colors.babu[100] }}
+          className="self-start mt-xs mb-xs px-sm py-0.5 rounded-full flex-row items-center gap-1"
+          style={{
+            backgroundColor: colors.babu[100],
+            borderColor: colors.babu[200],
+            borderWidth: 1,
+          }}
         >
+          <View
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: colors.babu[500] }}
+          />
           <Text
             className="text-xs font-normal"
-            style={{ color: colors.status.success }}
+            style={{ color: colors.babu[500] }}
           >
             Active
           </Text>
@@ -84,9 +110,7 @@ function ActiveBody({ subscription }: ActiveBodyProps) {
           )}
         </View>
 
-        <Text className="text-sm text-textSecondary font-thin">
-          Remains {user?.postActionCount} post actions
-        </Text>
+        {actionDisplay}
       </View>
     </View>
   );
