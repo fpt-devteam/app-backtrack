@@ -1,8 +1,4 @@
-import {
-  IS_QR_FEATURE_MOCK,
-  MOCK_QR_PLAN_DATA,
-  SUBSCRIPTION_LINK,
-} from "@/src/features/qr/constants";
+import { SUBSCRIPTION_LINK } from "@/src/features/qr/constants";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus, UserSubscription } from "@/src/features/qr/types";
 import { colors } from "@/src/shared/theme/colors";
@@ -173,12 +169,10 @@ export const UserSubscriptionPlanDetailCard = () => {
   }, []);
 
   const isActiveDisplay = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.isActive;
     return !!subscription && subscription.status === SubscriptionStatus.Active;
   }, [subscription]);
 
   const subscriptionData = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.subscription;
     return subscription;
   }, [subscription]);
 

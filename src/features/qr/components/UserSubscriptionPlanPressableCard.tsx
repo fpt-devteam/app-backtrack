@@ -1,7 +1,4 @@
-import {
-  IS_QR_FEATURE_MOCK,
-  MOCK_QR_PLAN_DATA,
-} from "@/src/features/qr/constants";
+import { useAppUser } from "@/src/features/auth/providers";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus, UserSubscription } from "@/src/features/qr/types";
 import { QR_ROUTE } from "@/src/shared/constants";
@@ -19,8 +16,6 @@ import React, { useCallback, useMemo } from "react";
 import type { ViewStyle } from "react-native";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-// Mirrors CARD_SHADOW from ProfileScreen so the active card
-// matches the visual elevation of the profile feature cards.
 const CARD_SHADOW: ViewStyle = {
   shadowColor: colors.black,
   shadowOffset: { width: 0, height: 8 },
@@ -28,8 +23,6 @@ const CARD_SHADOW: ViewStyle = {
   shadowRadius: 8,
   elevation: 4,
 };
-
-// ─── Active state ────────────────────────────────────────────────
 
 type ActiveBodyProps = {
   readonly subscription: UserSubscription;
@@ -84,8 +77,6 @@ function ActiveBody({ subscription }: ActiveBodyProps) {
   );
 }
 
-// ─── Upsell (no active subscription) ────────────────────────────
-
 function UpsellBody() {
   return (
     <View className="flex-row items-center justify-between">
@@ -112,9 +103,8 @@ function UpsellBody() {
   );
 }
 
-// ─── Main component ──────────────────────────────────────────────
-
 export const UserSubscriptionPlanPressableCard = () => {
+  const { user, refetch } = useAppUser();
   const { data: subscription, isLoading } = useGetMySubscription();
 
   const handleNavigatePlanScreen = useCallback(() => {
@@ -122,12 +112,10 @@ export const UserSubscriptionPlanPressableCard = () => {
   }, []);
 
   const isActiveDisplay = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.isActive;
     return !!subscription && subscription.status === SubscriptionStatus.Active;
   }, [subscription]);
 
   const subscriptionData = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_PLAN_DATA.subscription;
     return subscription;
   }, [subscription]);
 

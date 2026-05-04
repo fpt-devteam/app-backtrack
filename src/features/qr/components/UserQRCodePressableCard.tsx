@@ -1,4 +1,3 @@
-import { IS_QR_FEATURE_MOCK, MOCK_QR_CODE } from "@/src/features/qr/constants";
 import { useGetMyQR } from "@/src/features/qr/hooks";
 import { AppLoader } from "@/src/shared/components/AppLoader";
 import { QR_ROUTE } from "@/src/shared/constants";
@@ -40,10 +39,7 @@ export const UserQRCodePressableCard = ({
   }, [qrCode?.logoUrl]);
 
   const qrValue = useMemo(() => {
-    const code = IS_QR_FEATURE_MOCK
-      ? MOCK_QR_CODE.publicCode
-      : qrCode?.publicCode;
-    return "https://thebacktrack.vercel.app/profile/" + code;
+    return "https://thebacktrack.vercel.app/profile/" + qrCode?.publicCode;
   }, [qrCode?.publicCode]);
 
   const handlePreviewProfile = useCallback(() => {

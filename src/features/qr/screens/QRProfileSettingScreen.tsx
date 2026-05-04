@@ -1,15 +1,13 @@
+import { PostFormTextArea } from "@/src/features/post/components";
 import { LogoSelector } from "@/src/features/qr/components";
-import { IS_QR_FEATURE_MOCK, MOCK_QR_CODE } from "@/src/features/qr/constants";
 import { useGetMyQR, usePatchMyQR } from "@/src/features/qr/hooks";
-import {
-  AppBackButton,
-  TouchableIconButton,
-} from "@/src/shared/components";
+import { AppBackButton, TouchableIconButton } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { metrics } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
 import { typography } from "@/src/shared/theme/typography";
 import { getErrorMessage } from "@/src/shared/utils";
+import * as Haptics from "expo-haptics";
 import { Stack } from "expo-router";
 import {
   ChatTeardropTextIcon,
@@ -33,8 +31,6 @@ import {
   View,
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import * as Haptics from "expo-haptics";
-import { PostFormTextArea } from "@/src/features/post/components";
 
 type SettingsForm = {
   showPhone: boolean;
@@ -147,7 +143,6 @@ const QRProfileSettingScreen = () => {
   }, [qrData]);
 
   const publicCode = useMemo(() => {
-    if (IS_QR_FEATURE_MOCK) return MOCK_QR_CODE.publicCode;
     return qrData?.publicCode ?? "";
   }, [qrData?.publicCode]);
 
@@ -187,7 +182,9 @@ const QRProfileSettingScreen = () => {
           headerLeft: () => <AppBackButton />,
           headerRight: () => (
             <TouchableIconButton
-              icon={<CheckIcon size={24} color={colors.primary} weight="bold" />}
+              icon={
+                <CheckIcon size={24} color={colors.primary} weight="bold" />
+              }
               onPress={handleSave}
               disabled={!hasChanges || isBusy}
             />
@@ -227,10 +224,7 @@ const QRProfileSettingScreen = () => {
 
           {/* Logo */}
           <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
-            <SectionTitle
-              title="Logo"
-              subtitle="Add a logo to your QR code"
-            />
+            <SectionTitle title="Logo" subtitle="Add a logo to your QR code" />
             <LogoSelector
               value={form.logoUrl}
               onChange={(url: string) =>
