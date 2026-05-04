@@ -5,7 +5,7 @@ import { type UserPost } from "@/src/features/post/types/post.type";
 import { AppImage } from "@/src/shared/components";
 import { PROFILE_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors, metrics } from "@/src/shared/theme";
-import { formatIsoDate } from "@/src/shared/utils/datetime.utils";
+import { formatIsoDate, parseToDate } from "@/src/shared/utils/datetime.utils";
 import { router } from "expo-router";
 import { MotiPressable } from "moti/interactions";
 import { ClockIcon, MapPinIcon } from "phosphor-react-native";
@@ -38,7 +38,8 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
 
   const eventTimeLabel = useMemo(() => {
     if (!item.eventTime) return "Unknown time";
-    return formatIsoDate(item.eventTime);
+    const date = parseToDate(item.eventTime);
+    return formatIsoDate(date);
   }, [item.eventTime]);
 
   const handleOpenDetail = useCallback(() => {
