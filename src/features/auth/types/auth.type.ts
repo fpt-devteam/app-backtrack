@@ -1,5 +1,15 @@
 import type { Nullable } from "@/src/shared/types";
 
+
+const USER_STATUS = {
+  ACTIVE: "Active",
+  INACTIVE: "Inactive",
+} as const;
+
+export type UserStatus = typeof USER_STATUS[keyof typeof USER_STATUS];
+
+/**
+ */
 export type AppUser = {
   id: string;
   email: Nullable<string>;
@@ -9,6 +19,8 @@ export type AppUser = {
   globalRole: string;
   showEmail: boolean;
   showPhone: boolean;
+  postActionCount: number;
+  status: UserStatus;
 };
 
 export type AuthState = {

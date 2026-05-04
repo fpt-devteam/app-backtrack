@@ -24,6 +24,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppLink } from "../AppLink";
 import { AppButton } from "../ui/AppButton";
+import { toast } from "../ui/toast";
 
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
@@ -36,8 +37,10 @@ const TAB_ICONS: Record<string, TabIcon> = {
 
 export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   const insets = useSafeAreaInsets();
-  const { user } = useAppUser();
+  const { user, refetch } = useAppUser();
+
   const [isPhoneSheetVisible, setIsPhoneSheetVisible] = useState(false);
+  const isPostActionLimitReached = user ? user.postActionCount === 0 : false;
 
   const leadingRoutes = state.routes.slice(0, 2); // -> post, handover
   const trailingRoutes = state.routes.slice(2); // -> inbox, profile
@@ -116,7 +119,9 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
     );
   };
 
-  const handleAddPress = () => {
+  const handleAddPress = async () => {
+    await refetch();
+
     if (!user) {
       router.push(AUTH_ROUTE.onboarding);
       return;
@@ -127,6 +132,13 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
     //   setIsPhoneSheetVisible(true);
     //   return;
     // }
+
+    if (isPostActionLimitReached) {
+      toast.info(
+        "You've reached your post action limit. Please subscribe to our premium plan to continue posting and engaging with the community.",
+      );
+      return;
+    }
 
     router.push(POST_ROUTE.create);
   };
@@ -155,6 +167,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
         {trailingRoutes.map((route) => renderTabButton(route))}
       </Animated.View>
 
+      {/* Phone Verification Sheet */}
       <BottomSheet
         isVisible={isPhoneSheetVisible}
         onClose={() => setIsPhoneSheetVisible(false)}

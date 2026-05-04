@@ -12,7 +12,7 @@ import {
   StarIcon,
   WarningIcon,
 } from "phosphor-react-native";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import type { ViewStyle } from "react-native";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
@@ -29,6 +29,12 @@ type ActiveBodyProps = {
 };
 
 function ActiveBody({ subscription }: ActiveBodyProps) {
+  const { user, refetch } = useAppUser();
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
   return (
     <View className="gap-xs">
       {/* Plan heading row */}
@@ -53,25 +59,34 @@ function ActiveBody({ subscription }: ActiveBodyProps) {
         </View>
       </View>
 
-      {/* Renewal row */}
-      <View className="flex-row items-center gap-xs flex-wrap">
-        <CalendarBlankIcon size={13} color={colors.hof[400]} weight="thin" />
-        <Text className="text-sm text-textSecondary font-thin">
-          Renews {formatDate(subscription.currentPeriodEnd)}
-        </Text>
+      {/* Information row */}
+      <View className="flex-row justify-between items-center">
+        <View className="flex-row items-center gap-xs flex-wrap">
+          <CalendarBlankIcon size={13} color={colors.hof[400]} weight="thin" />
+          <Text className="text-sm text-textSecondary font-thin">
+            Renews {formatDate(subscription.currentPeriodEnd)}
+          </Text>
 
-        {subscription.cancelAtPeriodEnd && (
-          <View className="flex-row items-center gap-1 ml-auto">
-            <WarningIcon
-              size={13}
-              color={colors.status.warning}
-              weight="fill"
-            />
-            <Text className="text-xs" style={{ color: colors.status.warning }}>
-              Cancels soon
-            </Text>
-          </View>
-        )}
+          {subscription.cancelAtPeriodEnd && (
+            <View className="flex-row items-center gap-1 ml-auto">
+              <WarningIcon
+                size={13}
+                color={colors.status.warning}
+                weight="fill"
+              />
+              <Text
+                className="text-xs"
+                style={{ color: colors.status.warning }}
+              >
+                Cancels soon
+              </Text>
+            </View>
+          )}
+        </View>
+
+        <Text className="text-sm text-textSecondary font-thin">
+          Remains {user?.postActionCount} post actions
+        </Text>
       </View>
     </View>
   );
@@ -104,7 +119,6 @@ function UpsellBody() {
 }
 
 export const UserSubscriptionPlanPressableCard = () => {
-  const { user, refetch } = useAppUser();
   const { data: subscription, isLoading } = useGetMySubscription();
 
   const handleNavigatePlanScreen = useCallback(() => {
@@ -123,7 +137,6 @@ export const UserSubscriptionPlanPressableCard = () => {
     <View className="gap-2">
       <Pressable onPress={handleNavigatePlanScreen}>
         {isLoading ? (
-          // Loading skeleton — matches active card proportions
           <View
             className="bg-surface rounded-xl border border-divider px-5 py-5 items-center"
             style={CARD_SHADOW}
@@ -131,7 +144,6 @@ export const UserSubscriptionPlanPressableCard = () => {
             <ActivityIndicator size="small" color={colors.primary} />
           </View>
         ) : isActiveDisplay && subscriptionData ? (
-          // Active subscription — elevated white card matching FeatureCard
           <View
             className="bg-surface rounded-xl border border-divider px-5 py-4"
             style={CARD_SHADOW}
@@ -139,7 +151,6 @@ export const UserSubscriptionPlanPressableCard = () => {
             <ActiveBody subscription={subscriptionData} />
           </View>
         ) : (
-          // Upsell banner — primary-tinted background, upgrade CTA
           <View
             className="rounded-xl px-5 py-4"
             style={{ backgroundColor: colors.rausch[50] }}
