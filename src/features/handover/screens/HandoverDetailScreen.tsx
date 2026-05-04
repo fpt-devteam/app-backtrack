@@ -401,6 +401,11 @@ const ActionPanel = ({
 }: ActionPanelProps) => {
   const { status } = report;
 
+  const isCloseDisabled = isActivating || isConfirming || isRejecting;
+  const isDeliveryDisabled = isConfirming || isRejecting || isClosing;
+  const isConfirmingDisabled = isActivating || isRejecting || isClosing;
+  const isRejectingDisabled = isActivating || isConfirming || isClosing;
+
   if (status === "Confirmed") {
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
@@ -430,6 +435,8 @@ const ActionPanel = ({
   }
 
   if (status === "Ongoing" && isFinder) {
+    console.log("Here Ongoing");
+
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
         <View className="flex-row gap-md">
@@ -438,8 +445,8 @@ const ActionPanel = ({
             <AppButton
               title="Close Handover"
               onPress={onClose}
-              disabled={isConfirming || isRejecting || isClosing}
               loading={isClosing}
+              disabled={isCloseDisabled}
               variant="outline"
             />
           </View>
@@ -450,7 +457,7 @@ const ActionPanel = ({
               title="Mark Delivered"
               onPress={onActivate}
               loading={isActivating}
-              disabled={isActivating}
+              disabled={isDeliveryDisabled}
               variant="secondary"
             />
           </View>
@@ -472,6 +479,7 @@ const ActionPanel = ({
   }
 
   if (status === "Delivered" && isFinder) {
+    console.log("Here Delivered");
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
         <AppTipCard
@@ -492,8 +500,8 @@ const ActionPanel = ({
             <AppButton
               title="Reject"
               onPress={onReject}
-              disabled={isConfirming || isRejecting}
               loading={isRejecting}
+              disabled={isRejectingDisabled}
               variant="outline"
             />
           </View>
@@ -503,8 +511,8 @@ const ActionPanel = ({
             <AppButton
               title="I've Received"
               onPress={onConfirm}
-              disabled={isConfirming || isRejecting}
               loading={isConfirming}
+              disabled={isConfirmingDisabled}
               variant="secondary"
             />
           </View>
@@ -841,6 +849,9 @@ const HandoverDetailScreen = () => {
     );
   }, [report, ownerReject]);
 
+  const isInProgressHandover =
+    report && (report.status === "Ongoing" || report.status === "Delivered");
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -1005,14 +1016,15 @@ const HandoverDetailScreen = () => {
           headerLeft: () => (
             <AppBackButton type="arrowLeftIcon" showBackground={false} />
           ),
-          headerRight: () => (
-            <TouchableIconButton
-              icon={<ChatCenteredTextIcon size={24} />}
-              onPress={handleOpenChat}
-              disabled={!counterpartId || isOpeningChat}
-              loading={isOpeningChat}
-            />
-          ),
+          headerRight: () =>
+            isInProgressHandover && (
+              <TouchableIconButton
+                icon={<ChatCenteredTextIcon size={24} />}
+                onPress={handleOpenChat}
+                disabled={!counterpartId || isOpeningChat}
+                loading={isOpeningChat}
+              />
+            ),
           headerTitleStyle: {
             fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
