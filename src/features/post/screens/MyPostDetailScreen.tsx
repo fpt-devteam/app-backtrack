@@ -13,6 +13,7 @@ import { usePostSubcategoryStore } from "@/src/features/post/store";
 import {
   ELECTRONICS_SUBCATEGORY,
   POST_CATEGORIES,
+  POST_STATUS,
 } from "@/src/features/post/types";
 import {
   AppLoader,
@@ -594,6 +595,10 @@ const MyPostDetailScreen = () => {
     );
   };
 
+  const isActivePost = useMemo(() => {
+    return post?.status === POST_STATUS.ACTIVE;
+  }, [post?.status]);
+
   return (
     <>
       <Stack.Screen
@@ -619,16 +624,17 @@ const MyPostDetailScreen = () => {
             <HeaderIcon icon={ArrowLeftIcon} onPress={handleBackPress} />
           ),
 
-          headerRight: () => (
-            <View className="flex-row items-center gap-sm">
-              <HeaderIcon icon={ExportIcon} onPress={handleSharePress} />
+          headerRight: () =>
+            isActivePost && (
+              <View className="flex-row items-center gap-sm">
+                <HeaderIcon icon={ExportIcon} onPress={handleSharePress} />
 
-              <HeaderIcon
-                icon={DotsThreeVerticalIcon}
-                onPress={handleMorePress}
-              />
-            </View>
-          ),
+                <HeaderIcon
+                  icon={DotsThreeVerticalIcon}
+                  onPress={handleMorePress}
+                />
+              </View>
+            ),
         }}
       />
 

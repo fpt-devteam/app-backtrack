@@ -20,6 +20,7 @@ import {
 } from "@/src/features/post/types";
 import {
   AppBackButton,
+  AppButton,
   AppInlineError,
   AppLoader,
   AppSearchRow,
@@ -48,7 +49,6 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import {
   CameraIcon,
-  CheckIcon,
   GpsFixIcon,
   HeadCircuitIcon,
   ImageIcon,
@@ -65,6 +65,7 @@ import React, {
   useState,
 } from "react";
 import {
+  Alert,
   Image,
   Keyboard,
   Pressable,
@@ -75,7 +76,10 @@ import {
   View,
 } from "react-native";
 import MapView, { Marker, Region } from "react-native-maps";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import PostDetailForm from "./CategoryForm/PostDetailForm";
 
 const PICKER_OPTIONS: ImagePickerOptions = {
@@ -91,6 +95,8 @@ const CAMERA_OPTIONS: ImagePickerOptions = {
 
 const MyPostUpdateScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
+  const insets = useSafeAreaInsets();
+
   const {
     isLoading,
     data: post,
@@ -105,13 +111,19 @@ const MyPostUpdateScreen = () => {
 
   const draftImages = usePostCreationStore((s) => s.draftImages);
 
-  const isActionDisabled = isUpdatingPost || isAnalyzing || !isAnalysisDone;
-
   const canAnalyze = useMemo(() => {
     if (!post) return false;
     const hasImages = post.imageUrls.length > 0 || draftImages.length > 0;
     return hasImages;
   }, [post, draftImages]);
+
+  const isAnalyzeRunning = isAnalyzing || !isAnalysisDone;
+
+  const isBackDisabled = isUpdatingPost || isAnalyzeRunning;
+  const isAnalyzeLoading = isAnalyzeRunning;
+  const isAnalyzeDisabled = isUpdatingPost || !canAnalyze || isAnalyzeRunning;
+  const isSaveLoading = isUpdatingPost;
+  const isSaveDisabled = isUpdatingPost || isAnalyzeRunning;
 
   const addImages = usePostCreationStore((s) => s.addImages);
   const removeImage = usePostCreationStore((s) => s.removeImage);
@@ -354,6 +366,25 @@ const MyPostUpdateScreen = () => {
     }
   };
 
+  const handlePressSave = () => {
+    Alert.alert(
+      "Confirm Update",
+      "Saving these changes will permanently cancel all current handover sessions. This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Confirm & Update",
+          onPress: async () => {
+            await handleSave();
+          },
+        },
+      ],
+    );
+  };
+
   const handleSave = async () => {
     if (!postId) {
       toast.error("Invalid post. Please go back and try again.");
@@ -391,7 +422,6 @@ const MyPostUpdateScreen = () => {
     }
   };
 
-
   if (isLoading || !isLoaded) {
     return (
       <SafeAreaView className="flex-1 bg-surface items-center justify-center">
@@ -420,27 +450,23 @@ const MyPostUpdateScreen = () => {
                 .normal as TextStyle["fontWeight"],
             },
             headerLeft: () => (
-              <AppBackButton type="arrowLeftIcon" showBackground={false} disabled={isActionDisabled} />
+              <AppBackButton
+                type="arrowLeftIcon"
+                showBackground={false}
+                disabled={isBackDisabled}
+              />
             ),
             headerRight: () => (
-              <View className="flex-row items-center gap-md">
-                <TouchableIconButton
-                  icon={<HeadCircuitIcon size={28} />}
-                  onPress={handleAIAnalyze}
-                  disabled={isActionDisabled || !canAnalyze}
-                  loading={isAnalyzing}
-                />
-
-                <TouchableIconButton
-                  icon={<CheckIcon size={28} />}
-                  onPress={handleSave}
-                  disabled={isActionDisabled}
-                  loading={isUpdatingPost}
-                />
-              </View>
+              <TouchableIconButton
+                icon={<HeadCircuitIcon size={28} />}
+                onPress={handleAIAnalyze}
+                disabled={isAnalyzeDisabled}
+                loading={isAnalyzeLoading}
+              />
             ),
           }}
         />
+
         <ScrollView
           className="flex-1"
           contentContainerStyle={{
@@ -540,6 +566,18 @@ const MyPostUpdateScreen = () => {
             <PostDetailForm subcategory={safeSubCategory.code} />
           </View>
         </ScrollView>
+      </View>
+
+      <View
+        className="bg-surface border-t border-divider px-lg pt-md2"
+        style={{ paddingBottom: insets.bottom }}
+      >
+        <AppButton
+          title="Update Post"
+          onPress={handlePressSave}
+          loading={isSaveLoading}
+          disabled={isSaveDisabled}
+        />
       </View>
 
       {(isAnalyzing || !isAnalysisDone) && (
