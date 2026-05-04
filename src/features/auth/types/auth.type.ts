@@ -19,6 +19,7 @@ export type AppUser = {
   globalRole: string;
   showEmail: boolean;
   showPhone: boolean;
+  postActionLimit?: number;
   postActionCount: number;
   status: UserStatus;
 };
