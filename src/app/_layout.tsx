@@ -52,7 +52,6 @@ export default function RootLayout() {
     (state) => state.loadAllSubcategories,
   );
 
-  // Handle notification when app is opened from a killed state
   useEffect(() => {
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.screenPath;
@@ -75,7 +74,6 @@ export default function RootLayout() {
     };
   }, []);
 
-  // Prepare App
   useEffect(() => {
     async function prepareApp() {
       try {
@@ -93,7 +91,6 @@ export default function RootLayout() {
           ...cacheImagePromises,
           Asset.loadAsync(FALLBACK_AVATAR_SOURCE),
 
-          //
           loadAllSubcategories(),
         ]);
       } catch (e) {
@@ -117,6 +114,7 @@ export default function RootLayout() {
 
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="(tabs)" />
+
                   <Stack.Screen
                     name="(auth)"
                     options={{
@@ -124,7 +122,24 @@ export default function RootLayout() {
                       animation: "slide_from_bottom",
                     }}
                   />
+
                   <Stack.Screen name="(shared)" />
+
+                  <Stack.Screen
+                    name="(post-create)"
+                    options={{
+                      headerShown: false,
+                      animation: "slide_from_bottom",
+                    }}
+                  />
+
+                  <Stack.Screen
+                    name="(post)"
+                    options={{
+                      headerShown: false,
+                      animation: "fade_from_bottom",
+                    }}
+                  />
                 </Stack>
 
                 <Toast config={toastConfig} position="top" topOffset={56} />

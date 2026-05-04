@@ -2,7 +2,7 @@ import { useAppUser } from "@/src/features/auth/providers";
 import { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
 import { TabBarButton } from "@/src/shared/components/app-utils/TabBarButton";
 import { BottomSheet } from "@/src/shared/components/ui/BottomSheet";
-import { AUTH_ROUTE, POST_ROUTE } from "@/src/shared/constants";
+import { AUTH_ROUTE, POST_CREATE, POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { StackActions } from "@react-navigation/native";
@@ -24,7 +24,6 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppLink } from "../AppLink";
 import { AppButton } from "../ui/AppButton";
-import { toast } from "../ui/toast";
 
 type TabIcon = { Icon: React.ElementType<IconProps>; label: string };
 
@@ -133,14 +132,14 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
     //   return;
     // }
 
-    if (isPostActionLimitReached) {
-      toast.info(
-        "You've reached your post action limit. Please subscribe to our premium plan to continue posting and engaging with the community.",
-      );
-      return;
-    }
+    // if (isPostActionLimitReached) {
+    //   toast.info(
+    //     "You've reached your post action limit. Please subscribe to our premium plan to continue posting and engaging with the community.",
+    //   );
+    //   return;
+    // }
 
-    router.push(POST_ROUTE.create);
+    router.push(POST_CREATE.index);
   };
 
   return (

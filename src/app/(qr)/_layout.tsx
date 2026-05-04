@@ -11,13 +11,13 @@ import { Pressable } from "react-native-gesture-handler";
 
 const QrLayout = () => {
   const handleNavigateSettingScreen = useCallback(() => {
-    router.push(QR_ROUTE.profileSetting);
+    router.push(QR_ROUTE.qrProfileSetting);
   }, []);
 
   return (
     <Stack>
       <Stack.Screen
-        name="index"
+        name="qr"
         options={{
           headerTitle: "Backtrack QR",
           headerLeft: () => <AppBackButton />,

@@ -7,8 +7,6 @@ import { TextStyle } from "react-native/Libraries/StyleSheet/StyleSheetTypes";
 const ChatLayout = () => {
   return (
     <Stack>
-      <Stack.Screen name="index" />
-
       <Stack.Screen name="[conversationId]/index" />
 
       <Stack.Screen

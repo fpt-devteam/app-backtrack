@@ -3,13 +3,14 @@ import { usePostSearchStore } from "@/src/features/post/hooks/usePostSearchStore
 import { radiusSearchSchema } from "@/src/features/post/schemas";
 import { type ItemCategory, PostType } from "@/src/features/post/types";
 import {
+  AppBackButton,
   AppButton,
   AppLink,
   AppSegmentedControl,
 } from "@/src/shared/components";
-import { colors, metrics } from "@/src/shared/theme";
+import { colors, metrics, typography } from "@/src/shared/theme";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import { MotiView } from "moti";
 import {
   CubeFocusIcon,
@@ -18,7 +19,7 @@ import {
   MapPinSimpleAreaIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, TextStyle, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type PostTypeFilterValue = "all" | PostType;
@@ -122,109 +123,125 @@ const PostSearchFilterScreen = () => {
   }, [draftCategories, draftPostType, draftRadius, store]);
 
   return (
-    <View className="flex-1 bg-surface">
-      <ScrollView
-        className="flex-1 p-md"
-        contentContainerStyle={{ paddingBottom: 160 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="gap-lg">
-          {/* Post Type */}
-          <MotiView
-            from={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", damping: 15, delay: 40 }}
-          >
-            <View className="gap-lg">
-              <View className="flex-row items-center gap-sm">
-                <CubeFocusIcon
-                  size={32}
-                  weight="regular"
-                  color={colors.blue[500]}
-                />
-                <Text className="text-lg font-normal text-textPrimary">
-                  Type of Post
-                </Text>
-              </View>
-              <AppSegmentedControl
-                value={draftPostType}
-                onChange={(v) => setDraftPostType(v as PostTypeFilterValue)}
-                options={POST_TYPE_OPTIONS}
-              />
-            </View>
-          </MotiView>
-
-          <View className="border-t border-muted" />
-
-          {/* Search Radius */}
-          <MotiView
-            from={{ opacity: 0, translateY: 10 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 240 }}
-          >
-            <View className="gap-lg">
-              <View className="flex-row items-center gap-sm">
-                <MapPinSimpleAreaIcon
-                  size={32}
-                  weight="regular"
-                  color={colors.red[600]}
-                />
-                <Text className="text-lg font-normal text-textPrimary">
-                  Search Radius
-                </Text>
-              </View>
-              <AppSegmentedControl
-                value={draftRadius}
-                onChange={setDraftRadius}
-                options={RADIUS_OPTIONS}
-              />
-            </View>
-          </MotiView>
-
-          <View className="border-t border-muted" />
-
-          {/* Category */}
-          <MotiView
-            from={{ opacity: 0, translateY: 10 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 280, delay: 80 }}
-          >
-            <View className="gap-lg">
-              <View className="flex-row items-center gap-sm">
-                <FadersIcon size={32} weight="regular" color={colors.primary} />
-                <Text className="text-lg font-normal text-textPrimary">
-                  Category
-                </Text>
-              </View>
-
-              <View className="flex-row flex-wrap">
-                {Object.keys(CATEGORY_REGISTRY).map((key) => (
-                  <CategoryCard
-                    key={key}
-                    category={key as ItemCategory}
-                    selected={draftCategories.includes(key as ItemCategory)}
-                    onPress={handleToggleCategory}
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: "Filters",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+          headerRight: () => <AppBackButton type="xIcon" />,
+        }}
+      />
+      <View className="flex-1 bg-surface">
+        <ScrollView
+          className="flex-1 p-md"
+          contentContainerStyle={{ paddingBottom: 160 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View className="gap-lg">
+            {/* Post Type */}
+            <MotiView
+              from={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", damping: 15, delay: 40 }}
+            >
+              <View className="gap-lg">
+                <View className="flex-row items-center gap-sm">
+                  <CubeFocusIcon
+                    size={32}
+                    weight="regular"
+                    color={colors.blue[500]}
                   />
-                ))}
+                  <Text className="text-lg font-normal text-textPrimary">
+                    Type of Post
+                  </Text>
+                </View>
+                <AppSegmentedControl
+                  value={draftPostType}
+                  onChange={(v) => setDraftPostType(v as PostTypeFilterValue)}
+                  options={POST_TYPE_OPTIONS}
+                />
               </View>
-            </View>
-          </MotiView>
-        </View>
-      </ScrollView>
+            </MotiView>
 
-      {/* Actions */}
-      <View
-        className="absolute left-0 right-0 bottom-0 border-t border-muted bg-white/95 px-md pt-md2 flex-col gap-md items-center justify-between shadow-lg"
-        style={{ paddingBottom: insets.bottom + metrics.spacing.sm }}
-      >
-        <AppButton
-          title="Apply filters"
-          variant="secondary"
-          onPress={handleApply}
-        />
-        <AppLink title="Clear all" onPress={handleClearAll} size="sm" />
+            <View className="border-t border-muted" />
+
+            {/* Search Radius */}
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 240 }}
+            >
+              <View className="gap-lg">
+                <View className="flex-row items-center gap-sm">
+                  <MapPinSimpleAreaIcon
+                    size={32}
+                    weight="regular"
+                    color={colors.red[600]}
+                  />
+                  <Text className="text-lg font-normal text-textPrimary">
+                    Search Radius
+                  </Text>
+                </View>
+                <AppSegmentedControl
+                  value={draftRadius}
+                  onChange={setDraftRadius}
+                  options={RADIUS_OPTIONS}
+                />
+              </View>
+            </MotiView>
+
+            <View className="border-t border-muted" />
+
+            {/* Category */}
+            <MotiView
+              from={{ opacity: 0, translateY: 10 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 280, delay: 80 }}
+            >
+              <View className="gap-lg">
+                <View className="flex-row items-center gap-sm">
+                  <FadersIcon
+                    size={32}
+                    weight="regular"
+                    color={colors.primary}
+                  />
+                  <Text className="text-lg font-normal text-textPrimary">
+                    Category
+                  </Text>
+                </View>
+
+                <View className="flex-row flex-wrap">
+                  {Object.keys(CATEGORY_REGISTRY).map((key) => (
+                    <CategoryCard
+                      key={key}
+                      category={key as ItemCategory}
+                      selected={draftCategories.includes(key as ItemCategory)}
+                      onPress={handleToggleCategory}
+                    />
+                  ))}
+                </View>
+              </View>
+            </MotiView>
+          </View>
+        </ScrollView>
+
+        {/* Actions */}
+        <View
+          className="absolute left-0 right-0 bottom-0 border-t border-muted bg-white/95 px-md pt-md2 flex-col gap-md items-center justify-between shadow-lg"
+          style={{ paddingBottom: insets.bottom + metrics.spacing.sm }}
+        >
+          <AppButton
+            title="Apply filters"
+            variant="secondary"
+            onPress={handleApply}
+          />
+          <AppLink title="Clear all" onPress={handleClearAll} size="sm" />
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 

@@ -1,3 +1,4 @@
+import { PostFormField } from "@/src/features/post/components";
 import {
   AppBackButton,
   AppButton,
@@ -29,7 +30,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as yup from "yup";
-import { PostFormField } from "../../post/components";
 
 const passwordSchema = yup
   .string()
@@ -183,7 +183,6 @@ const ProfileUpdatePasswordScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,
           headerTitle: "Update Password",
           headerLeft: () => (
             <AppBackButton type="arrowLeftIcon" showBackground={false} />

@@ -44,7 +44,7 @@ export const UserQRCodePressableCard = ({
 
   const handlePreviewProfile = useCallback(() => {
     if (!qrCode) return;
-    router.push(QR_ROUTE.profile);
+    router.push(QR_ROUTE.qrProfile);
   }, [qrCode]);
 
   const handleUpgrade = useCallback(() => {

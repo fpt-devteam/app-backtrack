@@ -79,7 +79,6 @@ const InboxScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,
           headerTitle: "Inbox",
           headerTitleStyle: {
             fontSize: typography.fontSize.lg,

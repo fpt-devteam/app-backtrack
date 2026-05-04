@@ -4,8 +4,8 @@ import { useUnregisterDeviceMutation } from "@/src/features/notification/hooks";
 import { AppButton, AppUserAvatar } from "@/src/shared/components";
 import { AUTH_ROUTE, PROFILE_ROUTE, QR_ROUTE } from "@/src/shared/constants";
 import { auth } from "@/src/shared/lib/firebase";
-import { colors } from "@/src/shared/theme";
-import { router } from "expo-router";
+import { colors, typography } from "@/src/shared/theme";
+import { router, Stack } from "expo-router";
 import { signOut } from "firebase/auth";
 import {
   CaretRightIcon,
@@ -30,7 +30,7 @@ import {
 import { UserSubscriptionPlanPressableCard } from "@/src/features/qr/components";
 import type { IconProps } from "phosphor-react-native";
 import type { ComponentType } from "react";
-import type { ViewStyle } from "react-native";
+import type { TextStyle, ViewStyle } from "react-native";
 
 const CARD_SHADOW: ViewStyle = {
   shadowColor: colors.black,
@@ -128,7 +128,7 @@ function ProfileScreen() {
   }, []);
 
   const handleUserQR = useCallback(() => {
-    router.push(QR_ROUTE.index);
+    router.push(QR_ROUTE.qr);
   }, []);
 
   const handleGetHelp = useCallback(() => {
@@ -246,7 +246,20 @@ function ProfileScreen() {
     );
   };
 
-  return <View className="flex-1 bg-surface">{renderContent()}</View>;
+  return (
+    <View className="flex-1 bg-surface">
+      <Stack.Screen
+        options={{
+          headerTitle: "Profile",
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
+      {renderContent()}
+    </View>
+  );
 }
 
 export default ProfileScreen;

@@ -6,8 +6,8 @@ import {
   ELECTRONICS_SUB_CATEGORY_ICONS,
   PERSONAL_BELONGING_SUB_CATEGORY_ICONS,
 } from "@/src/shared/constants";
-import { POST_ROUTE } from "@/src/shared/constants/route.constant";
-import { RelativePathString, router } from "expo-router";
+import { POST_CREATE } from "@/src/shared/constants/route.constant";
+import { router } from "expo-router";
 import React, { useEffect } from "react";
 import { Image, ImageSourcePropType, Text, View } from "react-native";
 import Animated, {
@@ -95,7 +95,7 @@ const ReportIntentStepScreen = () => {
 
   const handleNavigate = (postType: PostType) => {
     selectPostType(postType);
-    router.push(POST_ROUTE.stepper as RelativePathString);
+    router.push(POST_CREATE.stepper);
   };
 
   const renderContent = () => {

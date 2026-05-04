@@ -19,7 +19,7 @@ import {
 } from "@/src/shared/components";
 import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
 import { toast } from "@/src/shared/components/ui/toast";
-import { POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { POST_CREATE, POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { ensureMediaPermission } from "@/src/shared/services";
 import { colors, typography } from "@/src/shared/theme";
 import {
@@ -65,12 +65,12 @@ type StepKey = (typeof STEP_KEY)[keyof typeof STEP_KEY];
 
 const STEPS: { key: StepKey; path: ExternalPathString | RelativePathString }[] =
   [
-    { key: STEP_KEY.CATEGORY, path: POST_ROUTE.category },
-    { key: STEP_KEY.SUB_CATEGORY, path: POST_ROUTE.subCategory },
-    { key: STEP_KEY.IDENTITY, path: POST_ROUTE.identity },
-    { key: STEP_KEY.LOCATION, path: POST_ROUTE.location },
-    { key: STEP_KEY.TIMELINE, path: POST_ROUTE.timeline },
-    { key: STEP_KEY.DETAIL, path: POST_ROUTE.itemDetail },
+    { key: STEP_KEY.CATEGORY, path: POST_CREATE.category },
+    { key: STEP_KEY.SUB_CATEGORY, path: POST_CREATE.subCategory },
+    { key: STEP_KEY.IDENTITY, path: POST_CREATE.identity },
+    { key: STEP_KEY.LOCATION, path: POST_CREATE.location },
+    { key: STEP_KEY.TIMELINE, path: POST_CREATE.timeline },
+    { key: STEP_KEY.DETAIL, path: POST_CREATE.itemDetail },
   ];
 
 const PostCreationStepperLayout = () => {

@@ -141,10 +141,11 @@ const UserPostScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerTitle: "What You've Posted",
+          headerTitle: "My Posts",
           headerLeft: () => (
             <AppBackButton type="arrowLeftIcon" showBackground={false} />
           ),
+          headerShadowVisible: false,
           headerTitleStyle: {
             fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],

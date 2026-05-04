@@ -15,7 +15,7 @@ import {
   AppInlineError,
   AppSplashScreen,
 } from "@/src/shared/components";
-import { SHARED_ROUTE } from "@/src/shared/constants";
+import { HANDOVER_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { formatCompareTimeGap } from "@/src/shared/utils/datetime.utils";
 import { formatLocationGap } from "@/src/shared/utils/location.utils";
@@ -275,7 +275,7 @@ export const ComparePostsScreen = ({
     }
 
     if (existingHandoverId) {
-      router.navigate(SHARED_ROUTE.handoverDetail(existingHandoverId));
+      router.navigate(HANDOVER_ROUTE.detail(existingHandoverId));
       return;
     }
 

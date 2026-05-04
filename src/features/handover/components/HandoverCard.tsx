@@ -7,7 +7,7 @@ import {
 } from "@/src/features/handover/components/handover.presentation";
 import type { Handover } from "@/src/features/handover/types";
 import { AppImage, AppUserAvatar } from "@/src/shared/components";
-import { SHARED_ROUTE } from "@/src/shared/constants";
+import { HANDOVER_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
 import React, { useCallback } from "react";
 import { InteractionManager, Text, View } from "react-native";
 
@@ -31,7 +31,7 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
   const handlePress = useCallback(() => {
     if (router.canDismiss()) router.dismiss();
     InteractionManager.runAfterInteractions(() => {
-      router.navigate(SHARED_ROUTE.handoverDetail(handover.id));
+      router.navigate(HANDOVER_ROUTE.detail(handover.id));
     });
   }, [handover]);
 

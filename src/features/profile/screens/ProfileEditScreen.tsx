@@ -4,7 +4,7 @@ import { usePatchProfile } from "@/src/features/profile/hooks";
 import type { UpdateProfileRequest } from "@/src/features/profile/types";
 import { AppBackButton, AppButton, AppLoader } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { metrics } from "@/src/shared/theme";
+import { metrics, typography } from "@/src/shared/theme";
 import { getErrorMessage } from "@/src/shared/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { router, Stack } from "expo-router";
@@ -16,6 +16,7 @@ import {
   Platform,
   ScrollView,
   Text,
+  TextStyle,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -121,6 +122,22 @@ const ProfileEditScreen = () => {
 
   return (
     <>
+      <Stack.Screen
+        options={{
+          title: "Edit Profile",
+
+          headerRight: () => (
+            <AppBackButton type="xIcon" showBackground={true} />
+          ),
+          headerLeft: () => null,
+          headerShadowVisible: true,
+          headerTitleStyle: {
+            fontSize: typography.fontSize.base,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
+        }}
+      />
+
       <KeyboardAvoidingView
         className="flex-1 bg-surface"
         behavior={Platform.OS === "ios" ? "padding" : undefined}

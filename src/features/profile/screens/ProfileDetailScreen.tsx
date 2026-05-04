@@ -1,11 +1,11 @@
 import { useAppUser } from "@/src/features/auth/providers";
 import { AppBackButton, AppUserAvatar } from "@/src/shared/components";
-import { PROFILE_ROUTE } from "@/src/shared/constants";
+import { PROFILE_ROUTE } from "@/src/shared/constants/route.constant";
+import { typography } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
-import { typography } from "@/src/shared/theme/typography";
 import { router, Stack } from "expo-router";
 import { EnvelopeIcon, IconProps, PhoneIcon } from "phosphor-react-native";
-import React, { ComponentType, useCallback } from "react";
+import React, { ComponentType, useCallback, useEffect } from "react";
 import { Pressable, ScrollView, Text, TextStyle, View } from "react-native";
 
 type Props = {
@@ -22,8 +22,11 @@ const InfoRow = ({ icon: Icon, value }: Props) => (
 
 const ProfileDetailScreen = () => {
   const { user, refetch } = useAppUser();
-
   const displayName = user?.displayName?.trim() || user?.email || "User";
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const handleEditProfile = useCallback(() => {
     router.push(PROFILE_ROUTE.edit);
@@ -33,7 +36,6 @@ const ProfileDetailScreen = () => {
     <>
       <Stack.Screen
         options={{
-          headerShown: true,
           headerTitle: "Profile Details",
           headerLeft: () => (
             <AppBackButton type={"arrowLeftIcon"} showBackground={false} />
@@ -53,6 +55,7 @@ const ProfileDetailScreen = () => {
           },
         }}
       />
+
       <ScrollView
         className="flex-1 bg-surface"
         contentContainerClassName="px-lg pt-xl pb-xl"
