@@ -102,12 +102,12 @@ const MyPostUpdateScreen = () => {
     data: post,
     error: fetchError,
   } = useGetPostById({ postId });
+
+  console.log("Post:", post);
+
   const { isLoaded, findSubcategoryById } = usePostSubcategoryStore();
-
-  const { updatePost, isUpdatingPost } = useUpdatePost();
-  const { analyzeImage, isAnalyzing } = useAnalyzeImage();
-
-  const [isAnalysisDone, setIsAnalysisDone] = useState(true);
+  const { updatePost } = useUpdatePost();
+  const { analyzeImage } = useAnalyzeImage();
 
   const draftImages = usePostCreationStore((s) => s.draftImages);
 
@@ -117,13 +117,12 @@ const MyPostUpdateScreen = () => {
     return hasImages;
   }, [post, draftImages]);
 
-  const isAnalyzeRunning = isAnalyzing || !isAnalysisDone;
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
+  const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
 
-  const isBackDisabled = isUpdatingPost || isAnalyzeRunning;
-  const isAnalyzeLoading = isAnalyzeRunning;
-  const isAnalyzeDisabled = isUpdatingPost || !canAnalyze || isAnalyzeRunning;
-  const isSaveLoading = isUpdatingPost;
-  const isSaveDisabled = isUpdatingPost || isAnalyzeRunning;
+  const isBackDisabled = isAnalysisLoading || isSaveLoading;
+  const isSaveDisabled = isAnalysisLoading || isSaveLoading;
+  const isAnalyzeDisabled = !canAnalyze || isAnalysisLoading || isSaveLoading;
 
   const addImages = usePostCreationStore((s) => s.addImages);
   const removeImage = usePostCreationStore((s) => s.removeImage);
@@ -319,7 +318,8 @@ const MyPostUpdateScreen = () => {
 
   const handleAIAnalyze = async () => {
     try {
-      setIsAnalysisDone(false);
+      setIsAnalysisLoading(true);
+
       uploadImages();
       const imageUrls = await getUploadedImageUrls();
       const result = await analyzeImage({
@@ -362,7 +362,7 @@ const MyPostUpdateScreen = () => {
     } catch {
       toast.error("AI analysis got an error. Please try again.");
     } finally {
-      setIsAnalysisDone(true);
+      setIsAnalysisLoading(false);
     }
   };
 
@@ -395,6 +395,8 @@ const MyPostUpdateScreen = () => {
       return;
     }
     try {
+      setIsSaveLoading(true);
+
       uploadImages();
       const imageUrls = await getUploadedImageUrls();
 
@@ -415,6 +417,9 @@ const MyPostUpdateScreen = () => {
       };
 
       await updatePost({ postId, req });
+
+      setIsSaveLoading(false);
+
       toast.success("Post updated successfully.");
       router.back();
     } catch {
@@ -461,7 +466,7 @@ const MyPostUpdateScreen = () => {
                 icon={<HeadCircuitIcon size={28} />}
                 onPress={handleAIAnalyze}
                 disabled={isAnalyzeDisabled}
-                loading={isAnalyzeLoading}
+                loading={isAnalysisLoading}
               />
             ),
           }}
@@ -580,7 +585,7 @@ const MyPostUpdateScreen = () => {
         />
       </View>
 
-      {(isAnalyzing || !isAnalysisDone) && (
+      {isAnalysisLoading && (
         <View className="absolute inset-0 z-10 items-center justify-center bg-black/10">
           <AppLoader />
         </View>
