@@ -16,6 +16,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
@@ -47,21 +48,25 @@ export default function HandoverRequestScreen() {
     error: postError,
   } = useGetPostById({ postId: otherPostId });
 
-  const { isCreating, createC2CReturnReport } = useCreateC2CReturnReport();
+  const { isCreating: isCreatingReturnReport, createC2CReturnReport } = useCreateC2CReturnReport();
 
   const { create, isCreating: isCreatingConversation } =
     useCreateDirectConversation();
+    
   const { sendMessage, isSendingMessage } = useSendMessage();
-  const [message, setMessage] = useState("");
-  const isSubmitting = isCreating || isCreatingConversation || isSendingMessage;
-  const isSubmitDisabled = isSubmitting || !message.trim();
+
+  const [draftMessage, setDraftMessage] = useState("");
+
+  const isSubmitting = isCreatingReturnReport || isCreatingConversation || isSendingMessage;
+
+  const isSubmitDisabled = isSubmitting || !draftMessage.trim();
 
   const handleCreateReturnReport = async () => {
     if (!otherPost || !user) return;
 
-    const trimmedMessage = message.trim();
+    const trimmedMessage = draftMessage.trim();
     if (!trimmedMessage) {
-      toast.error("Please enter a message.");
+      toast.error("Error","Please enter a message.");
       return;
     }
 
@@ -91,12 +96,14 @@ export default function HandoverRequestScreen() {
 
       if (res) {
         router.back();
-        toast.success("Handover request sent successfully!");
+        router.navigate(HANDOVER_ROUTE.detail(res.id));
+
+        toast.success("Success","Handover request sent successfully!");
       } else {
-        toast.error("Failed to create handover request.");
+        toast.error("Error","Failed to create handover request.");
       }
     } catch {
-      toast.error("Failed to send handover request.");
+      toast.error("Error","Failed to send handover request.");
       return;
     }
   };
@@ -201,8 +208,8 @@ export default function HandoverRequestScreen() {
             </Text>
 
             <PostFormTextArea
-              onChange={setMessage}
-              value={message}
+              onChange={setDraftMessage}
+              value={draftMessage}
               placeholder="Example: I can describe the keychain attached to these keys, and I’m available near F-Town after 5 PM."
             />
           </MotiView>
