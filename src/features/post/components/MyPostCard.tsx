@@ -39,6 +39,7 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
   const eventTimeLabel = useMemo(() => {
     if (!item.eventTime) return "Unknown time";
     const date = parseToDate(item.eventTime);
+    if (!date) return "Unknown time";
     return formatIsoDate(date);
   }, [item.eventTime]);
 
