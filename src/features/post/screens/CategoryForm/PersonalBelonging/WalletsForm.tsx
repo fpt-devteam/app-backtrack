@@ -28,18 +28,17 @@ const WalletsForm = () => {
   const setPersonalBelongingAdditionalDetails = usePostCreationStore(
     (state) => state.setPersonalBelongingAdditionalDetails,
   );
-  const postTitle = usePostCreationStore((state) => state.postTitle);
-  const updatePostTitle = usePostCreationStore(
-    (state) => state.updatePostTitle,
+  const setPersonalBelongingItemName = usePostCreationStore(
+    (state) => state.setPersonalBelongingItemName,
   );
 
   return (
     <View className="flex-1 gap-md">
       <View className="border rounded-md overflow-hidden">
         <PostFormField
-          label="Post Title"
-          value={postTitle}
-          onChange={updatePostTitle}
+          label="Item Name"
+          value={personalBelongingDetail.itemName}
+          onChange={setPersonalBelongingItemName}
         />
 
         <View className="border-t" />

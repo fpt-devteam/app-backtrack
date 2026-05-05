@@ -30,9 +30,8 @@ const HeadphoneForm = () => {
   const setElectronicDistinguishingFeatures = usePostCreationStore(
     (state) => state.setElectronicDistinguishingFeatures,
   );
-  const postTitle = usePostCreationStore((state) => state.postTitle);
-  const updatePostTitle = usePostCreationStore(
-    (state) => state.updatePostTitle,
+  const setElectronicItemName = usePostCreationStore(
+    (state) => state.setElectronicItemName,
   );
 
   const hasCase = electronicDetail.hasCase ?? false;
@@ -41,9 +40,9 @@ const HeadphoneForm = () => {
     <View className="flex-1 gap-md">
       <View className="border rounded-md overflow-hidden">
         <PostFormField
-          label="Post Title"
-          value={postTitle}
-          onChange={updatePostTitle}
+          label="Item Name"
+          value={electronicDetail.itemName}
+          onChange={setElectronicItemName}
         />
 
         <View className="border-t" />

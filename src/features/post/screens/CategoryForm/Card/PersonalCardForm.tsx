@@ -27,18 +27,17 @@ const PersonalCardForm = () => {
   const setCardAiDescription = usePostCreationStore(
     (state) => state.setCardAiDescription,
   );
-  const postTitle = usePostCreationStore((state) => state.postTitle);
-  const updatePostTitle = usePostCreationStore(
-    (state) => state.updatePostTitle,
+  const setCardItemName = usePostCreationStore(
+    (state) => state.setCardItemName,
   );
 
   return (
     <View className="flex-1 gap-md">
       <View className="border rounded-md overflow-hidden">
         <PostFormField
-          label="Post Title"
-          value={postTitle}
-          onChange={updatePostTitle}
+          label="Item Name"
+          value={cardDetail.itemName}
+          onChange={setCardItemName}
         />
 
         <View className="border-t" />

@@ -21,11 +21,9 @@ const OtherForm = () => {
     (state) => state.setOtherAdditionalDetails,
   );
 
-  const updatePostTitle = usePostCreationStore(
-    (state) => state.updatePostTitle,
+  const setOtherItemName = usePostCreationStore(
+    (state) => state.setOtherItemName,
   );
-
-  const postTitle = usePostCreationStore((state) => state.postTitle);
 
   return (
     <View className="flex-1 gap-md">
@@ -41,9 +39,9 @@ const OtherForm = () => {
 
       <View className="border rounded-md overflow-hidden">
         <PostFormField
-          label="Post Title"
-          value={postTitle}
-          onChange={updatePostTitle}
+          label="Item Name"
+          value={otherDetail.itemName}
+          onChange={setOtherItemName}
         />
 
         <View className="border-t" />
