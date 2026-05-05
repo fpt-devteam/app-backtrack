@@ -9,7 +9,6 @@ import {
   type UserNotification,
 } from "@/src/features/notification/types";
 import { AppButton, AppLoader } from "@/src/shared/components";
-import EmptyList from "@/src/shared/components/ui/EmptyList";
 import { AUTH_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import { RelativePathString, router } from "expo-router";
@@ -50,6 +49,35 @@ const GuestView = () => {
         title="Login or Sign up"
         variant="secondary"
       />
+    </View>
+  );
+};
+
+const EmptyView = () => {
+  const layout = useWindowDimensions();
+
+  return (
+    <View
+      className="flex-1 bg-surface px-lg gap-lg"
+      style={{ paddingTop: layout.height * 0.15 }}
+    >
+      <View className="flex-row justify-center">
+        <BellSimpleSlashIcon
+          size={128}
+          color={colors.secondary}
+          weight="thin"
+        />
+      </View>
+
+      <View className="gap-y-2">
+        <Text className="text-xl font-normal text-textPrimary text-center">
+          You don't have any notifications yet.
+        </Text>
+
+        <Text className="text-base font-thin text-textSecondary text-center leading-6">
+          Once you receive notifications, they will appear here.
+        </Text>
+      </View>
     </View>
   );
 };
@@ -102,23 +130,6 @@ const NotificationScreen = () => {
     <NotificationRow notification={item} onPress={handlePress} />
   );
 
-  const renderEmpty = () => {
-    if (isLoading) return null;
-    return (
-      <EmptyList
-        icon={
-          <BellSimpleSlashIcon
-            size={96}
-            weight="light"
-            color={colors.primary}
-          />
-        }
-        title="You don't have any notifications."
-        subtitle="When you receive a new notification, it will appear here."
-      />
-    );
-  };
-
   const renderFooter = () => {
     if (!isLoadingNextPage) return null;
     return <AppLoader />;
@@ -130,7 +141,7 @@ const NotificationScreen = () => {
         data={items}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={renderEmpty}
+        ListEmptyComponent={EmptyView}
         ListFooterComponent={renderFooter}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}

@@ -94,7 +94,11 @@ const MyPostDetailScreen = () => {
     error: deletePostError,
     isDeletingPost,
   } = useDeletePost();
-  const { similarPosts } = useMatchingPost(post?.id);
+
+  const { similarPosts } = useMatchingPost({
+    postId: post?.id,
+    enabled: post?.status === POST_STATUS.ACTIVE,
+  });
 
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();

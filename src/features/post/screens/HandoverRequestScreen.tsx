@@ -4,6 +4,7 @@ import {
   useSendMessage,
 } from "@/src/features/chat/hooks";
 import { useCreateC2CReturnReport } from "@/src/features/handover/hooks";
+import { useSendNotification } from "@/src/features/notification/hooks";
 import { MyPostCard, PostFormTextArea } from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
 import { PostType } from "@/src/features/post/types";
@@ -16,7 +17,7 @@ import {
   AppUserAvatar,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { HANDOVER_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE, HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
@@ -46,65 +47,93 @@ export default function HandoverRequestScreen() {
     isLoading,
     data: otherPost,
     error: postError,
-  } = useGetPostById({ postId: otherPostId });
+  } = useGetPostById({
+    postId: otherPostId,
+    params: {
+      isBlurImages: false,
+    },
+  });
 
-  const { isCreating: isCreatingReturnReport, createC2CReturnReport } = useCreateC2CReturnReport();
-
-  const { create, isCreating: isCreatingConversation } =
-    useCreateDirectConversation();
-    
-  const { sendMessage, isSendingMessage } = useSendMessage();
+  const { sendNotification } = useSendNotification();
+  const { createC2CReturnReport } = useCreateC2CReturnReport();
+  const { create } = useCreateDirectConversation();
+  const { sendMessage } = useSendMessage();
 
   const [draftMessage, setDraftMessage] = useState("");
+  const [isSendLoading, setIsSendLoading] = useState(false);
 
-  const isSubmitting = isCreatingReturnReport || isCreatingConversation || isSendingMessage;
+  const isSentDisabled = isSendLoading || !draftMessage.trim();
 
-  const isSubmitDisabled = isSubmitting || !draftMessage.trim();
+  const getHandoverRoles = (postId: string, otherPost: any) => {
+    const isFoundPost = otherPost.postType === PostType.Found;
+    return {
+      finderPostId: isFoundPost ? otherPost.id : postId,
+      ownerPostId: isFoundPost ? postId : otherPost.id,
+    };
+  };
 
   const handleCreateReturnReport = async () => {
+    const trimmedMessage = draftMessage.trim();
+
     if (!otherPost || !user) return;
 
-    const trimmedMessage = draftMessage.trim();
-    if (!trimmedMessage) {
-      toast.error("Error","Please enter a message.");
-      return;
-    }
+    if (!trimmedMessage)
+      return toast.error(
+        "Message Required",
+        "Please enter a message to continue.",
+      );
 
     try {
-      const isFoundPost = otherPost.postType === PostType.Found;
-      const finderPostId = isFoundPost ? otherPostId : postId;
-      const ownerPostId = isFoundPost ? postId : otherPostId;
+      setIsSendLoading(true);
 
-      const req = {
+      const { finderPostId, ownerPostId } = getHandoverRoles(postId, otherPost);
+      const authorId = otherPost.author.id;
+
+      const handoverRes = await createC2CReturnReport({
         finderPostId,
         ownerPostId,
+      });
+
+      if (!handoverRes?.id) throw new Error("REPORT_CREATION_FAILED");
+
+      const handleChatFlow = async () => {
+        const convRes = await create({ memberId: authorId });
+        const conversationId = convRes.data?.conversation?.conversationId;
+
+        if (conversationId) {
+          await Promise.all([
+            sendMessage({
+              conversationId,
+              request: { type: "text", content: trimmedMessage },
+            }),
+            sendNotification({
+              target: { userId: authorId },
+              source: {
+                name: `Request from ${user.displayName || "User"}`,
+                eventId: Date.now().toString(),
+              },
+              title: "New Handover Request",
+              body: trimmedMessage,
+              type: "ChatEvent",
+              data: { screenPath: CHAT_ROUTE.message(conversationId) },
+            }),
+          ]);
+        }
       };
 
-      const res = await createC2CReturnReport(req);
+      handleChatFlow().catch((err) => console.error("Chat flow failed", err));
 
-      const conversation = await create({
-        memberId: otherPost.author.id,
-      });
+      toast.success("Request Sent", "Your handover request is on its way!");
 
-      const conversationId = conversation.data?.conversation?.conversationId;
-      if (!conversationId) throw new Error("Missing conversation ID");
-
-      await sendMessage({
-        conversationId,
-        request: { conversationId, type: "text", content: trimmedMessage },
-      });
-
-      if (res) {
-        router.back();
-        router.navigate(HANDOVER_ROUTE.detail(res.id));
-
-        toast.success("Success","Handover request sent successfully!");
-      } else {
-        toast.error("Error","Failed to create handover request.");
-      }
-    } catch {
-      toast.error("Error","Failed to send handover request.");
-      return;
+      router.dismissAll();
+      router.push(HANDOVER_ROUTE.detail(handoverRes.id));
+    } catch (error) {
+      toast.error(
+        "Send Failed",
+        "Could not complete the request. Please try again.",
+      );
+    } finally {
+      setIsSendLoading(false);
     }
   };
 
@@ -149,7 +178,7 @@ export default function HandoverRequestScreen() {
           </View>
 
           {/* Post Card */}
-          <MyPostCard item={otherPost} />
+          <MyPostCard item={otherPost} disabled={true} />
 
           {/* Post Owner Information */}
           <MotiView
@@ -230,8 +259,8 @@ export default function HandoverRequestScreen() {
           <AppButton
             title="Send handover request"
             onPress={handleCreateReturnReport}
-            loading={isSubmitting}
-            disabled={isSubmitDisabled}
+            loading={isSendLoading}
+            disabled={isSentDisabled}
             variant="secondary"
           />
         </View>

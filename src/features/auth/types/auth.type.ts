@@ -24,11 +24,6 @@ export type AppUser = {
   status: UserStatus;
 };
 
-export type AuthState = {
-  isAppReady: boolean;
-  isLoggedIn: boolean;
-};
-
 export type UserGlobalData = {
   user: Nullable<AppUser>;
 };

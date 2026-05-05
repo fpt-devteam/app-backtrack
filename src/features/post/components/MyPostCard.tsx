@@ -14,9 +14,10 @@ import { Text, View } from "react-native";
 
 type MyPostCardProps = {
   item: UserPost;
+  disabled?: boolean;
 };
 
-export const MyPostCard = ({ item }: MyPostCardProps) => {
+export const MyPostCard = ({ item, disabled }: MyPostCardProps) => {
   const imageUrl = item.imageUrls[0];
 
   const categoryLabel = useMemo(() => {
@@ -50,6 +51,7 @@ export const MyPostCard = ({ item }: MyPostCardProps) => {
   return (
     <MotiPressable
       onPress={handleOpenDetail}
+      disabled={disabled}
       animate={({ pressed }) => {
         "worklet";
         return {

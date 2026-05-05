@@ -4,6 +4,7 @@ import { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 import { formatTime } from "@/src/shared/utils";
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
+import { useAppUser } from "../../auth/providers";
 
 type MessageBubbleProps = {
   message: UserMessage;
@@ -20,6 +21,8 @@ export const UserMessageBubble = ({
   isBottomOfGroup,
   partnerAvatarUrl,
 }: MessageBubbleProps) => {
+  const { user } = useAppUser();
+
   const messageTime = useMemo(
     () =>
       formatTime(new Date(message.createdAt), {
@@ -59,12 +62,9 @@ export const UserMessageBubble = ({
       <View
         className={`flex-row items-end ${isOwnMessage ? "justify-end" : "justify-start"} max-w-[75%] gap-xs`}
       >
-        {!isOwnMessage &&
-          (isBottomOfGroup ? (
-            <AppUserAvatar avatarUrl={partnerAvatarUrl} size={28} />
-          ) : (
-            <View style={{ width: 28 }} />
-          ))}
+        {!isOwnMessage && (
+          <AppUserAvatar avatarUrl={partnerAvatarUrl} size={24} />
+        )}
 
         <View className="flex-shrink">
           {message.type === "image" ? (
@@ -86,6 +86,10 @@ export const UserMessageBubble = ({
             </View>
           )}
         </View>
+
+        {isOwnMessage && (
+          <AppUserAvatar avatarUrl={user?.avatarUrl} size={24} />
+        )}
       </View>
     </View>
   );

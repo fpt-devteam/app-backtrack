@@ -198,16 +198,21 @@ export const ComparePostsScreen = ({
     similarPosts,
     isLoading: isLoadingMatch,
     error,
-  } = useMatchingPost(postId);
+  } = useMatchingPost({ postId });
 
   const isNotFoundError = (error: unknown) => {
     if (!(error instanceof Error)) return false;
     return /404|not found/i.test(error.message);
   };
 
-  const { data: post1, isLoading: isLoadingPost1 } = useGetPostById({ postId });
+  const { data: post1, isLoading: isLoadingPost1 } = useGetPostById({
+    postId,
+    params: {
+      isBlurImages: false,
+    },
+  });
   const { data: matchedPostDetail, isLoading: isLoadingMatchedPostDetail } =
-    useGetPostById({ postId: otherPostId });
+    useGetPostById({ postId: otherPostId, params: { isBlurImages: false } });
 
   const { isCreating } = useCreateDirectConversation();
 

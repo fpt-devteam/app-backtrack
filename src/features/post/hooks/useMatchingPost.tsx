@@ -9,12 +9,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useCheckPostMatchingStatus } from "./useCheckPostMatchingStatus";
 
-export const useMatchingPost = (postId: Optional<string>) => {
+type Params = {
+  postId: Optional<string>;
+  enabled?: boolean;
+};
+
+export const useMatchingPost = ({ postId, enabled = true }: Params) => {
   const { isMatching } = useCheckPostMatchingStatus(postId);
 
   const query = useQuery<MatchingPostsData>({
     queryKey: [...POST_MATCHING_QUERY_KEY, "result", postId],
-    enabled: !isMatching && !!postId,
+    enabled: !isMatching && !!postId && enabled,
     queryFn: async () => {
       if (!postId) throw new Error("Post ID is required for matching");
 

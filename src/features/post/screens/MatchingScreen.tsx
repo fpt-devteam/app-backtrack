@@ -16,7 +16,7 @@ import { MatchingNoResultScreen } from "./MatchingNoResultScreen";
 export const MatchingScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
-  const { isMatching, similarPosts, error } = useMatchingPost(postId);
+  const { isMatching, similarPosts, error } = useMatchingPost({ postId });
   const insets = useSafeAreaInsets();
 
   useEffect(() => {

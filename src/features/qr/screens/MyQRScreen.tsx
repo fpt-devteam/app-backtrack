@@ -2,15 +2,28 @@ import type { QRSvgRef } from "@/src/features/qr/components";
 import { UserQRCodePressableCard } from "@/src/features/qr/components";
 import { useGetMySubscription } from "@/src/features/qr/hooks";
 import { SubscriptionStatus } from "@/src/features/qr/types";
-import { AppTipCard } from "@/src/shared/components";
+import {
+  AppBackButton,
+  AppTipCard,
+  TouchableIconButton,
+} from "@/src/shared/components";
 import { AppLoader } from "@/src/shared/components/AppLoader";
 import { toast } from "@/src/shared/components/ui/toast";
+import { QR_ROUTE } from "@/src/shared/constants/route.constant";
+import { typography } from "@/src/shared/theme";
 import { colors } from "@/src/shared/theme/colors";
 import * as FileSystem from "expo-file-system/legacy";
+import { router, Stack } from "expo-router";
 import * as Sharing from "expo-sharing";
-import { DownloadSimpleIcon } from "phosphor-react-native";
+import { DownloadSimpleIcon, GearSixIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const MyQRScreen = () => {
   const { data: subscription, isLoading } = useGetMySubscription();
@@ -53,52 +66,79 @@ const MyQRScreen = () => {
     }
   }, [isDownloading]);
 
+  const handleNavigateSettingScreen = useCallback(() => {
+    router.push(QR_ROUTE.qrProfileSetting);
+  }, []);
+
   return (
-    <View className="flex-1 bg-surface px-lg pt-md pb-xl gap-md">
-      {/* QR Card */}
-      <View className="w-full items-center gap-md ">
-        {isLoading ? (
-          <AppLoader />
-        ) : (
-          <UserQRCodePressableCard
-            isSubscripted={isSubscripted}
-            qrRef={qrRef}
-          />
-        )}
-
-        {/* Download Button — only when subscripted and QR is loaded */}
-        {!isLoading && isSubscripted && (
-          <TouchableOpacity
-            onPress={handleDownload}
-            disabled={isDownloading}
-            activeOpacity={0.75}
-            className="flex-row items-center justify-center gap-xs rounded-primary py-sm px-lg border border-divider bg-surface"
-            style={{ opacity: isDownloading ? 0.6 : 1 }}
-          >
-            {isDownloading ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <DownloadSimpleIcon
-                size={18}
-                color={colors.primary}
-                weight="bold"
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: "Backtrack QR",
+          headerLeft: () => <AppBackButton />,
+          headerRight: () =>
+            isSubscripted && (
+              <TouchableIconButton
+                icon={<GearSixIcon size={24} color={colors.black} />}
+                onPress={handleNavigateSettingScreen}
               />
-            )}
-            <Text className="text-sm font-normal text-primary">
-              {isDownloading ? "Preparing..." : "Download QR"}
-            </Text>
-          </TouchableOpacity>
-        )}
+            ),
+          headerTitleStyle: {
+            fontSize: typography.fontSize.lg,
+            fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],
+          },
 
-        <View className="w-full">
-          <AppTipCard
-            title="Pro Tip"
-            description="Stick your QR on items for a higher chance of recovery."
-            type="tip"
-          />
+          presentation: "card",
+          animation: "slide_from_right",
+        }}
+      />
+      <View className="flex-1 bg-surface px-lg pt-md pb-xl gap-md">
+        {/* QR Card */}
+        <View className="w-full items-center gap-md ">
+          {isLoading ? (
+            <AppLoader />
+          ) : (
+            <UserQRCodePressableCard
+              isSubscripted={isSubscripted}
+              qrRef={qrRef}
+            />
+          )}
+
+          {/* Download Button */}
+          {!isLoading && isSubscripted && (
+            <TouchableOpacity
+              onPress={handleDownload}
+              disabled={isDownloading}
+              activeOpacity={0.75}
+              className="flex-row items-center justify-center gap-xs rounded-primary py-sm px-lg border border-divider bg-surface"
+              style={{ opacity: isDownloading ? 0.6 : 1 }}
+            >
+              {isDownloading ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <DownloadSimpleIcon
+                  size={18}
+                  color={colors.primary}
+                  weight="bold"
+                />
+              )}
+              <Text className="text-sm font-normal text-primary">
+                {isDownloading ? "Preparing..." : "Download QR"}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Tip Card */}
+          <View className="w-full">
+            <AppTipCard
+              title="Pro Tip"
+              description="Stick your QR on items for a higher chance of recovery."
+              type="tip"
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </>
   );
 };
 

@@ -46,6 +46,35 @@ const GuestView = () => {
   );
 };
 
+const EmptyView = () => {
+  const layout = useWindowDimensions();
+
+  return (
+    <View
+      className="flex-1 bg-surface px-lg gap-lg"
+      style={{ paddingTop: layout.height * 0.15 }}
+    >
+      <View className="flex-row justify-center">
+        <ChatCenteredTextIcon
+          size={128}
+          color={colors.secondary}
+          weight="thin"
+        />
+      </View>
+
+      <View className="gap-y-2">
+        <Text className="text-xl font-normal text-textPrimary text-center">
+          You don't have any conversations yet.
+        </Text>
+
+        <Text className="text-base font-thin text-textSecondary text-center leading-6">
+          Once you receive messages, they will appear here.
+        </Text>
+      </View>
+    </View>
+  );
+};
+
 export const ChatScreen = () => {
   const { isAppReady, isLoggedIn } = useAuth();
   const isAuthReady = isAppReady && isLoggedIn;
@@ -55,7 +84,6 @@ export const ChatScreen = () => {
     isLoading,
     isError,
     refetch,
-    isFetching,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
@@ -150,33 +178,8 @@ export const ChatScreen = () => {
           onEndReachedThreshold={0.35}
           className="flex-1"
           ItemSeparatorComponent={() => <View className="h-lg" />}
-          ListEmptyComponent={
-            <View
-              className="flex-1"
-              style={{
-                justifyContent: "center",
-                gap: metrics.spacing.md,
-              }}
-            >
-              <View className="flex-row justify-center">
-                <ChatCenteredTextIcon
-                  size={200}
-                  weight="thin"
-                  color={colors.primary}
-                />
-              </View>
-
-              <View className="gap-y-xs">
-                <Text className="text-xl font-normal text-textPrimary text-center">
-                  You don't have any conversations yet.
-                </Text>
-
-                <Text className="text-base font-thin text-textSecondary text-center leading-6">
-                  Once you receive messages, they will appear here.
-                </Text>
-              </View>
-            </View>
-          }
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={<EmptyView />}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
@@ -187,6 +190,11 @@ export const ChatScreen = () => {
         />
       </View>
     );
+  };
+
+  const renderFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return <AppLoader />;
   };
 
   return <View className="flex-1">{renderBody()}</View>;

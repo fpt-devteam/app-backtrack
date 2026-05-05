@@ -28,7 +28,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CHAT_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { CHAT_ROUTE } from "@/src/shared/constants";
 import { router, Stack } from "expo-router";
 
 type Props = {
@@ -109,12 +109,29 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
   const handleSendImage = useCallback(
     async (imageUrl: string) => {
       if (!conversationId || !user) return;
+      if (!conversationDetail || !conversationDetail.partner) return;
 
       try {
         await sendMessage({
           conversationId,
           request: { conversationId, type: "image", content: imageUrl },
         });
+
+        const req: NotificationSendRequest = {
+          target: {
+            userId: conversationDetail.partner.id,
+          },
+          source: {
+            name: "Message from " + (user.displayName || "Unknown User"),
+            eventId: new Date().toString(),
+          },
+          title: "Message from " + (user.displayName || "Unknown User"),
+          body: "Sent you an image",
+          type: "ChatEvent",
+          data: { screenPath: CHAT_ROUTE.message(conversationId) },
+        };
+
+        await sendNotification(req);
       } catch {
         toast.error("Failed to send image. Please try again.");
       }
@@ -212,30 +229,33 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
                       </Text>
                     </View>
 
-                    {isPinnedExpanded ? (
-                      <Pressable onPress={handleCollapsePinned}>
+                    {inProgressHandovers.length > 1 && (
+                      <Pressable
+                        onPress={
+                          isPinnedExpanded
+                            ? handleCollapsePinned
+                            : handleExpandPinned
+                        }
+                      >
                         <View className="flex-row items-center gap-xs">
                           <Text className="text-xs font-thin text-textSecondary">
-                            Collapse
+                            {isPinnedExpanded
+                              ? "Collapse"
+                              : inProgressHandovers.length}
                           </Text>
-                          <CaretUpIcon
-                            size={16}
-                            color={colors.text.secondary}
-                            weight="bold"
-                          />
-                        </View>
-                      </Pressable>
-                    ) : (
-                      <Pressable onPress={handleExpandPinned}>
-                        <View className="flex-row items-center gap-xs">
-                          <Text className="text-xs font-thin text-textSecondary">
-                            {inProgressHandovers.length}
-                          </Text>
-                          <CaretDownIcon
-                            size={16}
-                            color={colors.text.secondary}
-                            weight="bold"
-                          />
+                          {isPinnedExpanded ? (
+                            <CaretUpIcon
+                              size={16}
+                              color={colors.text.secondary}
+                              weight="bold"
+                            />
+                          ) : (
+                            <CaretDownIcon
+                              size={16}
+                              color={colors.text.secondary}
+                              weight="bold"
+                            />
+                          )}
                         </View>
                       </Pressable>
                     )}

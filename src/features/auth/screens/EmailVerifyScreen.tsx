@@ -27,6 +27,10 @@ const EmailVerifyScreen = () => {
     return () => clearInterval(timer);
   }, [countdown]);
 
+  useEffect(() => {
+    handleResendVerificationEmail();
+  }, []);
+
   const handleResendVerificationEmail = async () => {
     if (countdown > 0) return;
     setIsLoading(true);

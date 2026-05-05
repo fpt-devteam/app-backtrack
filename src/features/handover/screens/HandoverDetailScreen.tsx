@@ -746,7 +746,7 @@ const HandoverDetailScreen = () => {
     if (!report) return;
     Alert.alert(
       "Item Received?",
-      "By confirming, you agree that the item has been safely returned to you. This action will finalize the process and reward the finder.",
+      "By confirming, you agree that the item has been safely returned to you. This action will finalize the process and cannot be undone.",
       [
         { text: "Not Yet", style: "cancel" },
         {

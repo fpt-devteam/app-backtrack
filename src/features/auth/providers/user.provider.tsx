@@ -55,10 +55,9 @@ export const AppUserProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     try {
-      await syncExpoToken();
-
       const idToken = await firebaseUser.getIdToken();
       const response = await syncUser({ idToken });
+      await syncExpoToken();
 
       if (mountedRef.current) {
         setUser(response.data);
