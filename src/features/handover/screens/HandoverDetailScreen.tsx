@@ -18,15 +18,12 @@ import {
   useOwnerConfirmC2CReturnReport,
   useOwnerRejectC2CReturnReport,
 } from "@/src/features/handover/hooks";
-import type {
-  DeliverC2CReturnReportRequest,
-  Handover,
-  HandoverStatus,
-} from "@/src/features/handover/types";
+import type { Handover, HandoverStatus } from "@/src/features/handover/types";
 import { PostCard } from "@/src/features/post/components";
 import {
   AppBackButton,
   AppButton,
+  AppImage,
   AppInlineError,
   AppLoader,
   AppTipCard,
@@ -34,12 +31,10 @@ import {
   TouchableIconButton,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { CHAT_ROUTE } from "@/src/shared/constants";
-import { uploadImageAssets } from "@/src/shared/services";
+import { CHAT_ROUTE, HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
 import { formatDate } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
-import * as ImagePicker from "expo-image-picker";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import {
@@ -435,8 +430,6 @@ const ActionPanel = ({
   }
 
   if (status === "Ongoing" && isFinder) {
-    console.log("Here Ongoing");
-
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
         <View className="flex-row gap-md">
@@ -479,7 +472,6 @@ const ActionPanel = ({
   }
 
   if (status === "Delivered" && isFinder) {
-    console.log("Here Delivered");
     return (
       <View className="px-lg pt-md border-t border-divider bg-surface">
         <AppTipCard
@@ -711,52 +703,7 @@ const HandoverDetailScreen = () => {
           text: "Take Photo",
           style: "default",
           onPress: async () => {
-            try {
-              setIsActivatingHandover(true);
-
-              const permissionResult =
-                await ImagePicker.requestCameraPermissionsAsync();
-
-              if (permissionResult.granted === false) {
-                Alert.alert(
-                  "Permission Required",
-                  "Please allow camera access to take a photo of the handover.",
-                );
-                return;
-              }
-
-              const result = await ImagePicker.launchCameraAsync({
-                mediaTypes: ["images"],
-                allowsEditing: true,
-                quality: 0.7,
-              });
-
-              if (result.canceled) return;
-
-              const localUri = result.assets[0];
-              const imageUrls = await uploadImageAssets([localUri]);
-
-              const req: DeliverC2CReturnReportRequest = {
-                reportId: report.id,
-                evidenceImageUrls: imageUrls,
-              };
-
-              await activate(req);
-
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-
-              toast.success("Success", "Item marked as delivered securely.");
-            } catch (error) {
-              console.error("Handover error:", error);
-              toast.error(
-                "Error",
-                "Could not complete handover. Please try again.",
-              );
-            } finally {
-              setIsActivatingHandover(false);
-            }
+            router.push(HANDOVER_ROUTE.evidenceUpload(report.id));
           },
         },
       ],
@@ -1004,6 +951,36 @@ const HandoverDetailScreen = () => {
             ))}
           </View>
         </View>
+
+        {/* Evidence Images */}
+        {report.evidenceImageUrls && report.evidenceImageUrls.length > 0 && (
+          <View className="gap-md2">
+            <Text className="text-lg font-normal text-textPrimary mb-sm">
+              Evidence Images
+            </Text>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                gap: metrics.spacing.md,
+              }}
+            >
+              {report.evidenceImageUrls.map((url, index) => (
+                <AppImage
+                  key={index}
+                  source={{ uri: url }}
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: metrics.borderRadius.md,
+                  }}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </ScrollView>
     );
   };

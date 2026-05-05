@@ -1,39 +1,24 @@
 import { AppUser } from "@/src/features/auth/types"
-import type { Post, PostType } from "@/src/features/post/types"
+import type { Post } from "@/src/features/post/types"
 import { Nullable } from "@/src/shared/types"
 
 /**
- * 
  */
-export type ReturnReportRole = "Finder" | "Owner"
-
-/**
- * The simplified Post shape returned by the Handover API.
- * Uses `postTitle` instead of `item.itemName`, and dates are ISO strings.
- */
-export type HandoverPost = {
-  id: string
-  author: Pick<AppUser, "id" | "displayName" | "avatarUrl">
-  postType: PostType
-  status: string
-  category: string
-  subcategoryId: string
-  postTitle: string
-  imageUrls: string[]
-  location: { latitude: number; longitude: number }
-  displayAddress: Nullable<string>
-  eventTime: string
-  createdAt: string
-}
+export type HandoverRole = "Finder" | "Owner"
 
 export type Handover = {
   id: string
   finder: Nullable<AppUser>
   owner: Nullable<AppUser>
+
   finderPost: Nullable<Post>
   ownerPost: Nullable<Post>
+
   status: HandoverStatus
-  activatedByRole: Nullable<ReturnReportRole>
+  activatedByRole: Nullable<HandoverRole>
+
+  evidenceImageUrls?: string[]
+
   confirmedAt: Nullable<string>
   expiresAt: string
   createdAt: string
