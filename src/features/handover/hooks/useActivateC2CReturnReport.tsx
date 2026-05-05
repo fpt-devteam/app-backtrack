@@ -1,4 +1,3 @@
-import { useAppUser } from "@/src/features/auth/providers";
 import { activateC2CReturnReportApi } from "@/src/features/handover/api";
 import {
   ACTIVATE_C2C_RETURN_REPORT_KEY,
@@ -15,7 +14,6 @@ import { useMemo } from "react";
 
 export const useActivateC2CReturnReport = () => {
   const qc = useQueryClient();
-  const { user: currentUser } = useAppUser();
 
   const mutation = useMutation({
     mutationKey: ACTIVATE_C2C_RETURN_REPORT_KEY,
@@ -24,13 +22,11 @@ export const useActivateC2CReturnReport = () => {
       if (!response.success) throw new Error("Failed to mark as delivered");
       return response.data;
     },
-    onSuccess: async (_, id) => {
-      qc.invalidateQueries({
-        queryKey: [...C2C_RETURN_REPORTS_QUERY_KEY, currentUser?.id ?? null],
-      });
+    onSuccess: async (_, req) => {
+      qc.invalidateQueries({ queryKey: C2C_RETURN_REPORTS_QUERY_KEY });
 
       qc.invalidateQueries({
-        queryKey: [...C2C_RETURN_REPORT_DETAIL_QUERY_KEY, id],
+        queryKey: [...C2C_RETURN_REPORT_DETAIL_QUERY_KEY, req.reportId],
       });
 
       qc.invalidateQueries({ queryKey: POSTS_QUERY_KEY });
