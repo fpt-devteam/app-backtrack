@@ -12,7 +12,7 @@ const OtherForm = () => {
   const setOtherPrimaryColor = usePostCreationStore(
     (state) => state.setOtherPrimaryColor,
   );
-  
+
   const setOtherAiDescription = usePostCreationStore(
     (state) => state.setOtherAiDescription,
   );
@@ -27,16 +27,6 @@ const OtherForm = () => {
 
   return (
     <View className="flex-1 gap-md">
-      <View>
-        <Text className="text-textPrimary font-normal text-2xl pr-lg tracking-tight">
-          What does it look like?
-        </Text>
-        <Text className="text-textSecondary font-thin text-base mt-xs">
-          Share the clearest traits you remember so others can recognize it
-          quickly.
-        </Text>
-      </View>
-
       <View className="border rounded-md overflow-hidden">
         <PostFormField
           label="Item Name"

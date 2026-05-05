@@ -7,12 +7,7 @@ import { SHARED_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors } from "@/src/shared/theme/colors";
 import { typography } from "@/src/shared/theme/typography";
 import { getErrorMessage } from "@/src/shared/utils";
-import {
-  router,
-  Stack,
-  useLocalSearchParams,
-  useNavigation,
-} from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, TextStyle, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,7 +18,6 @@ export const MatchingScreen = () => {
   const [applyingInterval, setApplyingInterval] = useState<boolean>(false);
   const { isMatching, similarPosts, error } = useMatchingPost(postId);
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
 
   useEffect(() => {
     setApplyingInterval(true);
@@ -49,7 +43,8 @@ export const MatchingScreen = () => {
     );
 
   const handleCancel = () => {
-    router.replace("/");
+    router.dismissAll();
+    return;
   };
 
   if (error)
