@@ -9,7 +9,7 @@ export const useGetPostById = (request: PostGetByIdRequest) => {
     queryKey: [...POST_DETAIL_QUERY_KEY, request.postId],
     enabled: !!request.postId,
     queryFn: async () => {
-      const response = await getPostByIdApi(request.postId);
+      const response = await getPostByIdApi(request);
       if (!response.success) throw new Error("Post not found");
       return response.data;
     },

@@ -24,7 +24,6 @@ export type AnalyzeImageData = {
 };
 
 /**
- * 
  */
 export type ElectronicAIAnalyzeData = {
   itemName: string
@@ -35,7 +34,6 @@ export type ElectronicAIAnalyzeData = {
   caseDescription: Nullable<string>;
   screenCondition: Nullable<string>;
   lockScreenDescription: Nullable<string>;
-  // 
   distinguishingFeatures: Nullable<string>;
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
@@ -43,7 +41,6 @@ export type ElectronicAIAnalyzeData = {
 
 
 /**
- * 
  */
 export type CardAIAnalyzeData = {
   itemName: string
@@ -55,14 +52,12 @@ export type CardAIAnalyzeData = {
   dateOfBirth: Nullable<string>;
   issueDate: Nullable<string>;
   expiryDate: Nullable<string>;
-  // 
   distinguishingFeatures: Nullable<string>;
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
 };
 
 /**
- * 
  */
 export type PersonalBelongingAIAnalyzeData = {
   itemName: string;
@@ -71,7 +66,6 @@ export type PersonalBelongingAIAnalyzeData = {
   material: Nullable<string>;
   size: Nullable<string>;
   condition: Nullable<string>;
-  // 
   distinctiveMarks: Nullable<string>;
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
@@ -79,7 +73,6 @@ export type PersonalBelongingAIAnalyzeData = {
 
 
 /**
- * 
  */
 export type OtherAIAnalyzeData = {
   itemName: string;

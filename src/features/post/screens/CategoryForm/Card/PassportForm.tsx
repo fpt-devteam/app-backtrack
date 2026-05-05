@@ -9,9 +9,7 @@ import { Text, View } from "react-native";
 
 const PassportForm = () => {
   const cardDetail = usePostCreationStore((state) => state.cardDetail);
-  const setCardNumberMasked = usePostCreationStore(
-    (state) => state.setCardNumberMasked,
-  );
+  const setcardNumber = usePostCreationStore((state) => state.setcardNumber);
   const setCardHolderName = usePostCreationStore(
     (state) => state.setCardHolderName,
   );
@@ -47,8 +45,8 @@ const PassportForm = () => {
 
         <PostFormField
           label="Passport Number"
-          value={cardDetail.cardNumberMasked ?? ""}
-          onChange={setCardNumberMasked}
+          value={cardDetail.cardNumber ?? ""}
+          onChange={setcardNumber}
         />
 
         <View className="border-t" />

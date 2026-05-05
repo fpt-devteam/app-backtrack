@@ -7,6 +7,10 @@ import {
 import { eventTimeSchema } from "@/src/features/post/schemas";
 import {
   CardDetail,
+  CardFormRequest,
+  ElectronicFormRequest,
+  OtherFormRequest,
+  PersonalBelongingFormRequest,
   POST_CATEGORIES,
   PostCreateRequest,
   PostType,
@@ -19,9 +23,10 @@ import {
 } from "@/src/shared/components";
 import { MenuBottomSheet } from "@/src/shared/components/ui/MenuBottomSheet";
 import { toast } from "@/src/shared/components/ui/toast";
-import { POST_CREATE, POST_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { POST_CREATE, SHARED_ROUTE } from "@/src/shared/constants";
 import { ensureMediaPermission } from "@/src/shared/services";
 import { colors, typography } from "@/src/shared/theme";
+import { Optional } from "@/src/shared/types/global.type";
 import {
   launchCameraAsync,
   launchImageLibraryAsync,
@@ -200,34 +205,49 @@ const PostCreationStepperLayout = () => {
             ? electronicDetail.itemName
             : personalBelongingDetail.itemName;
 
-      const req: PostCreateRequest = {
+      const electronicFormRequest: Optional<ElectronicFormRequest> =
+        category === POST_CATEGORIES.ELECTRONICS
+          ? { ...electronicDetail }
+          : undefined;
+
+      const cardFormRequest: Optional<CardFormRequest> =
+        category === POST_CATEGORIES.CARD ? { ...cardDetail } : undefined;
+
+      const personalBelongingFormRequest: Optional<PersonalBelongingFormRequest> =
+        category === POST_CATEGORIES.PERSONAL_BELONGINGS
+          ? { ...personalBelongingDetail }
+          : undefined;
+
+      const otherFormRequest: Optional<OtherFormRequest> =
+        category === POST_CATEGORIES.OTHERS ? { ...otherDetail } : undefined;
+
+      const createReq: PostCreateRequest = {
         postTitle: postTitle || titleData,
         postType,
         category,
         subcategoryCode: subCategoryCode,
+
         imageUrls,
+        eventTime: timelineDate ?? new Date(),
+
         location: location.coords,
         externalPlaceId: location.placeId,
         displayAddress: location.address,
-        eventTime: timelineDate ?? new Date(),
-        ...(category === POST_CATEGORIES.ELECTRONICS
-          ? { electronicDetail }
-          : {}),
-        ...(category === POST_CATEGORIES.CARD ? { cardDetail } : {}),
-        ...(category === POST_CATEGORIES.PERSONAL_BELONGINGS
-          ? { personalBelongingDetail }
-          : {}),
-        ...(category === POST_CATEGORIES.OTHERS ? { otherDetail } : {}),
+
+        electronicDetail: electronicFormRequest,
+        cardDetail: cardFormRequest,
+        personalBelongingDetail: personalBelongingFormRequest,
+        otherDetail: otherFormRequest,
       };
 
-      const postDetails = await createPost(req);
+      const postDetails = await createPost(createReq);
       const postId = postDetails?.id;
 
       if (!postId) {
         toast.error("Failed to create post. Please try again.");
         return;
       }
-      
+
       router.push(SHARED_ROUTE.matching(postId));
     } catch (e) {
       console.log("Submit failed", e);
@@ -270,8 +290,7 @@ const PostCreationStepperLayout = () => {
       if (cardDetail) {
         const mappedDetail: CardDetail = {
           itemName: cardDetail.itemName,
-          cardNumberHash: cardDetail.cardNumber,
-          cardNumberMasked: cardDetail.cardNumber,
+          cardNumber: cardDetail.cardNumber,
           holderName: cardDetail.holderName,
           holderNameNormalized: cardDetail.holderNameNormalized,
           dateOfBirth: cardDetail.dateOfBirth,

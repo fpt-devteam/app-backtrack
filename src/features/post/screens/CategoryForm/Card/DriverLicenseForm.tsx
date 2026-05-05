@@ -9,9 +9,7 @@ import { Text, View } from "react-native";
 
 const DriverLicenseForm = () => {
   const cardDetail = usePostCreationStore((state) => state.cardDetail);
-  const setCardNumberMasked = usePostCreationStore(
-    (state) => state.setCardNumberMasked,
-  );
+  const setcardNumber = usePostCreationStore((state) => state.setcardNumber);
   const setCardHolderName = usePostCreationStore(
     (state) => state.setCardHolderName,
   );
@@ -47,8 +45,8 @@ const DriverLicenseForm = () => {
 
         <PostFormField
           label="License Number"
-          value={cardDetail.cardNumberMasked ?? ""}
-          onChange={setCardNumberMasked}
+          value={cardDetail.cardNumber ?? ""}
+          onChange={setcardNumber}
         />
 
         <View className="border-t" />

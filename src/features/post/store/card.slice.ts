@@ -4,8 +4,7 @@ import { StateCreator } from "zustand";
 
 const DEFAULT_CARD_DETAIL: CardDetail = {
   itemName: "Card Item",
-  cardNumberHash: null,
-  cardNumberMasked: null,
+  cardNumber: null,
   holderName: null,
   holderNameNormalized: null,
   dateOfBirth: null,
@@ -21,7 +20,7 @@ export type CardSlice = {
   setCardItemName: (itemName: string) => void;
   setCardDetail: (detail: CardDetail) => void;
   setCardNumberHash: (cardNumberHash: Nullable<string>) => void;
-  setCardNumberMasked: (cardNumberMasked: Nullable<string>) => void;
+  setcardNumber: (cardNumber: Nullable<string>) => void;
   setCardHolderName: (holderName: Nullable<string>) => void;
   setCardHolderNameNormalized: (
     holderNameNormalized: Nullable<string>,
@@ -64,11 +63,11 @@ export const createCardSlice: StateCreator<CardSlice> = (set) => ({
       },
     })),
 
-  setCardNumberMasked: (cardNumberMasked) =>
+  setcardNumber: (cardNumber) =>
     set((state) => ({
       cardDetail: {
         ...state.cardDetail,
-        cardNumberMasked,
+        cardNumber,
       },
     })),
 

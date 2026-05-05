@@ -1,9 +1,9 @@
-import type { UserLocation } from "@/src/features/map/types";
 import type {
   ApiResponse
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
+import { UserLocation } from "../../map/types";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
   PostCategory,
@@ -38,19 +38,20 @@ type PostFeedResult = {
 export type PostFeedResponse = ApiResponse<PostFeedResult>;
 
 /**
- *  PostCreateRequest - This type defines the structure of the request body when creating a new post.
- *  It includes the post type, item name, description, image URLs, distinctive marks, event time, and location details (latitude and longitude).
  */
 export type PostCreateRequest = {
   postTitle: string;
   postType: PostType;
   category: PostCategory;
   subcategoryCode: PostSubcategoryCode
+
   imageUrls: string[];
   eventTime: Date;
-  electronicDetail?: ElectronicDetail
-  cardDetail?: CardDetail
-  personalBelongingDetail?: PersonalBelongingDetail
+
+  electronicDetail?: ElectronicFormRequest
+  cardDetail?: CardFormRequest
+  personalBelongingDetail?: PersonalBelongingFormRequest
+  otherDetail?: OtherFormRequest
 } & Omit<UserLocation, "radiusInKm">;
 
 /**
@@ -61,20 +62,23 @@ export type PostUpdateRequest = {
   imageUrls?: string[];
   eventTime?: Date;
 
-  electronicDetail?: ElectronicDetail
-  cardDetail?: CardDetail
-  personalBelongingDetail?: PersonalBelongingDetail
-  otherDetail?: OtherDetail
+  electronicDetail?: ElectronicFormRequest
+  cardDetail?: CardFormRequest
+  personalBelongingDetail?: PersonalBelongingFormRequest
+  otherDetail?: OtherFormRequest
 
   location?: LatLng;
   displayAddress?: string;
   externalPlaceId?: string;
-};
+}
 
 export type PostCreateResponse = ApiResponse<Post>;
 
 export type PostGetByIdRequest = {
   postId: string;
+  params?: {
+    isBlurImages: boolean;
+  }
 };
 
 export type PostGetByIdResponse = ApiResponse<UserPost>;
@@ -90,15 +94,13 @@ export type MatchingPostsData = {
 export type MatchingPostsResponse = ApiResponse<MatchingPostsData>;
 
 /**
- * 
  */
 export type PostDeleteByIdRequest = {
   postId: string;
 };
 
 
-/**
- * 
+/** 
  */
 export type GetAllMyPostResponse = ApiResponse<{
   total: number;
@@ -127,11 +129,24 @@ export type PostSearchResponse = ApiResponse<Post[]>;
 // Post Suggestion
 export type PostsSuggestionResponse = ApiResponse<PostSuggestion[]>;
 
+/**
+ */
+export type CardFormRequest = {
+  itemName: string;
+  cardNumber: Nullable<string>;
+  holderName: Nullable<string>;
+  holderNameNormalized: Nullable<string>;
+  dateOfBirth: Nullable<string>;
+  issueDate: Nullable<string>;
+  expiryDate: Nullable<string>;
+  issuingAuthority: Nullable<string>;
+  ocrText: Nullable<string>;
+  aiDescription: Nullable<string>;
+};
 
 /**
- * 
  */
-export type ElectronicDetail = {
+export type ElectronicFormRequest = {
   itemName: string
   brand: Nullable<string>;
   model: Nullable<string>;
@@ -145,7 +160,9 @@ export type ElectronicDetail = {
   additionalDetails: Nullable<string>;
 };
 
-export type PersonalBelongingDetail = {
+/**
+ */
+export type PersonalBelongingFormRequest = {
   itemName: string;
   color: Nullable<string>;
   brand: Nullable<string>;
@@ -157,21 +174,9 @@ export type PersonalBelongingDetail = {
   additionalDetails: Nullable<string>;
 };
 
-export type CardDetail = {
-  itemName: string;
-  cardNumberHash: Nullable<string>;
-  cardNumberMasked: Nullable<string>;
-  holderName: Nullable<string>;
-  holderNameNormalized: Nullable<string>;
-  dateOfBirth: Nullable<string>;
-  issueDate: Nullable<string>;
-  expiryDate: Nullable<string>;
-  issuingAuthority: Nullable<string>;
-  ocrText: Nullable<string>;
-  aiDescription: Nullable<string>;
-};
-
-export type OtherDetail = {
+/**
+ */
+export type OtherFormRequest = {
   itemName: string;
   primaryColor: Nullable<string>;
   aiDescription: Nullable<string>;

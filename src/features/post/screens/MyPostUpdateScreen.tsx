@@ -15,6 +15,13 @@ import { eventTimeSchema } from "@/src/features/post/schemas";
 import { usePostSubcategoryStore } from "@/src/features/post/store";
 import {
   CardDetail,
+  CardFormRequest,
+  ElectronicDetail,
+  ElectronicFormRequest,
+  OtherDetail,
+  OtherFormRequest,
+  PersonalBelongingDetail,
+  PersonalBelongingFormRequest,
   POST_CATEGORIES,
   PostUpdateRequest,
 } from "@/src/features/post/types";
@@ -101,9 +108,10 @@ const MyPostUpdateScreen = () => {
     isLoading,
     data: post,
     error: fetchError,
-  } = useGetPostById({ postId });
-
-  console.log("Post:", post);
+  } = useGetPostById({
+    postId,
+    params: { isBlurImages: false },
+  });
 
   const { isLoaded, findSubcategoryById } = usePostSubcategoryStore();
   const { updatePost } = useUpdatePost();
@@ -144,7 +152,6 @@ const MyPostUpdateScreen = () => {
     (s) => s.personalBelongingDetail,
   );
   const category = usePostCreationStore((s) => s.category);
-  const patchPostTitle = usePostCreationStore((s) => s.updatePostTitle);
   const subCategoryCode = usePostCreationStore((s) => s.subCategoryCode);
   const resetForm = usePostCreationStore((s) => s.resetForm);
 
@@ -179,71 +186,22 @@ const MyPostUpdateScreen = () => {
 
     if (post.electronicDetail) {
       usePostCreationStore.setState({
-        electronicDetail: {
-          itemName: post.electronicDetail.itemName ?? "",
-          brand: post.electronicDetail.brand ?? null,
-          model: post.electronicDetail.model ?? null,
-          color: post.electronicDetail.color ?? null,
-          hasCase: post.electronicDetail.hasCase ?? null,
-          caseDescription: post.electronicDetail.caseDescription ?? null,
-          screenCondition: post.electronicDetail.screenCondition ?? null,
-          lockScreenDescription:
-            post.electronicDetail.lockScreenDescription ?? null,
-          distinguishingFeatures:
-            post.electronicDetail.distinguishingFeatures ?? null,
-          aiDescription: post.electronicDetail.aiDescription ?? null,
-          additionalDetails: post.electronicDetail.additionalDetails ?? null,
-        },
+        electronicDetail: post.electronicDetail,
       });
     }
+
     if (post.cardDetail) {
-      const mapped: CardDetail = {
-        itemName: post.cardDetail.itemName ?? "",
-        cardNumberHash: null,
-        cardNumberMasked: post.cardDetail.cardNumberMasked ?? null,
-        holderName: post.cardDetail.holderName ?? null,
-        holderNameNormalized: null,
-        dateOfBirth: post.cardDetail.dateOfBirth
-          ? String(post.cardDetail.dateOfBirth)
-          : null,
-        issueDate: post.cardDetail.issueDate
-          ? String(post.cardDetail.issueDate)
-          : null,
-        expiryDate: post.cardDetail.expiryDate
-          ? String(post.cardDetail.expiryDate)
-          : null,
-        issuingAuthority: post.cardDetail.issuingAuthority ?? null,
-        ocrText: null,
-        aiDescription: post.cardDetail.aiDescription ?? null,
-      };
-      usePostCreationStore.setState({ cardDetail: mapped });
+      usePostCreationStore.setState({ cardDetail: post.cardDetail });
     }
+
     if (post.personalBelongingDetail) {
       usePostCreationStore.setState({
-        personalBelongingDetail: {
-          itemName: post.personalBelongingDetail.itemName ?? "",
-          color: post.personalBelongingDetail.color ?? null,
-          brand: post.personalBelongingDetail.brand ?? null,
-          material: post.personalBelongingDetail.material ?? null,
-          size: post.personalBelongingDetail.size ?? null,
-          condition: post.personalBelongingDetail.condition ?? null,
-          distinctiveMarks:
-            post.personalBelongingDetail.distinctiveMarks ?? null,
-          aiDescription: post.personalBelongingDetail.aiDescription ?? null,
-          additionalDetails:
-            post.personalBelongingDetail.additionalDetails ?? null,
-        },
+        personalBelongingDetail: post.personalBelongingDetail,
       });
     }
+
     if (post.otherDetail) {
-      usePostCreationStore.setState({
-        otherDetail: {
-          itemName: post.otherDetail.itemName ?? "",
-          primaryColor: post.otherDetail.primaryColor ?? null,
-          aiDescription: post.otherDetail.aiDescription ?? null,
-          additionalDetails: post.otherDetail.additionalDetails ?? null,
-        },
-      });
+      usePostCreationStore.setState({ otherDetail: post.otherDetail });
     }
   }, [post]);
 
@@ -322,24 +280,32 @@ const MyPostUpdateScreen = () => {
 
       uploadImages();
       const imageUrls = await getUploadedImageUrls();
+
       const result = await analyzeImage({
         imageUrls,
         subcategoryCode: subCategoryCode,
       });
 
-      if (result?.electronic)
-        usePostCreationStore.setState({ electronicDetail: result.electronic });
-      if (result?.personalBelonging)
-        usePostCreationStore.setState({
-          personalBelongingDetail: result.personalBelonging,
-        });
-      if (result?.other)
-        usePostCreationStore.setState({ otherDetail: result.other });
+      if (result?.electronic) {
+        const electronicDetail: ElectronicDetail = result.electronic;
+        usePostCreationStore.setState({ electronicDetail });
+      }
+
+      if (result?.personalBelonging) {
+        const personalBelongingDetail: PersonalBelongingDetail =
+          result.personalBelonging;
+        usePostCreationStore.setState({ personalBelongingDetail });
+      }
+
+      if (result?.other) {
+        const otherDetail: OtherDetail = result.other;
+        usePostCreationStore.setState({ otherDetail });
+      }
+
       if (result?.card) {
-        const mapped: CardDetail = {
+        const cardDetail: CardDetail = {
           itemName: result.card.itemName,
-          cardNumberHash: result.card.cardNumber,
-          cardNumberMasked: result.card.cardNumber,
+          cardNumber: result.card.cardNumber,
           holderName: result.card.holderName,
           holderNameNormalized: result.card.holderNameNormalized,
           dateOfBirth: result.card.dateOfBirth,
@@ -349,16 +315,8 @@ const MyPostUpdateScreen = () => {
           ocrText: result.card.ocrText,
           aiDescription: result.card.aiDescription,
         };
-        usePostCreationStore.setState({ cardDetail: mapped });
+        usePostCreationStore.setState({ cardDetail });
       }
-
-      const titleData =
-        category === POST_CATEGORIES.CARD
-          ? result?.card?.itemName
-          : category === POST_CATEGORIES.ELECTRONICS
-            ? result?.electronic?.itemName
-            : result?.personalBelonging?.itemName;
-      if (titleData) patchPostTitle(titleData);
     } catch {
       toast.error("AI analysis got an error. Please try again.");
     } finally {
@@ -387,43 +345,59 @@ const MyPostUpdateScreen = () => {
 
   const handleSave = async () => {
     if (!postId) {
-      toast.error("Invalid post. Please go back and try again.");
+      toast.error("Error", "Invalid post. Please go back and try again.");
       return;
     }
+
     if (eventTimeError) {
-      toast.error(eventTimeError);
+      toast.error("Error", eventTimeError);
       return;
     }
+
     try {
       setIsSaveLoading(true);
 
       uploadImages();
       const imageUrls = await getUploadedImageUrls();
 
-      const req: PostUpdateRequest = {
+      const electronicFormRequest: Optional<ElectronicFormRequest> =
+        category === POST_CATEGORIES.ELECTRONICS
+          ? { ...electronicDetail }
+          : undefined;
+
+      const cardFormRequest: Optional<CardFormRequest> =
+        category === POST_CATEGORIES.CARD ? { ...cardDetail } : undefined;
+
+      const personalBelongingFormRequest: Optional<PersonalBelongingFormRequest> =
+        category === POST_CATEGORIES.PERSONAL_BELONGINGS
+          ? { ...personalBelongingDetail }
+          : undefined;
+
+      const otherFormRequest: Optional<OtherFormRequest> =
+        category === POST_CATEGORIES.OTHERS ? { ...otherDetail } : undefined;
+
+      const updReq: PostUpdateRequest = {
         imageUrls,
         eventTime: draftDate,
+
         location: location.coords ?? undefined,
         displayAddress: location.address ?? undefined,
         externalPlaceId: location.placeId ?? undefined,
-        ...(category === POST_CATEGORIES.ELECTRONICS
-          ? { electronicDetail }
-          : {}),
-        ...(category === POST_CATEGORIES.CARD ? { cardDetail } : {}),
-        ...(category === POST_CATEGORIES.PERSONAL_BELONGINGS
-          ? { personalBelongingDetail }
-          : {}),
-        ...(category === POST_CATEGORIES.OTHERS ? { otherDetail } : {}),
+
+        electronicDetail: electronicFormRequest,
+        cardDetail: cardFormRequest,
+        personalBelongingDetail: personalBelongingFormRequest,
+        otherDetail: otherFormRequest,
       };
 
-      await updatePost({ postId, req });
+      await updatePost({ postId, req: updReq });
 
       setIsSaveLoading(false);
 
       toast.success("Post updated successfully.");
       router.back();
     } catch {
-      toast.error("Failed to update post. Please try again.");
+      toast.error("Error", "Failed to update post. Please try again.");
     }
   };
 

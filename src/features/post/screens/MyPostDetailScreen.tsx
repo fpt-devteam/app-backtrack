@@ -83,7 +83,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const MyPostDetailScreen = () => {
   const { postId } = useLocalSearchParams<{ postId: string }>();
-  const { isLoading, data: post } = useGetPostById({ postId });
+
+  const { isLoading, data: post } = useGetPostById({
+    postId,
+    params: { isBlurImages: false },
+  });
+
   const {
     deletePost,
     error: deletePostError,
@@ -142,10 +147,6 @@ const MyPostDetailScreen = () => {
 
   const handleBackPress = useCallback(() => {
     router.back();
-  }, []);
-
-  const handleSharePress = useCallback(() => {
-    // TODO: Implement share functionality (e.g., share post details or deep link)
   }, []);
 
   const handleMorePress = useCallback(() => {
@@ -308,12 +309,11 @@ const MyPostDetailScreen = () => {
       const detail = post?.cardDetail;
       pushRow(IdentificationCardIcon, "Name", detail.itemName);
       pushRow(UserCircleIcon, "Holder", detail.holderName);
-      pushRow(HashStraightIcon, "Card no.", detail.cardNumberMasked);
+      pushRow(HashStraightIcon, "Card no.", detail.cardNumber);
       pushRow(CalendarDotsIcon, "DOB", detail.dateOfBirth);
       pushRow(CalendarDotsIcon, "Issued", detail.issueDate);
       pushRow(CalendarDotsIcon, "Expires", detail.expiryDate);
       pushRow(CertificateIcon, "Authority", detail.issuingAuthority);
-      pushRow(ListBulletsIcon, "Details", detail.additionalDetails);
       return rows;
     }
 

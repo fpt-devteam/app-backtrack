@@ -67,10 +67,10 @@ export type UserPost = {
   displayAddress: string
 
   // 
-  personalBelongingDetail?: Nullable<SimilarPostPersonalBelongingDetail>
-  cardDetail?: Nullable<SimilarPostCardDetail>
-  electronicDetail?: Nullable<SimilarPostElectronicDetail>
-  otherDetail?: Nullable<SimilarPostOtherDetail>
+  personalBelongingDetail?: PersonalBelongingDetail
+  cardDetail?: CardDetail
+  electronicDetail?: ElectronicDetail
+  otherDetail?: OtherDetail
 
   // 
   eventTime: Date | string
@@ -261,65 +261,18 @@ export type MatchStatus = typeof MATCH_STATUS[keyof typeof MATCH_STATUS];
 /**
  * 
  */
-export type SimilarPostPersonalBelongingDetail = {
-  itemName?: Nullable<string>;
-  color?: Nullable<string>;
-  brand?: Nullable<string>;
-  material?: Nullable<string>;
-  size?: Nullable<string>;
-  condition?: Nullable<string>;
-  distinctiveMarks?: Nullable<string>;
-  aiDescription?: Nullable<string>;
-  additionalDetails?: Nullable<string>;
-}
-
-export type SimilarPostCardDetail = {
-  itemName?: Nullable<string>;
-  cardNumberMasked?: Nullable<string>;
-  holderName?: Nullable<string>;
-  dateOfBirth?: Nullable<Date | string>;
-  issueDate?: Nullable<Date | string>;
-  expiryDate?: Nullable<Date | string>;
-  issuingAuthority?: Nullable<string>;
-  additionalDetails?: Nullable<string>;
-  aiDescription?: Nullable<string>;
-}
-
-export type SimilarPostElectronicDetail = {
-  itemName?: Nullable<string>;
-  brand?: Nullable<string>;
-  model?: Nullable<string>;
-  color?: Nullable<string>;
-  hasCase?: Nullable<boolean>;
-  caseDescription?: Nullable<string>;
-  screenCondition?: Nullable<string>;
-  lockScreenDescription?: Nullable<string>;
-  distinguishingFeatures?: Nullable<string>;
-  aiDescription?: Nullable<string>;
-  additionalDetails?: Nullable<string>;
-}
-
-export type SimilarPostOtherDetail = {
-  itemName?: Nullable<string>;
-  primaryColor?: Nullable<string>;
-  aiDescription?: Nullable<string>;
-  additionalDetails?: Nullable<string>;
-}
-
-/**
- * 
- */
 export type SimilarPost = BasePost & {
-  personalBelongingDetail?: Nullable<SimilarPostPersonalBelongingDetail>
-  cardDetail?: Nullable<SimilarPostCardDetail>
-  electronicDetail?: Nullable<SimilarPostElectronicDetail>
-  otherDetail?: Nullable<SimilarPostOtherDetail>
+  personalBelongingDetail?: PersonalBelongingDetail
+  cardDetail?: CardDetail
+  electronicDetail?: ElectronicDetail
+  otherDetail?: OtherDetail
   score: number;
   evidence: MatchEvidence[];
   status: MatchStatus;
   timeGap: string;
   locationDistance: number;
 }
+
 
 /**
  * BasePost
@@ -343,3 +296,54 @@ export type BasePost = {
   createdAt: Date | string
 }
 
+/**
+ */
+export type ElectronicDetail = {
+  itemName: string
+  brand: Nullable<string>;
+  model: Nullable<string>;
+  color: Nullable<string>;
+  hasCase: Nullable<boolean>;
+  caseDescription: Nullable<string>;
+  screenCondition: Nullable<string>;
+  lockScreenDescription: Nullable<string>;
+  distinguishingFeatures: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};
+
+/**
+ */
+export type PersonalBelongingDetail = {
+  itemName: string;
+  color: Nullable<string>;
+  brand: Nullable<string>;
+  material: Nullable<string>;
+  size: Nullable<string>;
+  condition: Nullable<string>;
+  distinctiveMarks: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};
+
+/**
+ */
+export type CardDetail = {
+  itemName: string;
+  cardNumber: Nullable<string>;
+  holderName: Nullable<string>;
+  holderNameNormalized: Nullable<string>;
+  dateOfBirth: Nullable<string>;
+  issueDate: Nullable<string>;
+  expiryDate: Nullable<string>;
+  issuingAuthority: Nullable<string>;
+  ocrText: Nullable<string>;
+  aiDescription: Nullable<string>;
+};
+
+export type OtherDetail = {
+  itemName: string;
+  primaryColor: Nullable<string>;
+  aiDescription: Nullable<string>;
+  additionalDetails: Nullable<string>;
+};

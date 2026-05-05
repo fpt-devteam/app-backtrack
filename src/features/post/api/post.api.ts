@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdRequest, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -25,8 +25,8 @@ export const createPost = async (req: PostCreateRequest) => {
   return response.data;
 };
 
-export async function getPostByIdApi(postId: string) {
-  const response = await privateClient.get<PostGetByIdResponse>(POST_API.detail(postId));
+export async function getPostByIdApi(req: PostGetByIdRequest) {
+  const response = await privateClient.get<PostGetByIdResponse>(POST_API.detail(req.postId), { params: req.params });
   return response.data;
 }
 
