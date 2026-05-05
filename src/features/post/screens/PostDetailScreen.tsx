@@ -19,7 +19,6 @@ import { MotiView } from "moti";
 import {
   ArrowLeftIcon,
   ClockIcon,
-  ExportIcon,
   IconProps,
   MapPinIcon,
   SealCheckIcon,
@@ -388,15 +387,6 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
 
           headerLeft: () => (
             <HeaderIcon icon={ArrowLeftIcon} onPress={() => router.back()} />
-          ),
-
-          headerRight: () => (
-            <View>
-              <HeaderIcon
-                icon={ExportIcon}
-                onPress={() => console.log("Export")}
-              />
-            </View>
           ),
         }}
       />

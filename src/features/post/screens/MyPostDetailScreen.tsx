@@ -44,7 +44,6 @@ import {
   CpuIcon,
   DeviceMobileIcon,
   DotsThreeVerticalIcon,
-  ExportIcon,
   FingerprintIcon,
   HandbagIcon,
   HashStraightIcon,
@@ -626,14 +625,10 @@ const MyPostDetailScreen = () => {
 
           headerRight: () =>
             isActivePost && (
-              <View className="flex-row items-center gap-sm">
-                <HeaderIcon icon={ExportIcon} onPress={handleSharePress} />
-
-                <HeaderIcon
-                  icon={DotsThreeVerticalIcon}
-                  onPress={handleMorePress}
-                />
-              </View>
+              <HeaderIcon
+                icon={DotsThreeVerticalIcon}
+                onPress={handleMorePress}
+              />
             ),
         }}
       />
