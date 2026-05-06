@@ -77,8 +77,6 @@ const LoginScreen = () => {
 
       await refresh();
       
-      router.dismissAll();
-
       toast.success("Welcome back!");
     } catch (error) {
       toast.error("Login failed");
