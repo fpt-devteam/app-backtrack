@@ -58,14 +58,22 @@ export const ConversationDetailScreen = ({ conversationId }: Props) => {
   const pinnedHandover = inProgressHandovers[0];
   const hasPinnedHandovers = inProgressHandovers.length > 0;
 
+  const isOrgConversation = useMemo(() => {
+    return conversationDetail?.orgId !== null;
+  }, [conversationDetail]);
+
   const displayPartnerName = useMemo(() => {
-    return partner?.displayName || "Unknown User";
-  }, [partner]);
+    const defaultName = "Unknown User";
+    if (isOrgConversation) return conversationDetail?.orgName || defaultName;
+
+    if (!conversationDetail?.partner) return defaultName;
+    return conversationDetail?.partner?.displayName || defaultName;
+  }, [conversationDetail, isOrgConversation]);
 
   const displayPartnerAvatar = useMemo(() => {
-    if (!partner) return null;
-    return "avatarUrl" in partner ? partner.avatarUrl : null;
-  }, [partner]);
+    if (isOrgConversation) return conversationDetail?.orgLogoUrl;
+    return conversationDetail?.partner?.avatarUrl;
+  }, [conversationDetail, isOrgConversation]);
 
   useEffect(() => {
     if (!hasPinnedHandovers && isPinnedExpanded) {

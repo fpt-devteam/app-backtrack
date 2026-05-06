@@ -12,6 +12,10 @@ type Props = {
 };
 
 export const ConversationCard = ({ conversation }: Props) => {
+  const isOrgConversation = useMemo(() => {
+    return conversation.orgId !== null;
+  }, [conversation]);
+
   const isLastMessageFromPartner = useMemo(() => {
     return conversation.lastMessage?.senderId === conversation.partner?.id;
   }, [conversation]);
@@ -20,11 +24,18 @@ export const ConversationCard = ({ conversation }: Props) => {
     return conversation.unreadCount > 0 && isLastMessageFromPartner;
   }, [conversation, isLastMessageFromPartner]);
 
+  const imageConversationUrl = useMemo(() => {
+    if (isOrgConversation) return conversation.orgLogoUrl;
+    return conversation.partner?.avatarUrl;
+  }, [conversation, isOrgConversation]);
+
   const displayPartnerName = useMemo(() => {
     const defaultName = "Unknown User";
+    if (isOrgConversation) return conversation.orgName || defaultName;
+
     if (!conversation.partner) return defaultName;
     return conversation.partner?.displayName || defaultName;
-  }, [conversation]);
+  }, [conversation, isOrgConversation]);
 
   const displayLastMessage = useMemo(() => {
     const defaultContent = `Say something to ${
@@ -92,10 +103,7 @@ export const ConversationCard = ({ conversation }: Props) => {
       >
         <View className="flex-row items-center gap-md">
           {/* Avatar */}
-          <AppUserAvatar
-            avatarUrl={conversation.partner?.avatarUrl}
-            size={52}
-          />
+          <AppUserAvatar avatarUrl={imageConversationUrl} size={52} />
 
           {/* Main */}
           <View className="flex-1 gap-xs">

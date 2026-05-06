@@ -101,6 +101,8 @@ export type DirectConversation = {
 export type Conversation = DirectConversation & {
   type: ConversationType;
   orgId: Nullable<string>;
+  orgName: Nullable<string>;
+  orgLogoUrl: Nullable<string>;
   status: Nullable<SupportConversationStatus>;
   assignedStaffId: Nullable<string>;
 }

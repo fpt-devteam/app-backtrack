@@ -92,7 +92,6 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
     useGetC2CReturnReportsByPartner(partner?.id);
 
   const currentUser = getParticipantInfo(user, "You");
-  const partnerInfo = getParticipantInfo(partner, "Unknown User");
 
   const handleMarkAsUnread = useCallback(() => {
     // TODO: Implement mark as unread
@@ -102,7 +101,7 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
     // TODO: Implement archive
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !conversation) {
     return (
       <View className="flex-1 bg-surface items-center justify-center">
         <AppLoader />
@@ -110,12 +109,26 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
     );
   }
 
+  const isOrgConversation = conversation?.orgId !== null;
+
+  const displayPartnerName = () => {
+    const defaultName = "Unknown User";
+    if (isOrgConversation) return conversation.orgName || defaultName;
+    return conversation.partner?.displayName || defaultName;
+  };
+
+  const displayPartnerAvatar = () => {
+    if (conversation === undefined) return null;
+    if (isOrgConversation) return conversation.orgLogoUrl;
+    return conversation.partner?.avatarUrl || null;
+  };
+
   return (
     <ScrollView
       className="flex-1 bg-surface"
       contentContainerClassName="px-lg pb-xl"
     >
-      {/* Handover section — only shown when in-progress handovers exist */}
+      {/* Handover section  */}
       {!isHandoverLoading && inProgressHandovers.length > 0 && (
         <View className="mt-xl">
           <SectionHeader title="Handovers" />
@@ -136,8 +149,8 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
           role="Owner"
         />
         <ParticipantRow
-          avatarUrl={partnerInfo.avatarUrl}
-          name={partnerInfo.name}
+          avatarUrl={displayPartnerAvatar()}
+          name={displayPartnerName()}
           role="Finder"
           isLast
         />

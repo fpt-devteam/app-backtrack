@@ -13,13 +13,6 @@ import { AUTH_ROUTE } from "@/src/shared/constants";
 import { auth } from "@/src/shared/lib";
 import { getErrorMessage } from "@/src/shared/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  GoogleSignin,
-  isCancelledResponse,
-  isErrorWithCode,
-  isSuccessResponse,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import {
   GoogleAuthProvider,
@@ -42,10 +35,22 @@ import * as yup from "yup";
 
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
-if (GOOGLE_WEB_CLIENT_ID) {
-  GoogleSignin.configure({
-    webClientId: GOOGLE_WEB_CLIENT_ID,
-  });
+type GoogleSigninModule = typeof import("@react-native-google-signin/google-signin");
+
+let googleSigninModule: GoogleSigninModule | null = null;
+
+try {
+  // Expo Go does not include the native Google Sign-In module.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  googleSigninModule = require("@react-native-google-signin/google-signin") as GoogleSigninModule;
+
+  if (GOOGLE_WEB_CLIENT_ID) {
+    googleSigninModule.GoogleSignin.configure({
+      webClientId: GOOGLE_WEB_CLIENT_ID,
+    });
+  }
+} catch {
+  googleSigninModule = null;
 }
 
 const loginFormSchema = yup
@@ -83,6 +88,14 @@ const OnboardingScreen = () => {
   const hasEmail = emailValue.trim().length > 0;
 
   const handleLoginGoogle = async () => {
+    if (!googleSigninModule) {
+      toast.error(
+        "Not available in Expo Go",
+        "Google Sign-In requires a development build.",
+      );
+      return;
+    }
+
     if (!GOOGLE_WEB_CLIENT_ID) {
       toast.error(
         "Google login unavailable",
@@ -90,6 +103,14 @@ const OnboardingScreen = () => {
       );
       return;
     }
+
+    const {
+      GoogleSignin,
+      isCancelledResponse,
+      isErrorWithCode,
+      isSuccessResponse,
+      statusCodes,
+    } = googleSigninModule;
 
     setIsGoogleLoginLoading(true);
     let shouldCleanupSession = false;

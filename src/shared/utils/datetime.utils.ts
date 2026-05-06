@@ -61,7 +61,7 @@ export const formatDateTime = (input: Date | string) => {
   const yyyy = d.getFullYear();
   const hh = pad2(d.getHours());
   const min = pad2(d.getMinutes());
-  return `${mm}/${dd}/${yyyy}, ${hh}:${min}`;
+  return `${hh}:${min}, ${mm}/${dd}/${yyyy}`;
 };
 
 export function formatTime<T extends Intl.DateTimeFormatOptions>(

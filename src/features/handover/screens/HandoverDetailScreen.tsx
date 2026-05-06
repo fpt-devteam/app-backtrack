@@ -33,7 +33,7 @@ import {
 import { toast } from "@/src/shared/components/ui/toast";
 import { CHAT_ROUTE, HANDOVER_ROUTE } from "@/src/shared/constants";
 import { colors, metrics, typography } from "@/src/shared/theme";
-import { formatDate } from "@/src/shared/utils";
+import { formatDateTime } from "@/src/shared/utils";
 import * as Haptics from "expo-haptics";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
@@ -110,9 +110,7 @@ const HANDOVER_PROGRESS_STEP_LABELS: Record<
   },
 };
 
-const getHandoverProgressPath = (
-  report: Handover,
-): HandoverProgressPath => {
+const getHandoverProgressPath = (report: Handover): HandoverProgressPath => {
   const isExpired = Date.now() > new Date(report.expiresAt).getTime();
 
   if (report.status === "Closed") {
@@ -181,7 +179,7 @@ type ProgressStepperProps = {
 
 const ProgressStepper = ({ stepDots }: ProgressStepperProps) => {
   return (
-    <View className="flex-row items-start justify-between">
+    <View className="flex-row items-start">
       {stepDots.map((step, i) => (
         <React.Fragment key={step.key}>
           <View className="items-center flex-1">
@@ -502,9 +500,12 @@ const HandoverDetailScreen = () => {
     const labels = HANDOVER_PROGRESS_STEP_LABELS[viewerRole];
     const isExpired = Date.now() > new Date(report.expiresAt).getTime();
     const path = getHandoverProgressPath(report);
-    const deliveredContent = report.activatedByRole
+    const deliveredFallbackContent = report.activatedByRole
       ? `${report.activatedByRole} marked delivered`
       : "Item handed over";
+    const deliveredContent = report.deliveredAt
+      ? formatDateTime(report.deliveredAt)
+      : deliveredFallbackContent;
     const confirmedLabel =
       report.status === "Confirmed" ? "Confirmed" : labels.confirmed;
     const confirmedState: StepState =
@@ -519,7 +520,7 @@ const HandoverDetailScreen = () => {
         {
           key: "ongoing",
           label: labels.ongoing,
-          content: formatDate(report.createdAt),
+          content: formatDateTime(report.createdAt),
           state: "done",
         },
         {
@@ -542,7 +543,7 @@ const HandoverDetailScreen = () => {
         {
           key: "ongoing",
           label: labels.ongoing,
-          content: formatDate(report.createdAt),
+          content: formatDateTime(report.createdAt),
           state: "done",
         },
         {
@@ -559,7 +560,7 @@ const HandoverDetailScreen = () => {
         {
           key: "ongoing",
           label: labels.ongoing,
-          content: formatDate(report.createdAt),
+          content: formatDateTime(report.createdAt),
           state: "done",
         },
         {
@@ -571,7 +572,7 @@ const HandoverDetailScreen = () => {
         {
           key: "expire",
           label: labels.expire,
-          content: formatDate(report.expiresAt),
+          content: formatDateTime(report.expiresAt),
           state: "done",
         },
       ];
@@ -582,13 +583,13 @@ const HandoverDetailScreen = () => {
         {
           key: "ongoing",
           label: labels.ongoing,
-          content: formatDate(report.createdAt),
+          content: formatDateTime(report.createdAt),
           state: "done",
         },
         {
           key: "expire",
           label: labels.expire,
-          content: formatDate(report.expiresAt),
+          content: formatDateTime(report.expiresAt),
           state: "done",
         },
       ];
@@ -598,7 +599,7 @@ const HandoverDetailScreen = () => {
       {
         key: "ongoing",
         label: labels.ongoing,
-        content: formatDate(report.createdAt),
+        content: formatDateTime(report.createdAt),
         state: report.status === "Ongoing" ? "active" : "done",
       },
       {
@@ -611,14 +612,14 @@ const HandoverDetailScreen = () => {
         key: "confirmed",
         label: confirmedLabel,
         content: report.confirmedAt
-          ? formatDate(report.confirmedAt)
+          ? formatDateTime(report.confirmedAt)
           : "Receipt acknowledged",
         state: confirmedState,
       },
       {
         key: "expire",
         label: labels.expire,
-        content: formatDate(report.expiresAt),
+        content: formatDateTime(report.expiresAt),
         state: isExpired ? "done" : "pending",
       },
     ];
@@ -854,9 +855,7 @@ const HandoverDetailScreen = () => {
         <View className="gap-md2">
           <Text className="text-lg font-normal text-textPrimary">Progress</Text>
 
-          <ProgressStepper
-            stepDots={stepDots}
-          />
+          <ProgressStepper stepDots={stepDots} />
         </View>
 
         {/* Items involved  */}
