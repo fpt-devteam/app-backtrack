@@ -137,9 +137,12 @@ const StepDot = ({ state }: { state: StepState }) => {
     return (
       <View
         className="w-xl aspect-square rounded-full border items-center justify-center"
-        style={{ backgroundColor: colors.babu[400] }}
+        style={{
+          backgroundColor: colors.babu[100],
+          borderColor: colors.babu[500],
+        }}
       >
-        <CheckCircleIcon size={24} color={colors.white} weight="fill" />
+        <CheckCircleIcon size={16} color={colors.babu[600]} weight="fill" />
       </View>
     );
   }
@@ -514,6 +517,7 @@ const HandoverDetailScreen = () => {
         : report.status === "Delivered"
           ? "active"
           : "pending";
+    const shouldShowExpireStep = report.status !== "Confirmed";
 
     if (path === "rejected") {
       return [
@@ -616,12 +620,16 @@ const HandoverDetailScreen = () => {
           : "Receipt acknowledged",
         state: confirmedState,
       },
-      {
-        key: "expire",
-        label: labels.expire,
-        content: formatDateTime(report.expiresAt),
-        state: isExpired ? "done" : "pending",
-      },
+      ...(shouldShowExpireStep
+        ? [
+            {
+              key: "expire" as const,
+              label: labels.expire,
+              content: formatDateTime(report.expiresAt),
+              state: (isExpired ? "done" : "pending") as StepState,
+            } satisfies StepDotDisplay,
+          ]
+        : []),
     ];
   }, [report, viewerRole]);
 
