@@ -39,6 +39,12 @@ const STATUS_THEME: Record<PostStatus, StatusTheme> = {
     bgColor: colors.error[100],
     borderColor: colors.error[500],
   },
+  [POST_STATUS.DELIVERED]: {
+    label: "Delivered",
+    color: colors.amber[500],
+    bgColor: colors.amber[100],
+    borderColor: colors.amber[500],
+  },
 };
 
 export const PostStatusBadge = ({ status }: PostStatusBadgeProps) => {

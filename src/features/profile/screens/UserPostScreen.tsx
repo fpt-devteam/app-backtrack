@@ -11,7 +11,14 @@ import { colors, metrics, typography } from "@/src/shared/theme";
 import { Stack } from "expo-router";
 import { PackageIcon } from "phosphor-react-native";
 import React, { useMemo, useState } from "react";
-import { FlatList, Pressable, Text, TextStyle, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  TextStyle,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type UserPostFilter = "all" | PostStatus;
@@ -22,6 +29,7 @@ const STATUS_TABS: { key: UserPostFilter; label: string }[] = [
   { key: POST_STATUS.RETURNED, label: POST_STATUS.RETURNED },
   { key: POST_STATUS.ARCHIVED, label: POST_STATUS.ARCHIVED },
   { key: POST_STATUS.EXPIRED, label: POST_STATUS.EXPIRED },
+  { key: POST_STATUS.DELIVERED, label: POST_STATUS.DELIVERED },
 ];
 
 const EMPTY_STATE_COPY: Record<
@@ -47,6 +55,10 @@ const EMPTY_STATE_COPY: Record<
   [POST_STATUS.EXPIRED]: {
     title: "No Expired Posts",
     subtitle: "Your expired posts will appear here.",
+  },
+  [POST_STATUS.DELIVERED]: {
+    title: "No Delivered Posts",
+    subtitle: "Your delivered posts will appear here.",
   },
 };
 
@@ -153,14 +165,24 @@ const UserPostScreen = () => {
         }}
       />
 
-      <View className="bg-surface py-sm flex-row items-center justify-evenly px-lg">
-        <AppChipsRow
-          chips={STATUS_TABS.map(({ key, label }) => ({
-            label,
-            selected: selectedTab === key,
-            onPress: () => setSelectedTab(key),
-          }))}
-        />
+      <View className="bg-surface border-b border-divider">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: metrics.spacing.lg,
+            paddingVertical: metrics.spacing.sm,
+            alignItems: "center",
+          }}
+        >
+          <AppChipsRow
+            chips={STATUS_TABS.map(({ key, label }) => ({
+              label,
+              selected: selectedTab === key,
+              onPress: () => setSelectedTab(key),
+            }))}
+          />
+        </ScrollView>
       </View>
 
       {renderBody()}

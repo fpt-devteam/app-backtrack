@@ -19,9 +19,10 @@ export type Handover = {
 
   evidenceImageUrls?: string[]
 
-  confirmedAt: Nullable<string>
   expiresAt: string
   createdAt: string
+  confirmedAt: Nullable<string>
+  deliveredAt: Nullable<string>
 }
 
 /**

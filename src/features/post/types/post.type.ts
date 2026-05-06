@@ -44,7 +44,8 @@ export const POST_STATUS = {
   ACTIVE: "Active",
   RETURNED: "Returned",
   ARCHIVED: "Archived",
-  EXPIRED: "Expired"
+  EXPIRED: "Expired",
+  DELIVERED: "Delivered",
 } as const
 
 export type PostStatus = typeof POST_STATUS[keyof typeof POST_STATUS]

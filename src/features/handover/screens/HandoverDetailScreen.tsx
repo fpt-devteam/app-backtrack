@@ -18,7 +18,7 @@ import {
   useOwnerConfirmC2CReturnReport,
   useOwnerRejectC2CReturnReport,
 } from "@/src/features/handover/hooks";
-import type { Handover, HandoverStatus } from "@/src/features/handover/types";
+import type { Handover } from "@/src/features/handover/types";
 import { PostCard } from "@/src/features/post/components";
 import {
   AppBackButton,
@@ -56,103 +56,92 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type StepState = "done" | "active" | "pending";
 
-type StepDef = {
+type ViewerRole = "Finder" | "Owner" | "Unknown";
+
+type HandoverProgressStepKey =
+  | "ongoing"
+  | "delivered"
+  | "confirmed"
+  | "rejected"
+  | "closed"
+  | "expire";
+
+type HandoverProgressPath =
+  | "happy"
+  | "rejected"
+  | "closed"
+  | "expiredAfterDelivery"
+  | "expiredOngoing";
+
+type StepDotDisplay = {
+  key: HandoverProgressStepKey;
   label: string;
-  sublabel: string;
+  content: string;
   state: StepState;
 };
 
-type StepDisplay = StepDef & {
-  content: string;
+const HANDOVER_PROGRESS_STEP_LABELS: Record<
+  ViewerRole,
+  Record<HandoverProgressStepKey, string>
+> = {
+  Finder: {
+    ongoing: "Ongoing",
+    delivered: "You Deliver",
+    confirmed: "Owner Confirms",
+    rejected: "Rejected",
+    closed: "Closed",
+    expire: "Expires",
+  },
+  Owner: {
+    ongoing: "Ongoing",
+    delivered: "Finder Delivers",
+    confirmed: "You Confirm",
+    rejected: "Rejected",
+    closed: "Closed",
+    expire: "Expires",
+  },
+  Unknown: {
+    ongoing: "Ongoing",
+    delivered: "Delivered",
+    confirmed: "Confirmed",
+    rejected: "Rejected",
+    closed: "Closed",
+    expire: "Expires",
+  },
 };
 
-type ProgressStepContent = {
-  coordinate: string;
-  deliver: string;
-  confirm: string;
-};
+const getHandoverProgressPath = (
+  report: Handover,
+): HandoverProgressPath => {
+  const isExpired = Date.now() > new Date(report.expiresAt).getTime();
 
-function deriveSteps(
-  status: HandoverStatus,
-  isFinder: boolean,
-  hasMarkedDelivery: boolean,
-): StepDef[] {
-  const steps: StepDef[] = [
-    {
-      label: "Coordinate",
-      sublabel: "Chat & agree on meetup",
-      state: "pending",
-    },
-    {
-      label: isFinder ? "You Deliver" : "Finder Delivers",
-      sublabel: "Item handed over",
-      state: "pending",
-    },
-    {
-      label: isFinder ? "Owner Confirms" : "You Confirm",
-      sublabel: "Receipt acknowledged",
-      state: "pending",
-    },
-  ];
-
-  if (status === "Ongoing") {
-    steps[0].state = "active";
-  } else if (status === "Delivered") {
-    steps[0].state = "done";
-    steps[1].state = "done";
-    steps[2].state = "active";
-  } else if (status === "Confirmed") {
-    steps[0].state = "done";
-    steps[1].state = "done";
-    steps[2].state = "done";
-  } else if (status === "Closed" || status === "Rejected") {
-    if (hasMarkedDelivery) {
-      steps[0].state = "done";
-      steps[1].state = "done";
-    }
+  if (report.status === "Closed") {
+    return "closed";
   }
-  return steps;
-}
 
-function buildProgressStepContent(report: Handover): ProgressStepContent {
-  const isInProgressStatus =
-    report.status === "Ongoing" || report.status === "Delivered";
+  if (report.status === "Rejected") {
+    return "rejected";
+  }
 
-  const coordinate = isInProgressStatus
-    ? `Expires ${formatDate(report.expiresAt)}`
-    : formatDate(report.createdAt);
+  if (report.status === "Delivered" && isExpired) {
+    return "expiredAfterDelivery";
+  }
 
-  const deliver = report.activatedByRole
-    ? `${report.activatedByRole} marked delivered`
-    : report.status === "Closed"
-      ? "Items did not match"
-      : report.status === "Rejected"
-        ? "Request was declined"
-        : "Item handed over";
+  if (report.status === "Ongoing" && isExpired) {
+    return "expiredOngoing";
+  }
 
-  const confirm = report.confirmedAt
-    ? formatDate(report.confirmedAt)
-    : report.status === "Rejected"
-      ? "Request was declined"
-      : report.status === "Closed"
-        ? "Items did not match"
-        : "Receipt acknowledged";
-
-  return {
-    coordinate,
-    deliver,
-    confirm,
-  };
-}
+  return "happy";
+};
 
 const StepDot = ({ state }: { state: StepState }) => {
   if (state === "done") {
     return (
       <View
-        className="w-8 aspect-square rounded-full border items-center justify-center"
+        className="w-xl aspect-square rounded-full border items-center justify-center"
         style={{ backgroundColor: colors.babu[400] }}
       >
-        <CheckCircleIcon size={18} color={colors.white} weight="fill" />
+        <CheckCircleIcon size={24} color={colors.white} weight="fill" />
       </View>
     );
   }
@@ -160,82 +149,41 @@ const StepDot = ({ state }: { state: StepState }) => {
   if (state === "active") {
     return (
       <View
-        className="w-8 aspect-square rounded-full border items-center justify-center"
+        className="w-xl aspect-square rounded-full border items-center justify-center"
         style={{
           backgroundColor: colors.primary,
           borderColor: colors.rausch[100],
         }}
       >
-        <View className="w-2.5 h-2.5 rounded-full bg-white" />
+        <View className="w-sm h-sm rounded-full bg-white" />
       </View>
     );
   }
   return (
     <View
-      className="w-8 aspect-square rounded-full border items-center justify-center"
+      className="w-xl aspect-square rounded-full border items-center justify-center"
       style={{
         backgroundColor: colors.hof[100],
         borderColor: colors.hof[300],
       }}
     >
       <View
-        className="w-2.5 h-2.5 rounded-full"
+        className="w-sm h-sm rounded-full"
         style={{ backgroundColor: colors.hof[300] }}
       />
     </View>
   );
 };
 
-const ProgressStepper = ({
-  status,
-  isFinder,
-  hasMarkedDelivery,
-  viewerRole,
-  stepContent,
-}: {
-  status: HandoverStatus;
-  isFinder: boolean;
-  hasMarkedDelivery: boolean;
-  viewerRole: "Finder" | "Owner" | "Unknown";
-  stepContent: {
-    coordinate: string;
-    deliver: string;
-    confirm: string;
-  };
-}) => {
-  const steps = deriveSteps(status, isFinder, hasMarkedDelivery);
+type ProgressStepperProps = {
+  stepDots: StepDotDisplay[];
+};
 
-  const stepsWithViewerCopy = useMemo<StepDisplay[]>(() => {
-    const normalizedSteps =
-      viewerRole !== "Unknown"
-        ? steps
-        : steps.map((step) => {
-            if (step.label === "You Deliver") {
-              return { ...step, label: "Finder Delivers" };
-            }
-
-            if (step.label === "You Confirm") {
-              return { ...step, label: "Owner Confirms" };
-            }
-
-            return step;
-          });
-
-    return normalizedSteps.map((step, index) => ({
-      ...step,
-      content:
-        index === 0
-          ? stepContent.coordinate
-          : index === 1
-            ? stepContent.deliver
-            : stepContent.confirm,
-    }));
-  }, [stepContent.confirm, stepContent.coordinate, stepContent.deliver, steps, viewerRole]);
-
+const ProgressStepper = ({ stepDots }: ProgressStepperProps) => {
   return (
     <View className="flex-row items-start justify-between">
-      {stepsWithViewerCopy.map((step, i) => (
-        <React.Fragment key={step.label}>
+      {stepDots.map((step, i) => (
+        <React.Fragment key={step.key}>
           <View className="items-center flex-1">
             <StepDot state={step.state} />
 
@@ -261,13 +209,13 @@ const ProgressStepper = ({
             </Text>
           </View>
 
-          {i < steps.length - 1 && (
+          {i < stepDots.length - 1 && (
             <View
               className="h-0.5 mt-4"
               style={{
                 flex: 0.4,
                 backgroundColor:
-                  stepsWithViewerCopy[i + 1].state === "pending"
+                  stepDots[i + 1].state === "pending"
                     ? colors.hof[200]
                     : colors.babu[200],
               }}
@@ -533,7 +481,8 @@ const HandoverDetailScreen = () => {
   );
 
   const viewerRole = useMemo(
-    () => (report ? getHandoverViewerRole(report, currentUser?.id) : "Unknown"),
+    (): ViewerRole =>
+      report ? getHandoverViewerRole(report, currentUser?.id) : "Unknown",
     [report, currentUser?.id],
   );
 
@@ -542,23 +491,138 @@ const HandoverDetailScreen = () => {
     [report],
   );
 
-  const hasMarkedDelivery = !!report?.activatedByRole;
-
   const detailGuidance = useMemo(() => {
     if (!report) return "";
     return getHandoverDetailGuidance(report, currentUser?.id);
   }, [report, currentUser?.id]);
 
-  const progressStepContent = useMemo(() => {
-    if (!report) {
-      return {
-        coordinate: "Chat & agree on meetup",
-        deliver: "Item handed over",
-        confirm: "Receipt acknowledged",
-      };
+  const stepDots = useMemo<StepDotDisplay[]>(() => {
+    if (!report) return [];
+
+    const labels = HANDOVER_PROGRESS_STEP_LABELS[viewerRole];
+    const isExpired = Date.now() > new Date(report.expiresAt).getTime();
+    const path = getHandoverProgressPath(report);
+    const deliveredContent = report.activatedByRole
+      ? `${report.activatedByRole} marked delivered`
+      : "Item handed over";
+    const confirmedLabel =
+      report.status === "Confirmed" ? "Confirmed" : labels.confirmed;
+    const confirmedState: StepState =
+      report.status === "Confirmed"
+        ? "done"
+        : report.status === "Delivered"
+          ? "active"
+          : "pending";
+
+    if (path === "rejected") {
+      return [
+        {
+          key: "ongoing",
+          label: labels.ongoing,
+          content: formatDate(report.createdAt),
+          state: "done",
+        },
+        {
+          key: "delivered",
+          label: labels.delivered,
+          content: deliveredContent,
+          state: "done",
+        },
+        {
+          key: "rejected",
+          label: labels.rejected,
+          content: "Request was declined",
+          state: "done",
+        },
+      ];
     }
-    return buildProgressStepContent(report);
-  }, [report]);
+
+    if (path === "closed") {
+      return [
+        {
+          key: "ongoing",
+          label: labels.ongoing,
+          content: formatDate(report.createdAt),
+          state: "done",
+        },
+        {
+          key: "closed",
+          label: labels.closed,
+          content: "Items did not match",
+          state: "done",
+        },
+      ];
+    }
+
+    if (path === "expiredAfterDelivery") {
+      return [
+        {
+          key: "ongoing",
+          label: labels.ongoing,
+          content: formatDate(report.createdAt),
+          state: "done",
+        },
+        {
+          key: "delivered",
+          label: labels.delivered,
+          content: deliveredContent,
+          state: "done",
+        },
+        {
+          key: "expire",
+          label: labels.expire,
+          content: formatDate(report.expiresAt),
+          state: "done",
+        },
+      ];
+    }
+
+    if (path === "expiredOngoing") {
+      return [
+        {
+          key: "ongoing",
+          label: labels.ongoing,
+          content: formatDate(report.createdAt),
+          state: "done",
+        },
+        {
+          key: "expire",
+          label: labels.expire,
+          content: formatDate(report.expiresAt),
+          state: "done",
+        },
+      ];
+    }
+
+    return [
+      {
+        key: "ongoing",
+        label: labels.ongoing,
+        content: formatDate(report.createdAt),
+        state: report.status === "Ongoing" ? "active" : "done",
+      },
+      {
+        key: "delivered",
+        label: labels.delivered,
+        content: deliveredContent,
+        state: report.status === "Ongoing" ? "pending" : "done",
+      },
+      {
+        key: "confirmed",
+        label: confirmedLabel,
+        content: report.confirmedAt
+          ? formatDate(report.confirmedAt)
+          : "Receipt acknowledged",
+        state: confirmedState,
+      },
+      {
+        key: "expire",
+        label: labels.expire,
+        content: formatDate(report.expiresAt),
+        state: isExpired ? "done" : "pending",
+      },
+    ];
+  }, [report, viewerRole]);
 
   const handleActionPanelLayout = useCallback(
     (event: LayoutChangeEvent) => {
@@ -791,11 +855,7 @@ const HandoverDetailScreen = () => {
           <Text className="text-lg font-normal text-textPrimary">Progress</Text>
 
           <ProgressStepper
-            status={report.status}
-            isFinder={isFinder}
-            hasMarkedDelivery={hasMarkedDelivery}
-            viewerRole={viewerRole}
-            stepContent={progressStepContent}
+            stepDots={stepDots}
           />
         </View>
 

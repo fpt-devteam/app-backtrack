@@ -410,6 +410,7 @@ const compat = {
   },
   /** Use kazan scale or status.warning. */
   amber: {
+    100: palette.kazan[100],
     500: palette.kazan[500],
   },
   /** Use error scale or status.error / destructive. */
