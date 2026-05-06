@@ -174,15 +174,15 @@ const MyPostDetailScreen = () => {
         await deletePost({ postId });
         router.back();
 
-        toast.success("Delete Successful", "Post deleted successfully.");
+        toast.success("Archive Successful", "Post archived successfully.");
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
-            : deletePostError?.message || "Delete post failed";
+            : deletePostError?.message || "Archive post failed";
 
         console.log("Error: ", error);
-        toast.error("Delete Failed", message);
+        toast.error("Archive Failed", message);
       }
     })();
   }, [deletePost, deletePostError?.message, isDeletingPost, postId]);
@@ -192,12 +192,12 @@ const MyPostDetailScreen = () => {
 
     handleCloseActionSheet();
     Alert.alert(
-      "Delete Post",
-      "Are you sure you want to delete this post? All handover requests will be cancelled.",
+      "Archive Post",
+      "Are you sure you want to archive this post? All handover requests will be cancelled.",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Delete",
+          text: "Archive",
           style: "destructive",
           onPress: handleDeleteConfirm,
         },
@@ -216,8 +216,8 @@ const MyPostDetailScreen = () => {
       },
       {
         id: "delete-post",
-        label: "Delete",
-        description: "Remove this post permanently",
+        label: "Archive",
+        description: "Move this post to archive",
         icon: TrashIcon,
         onPress: handleDeletePress,
       },
