@@ -57,6 +57,7 @@
           "cameraPermission": "The app accesses your camera to let you take photos and share them with your friends."
         }
       ],
+      "@react-native-google-signin/google-signin",
       "expo-notifications",
       "expo-asset"
     ],

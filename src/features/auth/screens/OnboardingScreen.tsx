@@ -1,4 +1,5 @@
-import { useCheckEmailStatus } from "@/src/features/auth/hooks";
+import { useCheckEmailStatus, useSync } from "@/src/features/auth/hooks";
+import { useAuth } from "@/src/features/auth/providers";
 import { EMAIL_STATUS } from "@/src/features/auth/types";
 import {
   AppButton,
@@ -7,10 +8,25 @@ import {
   TouchableIconButton,
 } from "@/src/shared/components";
 import { AppGoogleLogo } from "@/src/shared/components/AppGoogleLogo";
+import { toast } from "@/src/shared/components/ui/toast";
 import { AUTH_ROUTE } from "@/src/shared/constants";
+import { auth } from "@/src/shared/lib";
+import { getErrorMessage } from "@/src/shared/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  GoogleSignin,
+  isCancelledResponse,
+  isErrorWithCode,
+  isSuccessResponse,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
-import React from "react";
+import {
+  GoogleAuthProvider,
+  signInWithCredential,
+  signOut as firebaseSignOut,
+} from "firebase/auth";
+import React, { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -23,6 +39,14 @@ import {
   View,
 } from "react-native";
 import * as yup from "yup";
+
+const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+
+if (GOOGLE_WEB_CLIENT_ID) {
+  GoogleSignin.configure({
+    webClientId: GOOGLE_WEB_CLIENT_ID,
+  });
+}
 
 const loginFormSchema = yup
   .object({
@@ -38,6 +62,10 @@ type LoginFormSchema = yup.InferType<typeof loginFormSchema>;
 
 const OnboardingScreen = () => {
   const { checkEmailStatus, loading } = useCheckEmailStatus();
+  const { checkEmailStatus: checkGoogleEmailStatus } = useCheckEmailStatus();
+  const { syncUser } = useSync();
+  const { refresh } = useAuth();
+  const [isGoogleLoginLoading, setIsGoogleLoginLoading] = useState(false);
 
   const {
     control: formControl,
@@ -53,6 +81,92 @@ const OnboardingScreen = () => {
 
   const emailValue = watch("email");
   const hasEmail = emailValue.trim().length > 0;
+
+  const handleLoginGoogle = async () => {
+    if (!GOOGLE_WEB_CLIENT_ID) {
+      toast.error(
+        "Google login unavailable",
+        "Google Sign-In is not configured for this build.",
+      );
+      return;
+    }
+
+    setIsGoogleLoginLoading(true);
+    let shouldCleanupSession = false;
+
+    try {
+      if (Platform.OS === "android") {
+        await GoogleSignin.hasPlayServices({
+          showPlayServicesUpdateDialog: true,
+        });
+      }
+
+      const googleResponse = await GoogleSignin.signIn();
+
+      if (isCancelledResponse(googleResponse)) {
+        return;
+      }
+
+      if (!isSuccessResponse(googleResponse) || !googleResponse.data.idToken) {
+        throw new Error("Google Sign-In did not return a valid identity token.");
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(
+        googleResponse.data.idToken,
+      );
+      const userCredential = await signInWithCredential(auth, googleCredential);
+      shouldCleanupSession = true;
+
+      const email =
+        userCredential.user.email?.trim() ??
+        googleResponse.data.user.email?.trim() ??
+        "";
+
+      if (!email) {
+        throw new Error("Google account did not provide an email address.");
+      }
+
+      let emailStatusResponse = await checkGoogleEmailStatus({ email });
+
+      if (emailStatusResponse.status !== EMAIL_STATUS.VERIFIED) {
+        const idToken = await userCredential.user.getIdToken(true);
+
+        if (!idToken) {
+          throw new Error("Failed to generate authentication token.");
+        }
+
+        await syncUser({ idToken });
+        emailStatusResponse = await checkGoogleEmailStatus({ email });
+      }
+
+      if (emailStatusResponse.status !== EMAIL_STATUS.VERIFIED) {
+        throw new Error(
+          "Google sign-in could not finish account setup. Please try again.",
+        );
+      }
+
+      await refresh();
+      toast.success("Welcome to Backtrack");
+    } catch (error) {
+      if (
+        isErrorWithCode(error) &&
+        error.code === statusCodes.SIGN_IN_CANCELLED
+      ) {
+        return;
+      }
+
+      if (shouldCleanupSession) {
+        await Promise.allSettled([
+          firebaseSignOut(auth),
+          GoogleSignin.signOut(),
+        ]);
+      }
+
+      toast.error("Google login failed", getErrorMessage(error));
+    } finally {
+      setIsGoogleLoginLoading(false);
+    }
+  };
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
     try {
@@ -80,13 +194,10 @@ const OnboardingScreen = () => {
     <KeyboardAvoidingView
       className="flex-1 bg-white"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-          }}
+          contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -141,17 +252,18 @@ const OnboardingScreen = () => {
 
               {/* Social Buttons */}
               <View className="gap-md2 flex-row justify-center">
-                <TouchableIconButton
-                  icon={
-                    <View className="p-md items-center justify-center rounded-sm bg-surface border border-border">
-                      <AppGoogleLogo />
-                    </View>
-                  }
-                  onPress={() => {}}
-                  disabled={loading}
-                />
+                  <TouchableIconButton
+                    icon={
+                      <View className="p-md items-center justify-center rounded-sm bg-surface border border-border">
+                        <AppGoogleLogo />
+                      </View>
+                    }
+                    onPress={handleLoginGoogle}
+                    disabled={loading}
+                    loading={isGoogleLoginLoading}
+                  />
+                </View>
               </View>
-            </View>
           </View>
         </ScrollView>
       </TouchableWithoutFeedback>
