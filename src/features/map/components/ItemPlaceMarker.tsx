@@ -1,7 +1,8 @@
 import type { Post } from "@/src/features/post/types";
-import { AppImage } from "@/src/shared/components";
+import { PostImage } from "@/src/features/post/components";
+import { usePostSubcategoryCode } from "@/src/features/post/hooks";
 import * as Haptics from "expo-haptics";
-import React, { useMemo } from "react";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Marker, type LatLng } from "react-native-maps";
 
@@ -18,7 +19,7 @@ export const ItemPlaceMarker = ({
   disabled,
   onPress,
 }: ItemPlaceMarkerProps) => {
-  const imgUrl = useMemo(() => item.imageUrls[0], [item.imageUrls]);
+  const subcategoryCode = usePostSubcategoryCode(item.subcategoryId);
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
@@ -50,15 +51,15 @@ export const ItemPlaceMarker = ({
             shadowOffset: { width: 0, height: 5 },
           }}
         >
-          <AppImage
-            source={{ uri: imgUrl }}
+          <PostImage
+            url={item.imageUrls[0]}
+            subcategoryCode={subcategoryCode}
             style={{
               width: "100%",
               height: "100%",
               borderRadius: "50%",
             }}
             resizeMode="cover"
-            // isBlurred={disabled}
           />
         </View>
       </TouchableOpacity>

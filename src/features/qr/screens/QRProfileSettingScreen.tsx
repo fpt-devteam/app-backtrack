@@ -23,6 +23,7 @@ import React, {
 } from "react";
 import {
   Keyboard,
+  KeyboardAvoidingView,
   ScrollView,
   Switch,
   Text,
@@ -196,92 +197,99 @@ const QRProfileSettingScreen = () => {
         }}
       />
 
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingHorizontal: metrics.spacing.md,
-            paddingVertical: metrics.spacing.lg,
-            gap: metrics.spacing.md,
-          }}
-        >
-          {/* QR Preview */}
-          <View className="rounded-3xl overflow-hidden border border-divider">
-            <View className="items-center py-md">
-              <QRCode
-                value={publicCode || "BTK-PREVIEW"}
-                size={180}
-                color="#000000"
-                backgroundColor="#FFFFFF"
-                quietZone={8}
-                ecl="H"
-                logo={form.logoUrl}
-                logoBorderRadius={99999}
-                logoSize={60}
+      <KeyboardAvoidingView className="flex-1" behavior="padding"
+        keyboardVerticalOffset={metrics.spacing.lg}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingHorizontal: metrics.spacing.md,
+              paddingVertical: metrics.spacing.lg,
+              gap: metrics.spacing.md,
+            }}
+          >
+            {/* QR Preview */}
+            <View className="rounded-3xl overflow-hidden border border-divider">
+              <View className="items-center py-md">
+                <QRCode
+                  value={publicCode || "BTK-PREVIEW"}
+                  size={180}
+                  color="#000000"
+                  backgroundColor="#FFFFFF"
+                  quietZone={8}
+                  ecl="H"
+                  logo={form.logoUrl}
+                  logoBorderRadius={99999}
+                  logoSize={60}
+                />
+              </View>
+            </View>
+
+            {/* Logo */}
+            <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
+              <SectionTitle
+                title="Logo"
+                subtitle="Add a logo to your QR code"
+              />
+              <LogoSelector
+                value={form.logoUrl}
+                onChange={(url: string) =>
+                  setForm((prev) => ({ ...prev, logoUrl: url }))
+                }
+                disabled={isBusy}
               />
             </View>
-          </View>
 
-          {/* Logo */}
-          <View className="bg-surface rounded-3xl border border-divider p-md gap-md">
-            <SectionTitle title="Logo" subtitle="Add a logo to your QR code" />
-            <LogoSelector
-              value={form.logoUrl}
-              onChange={(url: string) =>
-                setForm((prev) => ({ ...prev, logoUrl: url }))
+            {/* Contact Visibility */}
+            <UserSettingSectionCard
+              icon={<EyeIcon size={24} color={colors.primary} weight="fill" />}
+              title="Contact Visibility"
+              subtitle="Control what information finders can see when they scan your QR code."
+            >
+              <View className="w-full gap-md">
+                <UserSettingToggleRow
+                  label="Show Phone Number"
+                  subtitle="Allow direct calls"
+                  value={form.showPhone}
+                  onValueChange={(v) =>
+                    setForm((prev) => ({ ...prev, showPhone: v }))
+                  }
+                />
+                <UserSettingToggleRow
+                  label="Show Email Address"
+                  subtitle="Allow email contact"
+                  value={form.showEmail}
+                  onValueChange={(v) =>
+                    setForm((prev) => ({ ...prev, showEmail: v }))
+                  }
+                />
+              </View>
+            </UserSettingSectionCard>
+
+            {/* Custom Message to Finders */}
+            <UserSettingSectionCard
+              icon={
+                <ChatTeardropTextIcon
+                  size={24}
+                  color={colors.primary}
+                  weight="fill"
+                />
               }
-              disabled={isBusy}
-            />
-          </View>
-
-          {/* Contact Visibility */}
-          <UserSettingSectionCard
-            icon={<EyeIcon size={24} color={colors.primary} weight="fill" />}
-            title="Contact Visibility"
-            subtitle="Control what information finders can see when they scan your QR code."
-          >
-            <View className="w-full gap-md">
-              <UserSettingToggleRow
-                label="Show Phone Number"
-                subtitle="Allow direct calls"
-                value={form.showPhone}
-                onValueChange={(v) =>
-                  setForm((prev) => ({ ...prev, showPhone: v }))
+              title="Custom Message to Finders"
+              subtitle="Let finders know what to do when they scan your QR code."
+            >
+              <PostFormTextArea
+                value={form.customMessage}
+                onChange={(v) =>
+                  setForm((prev) => ({ ...prev, customMessage: v }))
                 }
+                placeholder="Write a message for finders..."
               />
-              <UserSettingToggleRow
-                label="Show Email Address"
-                subtitle="Allow email contact"
-                value={form.showEmail}
-                onValueChange={(v) =>
-                  setForm((prev) => ({ ...prev, showEmail: v }))
-                }
-              />
-            </View>
-          </UserSettingSectionCard>
-
-          {/* Custom Message to Finders */}
-          <UserSettingSectionCard
-            icon={
-              <ChatTeardropTextIcon
-                size={24}
-                color={colors.primary}
-                weight="fill"
-              />
-            }
-            title="Custom Message to Finders"
-            subtitle="Let finders know what to do when they scan your QR code."
-          >
-            <PostFormTextArea
-              value={form.customMessage}
-              onChange={(v) =>
-                setForm((prev) => ({ ...prev, customMessage: v }))
-              }
-              placeholder="Write a message for finders..."
-            />
-          </UserSettingSectionCard>
-        </ScrollView>
-      </TouchableWithoutFeedback>
+            </UserSettingSectionCard>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </View>
   );
 };

@@ -1,9 +1,13 @@
-import { useAppUser } from "@/src/features/auth/providers";
 import {
+  PostImage,
   PostCategoryBadge,
   PostTypeIconBadge,
 } from "@/src/features/post/components";
-import { useGetPostById, useMatchedPostIds } from "@/src/features/post/hooks";
+import {
+  useGetPostById,
+  useMatchedPostIds,
+  usePostSubcategoryCode,
+} from "@/src/features/post/hooks";
 import { POST_CATEGORIES } from "@/src/features/post/types";
 import {
   AppLoader,
@@ -70,9 +74,8 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
 
   const { isLoading, data: post } = useGetPostById({ postId });
 
-  const { user } = useAppUser();
-
   const { matchedPostIds } = useMatchedPostIds();
+  const subcategoryCode = usePostSubcategoryCode(post?.subcategoryId);
 
   const CAROUSEL_HEIGHT = height * 0.5;
   const CAROUSEL_WIDTH = width;
@@ -141,7 +144,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
       hasEmail: !!author?.showEmail && !!author?.email,
       hasPhone: !!author?.showPhone && !!author?.phone,
     };
-  }, [post, user]);
+  }, [post]);
 
   const displayPostTitle = useMemo(() => {
     return post?.postTitle || "Untitled item";
@@ -193,6 +196,14 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
             isBlurred={isBlurred || post.category === "Cards"}
+            emptyState={
+              <PostImage
+                url={undefined}
+                subcategoryCode={subcategoryCode}
+                style={{ width: CAROUSEL_WIDTH, height: CAROUSEL_HEIGHT }}
+                contentFit="contain"
+              />
+            }
           />
         </Animated.View>
 

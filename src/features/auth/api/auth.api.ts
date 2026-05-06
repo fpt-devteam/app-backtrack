@@ -13,14 +13,8 @@ export async function meApi() {
   return res.data;
 }
 
-export async function syncUserApi(body: SyncRequest) {
-  const { idToken } = body;
-  const res = await publicClient.post(AUTH.sync, {}, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${idToken}`,
-    },
-  });
+export async function syncUserApi(_body: SyncRequest) {
+  const res = await privateClient.post<SyncResponse>(AUTH.sync, {});
   return res.data as SyncResponse;
 }
 
@@ -28,4 +22,3 @@ export async function checkEmailStatusApi(email: string) {
   const res = await publicClient.post(AUTH.emailCheck, { email });
   return res.data as EmailStatusCheckResponse;
 }
-

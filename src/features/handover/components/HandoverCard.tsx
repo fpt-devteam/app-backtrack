@@ -1,4 +1,6 @@
 import { useAppUser } from "@/src/features/auth/providers/user.provider";
+import { PostImage } from "@/src/features/post/components";
+import { usePostSubcategoryCode } from "@/src/features/post/hooks";
 import {
   getHandoverCounterpart,
   getHandoverNextStep,
@@ -6,8 +8,8 @@ import {
   getViewerRoleContext,
 } from "@/src/features/handover/components/handover.presentation";
 import type { Handover } from "@/src/features/handover/types";
-import { AppImage, AppUserAvatar } from "@/src/shared/components";
-import { HANDOVER_ROUTE, SHARED_ROUTE } from "@/src/shared/constants";
+import { AppUserAvatar } from "@/src/shared/components";
+import { HANDOVER_ROUTE } from "@/src/shared/constants";
 import React, { useCallback } from "react";
 import { InteractionManager, Text, View } from "react-native";
 
@@ -27,6 +29,10 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
 
   const imageUrl =
     handover.finderPost?.imageUrls?.[0] ?? handover.ownerPost?.imageUrls?.[0];
+  const fallbackSubcategoryId = handover.finderPost?.imageUrls?.[0]
+    ? handover.finderPost?.subcategoryId
+    : handover.ownerPost?.subcategoryId ?? handover.finderPost?.subcategoryId;
+  const fallbackSubcategoryCode = usePostSubcategoryCode(fallbackSubcategoryId);
 
   const handlePress = useCallback(() => {
     if (router.canDismiss()) router.dismiss();
@@ -69,8 +75,9 @@ export const HandoverCard = ({ handover }: { handover: Handover }) => {
       {/* Image Section */}
       <View className="relative bg-surface">
         <View className="overflow-hidden">
-          <AppImage
-            source={{ uri: imageUrl }}
+          <PostImage
+            url={imageUrl}
+            subcategoryCode={fallbackSubcategoryCode}
             style={{
               width: 64,
               height: 64,

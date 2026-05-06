@@ -1,14 +1,16 @@
 import { View } from "moti";
 import { PackageIcon } from "phosphor-react-native";
+import type { ReactNode } from "react";
 import { FlatList } from "react-native-gesture-handler";
-import { colors } from "../../theme";
-import { AppImage } from "../AppImage";
+import { AppImage } from "@/src/shared/components/AppImage";
+import { colors } from "@/src/shared/theme";
 
 type ImageCarouselProps = {
   imageUrls: string[];
   height: number;
   width: number;
   isBlurred?: boolean;
+  emptyState?: ReactNode;
 };
 
 export const ImageCarousel = ({
@@ -16,6 +18,7 @@ export const ImageCarousel = ({
   height,
   width,
   isBlurred = false,
+  emptyState,
 }: ImageCarouselProps) => {
   if (imageUrls.length === 0) {
     return (
@@ -23,7 +26,9 @@ export const ImageCarousel = ({
         style={{ height, width }}
         className="bg-canvas items-center justify-center"
       >
-        <PackageIcon size={64} color={colors.hof[300]} weight="thin" />
+        {emptyState ?? (
+          <PackageIcon size={64} color={colors.hof[300]} weight="thin" />
+        )}
       </View>
     );
   }

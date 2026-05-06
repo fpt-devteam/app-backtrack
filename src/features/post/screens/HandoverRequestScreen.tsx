@@ -38,6 +38,9 @@ type Params = {
   otherPostId: string;
 };
 
+const DEFAULT_MESSAGE =
+  "Hi! I’m interested in coordinating a handover for this item. Please let me know if you’re open to it and we can discuss the details!";
+
 export default function HandoverRequestScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAppUser();
@@ -59,7 +62,7 @@ export default function HandoverRequestScreen() {
   const { create } = useCreateDirectConversation();
   const { sendMessage } = useSendMessage();
 
-  const [draftMessage, setDraftMessage] = useState("");
+  const [draftMessage, setDraftMessage] = useState(DEFAULT_MESSAGE);
   const [isSendLoading, setIsSendLoading] = useState(false);
 
   const isSentDisabled = isSendLoading || !draftMessage.trim();
@@ -121,7 +124,7 @@ export default function HandoverRequestScreen() {
         }
       };
 
-      handleChatFlow().catch((err) => console.error("Chat flow failed", err));
+      handleChatFlow().catch((err) => console.log("Chat flow failed", err));
 
       toast.success("Request Sent", "Your handover request is on its way!");
 

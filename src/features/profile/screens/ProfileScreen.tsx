@@ -157,7 +157,7 @@ function ProfileScreen() {
               await signOut(auth);
               router.push(AUTH_ROUTE.onboarding);
             } catch (error) {
-              console.error("Logout failed", error);
+              console.log("Logout failed", error);
             }
           })();
         },

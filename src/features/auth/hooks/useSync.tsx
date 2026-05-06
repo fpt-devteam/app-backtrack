@@ -5,7 +5,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 export function useSync() {
-
   const mutation = useMutation<SyncResponse, Error, SyncRequest>({
     mutationKey: SYNC_QUERY_KEY,
 
@@ -14,18 +13,21 @@ export function useSync() {
 
       const response = await syncUserApi(req);
       if (!response) throw new Error("Sync user failed");
-      if (!response.success || !response.data) throw new Error(response.error?.message ?? "Sync user failed");
+      if (!response.success || !response.data)
+        throw new Error(response.error?.message ?? "Sync user failed");
       return response;
     },
 
     onError: async (err) => {
-      console.error("Sync user failed:", err.message);
+      console.log("Sync user failed:", err.message);
     },
   });
 
   const error = useMemo(() => {
     if (!mutation.error) return null;
-    return mutation.error instanceof Error ? mutation.error : new Error("Get profile failed");
+    return mutation.error instanceof Error
+      ? mutation.error
+      : new Error("Get profile failed");
   }, [mutation.error]);
 
   return {

@@ -4,6 +4,7 @@ export { useGetAllMyPost } from './useGetAllMyPost'
 export { useGetPostById } from './useGetPostById'
 export { useMatchedPostIds } from './useMatchedPostIds'
 export { useMatchingPost } from './useMatchingPost'
+export { usePostSubcategoryCode } from './usePostSubcategoryCode'
 
 export { useDeletePost } from './useDeletePost'
 export { usePostCreationStore } from './usePostCreationStore'
@@ -11,4 +12,3 @@ export { usePosts } from './usePosts'
 export { usePostSearchStore } from './usePostSearchStore'
 export { useSearchPost } from './useSearchPost'
 export { useUpdatePost } from './useUpdatePost'
-

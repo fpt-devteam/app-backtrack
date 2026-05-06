@@ -18,7 +18,7 @@ export const usePatchProfile = () => {
     },
 
     onError: (err) => {
-      console.error("Mutation Error:", err);
+      console.log("Mutation Error:", err);
     },
   });
 

@@ -118,7 +118,7 @@ const EvidenceUploadScreen = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       toast.success("Success", "Item marked as delivered securely.");
     } catch (error) {
-      console.error("Handover error:", error);
+      console.log("Handover error:", error);
       toast.error("Error", "Could not complete handover. Please try again.");
     } finally {
       setIsSaveLoading(false);

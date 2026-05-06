@@ -1,8 +1,9 @@
 import { PostCategoryBadge } from "@/src/features/post/components/PostCategoryBadge";
+import { PostImage } from "@/src/features/post/components/PostImage";
 import { PostStatusBadge } from "@/src/features/post/components/PostStatusBadge";
 import { PostTypeIconBadge } from "@/src/features/post/components/PostTypeIconBadge";
+import { usePostSubcategoryCode } from "@/src/features/post/hooks";
 import { type UserPost } from "@/src/features/post/types/post.type";
-import { AppImage } from "@/src/shared/components";
 import { PROFILE_ROUTE } from "@/src/shared/constants/route.constant";
 import { colors, metrics } from "@/src/shared/theme";
 import { formatIsoDate, parseToDate } from "@/src/shared/utils/datetime.utils";
@@ -18,7 +19,7 @@ type MyPostCardProps = {
 };
 
 export const MyPostCard = ({ item, disabled }: MyPostCardProps) => {
-  const imageUrl = item.imageUrls[0];
+  const subcategoryCode = usePostSubcategoryCode(item.subcategoryId);
 
   const categoryLabel = useMemo(() => {
     return item.category;
@@ -78,9 +79,10 @@ export const MyPostCard = ({ item, disabled }: MyPostCardProps) => {
           className="w-28 overflow-hidden rounded-sm"
           style={{ aspectRatio: 1.18 }}
         >
-          <AppImage
+          <PostImage
             style={{ width: "100%", height: "100%" }}
-            source={{ uri: imageUrl }}
+            url={item.imageUrls[0]}
+            subcategoryCode={subcategoryCode}
           />
         </View>
 

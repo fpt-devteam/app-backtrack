@@ -200,7 +200,7 @@ export const UserMessageList = ({
           },
         );
       } catch (error) {
-        console.error("Failed to initialize socket:", error);
+        console.log("Failed to initialize socket:", error);
       }
     };
     initSocket();

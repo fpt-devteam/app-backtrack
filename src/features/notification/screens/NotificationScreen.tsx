@@ -118,7 +118,7 @@ const NotificationScreen = () => {
         console.warn(`Invalid notification screen path: ${screenPath}`);
       }
     } catch (error) {
-      console.error("Error when handling notification press: ", error);
+      console.log("Error when handling notification press: ", error);
     }
   };
 

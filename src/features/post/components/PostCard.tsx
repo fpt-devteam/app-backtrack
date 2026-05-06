@@ -1,5 +1,5 @@
+import { usePostSubcategoryCode } from "@/src/features/post/hooks";
 import { type Post } from "@/src/features/post/types";
-import { AppImage } from "@/src/shared/components/AppImage";
 import { POST_ROUTE } from "@/src/shared/constants";
 import { colors, metrics } from "@/src/shared/theme";
 import {
@@ -11,6 +11,7 @@ import { MotiPressable } from "moti/interactions";
 import { MapPinIcon } from "phosphor-react-native";
 import React, { useCallback, useMemo } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
+import { PostImage } from "./PostImage";
 import { PostTypeIconBadge } from "./PostTypeIconBadge";
 
 type PostCardProps = {
@@ -25,9 +26,9 @@ export const PostCard = ({
   isBlurred = true,
 }: PostCardProps) => {
   const { width } = useWindowDimensions();
+  const subcategoryCode = usePostSubcategoryCode(item.subcategoryId);
 
   const cardWidth = width * (size === "sm" ? 0.43 : 0.9);
-  const imageUrl = item.imageUrls[0];
 
   const eventTimeLabel = useMemo(() => {
     const tickDiff = calculateTimeDifference(item.eventTime, new Date());
@@ -78,9 +79,10 @@ export const PostCard = ({
       {/* IMAGE */}
       <View className="w-full overflow-hidden" style={{ aspectRatio: 1.18 }}>
         <View className="">
-          <AppImage
+          <PostImage
             style={{ width: "100%", height: "100%" }}
-            source={{ uri: imageUrl }}
+            url={item.imageUrls[0]}
+            subcategoryCode={subcategoryCode}
             isBlurred={isBlurred || item.category === "Cards"}
             contentFit="cover"
           />

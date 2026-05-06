@@ -143,7 +143,7 @@ const PostLocationSearchScreen = ({
         updateLocationAddress(label);
         updateLocationCoords(res.location);
       } catch (error) {
-        console.error("Error fetching place details:", error);
+        console.log("Error fetching place details:", error);
       } finally {
         setIsFocused(false);
         inputRef.current?.blur();
@@ -365,10 +365,7 @@ const PostLocationSearchScreen = ({
       setIsFocused(false);
       inputRef.current?.blur();
 
-      if (
-        displayMode === "suggestions" &&
-        predictions.length > 0
-      )
+      if (displayMode === "suggestions" && predictions.length > 0)
         await handleSelectSuggestion(predictions[0]);
     }
     onToggle();

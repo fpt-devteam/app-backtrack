@@ -1,4 +1,5 @@
 import {
+  PostImage,
   PostCategoryBadge,
   PostSubcategoryBadge,
   PostTypeIconBadge,
@@ -8,8 +9,8 @@ import {
   useDeletePost,
   useGetPostById,
   useMatchingPost,
+  usePostSubcategoryCode,
 } from "@/src/features/post/hooks";
-import { usePostSubcategoryStore } from "@/src/features/post/store";
 import {
   ELECTRONICS_SUBCATEGORY,
   POST_CATEGORIES,
@@ -157,14 +158,14 @@ const MyPostDetailScreen = () => {
     setIsActionSheetVisible(true);
   }, []);
 
-  const handleUpdatePress = useCallback(() => {
-    handleCloseActionSheet();
-    router.push(PROFILE_ROUTE.userPostDetailEdit(postId));
-  }, [postId]);
-
   const handleCloseActionSheet = useCallback(() => {
     setIsActionSheetVisible(false);
   }, []);
+
+  const handleUpdatePress = useCallback(() => {
+    handleCloseActionSheet();
+    router.push(PROFILE_ROUTE.userPostDetailEdit(postId));
+  }, [handleCloseActionSheet, postId]);
 
   const handleDeleteConfirm = useCallback(() => {
     if (!postId || isDeletingPost) return;
@@ -222,7 +223,7 @@ const MyPostDetailScreen = () => {
         onPress: handleDeletePress,
       },
     ],
-    [handleCloseActionSheet, handleDeletePress],
+    [handleDeletePress, handleUpdatePress],
   );
 
   const { displayAddress } = useMemo(() => {
@@ -251,15 +252,7 @@ const MyPostDetailScreen = () => {
     return post?.imageUrls ?? [];
   }, [post]);
 
-  const subcategoryCode = usePostSubcategoryStore(
-    useCallback(
-      (state) => {
-        if (!post?.subcategoryId) return undefined;
-        return state.findSubcategoryById(post.subcategoryId)?.code;
-      },
-      [post?.subcategoryId],
-    ),
-  );
+  const subcategoryCode = usePostSubcategoryCode(post?.subcategoryId);
 
   const itemDetailRows = useMemo<ItemDetailRow[]>(() => {
     const rows: ItemDetailRow[] = [];
@@ -396,6 +389,14 @@ const MyPostDetailScreen = () => {
             imageUrls={displayImageUrls}
             height={CAROUSEL_HEIGHT}
             width={CAROUSEL_WIDTH}
+            emptyState={
+              <PostImage
+                url={undefined}
+                subcategoryCode={subcategoryCode}
+                style={{ width: CAROUSEL_WIDTH, height: CAROUSEL_HEIGHT }}
+                contentFit="contain"
+              />
+            }
           />
         </Animated.View>
 
@@ -424,7 +425,7 @@ const MyPostDetailScreen = () => {
                 <PostCategoryBadge category={post.category} />
 
                 {/* Subcategory Badge */}
-                {subcategoryCode && post.category != POST_CATEGORIES.OTHERS && (
+                {subcategoryCode && post.category !== POST_CATEGORIES.OTHERS && (
                   <PostSubcategoryBadge subcategory={subcategoryCode} />
                 )}
               </View>

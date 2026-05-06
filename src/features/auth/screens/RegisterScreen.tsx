@@ -113,6 +113,7 @@ const RegisterScreen = () => {
       const req: RegisterRequest = {
         email,
         password: data.password,
+        displayName: `${data.firstName} ${data.lastName}`,
       };
 
       await register(req);

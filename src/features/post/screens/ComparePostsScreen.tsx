@@ -1,6 +1,14 @@
 import { useCreateDirectConversation } from "@/src/features/chat/hooks";
-import { PostTypeIconBadge, ScoreBadge } from "@/src/features/post/components";
-import { useGetPostById, useMatchingPost } from "@/src/features/post/hooks";
+import {
+  PostImage,
+  PostTypeIconBadge,
+  ScoreBadge,
+} from "@/src/features/post/components";
+import {
+  useGetPostById,
+  useMatchingPost,
+  usePostSubcategoryCode,
+} from "@/src/features/post/hooks";
 import type {
   BasePost,
   MatchEvidence,
@@ -11,7 +19,6 @@ import { PostType } from "@/src/features/post/types";
 import { useGetc2cHandoverPost } from "@/src/features/handover/hooks";
 import {
   AppAccordion,
-  AppImage,
   AppInlineError,
   AppSplashScreen,
 } from "@/src/shared/components";
@@ -133,6 +140,8 @@ const getStrengthColor = (strength: MatchStrength): string => {
 };
 
 const ComparePostCard = ({ post }: CompareCardProps) => {
+  const subcategoryCode = usePostSubcategoryCode(post.subcategoryId);
+
   const displayTitle = useMemo(() => {
     if (post.postTitle?.trim()) return post.postTitle;
     return "Untitled item";
@@ -154,8 +163,9 @@ const ComparePostCard = ({ post }: CompareCardProps) => {
           aspectRatio: 1,
         }}
       >
-        <AppImage
-          source={post.imageUrls?.[0] ? { uri: post.imageUrls[0] } : undefined}
+        <PostImage
+          url={post.imageUrls[0]}
+          subcategoryCode={subcategoryCode}
           style={{ width: "100%", height: "100%" }}
           resizeMode="cover"
         />

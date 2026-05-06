@@ -2,9 +2,12 @@ import { Image } from "expo-image";
 import React, { useMemo } from "react";
 import type { ImageStyle, StyleProp } from "react-native";
 
-type AppImageSource = string | { uri?: string | null } | null | undefined;
+import {
+  resolveAppImageSource,
+  type AppImageSource,
+} from "./app-image.utils";
 
-const blurhash =
+const _blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
 type LegacyResizeMode = "cover" | "contain" | "stretch" | "center";
@@ -38,16 +41,12 @@ export const AppImage = ({
   width,
   height,
   style,
-  isBlurred = false,
+  isBlurred: _isBlurred = false,
 }: AppImageProps) => {
-  const resolvedSource = useMemo(() => {
-    if (url) return { uri: url };
-    if (typeof source === "string" && source) return { uri: source };
-    if (source && typeof source === "object" && source.uri) {
-      return { uri: source.uri };
-    }
-    return undefined;
-  }, [source, url]);
+  const resolvedSource = useMemo(
+    () => resolveAppImageSource(source, url),
+    [source, url],
+  );
 
   const resolvedContentFit =
     contentFit ?? mapResizeModeToContentFit(resizeMode) ?? "cover";

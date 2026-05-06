@@ -10,6 +10,7 @@ export { PostTypeIconBadge } from "@/src/features/post/components/PostTypeIconBa
 
 export { MyPostCard } from "@/src/features/post/components/MyPostCard";
 export { PostCard } from "@/src/features/post/components/PostCard";
+export { PostImage } from "@/src/features/post/components/PostImage";
 export { SimilarPostCard } from "@/src/features/post/components/SimilarPostCard";
 
 export { PostFormField } from "@/src/features/post/components/PostFormField";

@@ -68,7 +68,7 @@ async function loadRecentSearches(
     const sorted = sortByUpdatedAtDesc(sanitized);
     return sorted.slice(0, maxItems);
   } catch (error) {
-    console.error("Failed to load recent searches:", error);
+    console.log("Failed to load recent searches:", error);
     return [];
   }
 }

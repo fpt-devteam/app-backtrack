@@ -38,15 +38,10 @@ import * as Haptics from "expo-haptics";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import {
-  CalendarCheckIcon,
   ChatCenteredTextIcon,
   CheckCircleIcon,
-  ClockCountdownIcon,
-  HandshakeIcon,
   InfoIcon,
-  PackageIcon,
   PhoneIcon,
-  WarningCircleIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -65,6 +60,16 @@ type StepDef = {
   label: string;
   sublabel: string;
   state: StepState;
+};
+
+type StepDisplay = StepDef & {
+  content: string;
+};
+
+type ProgressStepContent = {
+  coordinate: string;
+  deliver: string;
+  confirm: string;
 };
 
 function deriveSteps(
@@ -107,6 +112,37 @@ function deriveSteps(
     }
   }
   return steps;
+}
+
+function buildProgressStepContent(report: Handover): ProgressStepContent {
+  const isInProgressStatus =
+    report.status === "Ongoing" || report.status === "Delivered";
+
+  const coordinate = isInProgressStatus
+    ? `Expires ${formatDate(report.expiresAt)}`
+    : formatDate(report.createdAt);
+
+  const deliver = report.activatedByRole
+    ? `${report.activatedByRole} marked delivered`
+    : report.status === "Closed"
+      ? "Items did not match"
+      : report.status === "Rejected"
+        ? "Request was declined"
+        : "Item handed over";
+
+  const confirm = report.confirmedAt
+    ? formatDate(report.confirmedAt)
+    : report.status === "Rejected"
+      ? "Request was declined"
+      : report.status === "Closed"
+        ? "Items did not match"
+        : "Receipt acknowledged";
+
+  return {
+    coordinate,
+    deliver,
+    confirm,
+  };
 }
 
 const StepDot = ({ state }: { state: StepState }) => {
@@ -155,35 +191,51 @@ const ProgressStepper = ({
   isFinder,
   hasMarkedDelivery,
   viewerRole,
+  stepContent,
 }: {
   status: HandoverStatus;
   isFinder: boolean;
   hasMarkedDelivery: boolean;
   viewerRole: "Finder" | "Owner" | "Unknown";
+  stepContent: {
+    coordinate: string;
+    deliver: string;
+    confirm: string;
+  };
 }) => {
   const steps = deriveSteps(status, isFinder, hasMarkedDelivery);
 
-  const stepsWithViewerCopy = useMemo(() => {
-    if (viewerRole !== "Unknown") return steps;
+  const stepsWithViewerCopy = useMemo<StepDisplay[]>(() => {
+    const normalizedSteps =
+      viewerRole !== "Unknown"
+        ? steps
+        : steps.map((step) => {
+            if (step.label === "You Deliver") {
+              return { ...step, label: "Finder Delivers" };
+            }
 
-    return steps.map((step) => {
-      if (step.label === "You Deliver") {
-        return { ...step, label: "Finder Delivers" };
-      }
+            if (step.label === "You Confirm") {
+              return { ...step, label: "Owner Confirms" };
+            }
 
-      if (step.label === "You Confirm") {
-        return { ...step, label: "Owner Confirms" };
-      }
+            return step;
+          });
 
-      return step;
-    });
-  }, [steps, viewerRole]);
+    return normalizedSteps.map((step, index) => ({
+      ...step,
+      content:
+        index === 0
+          ? stepContent.coordinate
+          : index === 1
+            ? stepContent.deliver
+            : stepContent.confirm,
+    }));
+  }, [stepContent.confirm, stepContent.coordinate, stepContent.deliver, steps, viewerRole]);
 
   return (
     <View className="flex-row items-start justify-between">
       {stepsWithViewerCopy.map((step, i) => (
         <React.Fragment key={step.label}>
-          {/* Step */}
           <View className="items-center flex-1">
             <StepDot state={step.state} />
 
@@ -205,11 +257,10 @@ const ProgressStepper = ({
               className="text-xs font-thin mt-0.5 text-center"
               style={{ color: colors.hof[400] }}
             >
-              {step.sublabel}
+              {step.content}
             </Text>
           </View>
 
-          {/* Connector */}
           {i < steps.length - 1 && (
             <View
               className="h-0.5 mt-4"
@@ -282,84 +333,6 @@ const PartyRow = ({
         <Text className="text-xs font-semibold" style={{ color: roleColor }}>
           {role}
         </Text>
-      </View>
-    </View>
-  );
-};
-
-type TimelineEventData = {
-  key: string;
-  icon: React.ReactNode;
-  label: string;
-  value?: string;
-  state: "done" | "active" | "pending";
-};
-
-const VerticalTimelineEvent = ({
-  icon,
-  label,
-  value,
-  state,
-  isLast = false,
-  connectorDone = false,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value?: string;
-  state: "done" | "active" | "pending";
-  isFirst?: boolean;
-  isLast?: boolean;
-  connectorDone?: boolean;
-}) => {
-  const DOT_INNER = 36;
-
-  const innerBorder =
-    state === "done"
-      ? colors.babu[300]
-      : state === "active"
-        ? colors.rausch[500]
-        : colors.divider;
-
-  const lineColor = connectorDone ? colors.babu[300] : colors.divider;
-
-  return (
-    <View className="flex-row gap-md">
-      {/* Left column: ring dot + connector rail */}
-      <View className="items-center">
-        <View
-          style={{
-            width: DOT_INNER,
-            height: DOT_INNER,
-            borderRadius: DOT_INNER / 2,
-            backgroundColor: colors.surface,
-            borderWidth: 1,
-            borderColor: innerBorder,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {icon}
-        </View>
-
-        {/* Connector*/}
-        {!isLast && (
-          <View
-            style={{
-              width: 1,
-              minHeight: metrics.spacing.md,
-              backgroundColor: lineColor,
-            }}
-          />
-        )}
-      </View>
-
-      {/* Right column: label + value */}
-      <View className="flex-1 gap-xs">
-        <Text className="text-md  font-normal text-textPrimary">{label}</Text>
-
-        {value && (
-          <Text className="text-xs font-thin text-textSecondary">{value}</Text>
-        )}
       </View>
     </View>
   );
@@ -527,12 +500,11 @@ const HandoverDetailScreen = () => {
     error,
   } = useGetC2CReturnReportById(handoverId ?? "");
 
-  const { activate, isActivating } = useActivateC2CReturnReport();
+  const { isActivating } = useActivateC2CReturnReport();
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
   const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
   const { ownerClose, isClosing } = useOwnerCloseC2CReturnReport();
 
-  const [isActivatingHandover, setIsActivatingHandover] = useState(false);
   const [isOpeningChat, setIsOpeningChat] = useState(false);
 
   const [actionPanelHeight, setActionPanelHeight] = useState(
@@ -577,78 +549,15 @@ const HandoverDetailScreen = () => {
     return getHandoverDetailGuidance(report, currentUser?.id);
   }, [report, currentUser?.id]);
 
-  const timelineEvents = useMemo((): TimelineEventData[] => {
-    if (!report) return [];
-    const events: TimelineEventData[] = [
-      {
-        key: "created",
-        icon: <HandshakeIcon size={18} color={colors.hof[500]} weight="fill" />,
-        label: "Created",
-        value: formatDate(report.createdAt),
-        state: "done",
-      },
-    ];
-    if (report.status === "Ongoing" || report.status === "Delivered") {
-      events.push({
-        key: "expires",
-        icon: (
-          <ClockCountdownIcon
-            size={18}
-            color={colors.kazan[500]}
-            weight="fill"
-          />
-        ),
-        label: "Expires",
-        value: formatDate(report.expiresAt),
-        state: "active",
-      });
+  const progressStepContent = useMemo(() => {
+    if (!report) {
+      return {
+        coordinate: "Chat & agree on meetup",
+        deliver: "Item handed over",
+        confirm: "Receipt acknowledged",
+      };
     }
-    if (report.activatedByRole) {
-      events.push({
-        key: "activated",
-        icon: <PackageIcon size={18} color={colors.primary} weight="fill" />,
-        label: `${report.activatedByRole} marked delivered`,
-        state: "done",
-      });
-    }
-    if (report.confirmedAt) {
-      events.push({
-        key: "confirmed",
-        icon: (
-          <CalendarCheckIcon size={18} color={colors.babu[500]} weight="fill" />
-        ),
-        label: "Confirmed",
-        value: formatDate(report.confirmedAt),
-        state: "done",
-      });
-    }
-    if (report.status === "Rejected") {
-      events.push({
-        key: "rejected",
-        icon: (
-          <WarningCircleIcon
-            size={18}
-            color={colors.error[500]}
-            weight="fill"
-          />
-        ),
-        label: "Rejected",
-        value: "Request was declined",
-        state: "done",
-      });
-    }
-    if (report.status === "Closed") {
-      events.push({
-        key: "closed",
-        icon: (
-          <WarningCircleIcon size={18} color={colors.hof[500]} weight="fill" />
-        ),
-        label: "Closed",
-        value: "Items did not match",
-        state: "done",
-      });
-    }
-    return events;
+    return buildProgressStepContent(report);
   }, [report]);
 
   const handleActionPanelLayout = useCallback(
@@ -708,7 +617,7 @@ const HandoverDetailScreen = () => {
         },
       ],
     );
-  }, [report, activate]);
+  }, [report]);
 
   const handleClose = useCallback(() => {
     if (!report) return;
@@ -730,7 +639,7 @@ const HandoverDetailScreen = () => {
               );
 
               toast.success("Success", "Item closed securely.");
-            } catch (error) {
+            } catch {
               toast.error(
                 "Error",
                 "Could not close handover. Please try again.",
@@ -740,7 +649,7 @@ const HandoverDetailScreen = () => {
         },
       ],
     );
-  }, [report]);
+  }, [ownerClose, report]);
 
   const handleConfirm = useCallback(() => {
     if (!report) return;
@@ -886,6 +795,7 @@ const HandoverDetailScreen = () => {
             isFinder={isFinder}
             hasMarkedDelivery={hasMarkedDelivery}
             viewerRole={viewerRole}
+            stepContent={progressStepContent}
           />
         </View>
 
@@ -927,28 +837,6 @@ const HandoverDetailScreen = () => {
               role="Owner"
               isCurrentUser={isOwner}
             />
-          </View>
-        </View>
-
-        {/* Timeline */}
-        <View className="gap-md2">
-          <Text className="text-lg font-normal text-textPrimary mb-sm">
-            Timeline
-          </Text>
-
-          <View>
-            {timelineEvents.map((event, i) => (
-              <VerticalTimelineEvent
-                key={event.key}
-                icon={event.icon}
-                label={event.label}
-                value={event.value}
-                state={event.state}
-                isFirst={i === 0}
-                isLast={i === timelineEvents.length - 1}
-                connectorDone={event.state === "done"}
-              />
-            ))}
           </View>
         </View>
 
@@ -1029,7 +917,7 @@ const HandoverDetailScreen = () => {
             onReject={handleReject}
             onClose={handleClose}
             isClosing={isClosing}
-            isActivating={isActivating || isActivatingHandover}
+            isActivating={isActivating}
             isConfirming={isConfirming}
             isRejecting={isRejecting}
           />

@@ -2,7 +2,12 @@ import { useAppUser } from "@/src/features/auth/providers";
 import { AvatarFormField } from "@/src/features/profile/components";
 import { usePatchProfile } from "@/src/features/profile/hooks";
 import type { UpdateProfileRequest } from "@/src/features/profile/types";
-import { AppBackButton, AppButton, AppLoader } from "@/src/shared/components";
+import {
+  AppBackButton,
+  AppButton,
+  AppInlineError,
+  AppLoader,
+} from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
 import { metrics, typography } from "@/src/shared/theme";
 import { getErrorMessage } from "@/src/shared/utils";
@@ -26,8 +31,6 @@ import { PostFormField } from "../../post/components";
 type ProfileEditSchema = {
   displayName: string;
   phone: string;
-  showEmail: boolean;
-  showPhone: boolean;
 };
 
 const profileEditSchema = yup
@@ -40,13 +43,8 @@ const profileEditSchema = yup
     phone: yup
       .string()
       .trim()
-      .matches(/^[0-9+()\-\s]{7,20}$/, {
-        message: "Phone format is invalid.",
-        excludeEmptyString: true,
-      })
-      .required(),
-    showEmail: yup.boolean().required(),
-    showPhone: yup.boolean().required(),
+      .matches(/^[0-9]{10}$/, "Phone must be exactly 10 digits.")
+      .required("Phone number is required."),
   })
   .required();
 
@@ -58,8 +56,6 @@ const ProfileEditScreen = () => {
     () => ({
       displayName: profile?.displayName?.trim() ?? "",
       phone: profile?.phone?.trim() ?? "",
-      showEmail: profile?.showEmail ?? false,
-      showPhone: profile?.showPhone ?? false,
     }),
     [profile],
   );
@@ -81,12 +77,17 @@ const ProfileEditScreen = () => {
 
   const isSaveDisabled = !isDirty || isPatchingProfile;
 
+  const errorMessages = useMemo(() => {
+    if (!errors) return null;
+    return Object.values(errors)
+      .map((e) => e.message)
+      .join("\n");
+  }, [errors]);
+
   const onSubmit: SubmitHandler<ProfileEditSchema> = async (data) => {
     const payload: UpdateProfileRequest = {};
     if (dirtyFields.displayName) payload.displayName = data.displayName.trim();
     if (dirtyFields.phone) payload.phone = data.phone.trim();
-    if (dirtyFields.showEmail) payload.showEmail = data.showEmail;
-    if (dirtyFields.showPhone) payload.showPhone = data.showPhone;
 
     if (Object.keys(payload).length === 0) return;
 
@@ -192,6 +193,12 @@ const ProfileEditScreen = () => {
               )}
             />
           </View>
+
+          {errorMessages && (
+            <View className="mt-xs px-sm">
+              <AppInlineError message={errorMessages} />
+            </View>
+          )}
         </ScrollView>
 
         {/* Bottom Action Bar */}

@@ -47,7 +47,7 @@ export const AvatarFormField = () => {
       await refetch();
       toast.success("Avatar updated successfully!");
     } catch (error) {
-      console.error("Avatar update error:", error);
+      console.log("Avatar update error:", error);
       toast.error("An error occurred while updating your profile.");
     } finally {
       setIsUpdating(false);

@@ -40,7 +40,7 @@ export const useRegisterDeviceMutation = () => {
         Constants?.easConfig?.projectId;
 
       if (!projectId) {
-        console.error("Project ID not found");
+        console.log("Project ID not found");
         return;
       }
 

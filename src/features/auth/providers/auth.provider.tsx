@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
       }
     } catch (e) {
-      console.error("Auth sync failed:", e);
+      console.log("Auth sync failed:", e);
       if (mountedRef.current) {
         setAuthState({ isAppReady: true, isLoggedIn: false });
       }
