@@ -39,7 +39,7 @@ type Params = {
 };
 
 const DEFAULT_MESSAGE =
-  "Hi! I’m interested in coordinating a handover for this item. Please let me know if you’re open to it and we can discuss the details!";
+  "Chào bạn! mình đang quan tâm và muốn trao đổi về việc nhận lại món đồ này. Nếu được, chúng mình cùng bàn kỹ hơn về thời gian và địa điểm nhé!";
 
 export default function HandoverRequestScreen() {
   const insets = useSafeAreaInsets();

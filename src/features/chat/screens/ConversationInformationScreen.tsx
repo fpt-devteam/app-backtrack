@@ -6,8 +6,6 @@ import { ArchiveIcon, ChatDotsIcon } from "phosphor-react-native";
 import React, { useCallback } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import type { AppUser } from "@/src/features/auth/types";
-import type { ConversationPartner } from "@/src/features/chat/types";
 import { HandoverCard } from "@/src/features/handover/components";
 import { colors } from "@/src/shared/theme";
 import type { IconProps } from "phosphor-react-native";
@@ -64,19 +62,6 @@ const SectionHeader = ({ title }: { title: string }) => (
   <Text className="text-lg font-normal text-textPrimary mb-sm">{title}</Text>
 );
 
-const getParticipantInfo = (
-  participant: AppUser | ConversationPartner | null | undefined,
-  fallbackName: string,
-): { name: string; avatarUrl: string | null } => {
-  if (!participant) return { name: fallbackName, avatarUrl: null };
-
-  return {
-    name: participant.displayName ?? fallbackName,
-    avatarUrl:
-      "avatarUrl" in participant ? (participant.avatarUrl ?? null) : null,
-  };
-};
-
 type Props = {
   conversationId: string;
 };
@@ -90,8 +75,6 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
 
   const { inProgressHandovers, isLoading: isHandoverLoading } =
     useGetC2CReturnReportsByPartner(partner?.id);
-
-  const currentUser = getParticipantInfo(user, "You");
 
   const handleMarkAsUnread = useCallback(() => {
     // TODO: Implement mark as unread
@@ -109,7 +92,11 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
     );
   }
 
-  const isOrgConversation = conversation?.orgId !== null;
+  const isOrgConversation = conversation.orgId !== null;
+
+  const displayUserName = user?.displayName || "You";
+
+  const displayUserAvatar = user?.avatarUrl || null;
 
   const displayPartnerName = () => {
     const defaultName = "Unknown User";
@@ -144,8 +131,8 @@ const ConversationInformationScreen = ({ conversationId }: Props) => {
       <View className="mt-xl">
         <SectionHeader title="In this conversation" />
         <ParticipantRow
-          avatarUrl={currentUser.avatarUrl}
-          name={currentUser.name}
+          avatarUrl={displayUserAvatar}
+          name={displayUserName}
           role="Owner"
         />
         <ParticipantRow
