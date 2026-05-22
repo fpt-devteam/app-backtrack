@@ -73,4 +73,5 @@ export const POST_CREATE = {
   location: createPath(`${CREATE_POST_BASE}/stepper/location`),
   timeline: createPath(`${CREATE_POST_BASE}/stepper/timeline`),
   itemDetail: createPath(`${CREATE_POST_BASE}/stepper/detail`),
+  qna: createPath(`${CREATE_POST_BASE}/stepper/qna`),
 } as const;

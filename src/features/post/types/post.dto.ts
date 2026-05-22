@@ -3,10 +3,11 @@ import type {
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
-import { UserLocation } from "../../map/types";
+import type { UserLocation } from "@/src/features/map/types";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
   PostCategory,
+  QnA,
   PostSubcategory,
   PostSubcategoryCode,
   UserPost,
@@ -52,6 +53,7 @@ export type PostCreateRequest = {
   cardDetail?: CardFormRequest
   personalBelongingDetail?: PersonalBelongingFormRequest
   otherDetail?: OtherFormRequest
+  qnAs?: QnA[]
 } & Omit<UserLocation, "radiusInKm">;
 
 /**

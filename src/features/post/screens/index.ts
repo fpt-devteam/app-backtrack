@@ -17,10 +17,10 @@ export { default as IncidentTimelineStepScreen } from "@/src/features/post/scree
 export { default as ItemCategoryStepScreen } from "@/src/features/post/screens/PostCreation/ItemCategoryStepScreen";
 export { default as ItemDetailsStepScreen } from "@/src/features/post/screens/PostCreation/ItemDetailsStepScreen";
 export { default as ItemIdentityStepScreen } from "@/src/features/post/screens/PostCreation/ItemIdentityStepScreen";
+export { default as QnAStepScreen } from "@/src/features/post/screens/PostCreation/QnAStepScreen";
 export { default as ItemSubCategoryStepScreen } from "@/src/features/post/screens/PostCreation/ItemSubCategoryStepScreen";
 export { default as ReportIntentStepScreen } from "@/src/features/post/screens/PostCreation/ReportIntentStepScreen";
 
 // 
 export { default as MyPostDetailScreen } from "@/src/features/post/screens/MyPostDetailScreen";
 export { default as MyPostUpdateScreen } from "@/src/features/post/screens/MyPostUpdateScreen";
-

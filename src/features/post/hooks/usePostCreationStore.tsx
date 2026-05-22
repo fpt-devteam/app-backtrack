@@ -6,9 +6,11 @@ import {
   createElectronicsSlice,
   createOtherSlice,
   createPersonalBelongingSlice,
+  createVerificationQnASlice,
   ElectronicsSlice,
   OtherSlice,
   PersonalBelongingSlice,
+  VerificationQnASlice,
 } from "@/src/features/post/store";
 import {
   AnalyzeImageRequest,
@@ -88,7 +90,8 @@ export const usePostCreationStore = create<
     ElectronicsSlice &
     CardSlice &
     PersonalBelongingSlice &
-    OtherSlice
+    OtherSlice &
+    VerificationQnASlice
 >((set, get, api) => ({
   ...initialState,
   ...createPhotoSlice(set, get, api),
@@ -97,6 +100,7 @@ export const usePostCreationStore = create<
   ...createCardSlice(set, get, api),
   ...createPersonalBelongingSlice(set, get, api),
   ...createOtherSlice(set, get, api),
+  ...createVerificationQnASlice(set, get, api),
 
   selectPostType: (type) => set({ postType: type }),
   selectCategory: (category) =>
@@ -128,6 +132,7 @@ export const usePostCreationStore = create<
 
   resetForm: () => {
     set(initialState);
+    set({ questions: [] });
 
     const {
       resetPhotoSlice,

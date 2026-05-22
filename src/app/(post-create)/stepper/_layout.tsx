@@ -65,6 +65,7 @@ const STEP_KEY = {
   LOCATION: "location",
   TIMELINE: "timeline",
   DETAIL: "detail",
+  QNA: "qna",
 } as const;
 
 type StepKey = (typeof STEP_KEY)[keyof typeof STEP_KEY];
@@ -85,6 +86,10 @@ const buildScreenStepper = (postType: PostType, category: PostCategory) => {
   steps.push({ key: STEP_KEY.LOCATION, path: POST_CREATE.location });
   steps.push({ key: STEP_KEY.TIMELINE, path: POST_CREATE.timeline });
   steps.push({ key: STEP_KEY.DETAIL, path: POST_CREATE.itemDetail });
+
+  if (postType === PostType.Found) {
+    steps.push({ key: STEP_KEY.QNA, path: POST_CREATE.qna });
+  }
 
   return steps;
 };
@@ -140,6 +145,7 @@ const PostCreationStepperLayout = () => {
   const personalBelongingDetail = usePostCreationStore(
     (state) => state.personalBelongingDetail,
   );
+  const questions = usePostCreationStore((state) => state.questions);
 
   const openGallery = async () => {
     closePickerSheet();
@@ -189,6 +195,7 @@ const PostCreationStepperLayout = () => {
     draftImages.length,
     location.coords,
     postType,
+    screenSteps,
     timelineDate,
   ]);
 
@@ -263,6 +270,7 @@ const PostCreationStepperLayout = () => {
         cardDetail: cardFormRequest,
         personalBelongingDetail: personalBelongingFormRequest,
         otherDetail: otherFormRequest,
+        qnAs: postType === PostType.Found ? questions : undefined,
       };
 
       const postDetails = await createPost(createReq);
@@ -467,6 +475,24 @@ const PostCreationStepperLayout = () => {
                     onPress={handleAIAnalyze}
                     disabled={isAnalyzing || draftImages.length === 0}
                   />
+                ),
+              }}
+            />
+
+            <Stack.Screen
+              name="qna"
+              options={{
+                headerShown: true,
+                headerTitle: "Verification Questions",
+                headerBackVisible: false,
+                headerLeft: () => <PostTypeIconBadge status={postType} />,
+                headerTitleStyle: {
+                  fontSize: typography.fontSize.lg,
+                  fontWeight: typography.fontWeight
+                    .normal as TextStyle["fontWeight"],
+                },
+                headerRight: () => (
+                  <AppBackButton onPress={handleCancel} type="xIcon" />
                 ),
               }}
             />
