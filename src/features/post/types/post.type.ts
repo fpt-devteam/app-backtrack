@@ -86,6 +86,7 @@ export type Post = BasePost & {
   organization: Nullable<string>
   author: AppUser
   distanceInMeters?: number
+  qnAs?: Nullable<QnA[]>
 } & Pick<UserLocation, "location" | "externalPlaceId" | "displayAddress">
 
 /**
@@ -348,3 +349,15 @@ export type OtherDetail = {
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
 };
+
+
+/**
+ * VerificationQuestion - 
+ * This type defines the structure of a verification question. 
+ * It includes an id, the question itself, and an optional answer.
+ */
+export type QnA = {
+  id: string;
+  questionText: string;
+  answerText?: string;
+}

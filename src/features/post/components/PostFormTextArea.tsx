@@ -6,18 +6,17 @@ type PostFormTextAreaProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  minHeight?: number;
 };
 
 export const PostFormTextArea = ({
   value,
   onChange,
   placeholder = "Think of anything unique: a specific dent, a phone charm, or a custom engraving.",
+  minHeight = 128,
 }: PostFormTextAreaProps) => {
   return (
-    <View
-      className="w-full bg-surface rounded-md border"
-      style={{ minHeight: 128 }}
-    >
+    <View className="w-full bg-surface rounded-md border" style={{ minHeight }}>
       <TextInput
         multiline
         numberOfLines={6}

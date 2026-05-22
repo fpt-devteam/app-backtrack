@@ -10,6 +10,7 @@ import {
   getHandoverTitle,
   getHandoverViewerRole,
   HandoverStatusBadge,
+  QnAAccordion,
 } from "@/src/features/handover/components";
 import {
   useActivateC2CReturnReport,
@@ -497,6 +498,8 @@ const HandoverDetailScreen = () => {
     return getHandoverDetailGuidance(report, currentUser?.id);
   }, [report, currentUser?.id]);
 
+  const qnAs = useMemo(() => report?.finderPost?.qnAs ?? [], [report?.finderPost?.qnAs]);
+
   const stepDots = useMemo<StepDotDisplay[]>(() => {
     if (!report) return [];
 
@@ -934,6 +937,21 @@ const HandoverDetailScreen = () => {
                 />
               ))}
             </ScrollView>
+          </View>
+        )}
+
+        {/* QnA Section */}
+        {qnAs.length > 0 && (
+          <View className="gap-md2">
+            <Text className="text-lg font-normal text-textPrimary mb-sm">
+              Questions & Answers
+            </Text>
+
+            <View className="gap-md2">
+              {qnAs.map((qna) => (
+                <QnAAccordion key={qna.id} qna={qna} />
+              ))}
+            </View>
           </View>
         )}
       </ScrollView>

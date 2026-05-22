@@ -12,6 +12,7 @@ import {
   OtherFormRequest,
   PersonalBelongingFormRequest,
   POST_CATEGORIES,
+  PostCategory,
   PostCreateRequest,
   PostType,
 } from "@/src/features/post/types";
@@ -68,22 +69,39 @@ const STEP_KEY = {
 
 type StepKey = (typeof STEP_KEY)[keyof typeof STEP_KEY];
 
-const STEPS: { key: StepKey; path: ExternalPathString | RelativePathString }[] =
-  [
-    { key: STEP_KEY.CATEGORY, path: POST_CREATE.category },
-    { key: STEP_KEY.SUB_CATEGORY, path: POST_CREATE.subCategory },
-    { key: STEP_KEY.IDENTITY, path: POST_CREATE.identity },
-    { key: STEP_KEY.LOCATION, path: POST_CREATE.location },
-    { key: STEP_KEY.TIMELINE, path: POST_CREATE.timeline },
-    { key: STEP_KEY.DETAIL, path: POST_CREATE.itemDetail },
-  ];
+const buildScreenStepper = (postType: PostType, category: PostCategory) => {
+  const steps: {
+    key: StepKey;
+    path: ExternalPathString | RelativePathString;
+  }[] = [];
+
+  steps.push({ key: STEP_KEY.CATEGORY, path: POST_CREATE.category });
+
+  if (category !== POST_CATEGORIES.OTHERS) {
+    steps.push({ key: STEP_KEY.SUB_CATEGORY, path: POST_CREATE.subCategory });
+  }
+
+  steps.push({ key: STEP_KEY.IDENTITY, path: POST_CREATE.identity });
+  steps.push({ key: STEP_KEY.LOCATION, path: POST_CREATE.location });
+  steps.push({ key: STEP_KEY.TIMELINE, path: POST_CREATE.timeline });
+  steps.push({ key: STEP_KEY.DETAIL, path: POST_CREATE.itemDetail });
+
+  return steps;
+};
 
 const PostCreationStepperLayout = () => {
-  const { createPost, isCreatingPost } = useCreatePost();
-  const [isCreating, setIsCreating] = useState(false);
+  const screenSteps = buildScreenStepper(
+    usePostCreationStore.getState().postType,
+    usePostCreationStore.getState().category,
+  );
 
   const [currentStep, setCurrentStep] = useState(0);
 
+  const { createPost, isCreatingPost } = useCreatePost();
+
+  const [isCreating, setIsCreating] = useState(false);
+
+  //
   const draftImages = usePostCreationStore((state) => state.draftImages);
   const uploadImages = usePostCreationStore((state) => state.uploadImages);
   const getUploadedImageUrls = usePostCreationStore(
@@ -99,6 +117,7 @@ const PostCreationStepperLayout = () => {
   const closePickerSheet = usePostCreationStore(
     (state) => state.closePickerSheet,
   );
+  //
 
   const postTitle = usePostCreationStore((state) => state.postTitle);
   const patchPostTitle = usePostCreationStore((state) => state.updatePostTitle);
@@ -151,37 +170,43 @@ const PostCreationStepperLayout = () => {
   );
 
   const isNextDisabled = useMemo(() => {
-    if (STEPS[currentStep].key === STEP_KEY.IDENTITY) {
+    if (screenSteps[currentStep].key === STEP_KEY.IDENTITY) {
       if (postType === PostType.Lost) return false;
       return draftImages.length === 0;
     }
 
-    if (STEPS[currentStep].key === STEP_KEY.LOCATION) {
+    if (screenSteps[currentStep].key === STEP_KEY.LOCATION) {
       return !location.coords;
     }
 
-    if (STEPS[currentStep].key === STEP_KEY.TIMELINE) {
+    if (screenSteps[currentStep].key === STEP_KEY.TIMELINE) {
       return !timelineDate || !eventTimeSchema.isValidSync(timelineDate);
     }
 
     return false;
-  }, [currentStep, timelineDate, draftImages, location]);
+  }, [
+    currentStep,
+    draftImages.length,
+    location.coords,
+    postType,
+    timelineDate,
+  ]);
 
   const isLoading = isCreating || isCreatingPost;
 
   const handleNext = async () => {
-    if (STEPS[currentStep].key === STEP_KEY.IDENTITY) {
+    if (screenSteps[currentStep].key === STEP_KEY.IDENTITY) {
       uploadImages();
     }
 
-    if (currentStep >= STEPS.length - 1) {
+    if (currentStep >= screenSteps.length - 1) {
       await handleSubmit();
       return;
     }
 
-    const newStep = Math.min(currentStep + 1, STEPS.length - 1);
+    const newStep = Math.min(currentStep + 1, screenSteps.length - 1);
     setCurrentStep(newStep);
-    router.push(STEPS[newStep].path);
+    router.push(screenSteps[newStep].path);
   };
 
   const handleBack = () => {
@@ -449,12 +474,10 @@ const PostCreationStepperLayout = () => {
         </View>
 
         {/* Step Indicator */}
-        <View className="">
-          <StepIndicator
-            currentStep={currentStep + 1}
-            totalSteps={STEPS.length}
-          />
-        </View>
+        <StepIndicator
+          currentStep={currentStep + 1}
+          totalSteps={screenSteps.length}
+        />
 
         {/* Actions footer */}
         <View className="flex-row border-t justify-between items-center px-lg pt-md">
@@ -475,7 +498,7 @@ const PostCreationStepperLayout = () => {
               <AppLoader colorClass="bg-white" />
             ) : (
               <Text className="text-base font-normal text-center text-white tracking-label">
-                {currentStep < STEPS.length - 1 ? "Next" : "Submit"}
+                {currentStep < screenSteps.length - 1 ? "Next" : "Submit"}
               </Text>
             )}
           </TouchableOpacity>
