@@ -357,7 +357,6 @@ export type OtherDetail = {
  * It includes an id, the question itself, and an optional answer.
  */
 export type QnA = {
-  id: string;
   questionText: string;
   answerText?: string;
 }

@@ -5,9 +5,13 @@ import {
 } from "@/src/features/chat/hooks";
 import { useCreateC2CReturnReport } from "@/src/features/handover/hooks";
 import { useSendNotification } from "@/src/features/notification/hooks";
-import { MyPostCard, PostFormTextArea } from "@/src/features/post/components";
+import {
+  MyPostCard,
+  PostFormTextArea,
+  QnAItem,
+} from "@/src/features/post/components";
 import { useGetPostById } from "@/src/features/post/hooks";
-import { PostType } from "@/src/features/post/types";
+import { PostType, type QnA, type UserPost } from "@/src/features/post/types";
 import {
   AppBackButton,
   AppButton,
@@ -22,7 +26,7 @@ import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import { SealCheckIcon } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -36,6 +40,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Params = {
   postId: string;
   otherPostId: string;
+};
+
+type UserPostWithQnAs = UserPost & {
+  qnAs?: QnA[] | null;
 };
 
 const DEFAULT_MESSAGE =
@@ -65,9 +73,14 @@ export default function HandoverRequestScreen() {
   const [draftMessage, setDraftMessage] = useState(DEFAULT_MESSAGE);
   const [isSendLoading, setIsSendLoading] = useState(false);
 
+  const qnAs = useMemo(
+    () => (otherPost as UserPostWithQnAs | undefined)?.qnAs ?? [],
+    [otherPost],
+  );
+
   const isSentDisabled = isSendLoading || !draftMessage.trim();
 
-  const getHandoverRoles = (postId: string, otherPost: any) => {
+  const getHandoverRoles = (postId: string, otherPost: UserPost) => {
     const isFoundPost = otherPost.postType === PostType.Found;
     return {
       finderPostId: isFoundPost ? otherPost.id : postId,
@@ -130,7 +143,7 @@ export default function HandoverRequestScreen() {
 
       router.dismissAll();
       router.push(HANDOVER_ROUTE.detail(handoverRes.id));
-    } catch (error) {
+    } catch (_error) {
       toast.error(
         "Send Failed",
         "Could not complete the request. Please try again.",
@@ -182,6 +195,28 @@ export default function HandoverRequestScreen() {
 
           {/* Post Card */}
           <MyPostCard item={otherPost} disabled={true} />
+
+          {otherPost.postType === PostType.Found && qnAs.length > 0 && (
+            <MotiView
+              from={{ opacity: 0, translateY: 8 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: "timing", duration: 240, delay: 180 }}
+              className="gap-sm"
+            >
+              <Text className="text-lg font-normal text-textPrimary">
+                Verification questions
+              </Text>
+
+              <View className="gap-md2">
+                {qnAs.map((qna, index) => (
+                  <QnAItem
+                    key={`${qna.questionText}-${index}`}
+                    qna={qna}
+                  />
+                ))}
+              </View>
+            </MotiView>
+          )}
 
           {/* Post Owner Information */}
           <MotiView

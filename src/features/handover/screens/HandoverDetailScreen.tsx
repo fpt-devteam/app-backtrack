@@ -498,7 +498,10 @@ const HandoverDetailScreen = () => {
     return getHandoverDetailGuidance(report, currentUser?.id);
   }, [report, currentUser?.id]);
 
-  const qnAs = useMemo(() => report?.finderPost?.qnAs ?? [], [report?.finderPost?.qnAs]);
+  const qnAs = useMemo(
+    () => report?.finderPost?.qnAs ?? [],
+    [report?.finderPost?.qnAs],
+  );
 
   const stepDots = useMemo<StepDotDisplay[]>(() => {
     if (!report) return [];
@@ -949,7 +952,7 @@ const HandoverDetailScreen = () => {
 
             <View className="gap-md2">
               {qnAs.map((qna) => (
-                <QnAAccordion key={qna.id} qna={qna} />
+                <QnAAccordion key={qna.questionText} qna={qna} />
               ))}
             </View>
           </View>

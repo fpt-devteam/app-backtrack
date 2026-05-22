@@ -14,5 +14,6 @@ export { PostImage } from "@/src/features/post/components/PostImage";
 export { SimilarPostCard } from "@/src/features/post/components/SimilarPostCard";
 
 export { PostFormField } from "@/src/features/post/components/PostFormField";
+export { QnAItem } from "@/src/features/post/components/QnAItem";
 export { PostFormTextArea } from "@/src/features/post/components/PostFormTextArea";
 export { default as ScoreBadge } from "@/src/features/post/components/ScoreBadge";

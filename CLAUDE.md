@@ -78,7 +78,7 @@ Feature APIs live in `src/features/[feature]/api/[feature].api.ts`. All response
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **app-backtrack** (3407 symbols, 5379 relationships, 106 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **app-backtrack** (3489 symbols, 5528 relationships, 115 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 
