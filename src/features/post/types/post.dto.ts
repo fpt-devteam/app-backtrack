@@ -1,15 +1,15 @@
+import type { UserLocation } from "@/src/features/map/types";
 import type {
   ApiResponse
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
-import type { UserLocation } from "@/src/features/map/types";
 import { PostMatchingStatus, PostType } from "./post.enum";
 import {
   PostCategory,
-  QnA,
   PostSubcategory,
   PostSubcategoryCode,
+  QnA,
   UserPost,
   type Post,
   type PostSearchOptions,
@@ -191,3 +191,8 @@ export type OtherFormRequest = {
  * It includes an array of PostSubcategory objects wrapped in an ApiResponse.
  */
 export type PostSubcategoryResponse = ApiResponse<PostSubcategory[]>;
+
+export type QnABatchRequest = {
+  postId: string;
+  questionTexts: string[];
+}
