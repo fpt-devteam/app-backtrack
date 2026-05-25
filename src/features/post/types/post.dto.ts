@@ -12,6 +12,7 @@ import {
   PostSubcategory,
   PostSubcategoryCode,
   QnA,
+  QnAAnswer,
   UserPost,
   type Post,
   type PostSearchOptions,
@@ -204,3 +205,25 @@ export type QnAGetByPostIdRequest = {
 } & PagedRequest
 
 export type QnAGetByPostIdResponse = ApiResponse<PagedResponse<QnA>>;
+
+export type QnAAnswerRequest = {
+  qnaId: string;
+  answererId: string;
+  answerText: string;
+}
+
+export type QnAGetWithAnswerRequest = {
+  postId: string;
+  answererId: string;
+}
+
+export type QnAAnswerResult = {
+  id: string;
+  postId: string;
+  askerId: string;
+  questionText: string;
+  answers: QnAAnswer[];
+  createdAt: string;
+}
+
+export type QnAGetAnswerResponse = ApiResponse<QnAAnswerResult[]>;

@@ -5,12 +5,14 @@ import { Text, View } from "react-native";
 
 type QnAItemProps = {
   qna: QnA;
+  value: string;
+  onChange: (value: string) => void;
 };
 
 const PLACEHOLDER =
   "Provide detailed information to help verify your claim faster...";
 
-export const QnAItem = ({ qna }: QnAItemProps) => {
+export const QnAItem = ({ qna, value, onChange }: QnAItemProps) => {
   return (
     <View className="gap-sm">
       <Text className="text-sm font-normal text-textPrimary leading-5">
@@ -19,8 +21,8 @@ export const QnAItem = ({ qna }: QnAItemProps) => {
       </Text>
 
       <PostFormTextArea
-        value=""
-        onChange={() => {}}
+        value={value}
+        onChange={onChange}
         minHeight={48}
         placeholder={PLACEHOLDER}
       />

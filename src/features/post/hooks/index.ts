@@ -1,6 +1,8 @@
 export { useAnalyzeImage } from './useAnalyzeImage'
+export { useAnswerQnA } from './useAnswerQnA'
 export { useCreatePost } from './useCreatePost'
 export { useGetAllMyPost } from './useGetAllMyPost'
+export { useGetQnAWithAnswer } from './useGetQnAWithAnswer'
 export { useGetPostById } from './useGetPostById'
 export { useMatchedPostIds } from './useMatchedPostIds'
 export { useMatchingPost } from './useMatchingPost'

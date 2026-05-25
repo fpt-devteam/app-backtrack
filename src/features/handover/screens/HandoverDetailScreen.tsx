@@ -21,6 +21,7 @@ import {
 } from "@/src/features/handover/hooks";
 import type { Handover } from "@/src/features/handover/types";
 import { PostCard } from "@/src/features/post/components";
+import { useGetQnAWithAnswer } from "@/src/features/post/hooks";
 import {
   AppBackButton,
   AppButton,
@@ -498,9 +499,30 @@ const HandoverDetailScreen = () => {
     return getHandoverDetailGuidance(report, currentUser?.id);
   }, [report, currentUser?.id]);
 
+  const qnaPostId = report?.finderPost?.id ?? "";
+  const qnaAnswererId = isFinder
+    ? currentUser?.id ?? ""
+    : report?.owner?.id ?? "";
+
+  const {
+    data: qnaResults,
+    isLoading: isQnALoading,
+    error: qnaError,
+  } = useGetQnAWithAnswer({
+    postId: qnaPostId,
+    answererId: qnaAnswererId,
+  });
+
   const qnAs = useMemo(
-    () => report?.finderPost?.qnAs ?? [],
-    [report?.finderPost?.qnAs],
+    () =>
+      (qnaResults ?? []).map((qna) => ({
+        id: qna.id,
+        questionText: qna.questionText,
+        answerText: qna.answers.find(
+          (answer) => answer.answererId === qnaAnswererId,
+        )?.answerText,
+      })),
+    [qnaAnswererId, qnaResults],
   );
 
   const stepDots = useMemo<StepDotDisplay[]>(() => {
@@ -804,6 +826,14 @@ const HandoverDetailScreen = () => {
       );
     }
 
+    if (qnaError) {
+      return (
+        <View className="flex-1 bg-surface items-center justify-center">
+          <AppInlineError message={qnaError.message} />
+        </View>
+      );
+    }
+
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -944,17 +974,21 @@ const HandoverDetailScreen = () => {
         )}
 
         {/* QnA Section */}
-        {qnAs.length > 0 && (
+        {(isQnALoading || qnAs.length > 0) && (
           <View className="gap-md2">
             <Text className="text-lg font-normal text-textPrimary mb-sm">
               Questions & Answers
             </Text>
 
-            <View className="gap-md2">
-              {qnAs.map((qna) => (
-                <QnAAccordion key={qna.questionText} qna={qna} />
-              ))}
-            </View>
+            {isQnALoading ? (
+              <AppLoader />
+            ) : (
+              <View className="gap-md2">
+                {qnAs.map((qna) => (
+                  <QnAAccordion key={qna.id ?? qna.questionText} qna={qna} />
+                ))}
+              </View>
+            )}
           </View>
         )}
       </ScrollView>

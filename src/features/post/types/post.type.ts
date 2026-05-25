@@ -360,6 +360,14 @@ export type OtherDetail = {
  * It includes an id, the question itself, and an optional answer.
  */
 export type QnA = {
+  id?: string;
   questionText: string;
   answerText?: string;
+}
+
+export type QnAAnswer = {
+  id: string;
+  questionId: string;
+  answererId: string;
+  answerText: string;
 }

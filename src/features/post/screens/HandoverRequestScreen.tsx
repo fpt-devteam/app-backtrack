@@ -10,7 +10,7 @@ import {
   PostFormTextArea,
   QnAItem,
 } from "@/src/features/post/components";
-import { useGetPostById } from "@/src/features/post/hooks";
+import { useAnswerQnA, useGetPostById } from "@/src/features/post/hooks";
 import { PostType, type QnA, type UserPost } from "@/src/features/post/types";
 import {
   AppBackButton,
@@ -54,6 +54,8 @@ export default function HandoverRequestScreen() {
   const { user } = useAppUser();
   const { postId, otherPostId } = useLocalSearchParams<Params>();
 
+  console.log("User", user);
+
   const {
     isLoading,
     data: otherPost,
@@ -69,8 +71,10 @@ export default function HandoverRequestScreen() {
   const { createC2CReturnReport } = useCreateC2CReturnReport();
   const { create } = useCreateDirectConversation();
   const { sendMessage } = useSendMessage();
+  const { answerQnA, isAnswering } = useAnswerQnA();
 
   const [draftMessage, setDraftMessage] = useState(DEFAULT_MESSAGE);
+  const [qnaAnswers, setQnaAnswers] = useState<Record<string, string>>({});
   const [isSendLoading, setIsSendLoading] = useState(false);
 
   const qnAs = useMemo(
@@ -78,7 +82,21 @@ export default function HandoverRequestScreen() {
     [otherPost],
   );
 
-  const isSentDisabled = isSendLoading || !draftMessage.trim();
+  const getQnAKey = (qna: QnA, index: number) =>
+    qna.id ?? `${qna.questionText}-${index}`;
+
+  const areAllQnAsAnswered = useMemo(() => {
+    if (otherPost?.postType !== PostType.Found || qnAs.length === 0)
+      return true;
+
+    return qnAs.every((qna, index) => {
+      const key = getQnAKey(qna, index);
+      return !!qnaAnswers[key]?.trim();
+    });
+  }, [otherPost?.postType, qnAs, qnaAnswers]);
+
+  const isSentDisabled =
+    isSendLoading || isAnswering || !draftMessage.trim() || !areAllQnAsAnswered;
 
   const getHandoverRoles = (postId: string, otherPost: UserPost) => {
     const isFoundPost = otherPost.postType === PostType.Found;
@@ -99,6 +117,38 @@ export default function HandoverRequestScreen() {
         "Please enter a message to continue.",
       );
 
+    if (
+      otherPost.postType === PostType.Found &&
+      qnAs.length > 0 &&
+      !areAllQnAsAnswered
+    ) {
+      return toast.error(
+        "Answers Required",
+        "Please answer all verification questions to continue.",
+      );
+    }
+
+    const buildAnswerRequests = () => {
+      return qnAs.map((qna, index) => {
+        const key = getQnAKey(qna, index);
+        const answerText = qnaAnswers[key]?.trim();
+
+        if (!answerText) {
+          throw new Error("QNA_ANSWER_REQUIRED");
+        }
+
+        if (!qna.id) {
+          throw new Error("QNA_ID_MISSING");
+        }
+
+        return {
+          qnaId: qna.id,
+          answerText,
+          answererId: user!.id,
+        };
+      });
+    };
+
     try {
       setIsSendLoading(true);
 
@@ -111,6 +161,11 @@ export default function HandoverRequestScreen() {
       });
 
       if (!handoverRes?.id) throw new Error("REPORT_CREATION_FAILED");
+
+      if (otherPost.postType === PostType.Found && qnAs.length > 0) {
+        const answerRequests = buildAnswerRequests();
+        await Promise.all(answerRequests.map((request) => answerQnA(request)));
+      }
 
       const handleChatFlow = async () => {
         const convRes = await create({ memberId: authorId });
@@ -146,7 +201,7 @@ export default function HandoverRequestScreen() {
     } catch (_error) {
       toast.error(
         "Send Failed",
-        "Could not complete the request. Please try again.",
+        "Could not complete the handover request and verification answers. Please try again.",
       );
     } finally {
       setIsSendLoading(false);
@@ -210,8 +265,15 @@ export default function HandoverRequestScreen() {
               <View className="gap-md2">
                 {qnAs.map((qna, index) => (
                   <QnAItem
-                    key={`${qna.questionText}-${index}`}
+                    key={getQnAKey(qna, index)}
                     qna={qna}
+                    value={qnaAnswers[getQnAKey(qna, index)] ?? ""}
+                    onChange={(value) =>
+                      setQnaAnswers((prev) => ({
+                        ...prev,
+                        [getQnAKey(qna, index)]: value,
+                      }))
+                    }
                   />
                 ))}
               </View>

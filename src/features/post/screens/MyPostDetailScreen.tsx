@@ -1,6 +1,6 @@
 import {
-  PostImage,
   PostCategoryBadge,
+  PostImage,
   PostSubcategoryBadge,
   PostTypeIconBadge,
   SimilarPostCard,
@@ -15,6 +15,7 @@ import {
   ELECTRONICS_SUBCATEGORY,
   POST_CATEGORIES,
   POST_STATUS,
+  PostType,
 } from "@/src/features/post/types";
 import {
   AppLoader,
@@ -252,6 +253,11 @@ const MyPostDetailScreen = () => {
     return post?.imageUrls ?? [];
   }, [post]);
 
+  const verificationQuestions = useMemo(() => {
+    if (post?.postType !== PostType.Found) return [];
+    return post.qnAs ?? [];
+  }, [post]);
+
   const subcategoryCode = usePostSubcategoryCode(post?.subcategoryId);
 
   const itemDetailRows = useMemo<ItemDetailRow[]>(() => {
@@ -425,9 +431,10 @@ const MyPostDetailScreen = () => {
                 <PostCategoryBadge category={post.category} />
 
                 {/* Subcategory Badge */}
-                {subcategoryCode && post.category !== POST_CATEGORIES.OTHERS && (
-                  <PostSubcategoryBadge subcategory={subcategoryCode} />
-                )}
+                {subcategoryCode &&
+                  post.category !== POST_CATEGORIES.OTHERS && (
+                    <PostSubcategoryBadge subcategory={subcategoryCode} />
+                  )}
               </View>
             </View>
           </MotiView>
@@ -551,6 +558,43 @@ const MyPostDetailScreen = () => {
               </View>
             </View>
           </MotiView>
+
+          {/* Verification Questions */}
+          {verificationQuestions.length > 0 && (
+            <>
+              {/* Divider */}
+              <View className="border-t border-muted mx-lg" />
+
+              {/* Verification Questions */}
+              <MotiView
+                from={{ opacity: 0, translateY: 8 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "timing", duration: 240, delay: 230 }}
+              >
+                <View className="gap-sm px-lg">
+                  <Text className="text-lg font-normal text-textPrimary">
+                    Verification Questions
+                  </Text>
+
+                  <View className="gap-sm">
+                    {verificationQuestions.map((qna, index) => (
+                      <View
+                        key={qna.id ?? `${qna.questionText}-${index}`}
+                        className="flex-row gap-sm rounded-xl border border-divider bg-canvas px-md py-md"
+                      >
+                        <Text className="text-sm font-medium text-textPrimary">
+                          {index + 1}.
+                        </Text>
+                        <Text className="flex-1 text-sm leading-5 text-textSecondary">
+                          {qna.questionText}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              </MotiView>
+            </>
+          )}
 
           {/* Divider */}
           <View className="border-t border-muted mx-lg" />
