@@ -1,4 +1,4 @@
-import { getPostByIdApi } from "@/src/features/post/api";
+import { getPostByIdApi, getQnAByPostId } from "@/src/features/post/api";
 import { POST_DETAIL_QUERY_KEY } from "@/src/features/post/constants";
 import type { PostGetByIdRequest } from "@/src/features/post/types";
 import { useQuery } from "@tanstack/react-query";
@@ -10,8 +10,23 @@ export const useGetPostById = (request: PostGetByIdRequest) => {
     enabled: !!request.postId,
     queryFn: async () => {
       const response = await getPostByIdApi(request);
-      if (!response.success) throw new Error("Post not found");
-      return response.data;
+      if (!response.success || !response.data)
+        throw new Error("Post not found");
+
+      const post = response.data;
+
+      if (post.postType === "Found") {
+        const qnaResponse = await getQnAByPostId({
+          postId: post.id,
+          page: 1,
+          pageSize: 20,
+        });
+
+        if (!qnaResponse.success) throw new Error("Failed to fetch QnAs");
+        return { ...post, qnAs: qnaResponse.data?.items || [] };
+      }
+
+      return post;
     },
   });
 

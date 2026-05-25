@@ -1,6 +1,8 @@
 import type { UserLocation } from "@/src/features/map/types";
 import type {
-  ApiResponse
+  ApiResponse,
+  PagedRequest,
+  PagedResponse
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
@@ -196,3 +198,9 @@ export type QnABatchRequest = {
   postId: string;
   questionTexts: string[];
 }
+
+export type QnAGetByPostIdRequest = {
+  postId: string;
+} & PagedRequest
+
+export type QnAGetByPostIdResponse = ApiResponse<PagedResponse<QnA>>;

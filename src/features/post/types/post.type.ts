@@ -73,6 +73,9 @@ export type UserPost = {
   electronicDetail?: ElectronicDetail
   otherDetail?: OtherDetail
 
+  //
+  qnAs?: QnA[]
+
   // 
   eventTime: Date | string
   createdAt: Date | string

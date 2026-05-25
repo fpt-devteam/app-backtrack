@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdRequest, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest, QnABatchRequest } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdRequest, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest, QnABatchRequest, QnAGetByPostIdRequest, QnAGetByPostIdResponse } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -14,6 +14,7 @@ export const POST_API = {
   getSubcategories: "/api/core/subcategories",
   update: (postId: string) => `/api/core/posts/${postId}`,
   batchQnA: "/api/core/qna/batch",
+  getQnAByPostId: (postId: string) => `/api/core/qna?postId=${postId}`,
 } as const;
 
 export async function getFeedPostsApi(params: PostFeedRequest) {
@@ -28,6 +29,11 @@ export const createPost = async (req: PostCreateRequest) => {
 
 export const batchQnA = async (req: QnABatchRequest) => {
   const response = await privateClient.post(POST_API.batchQnA, req);
+  return response.data;
+};
+
+export const getQnAByPostId = async (req: QnAGetByPostIdRequest) => {
+  const response = await privateClient.get<QnAGetByPostIdResponse>(POST_API.getQnAByPostId(req.postId));
   return response.data;
 };
 
