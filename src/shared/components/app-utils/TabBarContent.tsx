@@ -124,7 +124,7 @@ export const TabBarContent = ({ state, navigation }: BottomTabBarProps) => {
   };
 
   const handleAddPress = async () => {
-    await refetch();
+    // await refetch();
 
     if (!user) {
       router.push(AUTH_ROUTE.onboarding);

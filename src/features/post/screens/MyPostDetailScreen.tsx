@@ -378,6 +378,7 @@ const MyPostDetailScreen = () => {
     if (isLoading || !post) return <AppLoader />;
 
     const { formattedDate, formattedTime } = formatEventDate(post.eventTime);
+    const similarPostExist = !!similarPosts?.length;
 
     return (
       <Animated.ScrollView
@@ -596,48 +597,52 @@ const MyPostDetailScreen = () => {
             </>
           )}
 
-          {/* Divider */}
-          <View className="border-t border-muted mx-lg" />
+          {similarPostExist && (
+            <>
+              {/* Divider */}
+              <View className="border-t border-muted mx-lg" />
 
-          {/* Potential matches*/}
-          <MotiView
-            from={{ opacity: 0, translateY: 8 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 240, delay: 380 }}
-          >
-            {!!similarPosts?.length && (
-              <View className="gap-sm">
-                <View className="flex-row items-center justify-between px-lg">
-                  <Text className="text-lg font-normal text-textPrimary">
-                    Potential matches
-                  </Text>
-                </View>
-
-                <ScrollView
-                  horizontal={false}
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{
-                    gap: metrics.spacing.md,
-                    paddingHorizontal: metrics.spacing.lg,
-                    paddingBottom: metrics.spacing.lg,
-                  }}
-                >
-                  {similarPosts.map((p) => (
-                    <View key={p.id}>
-                      <SimilarPostCard
-                        item={p}
-                        onPress={() => {
-                          router.push(
-                            SHARED_ROUTE.matchingDetail(post.id, p.id),
-                          );
-                        }}
-                      />
+              {/* Potential matches*/}
+              <MotiView
+                from={{ opacity: 0, translateY: 8 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ type: "timing", duration: 240, delay: 380 }}
+              >
+                {!!similarPosts?.length && (
+                  <View className="gap-sm">
+                    <View className="flex-row items-center justify-between px-lg">
+                      <Text className="text-lg font-normal text-textPrimary">
+                        Potential matches
+                      </Text>
                     </View>
-                  ))}
-                </ScrollView>
-              </View>
-            )}
-          </MotiView>
+
+                    <ScrollView
+                      horizontal={false}
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{
+                        gap: metrics.spacing.md,
+                        paddingHorizontal: metrics.spacing.lg,
+                        paddingBottom: metrics.spacing.lg,
+                      }}
+                    >
+                      {similarPosts.map((p) => (
+                        <View key={p.id}>
+                          <SimilarPostCard
+                            item={p}
+                            onPress={() => {
+                              router.push(
+                                SHARED_ROUTE.matchingDetail(post.id, p.id),
+                              );
+                            }}
+                          />
+                        </View>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
+              </MotiView>
+            </>
+          )}
         </View>
       </Animated.ScrollView>
     );
