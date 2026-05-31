@@ -176,6 +176,10 @@ const PostCreationStepperLayout = () => {
   );
 
   const isNextDisabled = useMemo(() => {
+    if (screenSteps[currentStep]?.key) {
+      return false;
+    }
+
     if (screenSteps[currentStep].key === STEP_KEY.IDENTITY) {
       if (postType === PostType.Lost) return false;
       return draftImages.length === 0;

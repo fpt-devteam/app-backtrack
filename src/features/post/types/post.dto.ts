@@ -19,6 +19,7 @@ import {
   type PostSuggestion,
   type SimilarPost
 } from "./post.type";
+import { QnAQuestion } from "./qna.type";
 
 /**
  * PostFeedRequest - This type defines the filters that can be applied when fetching posts.
@@ -204,7 +205,7 @@ export type QnAGetByPostIdRequest = {
   postId: string;
 } & PagedRequest
 
-export type QnAGetByPostIdResponse = ApiResponse<PagedResponse<QnA>>;
+export type QnAGetByPostIdResponse = ApiResponse<PagedResponse<QnAQuestion>>;
 
 export type QnAAnswerRequest = {
   qnaId: string;
