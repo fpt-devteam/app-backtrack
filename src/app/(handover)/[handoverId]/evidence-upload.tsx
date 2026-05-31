@@ -4,28 +4,18 @@ import {
   AppBackButton,
   AppButton,
   AppImage,
+  AppLoader,
   AppTipCard,
-  MenuBottomSheet,
 } from "@/src/shared/components";
 import { toast } from "@/src/shared/components/ui/toast";
-import { ensureMediaPermission } from "@/src/shared/services";
-import {
-  CAMERA_OPTIONS,
-  PICKER_OPTIONS,
-  usePhotoStore,
-} from "@/src/shared/store";
+import { usePhotoStore } from "@/src/shared/store";
 import { colors } from "@/src/shared/theme/colors";
 import { typography } from "@/src/shared/theme/typography";
 import { Nullable } from "@/src/shared/types";
 import * as Haptics from "expo-haptics";
-import {
-  launchCameraAsync,
-  launchImageLibraryAsync,
-  requestCameraPermissionsAsync,
-  type ImagePickerAsset,
-} from "expo-image-picker";
+import { type ImagePickerAsset } from "expo-image-picker";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { CameraIcon, ImageIcon, XIcon } from "phosphor-react-native";
+import { ImageIcon, XIcon } from "phosphor-react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Pressable,
@@ -36,6 +26,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const MAX_EVIDENCE_IMAGES = 5;
+
 const EvidenceUploadScreen = () => {
   const { handoverId } = useLocalSearchParams<{ handoverId: string }>();
 
@@ -45,52 +37,26 @@ const EvidenceUploadScreen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const secondarySize = 0.4 * screenWidth;
 
-  const isPickerSheetVisible = usePhotoStore(
-    (state) => state.isPickerSheetVisible,
-  );
-
-  const closePickerSheet = usePhotoStore((state) => state.closePickerSheet);
   const openPickerSheet = usePhotoStore((state) => state.openPickerSheet);
 
   const maxImages = usePhotoStore((state) => state.maxImages);
   const draftImages = usePhotoStore((state) => state.draftImages);
   const removeImage = usePhotoStore((state) => state.removeImage);
   const emptySlots = Math.min(maxImages - draftImages.length, 4);
-  const addMulti = usePhotoStore((state) => state.addImages);
   const uploadImages = usePhotoStore((state) => state.uploadImages);
+  const isUploading = usePhotoStore((state) => state.isUploading);
   const getUploadedImageUrls = usePhotoStore(
     (state) => state.getUploadedImageUrls,
   );
   const reset = usePhotoStore((state) => state.reset);
+  const setMaxImages = usePhotoStore((state) => state.setMaxImages);
 
   const isSaveDisabled = isSaveLoading || draftImages.length === 0;
-
-  const openGallery = async () => {
-    closePickerSheet();
-    const granted = await ensureMediaPermission();
-    if (!granted) {
-      toast.error("Media library permission is required to pick photos.");
-      return;
-    }
-    const result = await launchImageLibraryAsync(PICKER_OPTIONS);
-    if (result.canceled || result.assets.length === 0) return;
-    addMulti(result.assets);
-  };
-
-  const takePhoto = async () => {
-    closePickerSheet();
-    const { status } = await requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      toast.error("Camera permission is required to take photos.");
-      return;
-    }
-    const result = await launchCameraAsync(CAMERA_OPTIONS);
-    if (result.canceled || result.assets.length === 0) return;
-    addMulti(result.assets);
-  };
+  const isUploadingOverlayVisible = isSaveLoading || isUploading;
 
   useEffect(() => {
     reset();
+    setMaxImages(MAX_EVIDENCE_IMAGES);
     return () => {
       reset();
     };
@@ -114,6 +80,7 @@ const EvidenceUploadScreen = () => {
 
       await activate(req);
 
+      reset();
       router.back();
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       toast.success("Success", "Item marked as delivered securely.");
@@ -198,26 +165,11 @@ const EvidenceUploadScreen = () => {
         />
       </View>
 
-      <MenuBottomSheet
-        isVisible={isPickerSheetVisible}
-        onClose={closePickerSheet}
-        options={[
-          {
-            id: "gallery",
-            label: "Open Gallery",
-            description: "Pick from your photo library",
-            icon: ImageIcon,
-            onPress: openGallery,
-          },
-          {
-            id: "camera",
-            label: "Take Photo",
-            description: "Use your camera",
-            icon: CameraIcon,
-            onPress: takePhoto,
-          },
-        ]}
-      />
+      {isUploadingOverlayVisible ? (
+        <View className="absolute inset-0 z-10 items-center justify-center bg-black/10">
+          <AppLoader colorClass="bg-white" />
+        </View>
+      ) : null}
     </SafeAreaView>
   );
 };

@@ -1,6 +1,7 @@
 import "@/global.css";
 import { AppUserProvider, AuthProvider } from "@/src/features/auth/providers";
 import { usePostSubcategoryStore } from "@/src/features/post/store";
+import { GlobalImagePickerSheet } from "@/src/shared/components";
 import { toastConfig } from "@/src/shared/components/ui/toast/toast-config";
 import {
   CARD_SUB_CATEGORY_ICONS,
@@ -143,6 +144,8 @@ export default function RootLayout() {
                 </Stack>
 
                 <Toast config={toastConfig} position="top" topOffset={56} />
+
+                <GlobalImagePickerSheet />
               </BottomSheetModalProvider>
             </AppUserProvider>
           </AuthProvider>

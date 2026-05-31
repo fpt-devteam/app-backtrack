@@ -21,6 +21,7 @@ export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 export { AppTipCard } from "@/src/shared/components/AppTipCard";
 export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
+export { GlobalImagePickerSheet } from "@/src/shared/components/image-picker";
 export { BaseInputField } from "@/src/shared/components/fields/BaseInputField";
 export { DatePickerField } from "@/src/shared/components/fields/DatePickerField";
 export { EmailField } from "@/src/shared/components/fields/EmailField";

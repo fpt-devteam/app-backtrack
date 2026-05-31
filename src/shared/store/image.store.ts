@@ -28,6 +28,7 @@ type PhotoActions = {
   addImages: (newImages: ImagePickerAsset[]) => void;
   removeImage: (index: number) => void;
   reset: () => void;
+  setMaxImages: (n: number) => void;
 
   openPickerSheet: () => void;
   closePickerSheet: () => void;
@@ -82,6 +83,8 @@ export const usePhotoStore = create<PhotoState & PhotoActions>((set, get) => ({
   },
 
   reset: () => set(initialState),
+
+  setMaxImages: (n) => set({ maxImages: n }),
 
   openPickerSheet: () => set({ isPickerSheetVisible: true }),
   closePickerSheet: () => set({ isPickerSheetVisible: false }),
