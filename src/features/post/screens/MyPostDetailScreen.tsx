@@ -3,6 +3,7 @@ import {
   PostImage,
   PostSubcategoryBadge,
   PostTypeIconBadge,
+  QnASection,
   SimilarPostCard,
 } from "@/src/features/post/components";
 import {
@@ -253,11 +254,6 @@ const MyPostDetailScreen = () => {
     return post?.imageUrls ?? [];
   }, [post]);
 
-  const verificationQuestions = useMemo(() => {
-    if (post?.postType !== PostType.Found) return [];
-    return post.qnAs ?? [];
-  }, [post]);
-
   const subcategoryCode = usePostSubcategoryCode(post?.subcategoryId);
 
   const itemDetailRows = useMemo<ItemDetailRow[]>(() => {
@@ -379,6 +375,8 @@ const MyPostDetailScreen = () => {
 
     const { formattedDate, formattedTime } = formatEventDate(post.eventTime);
     const similarPostExist = !!similarPosts?.length;
+
+    const showQnASection = post.postType === PostType.Found;
 
     return (
       <Animated.ScrollView
@@ -560,40 +558,13 @@ const MyPostDetailScreen = () => {
             </View>
           </MotiView>
 
-          {/* Verification Questions */}
-          {verificationQuestions.length > 0 && (
+          {/* QnA Section */}
+          {showQnASection && (
             <>
-              {/* Divider */}
               <View className="border-t border-muted mx-lg" />
-
-              {/* Verification Questions */}
-              <MotiView
-                from={{ opacity: 0, translateY: 8 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ type: "timing", duration: 240, delay: 230 }}
-              >
-                <View className="gap-sm px-lg">
-                  <Text className="text-lg font-normal text-textPrimary">
-                    Verification Questions
-                  </Text>
-
-                  <View className="gap-sm">
-                    {verificationQuestions.map((qna, index) => (
-                      <View
-                        key={qna.id ?? `${qna.questionText}-${index}`}
-                        className="flex-row gap-sm rounded-xl border border-divider bg-canvas px-md py-md"
-                      >
-                        <Text className="text-sm font-medium text-textPrimary">
-                          {index + 1}.
-                        </Text>
-                        <Text className="flex-1 text-sm leading-5 text-textSecondary">
-                          {qna.questionText}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              </MotiView>
+              <View className="px-lg">
+                <QnASection postId={post.id} />
+              </View>
             </>
           )}
 

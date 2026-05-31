@@ -1,14 +1,15 @@
 import {
-  PostImage,
   PostCategoryBadge,
+  PostImage,
   PostTypeIconBadge,
+  QnASection,
 } from "@/src/features/post/components";
 import {
   useGetPostById,
   useMatchedPostIds,
   usePostSubcategoryCode,
 } from "@/src/features/post/hooks";
-import { POST_CATEGORIES } from "@/src/features/post/types";
+import { POST_CATEGORIES, PostType } from "@/src/features/post/types";
 import {
   AppLoader,
   AppUserAvatar,
@@ -184,6 +185,8 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
 
     const isBlurred =
       !matchedPostIds.has(post.id) || post.category === POST_CATEGORIES.CARD;
+
+    const showQnASection = post.postType === PostType.Found;
 
     return (
       <>
@@ -370,6 +373,16 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
               </View>
             </View>
           </MotiView>
+
+          {/* QnA Section */}
+          {showQnASection && (
+            <>
+              <View className="border-t border-muted mx-lg" />
+              <View className="px-lg">
+                <QnASection postId={post.id} />
+              </View>
+            </>
+          )}
         </View>
       </>
     );
