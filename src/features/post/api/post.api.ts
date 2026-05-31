@@ -29,10 +29,7 @@ export const createPost = async (req: PostCreateRequest) => {
   return response.data;
 };
 
-export const answerQnA = async (req: QnAAnswerRequest) => {
-  const response = await privateClient.post(POST_API.answerQnA(req.qnaId), { answerText: req.answerText });
-  return response.data;
-};
+
 
 export const getQnAWithAnswer = async (req: QnAGetWithAnswerRequest) => {
   const response = await privateClient.get<QnAGetAnswerResponse>(POST_API.getQnAWithAnswer(req.postId, req.answererId));

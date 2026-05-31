@@ -5,13 +5,7 @@ const ComparePostLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="index" />
-      <Stack.Screen
-        name="handover-request"
-        options={{
-          presentation: "modal",
-          animation: "slide_from_bottom",
-        }}
-      />
+      <Stack.Screen name="handover-request" />
     </Stack>
   );
 };

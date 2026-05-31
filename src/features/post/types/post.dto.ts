@@ -1,8 +1,6 @@
 import type { UserLocation } from "@/src/features/map/types";
 import type {
-  ApiResponse,
-  PagedRequest,
-  PagedResponse
+  ApiResponse
 } from "@/src/shared/api";
 import { Nullable } from "@/src/shared/types";
 import { LatLng } from "react-native-maps";
@@ -11,15 +9,13 @@ import {
   PostCategory,
   PostSubcategory,
   PostSubcategoryCode,
-  QnA,
-  QnAAnswer,
   UserPost,
   type Post,
   type PostSearchOptions,
   type PostSuggestion,
   type SimilarPost
 } from "./post.type";
-import { QnAQuestion } from "./qna.type";
+import { QnA } from "./qna.type";
 
 /**
  * PostFeedRequest - This type defines the filters that can be applied when fetching posts.
@@ -195,36 +191,3 @@ export type OtherFormRequest = {
  * It includes an array of PostSubcategory objects wrapped in an ApiResponse.
  */
 export type PostSubcategoryResponse = ApiResponse<PostSubcategory[]>;
-
-export type QnABatchRequest = {
-  postId: string;
-  questionTexts: string[];
-}
-
-export type QnAGetByPostIdRequest = {
-  postId: string;
-} & PagedRequest
-
-export type QnAGetByPostIdResponse = ApiResponse<PagedResponse<QnAQuestion>>;
-
-export type QnAAnswerRequest = {
-  qnaId: string;
-  answererId: string;
-  answerText: string;
-}
-
-export type QnAGetWithAnswerRequest = {
-  postId: string;
-  answererId: string;
-}
-
-export type QnAAnswerResult = {
-  id: string;
-  postId: string;
-  askerId: string;
-  questionText: string;
-  answers: QnAAnswer[];
-  createdAt: string;
-}
-
-export type QnAGetAnswerResponse = ApiResponse<QnAAnswerResult[]>;

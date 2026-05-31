@@ -373,9 +373,7 @@ export default function HandoverRequestScreen() {
       <Stack.Screen
         options={{
           headerTitle: "Handover Request",
-          headerRight: () => (
-            <AppBackButton type="xIcon" showBackground={false} />
-          ),
+          headerLeft: () => <AppBackButton />,
           headerTitleStyle: {
             fontSize: typography.fontSize.lg,
             fontWeight: typography.fontWeight.normal as TextStyle["fontWeight"],

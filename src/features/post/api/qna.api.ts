@@ -1,5 +1,5 @@
 import { privateClient } from "@/src/shared/api";
-import { QnABatchRequest, QnAGetByPostIdRequest, QnAGetByPostIdResponse } from "../types";
+import { QnAAnswerRequest, QnABatchRequest, QnAGetByPostIdRequest, QnAGetByPostIdResponse } from "@/src/features/post/types";
 
 export const QNA_API = {
   batchQnA: "/api/core/qna/batch",
@@ -15,5 +15,16 @@ export const batchQnA = async (req: QnABatchRequest) => {
 
 export const getQnAByPostId = async (req: QnAGetByPostIdRequest) => {
   const response = await privateClient.get<QnAGetByPostIdResponse>(QNA_API.getQnAByPostId(req.postId));
+  return response.data;
+};
+
+export const answerQnA = async (req: QnAAnswerRequest) => {
+  const payload: Record<string, unknown> = {
+    type: req.type,
+  };
+  if (req.answerText !== undefined) payload.answerText = req.answerText;
+  if (req.imageUrls !== undefined) payload.imageUrls = req.imageUrls;
+
+  const response = await privateClient.post(QNA_API.answerQnA(req.qnaId), payload);
   return response.data;
 };

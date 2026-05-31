@@ -5,6 +5,7 @@ import { Nullable } from "@/src/shared/types"
 import type { LatLng } from "react-native-maps"
 import * as yup from "yup"
 import { PostType } from "./post.enum"
+import type { QnA } from "./qna.type"
 
 export type PostFilters = {
   postType?: PostType
@@ -352,22 +353,3 @@ export type OtherDetail = {
   aiDescription: Nullable<string>;
   additionalDetails: Nullable<string>;
 };
-
-
-/**
- * VerificationQuestion - 
- * This type defines the structure of a verification question. 
- * It includes an id, the question itself, and an optional answer.
- */
-export type QnA = {
-  id?: string;
-  questionText: string;
-  answerText?: string;
-}
-
-export type QnAAnswer = {
-  id: string;
-  questionId: string;
-  answererId: string;
-  answerText: string;
-}
