@@ -4,11 +4,11 @@ import { MotiView } from "moti";
 import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 
-type QnASectionProps = {
+type QnAQuestionSectionProps = {
   postId: string;
 };
 
-const QnASection = ({ postId }: QnASectionProps) => {
+const QnAQuestionSection = ({ postId }: QnAQuestionSectionProps) => {
   const { data, isLoading } = useQnAQuestions({ postId });
 
   const qnAs = useMemo(() => data || [], [data]);
@@ -50,4 +50,4 @@ const QnASection = ({ postId }: QnASectionProps) => {
   );
 };
 
-export default QnASection;
+export default QnAQuestionSection;

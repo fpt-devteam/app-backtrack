@@ -2,7 +2,7 @@ import {
   PostCategoryBadge,
   PostImage,
   PostTypeIconBadge,
-  QnASection,
+  QnAQuestionSection,
 } from "@/src/features/post/components";
 import {
   useGetPostById,
@@ -186,7 +186,7 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
     const isBlurred =
       !matchedPostIds.has(post.id) || post.category === POST_CATEGORIES.CARD;
 
-    const showQnASection = post.postType === PostType.Found;
+    const showQnAQuestionSection = post.postType === PostType.Found;
 
     return (
       <>
@@ -375,11 +375,11 @@ export const PostDetailScreen = ({ postId }: PostDetailScreenProps) => {
           </MotiView>
 
           {/* QnA Section */}
-          {showQnASection && (
+          {showQnAQuestionSection && (
             <>
               <View className="border-t border-muted mx-lg" />
               <View className="px-lg">
-                <QnASection postId={post.id} />
+                <QnAQuestionSection postId={post.id} />
               </View>
             </>
           )}

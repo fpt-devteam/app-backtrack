@@ -16,8 +16,9 @@ export { SimilarPostCard } from "@/src/features/post/components/SimilarPostCard"
 export { PostFormField } from "@/src/features/post/components/PostFormField";
 export { PostFormTextArea } from "@/src/features/post/components/PostFormTextArea";
 export { QnACard } from "@/src/features/post/components/QnACard";
-export { QnAItem } from "@/src/features/post/components/QnAItem";
 export { default as ScoreBadge } from "@/src/features/post/components/ScoreBadge";
 
 
-export { default as QnASection } from "@/src/features/post/components/QnASection";
+export { default as QnAAnswerSection } from "@/src/features/post/components/QnAAnswerSection";
+export { default as QnAQuestionSection } from "@/src/features/post/components/QnAQuestionSection";
+

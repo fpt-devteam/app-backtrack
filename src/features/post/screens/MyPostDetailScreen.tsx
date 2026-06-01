@@ -3,7 +3,7 @@ import {
   PostImage,
   PostSubcategoryBadge,
   PostTypeIconBadge,
-  QnASection,
+  QnAQuestionSection,
   SimilarPostCard,
 } from "@/src/features/post/components";
 import {
@@ -376,7 +376,7 @@ const MyPostDetailScreen = () => {
     const { formattedDate, formattedTime } = formatEventDate(post.eventTime);
     const similarPostExist = !!similarPosts?.length;
 
-    const showQnASection = post.postType === PostType.Found;
+    const showQnQuestionSection = post.postType === PostType.Found;
 
     return (
       <Animated.ScrollView
@@ -559,11 +559,11 @@ const MyPostDetailScreen = () => {
           </MotiView>
 
           {/* QnA Section */}
-          {showQnASection && (
+          {showQnQuestionSection && (
             <>
               <View className="border-t border-muted mx-lg" />
               <View className="px-lg">
-                <QnASection postId={post.id} />
+                <QnAQuestionSection postId={post.id} />
               </View>
             </>
           )}
