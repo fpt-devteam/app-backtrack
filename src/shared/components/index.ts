@@ -21,11 +21,11 @@ export { AppSplashScreen } from "@/src/shared/components/AppSplashScreen";
 export { AppTipCard } from "@/src/shared/components/AppTipCard";
 export { AppUserAvatar } from "@/src/shared/components/AppUserAvatar";
 export { AppUserAvatarIcon } from "@/src/shared/components/AppUserAvatarIcon";
-export { GlobalImagePickerSheet } from "@/src/shared/components/image-picker";
 export { BaseInputField } from "@/src/shared/components/fields/BaseInputField";
 export { DatePickerField } from "@/src/shared/components/fields/DatePickerField";
 export { EmailField } from "@/src/shared/components/fields/EmailField";
 export { PasswordField } from "@/src/shared/components/fields/PasswordField";
+export { GlobalImagePickerSheet } from "@/src/shared/components/image-picker";
 export { AppButton } from '@/src/shared/components/ui/AppButton';
 export { BottomSheet } from '@/src/shared/components/ui/BottomSheet';
 export { ImageCarousel } from '@/src/shared/components/ui/ImageCarousel';
@@ -33,3 +33,4 @@ export { MenuBottomSheet } from '@/src/shared/components/ui/MenuBottomSheet';
 export type { MenuOption } from '@/src/shared/components/ui/MenuBottomSheet';
 export { TouchableIconButton } from "@/src/shared/components/ui/TouchableIconButton";
 
+export { AppImageSlot } from "@/src/shared/components/AppImageSlot";

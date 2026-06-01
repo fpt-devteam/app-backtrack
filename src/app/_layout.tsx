@@ -1,5 +1,6 @@
 import "@/global.css";
 import { AppUserProvider, AuthProvider } from "@/src/features/auth/providers";
+import { QnAImagePickerSheet } from "@/src/features/post/components";
 import { usePostSubcategoryStore } from "@/src/features/post/store";
 import { GlobalImagePickerSheet } from "@/src/shared/components";
 import { toastConfig } from "@/src/shared/components/ui/toast/toast-config";
@@ -8,6 +9,7 @@ import {
   ELECTRONICS_SUB_CATEGORY_ICONS,
   PERSONAL_BELONGING_SUB_CATEGORY_ICONS,
 } from "@/src/shared/constants";
+import { FALLBACK_AVATAR_SOURCE } from "@/src/shared/data";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Asset } from "expo-asset";
@@ -25,7 +27,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-get-random-values";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { FALLBACK_AVATAR_SOURCE } from "../shared/data";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -145,6 +146,7 @@ export default function RootLayout() {
 
                 <Toast config={toastConfig} position="top" topOffset={56} />
 
+                <QnAImagePickerSheet />
                 <GlobalImagePickerSheet />
               </BottomSheetModalProvider>
             </AppUserProvider>

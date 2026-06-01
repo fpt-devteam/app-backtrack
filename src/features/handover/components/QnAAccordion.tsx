@@ -1,11 +1,11 @@
-import type { QnA } from "@/src/features/post/types";
+import type { AppQnA } from "@/src/features/post/types";
 import { AppAccordion } from "@/src/shared/components";
 import { colors, metrics } from "@/src/shared/theme";
 import React, { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 
 type QnAAccordionProps = {
-  qna: QnA;
+  qna: AppQnA;
 };
 
 const DEFAULT_ANSWER_MESSAGE = "Awaiting response from the owner...";

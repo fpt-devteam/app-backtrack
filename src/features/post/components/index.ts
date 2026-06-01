@@ -21,4 +21,4 @@ export { default as ScoreBadge } from "@/src/features/post/components/ScoreBadge
 
 export { default as QnAAnswerSection } from "@/src/features/post/components/QnAAnswerSection";
 export { default as QnAQuestionSection } from "@/src/features/post/components/QnAQuestionSection";
-
+export { QnAImagePickerSheet } from "@/src/features/post/components/QnAImagePickerSheet";

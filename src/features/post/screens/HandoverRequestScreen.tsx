@@ -8,10 +8,11 @@ import { useSendNotification } from "@/src/features/notification/hooks";
 import {
   MyPostCard,
   PostFormTextArea,
-  QnAItem,
+  QnAAnswerSection,
 } from "@/src/features/post/components";
 import { useAnswerQnA, useGetPostById } from "@/src/features/post/hooks";
-import { PostType, type QnA, type UserPost } from "@/src/features/post/types";
+import { useQnAStore } from "@/src/features/post/store";
+import { PostType, type UserPost } from "@/src/features/post/types";
 import {
   AppBackButton,
   AppButton,
@@ -26,7 +27,7 @@ import { colors, metrics, typography } from "@/src/shared/theme";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { MotiView } from "moti";
 import { SealCheckIcon } from "phosphor-react-native";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -42,10 +43,6 @@ type Params = {
   otherPostId: string;
 };
 
-type UserPostWithQnAs = UserPost & {
-  qnAs?: QnA[] | null;
-};
-
 const DEFAULT_MESSAGE =
   "Chào bạn! mình đang quan tâm và muốn trao đổi về việc nhận lại món đồ này. Nếu được, chúng mình cùng bàn kỹ hơn về thời gian và địa điểm nhé!";
 
@@ -54,7 +51,8 @@ export default function HandoverRequestScreen() {
   const { user } = useAppUser();
   const { postId, otherPostId } = useLocalSearchParams<Params>();
 
-  console.log("User", user);
+  const { buildAnswerRequests, canSubmitAnswers } = useQnAStore();
+  const { answerQnA } = useAnswerQnA();
 
   const {
     isLoading,
@@ -71,32 +69,13 @@ export default function HandoverRequestScreen() {
   const { createC2CReturnReport } = useCreateC2CReturnReport();
   const { create } = useCreateDirectConversation();
   const { sendMessage } = useSendMessage();
-  const { answerQnA, isAnswering } = useAnswerQnA();
 
   const [draftMessage, setDraftMessage] = useState(DEFAULT_MESSAGE);
-  const [qnaAnswers, setQnaAnswers] = useState<Record<string, string>>({});
+
   const [isSendLoading, setIsSendLoading] = useState(false);
 
-  const qnAs = useMemo(
-    () => (otherPost as UserPostWithQnAs | undefined)?.qnAs ?? [],
-    [otherPost],
-  );
-
-  const getQnAKey = (qna: QnA, index: number) =>
-    qna.id ?? `${qna.questionText}-${index}`;
-
-  const areAllQnAsAnswered = useMemo(() => {
-    if (otherPost?.postType !== PostType.Found || qnAs.length === 0)
-      return true;
-
-    return qnAs.every((qna, index) => {
-      const key = getQnAKey(qna, index);
-      return !!qnaAnswers[key]?.trim();
-    });
-  }, [otherPost?.postType, qnAs, qnaAnswers]);
-
   const isSentDisabled =
-    isSendLoading || isAnswering || !draftMessage.trim() || !areAllQnAsAnswered;
+    isSendLoading || !draftMessage.trim() || !canSubmitAnswers();
 
   const getHandoverRoles = (postId: string, otherPost: UserPost) => {
     const isFoundPost = otherPost.postType === PostType.Found;
@@ -107,51 +86,12 @@ export default function HandoverRequestScreen() {
   };
 
   const handleCreateReturnReport = async () => {
-    const trimmedMessage = draftMessage.trim();
-
     if (!otherPost || !user) return;
-
-    if (!trimmedMessage)
-      return toast.error(
-        "Message Required",
-        "Please enter a message to continue.",
-      );
-
-    if (
-      otherPost.postType === PostType.Found &&
-      qnAs.length > 0 &&
-      !areAllQnAsAnswered
-    ) {
-      return toast.error(
-        "Answers Required",
-        "Please answer all verification questions to continue.",
-      );
-    }
-
-    const buildAnswerRequests = () => {
-      return qnAs.map((qna, index) => {
-        const key = getQnAKey(qna, index);
-        const answerText = qnaAnswers[key]?.trim();
-
-        if (!answerText) {
-          throw new Error("QNA_ANSWER_REQUIRED");
-        }
-
-        if (!qna.id) {
-          throw new Error("QNA_ID_MISSING");
-        }
-
-        return {
-          qnaId: qna.id,
-          answerText,
-          answererId: user!.id,
-        };
-      });
-    };
 
     try {
       setIsSendLoading(true);
 
+      const trimmedMessage = draftMessage.trim();
       const { finderPostId, ownerPostId } = getHandoverRoles(postId, otherPost);
       const authorId = otherPost.author.id;
 
@@ -160,45 +100,49 @@ export default function HandoverRequestScreen() {
         ownerPostId,
       });
 
-      if (!handoverRes?.id) throw new Error("REPORT_CREATION_FAILED");
-
-      if (otherPost.postType === PostType.Found && qnAs.length > 0) {
-        const answerRequests = buildAnswerRequests();
-        await Promise.all(answerRequests.map((request) => answerQnA(request)));
+      if (!handoverRes?.id) {
+        throw new Error("REPORT_CREATION_FAILED");
       }
 
-      const handleChatFlow = async () => {
-        const convRes = await create({ memberId: authorId });
-        const conversationId = convRes.data?.conversation?.conversationId;
+      const convRes = await create({ memberId: authorId });
+      const conversationId = convRes.data?.conversation?.conversationId;
 
-        if (conversationId) {
-          await Promise.all([
-            sendMessage({
-              conversationId,
-              request: { type: "text", content: trimmedMessage },
-            }),
-            sendNotification({
-              target: { userId: authorId },
-              source: {
-                name: `Request from ${user.displayName || "User"}`,
-                eventId: Date.now().toString(),
-              },
-              title: "New Handover Request",
-              body: trimmedMessage,
-              type: "ChatEvent",
-              data: { screenPath: CHAT_ROUTE.message(conversationId) },
-            }),
-          ]);
-        }
-      };
+      if (!conversationId) {
+        throw new Error("CONVERSATION_CREATION_FAILED");
+      }
 
-      handleChatFlow().catch((err) => console.log("Chat flow failed", err));
+      const qnaAnswerReqs = await buildAnswerRequests();
+
+      if (qnaAnswerReqs === null) {
+        throw new Error("QNA_ANSWER_BUILD_FAILED");
+      }
+
+      await Promise.all([
+        sendMessage({
+          conversationId,
+          request: { type: "text", content: trimmedMessage },
+        }),
+
+        sendNotification({
+          target: { userId: authorId },
+          source: {
+            name: `Request from ${user.displayName || "User"}`,
+            eventId: Date.now().toString(),
+          },
+          title: "New Handover Request",
+          body: trimmedMessage,
+          type: "ChatEvent",
+          data: { screenPath: CHAT_ROUTE.message(conversationId) },
+        }),
+
+        ...qnaAnswerReqs.map((req) => answerQnA(req)),
+      ]);
 
       toast.success("Request Sent", "Your handover request is on its way!");
-
       router.dismissAll();
       router.push(HANDOVER_ROUTE.detail(handoverRes.id));
-    } catch (_error) {
+    } catch (error) {
+      console.error("Handover request failed:", error);
       toast.error(
         "Send Failed",
         "Could not complete the handover request and verification answers. Please try again.",
@@ -220,6 +164,8 @@ export default function HandoverRequestScreen() {
         </View>
       );
     }
+
+    const showQnASection = otherPost.postType === PostType.Found;
 
     return (
       <KeyboardAvoidingView
@@ -251,34 +197,8 @@ export default function HandoverRequestScreen() {
           {/* Post Card */}
           <MyPostCard item={otherPost} disabled={true} />
 
-          {otherPost.postType === PostType.Found && qnAs.length > 0 && (
-            <MotiView
-              from={{ opacity: 0, translateY: 8 }}
-              animate={{ opacity: 1, translateY: 0 }}
-              transition={{ type: "timing", duration: 240, delay: 180 }}
-              className="gap-sm"
-            >
-              <Text className="text-lg font-normal text-textPrimary">
-                Verification questions
-              </Text>
-
-              <View className="gap-md2">
-                {qnAs.map((qna, index) => (
-                  <QnAItem
-                    key={getQnAKey(qna, index)}
-                    qna={qna}
-                    value={qnaAnswers[getQnAKey(qna, index)] ?? ""}
-                    onChange={(value) =>
-                      setQnaAnswers((prev) => ({
-                        ...prev,
-                        [getQnAKey(qna, index)]: value,
-                      }))
-                    }
-                  />
-                ))}
-              </View>
-            </MotiView>
-          )}
+          {/* QnA Questions */}
+          {showQnASection && <QnAAnswerSection postId={otherPost.id} />}
 
           {/* Post Owner Information */}
           <MotiView

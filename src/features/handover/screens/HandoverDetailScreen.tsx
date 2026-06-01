@@ -22,6 +22,7 @@ import {
 import type { Handover } from "@/src/features/handover/types";
 import { PostCard } from "@/src/features/post/components";
 import { useGetQnAWithAnswer } from "@/src/features/post/hooks";
+import { ANSWER_TYPE } from "@/src/features/post/types";
 import {
   AppBackButton,
   AppButton,
@@ -501,8 +502,8 @@ const HandoverDetailScreen = () => {
 
   const qnaPostId = report?.finderPost?.id ?? "";
   const qnaAnswererId = isFinder
-    ? currentUser?.id ?? ""
-    : report?.owner?.id ?? "";
+    ? (currentUser?.id ?? "")
+    : (report?.owner?.id ?? "");
 
   const {
     data: qnaResults,
@@ -515,13 +516,22 @@ const HandoverDetailScreen = () => {
 
   const qnAs = useMemo(
     () =>
-      (qnaResults ?? []).map((qna) => ({
-        id: qna.id,
-        questionText: qna.questionText,
-        answerText: qna.answers.find(
+      (qnaResults ?? []).map((qna) => {
+        const matchedAnswer = qna.answers.find(
           (answer) => answer.answererId === qnaAnswererId,
-        )?.answerText,
-      })),
+        );
+
+        return {
+          id: qna.id,
+          postId: qna.postId,
+          askerId: qna.askerId,
+          questionId: matchedAnswer?.questionId ?? qna.id,
+          questionText: qna.questionText,
+          type: matchedAnswer?.type ?? ANSWER_TYPE.TEXT,
+          answerText: matchedAnswer?.answerText,
+          imageUrls: matchedAnswer?.imageUrls,
+        };
+      }),
     [qnaAnswererId, qnaResults],
   );
 

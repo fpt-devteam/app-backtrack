@@ -2,5 +2,7 @@ export * from "./card.slice";
 export * from "./electronics.slice";
 export * from "./other.slice";
 export * from "./personal-belonging.slice";
+export * from "./qna-answer.store";
 export * from "./subcategory.store";
 export * from "./verification-qna.slice";
+
