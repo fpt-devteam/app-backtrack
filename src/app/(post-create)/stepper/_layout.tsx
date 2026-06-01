@@ -176,7 +176,7 @@ const PostCreationStepperLayout = () => {
   );
 
   const isNextDisabled = useMemo(() => {
-    if (screenSteps[currentStep]?.key) {
+    if (!screenSteps[currentStep]?.key) {
       return false;
     }
 
@@ -206,6 +206,10 @@ const PostCreationStepperLayout = () => {
   const isLoading = isCreating || isCreatingPost;
 
   const handleNext = async () => {
+    if (!screenSteps[currentStep]?.key) {
+      return;
+    }
+
     if (screenSteps[currentStep].key === STEP_KEY.IDENTITY) {
       uploadImages();
     }
