@@ -5,7 +5,7 @@ import {
 } from "@/src/features/post/constants";
 import {
   PostType,
-  QnA,
+  QnAQuestionCreateRequest,
   type PostCreateRequest,
 } from "@/src/features/post/types";
 import { Optional } from "@/src/shared/types/global.type";
@@ -15,7 +15,10 @@ import { useMemo } from "react";
 export const useCreatePost = () => {
   const qc = useQueryClient();
 
-  async function createQnAs(qnAs: Optional<QnA[]>, postId: string) {
+  async function createQnAs(
+    qnAs: Optional<QnAQuestionCreateRequest[]>,
+    postId: string,
+  ) {
     if (!qnAs || qnAs.length === 0) return;
 
     const qnaRequest = {

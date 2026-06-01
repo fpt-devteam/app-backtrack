@@ -15,7 +15,7 @@ import {
   type PostSuggestion,
   type SimilarPost
 } from "./post.type";
-import { QnA } from "./qna.type";
+import { QnAQuestionCreateRequest } from "./qna.dto";
 
 /**
  * PostFeedRequest - This type defines the filters that can be applied when fetching posts.
@@ -53,7 +53,7 @@ export type PostCreateRequest = {
   cardDetail?: CardFormRequest
   personalBelongingDetail?: PersonalBelongingFormRequest
   otherDetail?: OtherFormRequest
-  qnAs?: QnA[]
+  qnAs?: QnAQuestionCreateRequest[]
 } & Omit<UserLocation, "radiusInKm">;
 
 /**

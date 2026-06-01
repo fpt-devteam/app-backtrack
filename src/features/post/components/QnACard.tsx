@@ -1,13 +1,16 @@
 import { PostFormTextArea } from "@/src/features/post/components/PostFormTextArea";
-import type { QnA } from "@/src/features/post/types";
+import type { QnAQuestionCreateRequest } from "@/src/features/post/types";
 import { colors } from "@/src/shared/theme";
 import { PencilSimpleIcon, TrashIcon } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 type QnACardProps = {
-  qna: QnA;
-  onUpdate: (originalQuestionText: string, qna: QnA) => void;
+  qna: QnAQuestionCreateRequest;
+  onUpdate: (
+    originalQuestionText: string,
+    qna: QnAQuestionCreateRequest,
+  ) => void;
   onDelete: (questionText: string) => void;
 };
 

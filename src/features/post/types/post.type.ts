@@ -5,7 +5,6 @@ import { Nullable } from "@/src/shared/types"
 import type { LatLng } from "react-native-maps"
 import * as yup from "yup"
 import { PostType } from "./post.enum"
-import type { QnA } from "./qna.type"
 
 export type PostFilters = {
   postType?: PostType
@@ -75,9 +74,6 @@ export type UserPost = {
   otherDetail?: OtherDetail
 
   //
-  qnAs?: QnA[]
-
-  // 
   eventTime: Date | string
   createdAt: Date | string
 }
@@ -90,7 +86,6 @@ export type Post = BasePost & {
   organization: Nullable<string>
   author: AppUser
   distanceInMeters?: number
-  qnAs?: Nullable<QnA[]>
 } & Pick<UserLocation, "location" | "externalPlaceId" | "displayAddress">
 
 /**

@@ -1,12 +1,12 @@
 import { HANDOVER_VERIFICATION_QUESTIONS } from "@/src/features/post/constants/handover-verification.constant";
-import type { PostSubcategoryCode, QnA } from "@/src/features/post/types";
+import type { PostSubcategoryCode, QnAQuestionCreateRequest } from "@/src/features/post/types";
 import { StateCreator } from "zustand";
 
 const MAX_QNA_COUNT = 3;
 
 const normalizeQuestionText = (questionText: string) => questionText.trim();
 
-const buildMockQuestions = (subcategory: PostSubcategoryCode): QnA[] =>
+const buildMockQuestions = (subcategory: PostSubcategoryCode): QnAQuestionCreateRequest[] =>
   (HANDOVER_VERIFICATION_QUESTIONS[subcategory] ?? [])
     .slice(0, MAX_QNA_COUNT)
     .map((questionText) => ({
@@ -14,10 +14,10 @@ const buildMockQuestions = (subcategory: PostSubcategoryCode): QnA[] =>
     }));
 
 export type VerificationQnASlice = {
-  questions: QnA[];
+  questions: QnAQuestionCreateRequest[];
   loadMockQuestions: (subcategory: PostSubcategoryCode) => void;
-  addQuestion: (qna: QnA) => void;
-  updateQuestion: (originalQuestionText: string, qna: QnA) => void;
+  addQuestion: (qna: QnAQuestionCreateRequest) => void;
+  updateQuestion: (originalQuestionText: string, qna: QnAQuestionCreateRequest) => void;
   deleteQuestion: (questionText: string) => void;
   resetQuestions: () => void;
 };
@@ -77,7 +77,7 @@ export const createVerificationQnASlice: StateCreator<
         (question) =>
           normalizeQuestionText(question.questionText) === normalizedQuestionText &&
           normalizeQuestionText(question.questionText) !==
-            normalizedOriginalQuestionText,
+          normalizedOriginalQuestionText,
       );
 
       if (hasDuplicate) return state;
@@ -85,12 +85,12 @@ export const createVerificationQnASlice: StateCreator<
       return {
         questions: state.questions.map((question) =>
           normalizeQuestionText(question.questionText) ===
-          normalizedOriginalQuestionText
+            normalizedOriginalQuestionText
             ? {
-                ...question,
-                ...qna,
-                questionText: normalizedQuestionText,
-              }
+              ...question,
+              ...qna,
+              questionText: normalizedQuestionText,
+            }
             : question,
         ),
       };
