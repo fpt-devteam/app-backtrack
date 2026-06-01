@@ -279,7 +279,6 @@ export default function HandoverRequestScreen() {
           <AppButton
             title="Send handover request"
             onPress={handleCreateReturnReport}
-            loading={isSendLoading}
             disabled={isSentDisabled}
             variant="secondary"
           />
@@ -300,7 +299,15 @@ export default function HandoverRequestScreen() {
           },
         }}
       />
-      <View className="flex-1 bg-surface">{renderContent()}</View>
+      <View className="flex-1 bg-surface">
+        {renderContent()}
+
+        {isSendLoading ? (
+          <View className="absolute inset-0 z-10 items-center justify-center bg-black/10">
+            <AppLoader />
+          </View>
+        ) : null}
+      </View>
     </>
   );
 }
