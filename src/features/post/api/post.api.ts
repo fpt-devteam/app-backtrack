@@ -1,4 +1,4 @@
-import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdRequest, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest, QnAAnswerRequest, QnAGetAnswerResponse, QnAGetWithAnswerRequest } from "@/src/features/post/types";
+import type { AnalyzeImageRequest, AnalyzeImageResponse, GetAllMyPostResponse, MatchingPostsRequest, MatchingPostsResponse, PostCreateRequest, PostCreateResponse, PostDeleteByIdRequest, PostFeedRequest, PostFeedResponse, PostGetByIdRequest, PostGetByIdResponse, PostMatchingStatusCheckRequest, PostMatchingStatusCheckResponse, PostSearchRequest, PostSearchResponse, PostSubcategoryResponse, PostUpdateRequest } from "@/src/features/post/types";
 import { privateClient, publicClient } from "@/src/shared/api";
 
 export const POST_API = {
@@ -13,10 +13,6 @@ export const POST_API = {
   getAllMyPost: "/api/core/posts/me",
   getSubcategories: "/api/core/subcategories",
   update: (postId: string) => `/api/core/posts/${postId}`,
-  batchQnA: "/api/core/qna/batch",
-  getQnAByPostId: (postId: string) => `/api/core/qna?postId=${postId}`,
-  answerQnA: (qnaId: string) => `/api/core/qna/${qnaId}/answers`,
-  getQnAWithAnswer: (postId: string, answererId: string) => `/api/core/qna/with-answers?postId=${postId}&answererId=${answererId}`,
 } as const;
 
 export async function getFeedPostsApi(params: PostFeedRequest) {
@@ -26,13 +22,6 @@ export async function getFeedPostsApi(params: PostFeedRequest) {
 
 export const createPost = async (req: PostCreateRequest) => {
   const response = await privateClient.post<PostCreateResponse>(POST_API.create, req);
-  return response.data;
-};
-
-
-
-export const getQnAWithAnswer = async (req: QnAGetWithAnswerRequest) => {
-  const response = await privateClient.get<QnAGetAnswerResponse>(POST_API.getQnAWithAnswer(req.postId, req.answererId));
   return response.data;
 };
 
