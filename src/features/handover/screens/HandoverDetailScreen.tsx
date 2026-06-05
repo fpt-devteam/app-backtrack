@@ -452,6 +452,9 @@ const HandoverDetailScreen = () => {
     error,
   } = useGetC2CReturnReportById(handoverId ?? "");
 
+  console.log("User:", currentUser);
+  console.log("Report: ", report?.owner);
+
   const { isActivating } = useActivateC2CReturnReport();
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
   const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
@@ -501,8 +504,10 @@ const HandoverDetailScreen = () => {
   }, [report, currentUser?.id]);
 
   const qnaPostId = report?.finderPost?.id ?? "";
+  
+  // 
   const qnaAnswererId = isFinder
-    ? (currentUser?.id ?? "")
+    ? (report?.owner?.id ?? "")
     : (report?.owner?.id ?? "");
 
   const {
