@@ -6,6 +6,7 @@ const HandoverLayout = () => {
     <Stack>
       <Stack.Screen name="[handoverId]/index" />
       <Stack.Screen name="[handoverId]/evidence-upload" />
+      <Stack.Screen name="[handoverId]/answer-update" />
       <Stack.Screen name="all" />
     </Stack>
   );

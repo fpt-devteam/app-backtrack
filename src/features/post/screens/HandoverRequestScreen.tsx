@@ -198,7 +198,9 @@ export default function HandoverRequestScreen() {
           <MyPostCard item={otherPost} disabled={true} />
 
           {/* QnA Questions */}
-          {showQnASection && <QnAAnswerSection postId={otherPost.id} />}
+          {showQnASection && (
+            <QnAAnswerSection postId={otherPost.id} mode="create" />
+          )}
 
           {/* Post Owner Information */}
           <MotiView

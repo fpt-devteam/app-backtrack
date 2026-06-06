@@ -1,9 +1,12 @@
 import { answerQnA as answerQnAApi } from "@/src/features/post/api";
+import { POST_QNA_WITH_ANSWER_QUERY_KEY } from "@/src/features/post/constants";
 import type { QnAAnswerRequest } from "@/src/features/post/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 export const useAnswerQnA = () => {
+  const qc = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: async (request: QnAAnswerRequest) => {
       const response = await answerQnAApi(request);
@@ -13,6 +16,12 @@ export const useAnswerQnA = () => {
       }
 
       return response.data;
+    },
+
+    onSuccess: async () => {
+      await qc.invalidateQueries({
+        queryKey: POST_QNA_WITH_ANSWER_QUERY_KEY,
+      });
     },
   });
 

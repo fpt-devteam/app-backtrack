@@ -44,6 +44,7 @@ import {
   ChatCenteredTextIcon,
   CheckCircleIcon,
   InfoIcon,
+  PencilIcon,
   PhoneIcon,
 } from "phosphor-react-native";
 import React, { useCallback, useMemo, useState } from "react";
@@ -452,9 +453,6 @@ const HandoverDetailScreen = () => {
     error,
   } = useGetC2CReturnReportById(handoverId ?? "");
 
-  console.log("User:", currentUser);
-  console.log("Report: ", report?.owner);
-
   const { isActivating } = useActivateC2CReturnReport();
   const { ownerConfirm, isConfirming } = useOwnerConfirmC2CReturnReport();
   const { ownerReject, isRejecting } = useOwnerRejectC2CReturnReport();
@@ -504,8 +502,8 @@ const HandoverDetailScreen = () => {
   }, [report, currentUser?.id]);
 
   const qnaPostId = report?.finderPost?.id ?? "";
-  
-  // 
+
+  //
   const qnaAnswererId = isFinder
     ? (report?.owner?.id ?? "")
     : (report?.owner?.id ?? "");
@@ -991,9 +989,20 @@ const HandoverDetailScreen = () => {
         {/* QnA Section */}
         {(isQnALoading || qnAs.length > 0) && (
           <View className="gap-md2">
-            <Text className="text-lg font-normal text-textPrimary mb-sm">
-              Questions & Answers
-            </Text>
+            <View className="flex-row justify-between">
+              <Text className="text-lg font-normal text-textPrimary mb-sm">
+                Questions & Answers
+              </Text>
+
+              {isOwner && (
+                <TouchableIconButton
+                  icon={<PencilIcon />}
+                  onPress={() => {
+                    router.push(HANDOVER_ROUTE.answerUpdate(handoverId));
+                  }}
+                />
+              )}
+            </View>
 
             {isQnALoading ? (
               <AppLoader />

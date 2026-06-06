@@ -1,16 +1,20 @@
 import { MotiView } from "moti";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
 
 import { useAppUser } from "@/src/features/auth/providers";
 import { HANDOVER_VERIFICATION_PLACEHOLDER } from "@/src/features/post/constants/handover-verification.constant";
-import { useQnAQuestions } from "@/src/features/post/hooks";
+import {
+  useGetQnAWithAnswer,
+  useQnAQuestions,
+} from "@/src/features/post/hooks";
 import {
   DraftQnAAnswer,
   MAX_IMAGE_PER_ANSWER,
   useQnAStore,
 } from "@/src/features/post/store";
-import { ANSWER_TYPE } from "@/src/features/post/types";
+import { ANSWER_TYPE, type AppQnAAnswer } from "@/src/features/post/types";
+import type { ImagePickerAsset } from "expo-image-picker";
 
 import {
   AppImageSlot,
@@ -25,6 +29,7 @@ import { PostFormTextArea } from "./PostFormTextArea";
 
 type QnAAnswerSectionProps = {
   postId: string;
+  mode: "create" | "edit";
 };
 
 type QuestionAnswerItemProps = {
@@ -94,12 +99,17 @@ const QuestionAnswerItem = ({
   );
 };
 
-const QnAAnswerSection = ({ postId }: QnAAnswerSectionProps) => {
+const QnAAnswerSection = ({
+  postId,
+  mode = "create",
+}: QnAAnswerSectionProps) => {
+  const hasHydratedEditAnswers = useRef(false);
   const { data: questions, isLoading } = useQnAQuestions({ postId });
   const { user, isSyncing } = useAppUser();
 
   const {
     init,
+    hydrateAnswers,
     answers,
     getQuestionText,
     changeMode,
@@ -109,19 +119,65 @@ const QnAAnswerSection = ({ postId }: QnAAnswerSectionProps) => {
     reset,
   } = useQnAStore();
 
+  const safeAnswererId = user?.id || "";
+
+  const {
+    data: qnaResults,
+    isLoading: isQnALoading,
+    error: qnaError,
+  } = useGetQnAWithAnswer({
+    postId,
+    answererId: safeAnswererId,
+  });
+
+  const editDraftAnswers = useMemo(() => {
+    if (mode !== "edit" || !questions?.length) return [];
+
+    return questions.map((question): DraftQnAAnswer => {
+      const qnaResult = qnaResults?.find((item) => item.id === question.id);
+      const matchedAnswer = qnaResult?.answers.find(
+        (answer) => answer.answererId === safeAnswererId
+      );
+
+      return mapAnswerToDraft(question.id, matchedAnswer);
+    });
+  }, [mode, qnaResults, questions, safeAnswererId]);
+
+  const draftAnswer = useMemo(() => {
+    if (mode === "create") return answers;
+
+    return answers;
+  }, [mode, answers]);
+
   useEffect(() => {
     if (!questions || questions.length === 0) return;
 
     init(postId, questions);
 
     return () => {
+      hasHydratedEditAnswers.current = false;
       reset();
     };
   }, [init, postId, questions, reset]);
 
+  useEffect(() => {
+    if (mode !== "edit") return;
+    if (!questions?.length || !qnaResults) return;
+    if (hasHydratedEditAnswers.current) return;
+
+    hydrateAnswers(editDraftAnswers);
+    hasHydratedEditAnswers.current = true;
+  }, [editDraftAnswers, hydrateAnswers, mode, qnaResults, questions]);
+
   if (isLoading || isSyncing) return <AppLoader />;
 
+  if (mode === "edit" && isQnALoading) return <AppLoader />;
+
   if (!user) return <AppInlineError message="You need to be logged in." />;
+
+  if (mode === "edit" && qnaError) {
+    return <AppInlineError message={qnaError.message} />;
+  }
 
   if (questions.length === 0) return null;
 
@@ -138,7 +194,7 @@ const QnAAnswerSection = ({ postId }: QnAAnswerSectionProps) => {
         </Text>
 
         <View className="gap-md">
-          {answers.map((answer, index) => {
+          {draftAnswer.map((answer, index) => {
             const number = index + 1;
             const questionText = getQuestionText(answer.questionId);
             const id = answer.questionId;
@@ -189,3 +245,45 @@ const QnAAnswerSection = ({ postId }: QnAAnswerSectionProps) => {
 };
 
 export default QnAAnswerSection;
+
+const mapAnswerToDraft = (
+  questionId: string,
+  answer?: AppQnAAnswer
+): DraftQnAAnswer => {
+  if (!answer) {
+    return {
+      questionId,
+      type: ANSWER_TYPE.TEXT,
+      draftText: "",
+      draftImages: [],
+      existingImageUrls: [],
+    };
+  }
+
+  if (answer.type === ANSWER_TYPE.IMAGE) {
+    const existingImageUrls = answer.imageUrls ?? [];
+
+    return {
+      questionId,
+      type: ANSWER_TYPE.IMAGE,
+      draftText: "",
+      draftImages: existingImageUrls.map(mapImageUrlToDraftImage),
+      existingImageUrls,
+    };
+  }
+
+  return {
+    questionId,
+    type: ANSWER_TYPE.TEXT,
+    draftText: answer.answerText ?? "",
+    draftImages: [],
+    existingImageUrls: [],
+  };
+};
+
+const mapImageUrlToDraftImage = (uri: string): ImagePickerAsset => ({
+  uri,
+  assetId: uri,
+  width: 0,
+  height: 0,
+});

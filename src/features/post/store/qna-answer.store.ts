@@ -16,6 +16,7 @@ export type DraftQnAAnswer = {
   type: AnswerType;
   draftText?: string;
   draftImages?: ImagePickerAsset[];
+  existingImageUrls?: string[];
 };
 
 type QnAState = {
@@ -28,6 +29,7 @@ type QnAState = {
 
 type QnAAction = {
   init: (postId: string, questions: QnAQuestion[]) => void;
+  hydrateAnswers: (answers: DraftQnAAnswer[]) => void;
   getQuestionText: (questionId: string) => string;
 
   canSubmitAnswers: () => boolean;
@@ -74,6 +76,7 @@ export const useQnAStore = create<QnAState & QnAAction>((set, get) => ({
       type: ANSWER_TYPE.TEXT,
       draftText: "",
       draftImages: [],
+      existingImageUrls: [],
     }));
 
     set({
@@ -85,6 +88,24 @@ export const useQnAStore = create<QnAState & QnAAction>((set, get) => ({
     });
   },
 
+  hydrateAnswers: (answers) => {
+    set((state) => ({
+      answers: answers.map((answer) => {
+        const currentAnswer = state.answers.find(
+          (item) => item.questionId === answer.questionId
+        );
+
+        return {
+          questionId: answer.questionId,
+          type: answer.type,
+          draftText: answer.draftText ?? "",
+          draftImages: answer.draftImages ?? [],
+          existingImageUrls: answer.existingImageUrls ?? currentAnswer?.existingImageUrls ?? [],
+        };
+      }),
+    }));
+  },
+
   getQuestionText: (questionId) => {
     const question = get().questions.find((q) => q.id === questionId);
     return question?.questionText || "";
@@ -93,7 +114,14 @@ export const useQnAStore = create<QnAState & QnAAction>((set, get) => ({
   changeMode: (questionId, type) => {
     set((state) => ({
       answers: state.answers.map((answer) =>
-        answer.questionId === questionId ? { ...answer, type } : answer
+        answer.questionId === questionId
+          ? {
+              ...answer,
+              type,
+              draftText: type === ANSWER_TYPE.TEXT ? answer.draftText ?? "" : answer.draftText,
+              draftImages: type === ANSWER_TYPE.IMAGE ? answer.draftImages ?? [] : answer.draftImages,
+            }
+          : answer
       ),
     }));
   },
@@ -145,6 +173,9 @@ export const useQnAStore = create<QnAState & QnAAction>((set, get) => ({
         const existingImages = answer.draftImages || [];
         return {
           ...answer,
+          existingImageUrls: (answer.existingImageUrls || []).filter(
+            (_, idx) => idx !== indexToRemove
+          ),
           draftImages: existingImages.filter((_, idx) => idx !== indexToRemove),
         };
       }),
@@ -171,7 +202,16 @@ export const useQnAStore = create<QnAState & QnAAction>((set, get) => ({
         answers.map(async (answer) => {
           if (answer.type === ANSWER_TYPE.IMAGE) {
             const draftImages = answer.draftImages || [];
-            const imageUrls = await uploadImageAssets(draftImages);
+            const existingImageUrls = answer.existingImageUrls || [];
+            const existingImageUrlSet = new Set(existingImageUrls);
+            const newDraftImages = draftImages.filter(
+              (image) => !existingImageUrlSet.has(image.uri)
+            );
+            const uploadedImageUrls = await uploadImageAssets(newDraftImages);
+            const imageUrls = [
+              ...existingImageUrls,
+              ...uploadedImageUrls,
+            ];
 
             return {
               questionId: answer.questionId,

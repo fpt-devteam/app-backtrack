@@ -1,5 +1,5 @@
 import { getQnAWithAnswer } from "@/src/features/post/api";
-import { POST_DETAIL_QUERY_KEY } from "@/src/features/post/constants";
+import { POST_QNA_WITH_ANSWER_QUERY_KEY } from "@/src/features/post/constants";
 import type {
   QnAAnswerResult,
   QnAGetWithAnswerRequest,
@@ -10,8 +10,7 @@ import { useMemo } from "react";
 export const useGetQnAWithAnswer = (request: QnAGetWithAnswerRequest) => {
   const query = useQuery({
     queryKey: [
-      ...POST_DETAIL_QUERY_KEY,
-      "qna-with-answer",
+      ...POST_QNA_WITH_ANSWER_QUERY_KEY,
       request.postId,
       request.answererId,
     ],

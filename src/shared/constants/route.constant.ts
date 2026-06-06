@@ -45,6 +45,7 @@ export const CHAT_ROUTE = {
 export const HANDOVER_ROUTE = {
   detail: (id: string) => createPath(`${HANDOVER_BASE}/${id}`),
   evidenceUpload: (id: string) => createPath(`${HANDOVER_BASE}/${id}/evidence-upload`),
+  answerUpdate: (id: string) => createPath(`${HANDOVER_BASE}/${id}/answer-update`),
   all: (filter: `ongoing` | `past`) => createPath(`${HANDOVER_BASE}/all?filter=${filter}`),
 } as const;
 
