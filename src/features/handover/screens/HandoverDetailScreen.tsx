@@ -19,7 +19,7 @@ import {
   useOwnerConfirmC2CReturnReport,
   useOwnerRejectC2CReturnReport,
 } from "@/src/features/handover/hooks";
-import type { Handover } from "@/src/features/handover/types";
+import { HANDOVER_STATUS, type Handover } from "@/src/features/handover/types";
 import { PostCard } from "@/src/features/post/components";
 import { useGetQnAWithAnswer } from "@/src/features/post/hooks";
 import { ANSWER_TYPE } from "@/src/features/post/types";
@@ -520,9 +520,9 @@ const HandoverDetailScreen = () => {
   const qnAs = useMemo(
     () =>
       (qnaResults ?? []).map((qna) => {
-        const matchedAnswer = qna.answers.find(
-          (answer) => answer.answererId === qnaAnswererId,
-        );
+        const matchedAnswer = qna.answers
+          .filter((answer) => answer.answererId === qnaAnswererId)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
 
         return {
           id: qna.id,
@@ -847,6 +847,9 @@ const HandoverDetailScreen = () => {
       );
     }
 
+    const showEditQnAButton =
+      isOwner && report.status == HANDOVER_STATUS.Ongoing;
+
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -994,7 +997,7 @@ const HandoverDetailScreen = () => {
                 Questions & Answers
               </Text>
 
-              {isOwner && (
+              {showEditQnAButton && (
                 <TouchableIconButton
                   icon={<PencilIcon />}
                   onPress={() => {

@@ -72,10 +72,13 @@ const AnswerUpdateScreen = () => {
   const isSaveButtonLoading = isSaving;
 
   const handleSave = async () => {
-    const qnaAnswerReqs = await buildAnswerRequests();
-    if (!qnaAnswerReqs) return;
+    if (isSaving) return;
+
     try {
       setIsSaving(true);
+
+      const qnaAnswerReqs = await buildAnswerRequests();
+      if (!qnaAnswerReqs) return;
 
       await Promise.all([qnaAnswerReqs.map((req) => answerQnA(req))]);
 
@@ -119,6 +122,12 @@ const AnswerUpdateScreen = () => {
           disabled={isSaveButtonDisabled}
         />
       </View>
+
+      {isSaving && (
+        <View className="absolute inset-0 z-10 items-center justify-center bg-black/10">
+          <AppLoader />
+        </View>
+      )}
     </>
   );
 };

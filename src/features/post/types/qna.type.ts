@@ -23,6 +23,7 @@ export type QnAAnswer = {
 export type AppQnAAnswer = {
   id: string;
   answererId: string;
+  createdAt: string;
 } & QnAAnswer;
 
 export type AppQnA = QnAQuestion & QnAAnswer;

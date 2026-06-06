@@ -135,9 +135,9 @@ const QnAAnswerSection = ({
 
     return questions.map((question): DraftQnAAnswer => {
       const qnaResult = qnaResults?.find((item) => item.id === question.id);
-      const matchedAnswer = qnaResult?.answers.find(
-        (answer) => answer.answererId === safeAnswererId
-      );
+      const matchedAnswer = qnaResult?.answers
+        .filter((answer) => answer.answererId === safeAnswererId)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
 
       return mapAnswerToDraft(question.id, matchedAnswer);
     });
@@ -248,7 +248,7 @@ export default QnAAnswerSection;
 
 const mapAnswerToDraft = (
   questionId: string,
-  answer?: AppQnAAnswer
+  answer?: AppQnAAnswer,
 ): DraftQnAAnswer => {
   if (!answer) {
     return {
